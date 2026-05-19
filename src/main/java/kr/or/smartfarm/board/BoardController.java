@@ -26,7 +26,7 @@ public class BoardController {
 	@RequestMapping(value = "/list", method = RequestMethod.GET)
 	@ResponseBody
 	public List<BoardDTO> list() {
-		System.out.println("/list ?��?��");
+		System.out.println("/list 실행");
 
 		List<BoardDTO> list = boardService.getBoardList();
 		System.out.println("BoardController: List: " + list);
@@ -34,10 +34,6 @@ public class BoardController {
 		return list;
 	}
 
-	@RequestMapping("go")
-	public String test() {
-		System.out.print("go들어옴");
-		return "home";
-	}
+
 
 }

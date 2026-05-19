@@ -1,0 +1,37 @@
+package kr.or.smartfarm.vender;
+
+import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+@Controller
+public class VenderController {
+
+	private static final Logger logger = LoggerFactory.getLogger(VenderController.class);
+	
+	@Autowired 
+	VenderService venderService;
+	
+	@RequestMapping("/vender")
+	public String vender() {
+		return "content/vender";
+	}
+	
+	@RequestMapping(value="/list", method= RequestMethod.GET)
+	@ResponseBody
+	public List<VenderDTO> list(){
+		System.out.println("/list 실행");
+		
+		List<VenderDTO> list = venderService.getVenderList(); 
+		System.out.println("VenderController: List:" + list);
+		
+		return list;
+	}
+	
+}
