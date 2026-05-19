@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.proj3.Proj3DAO.Proj3DAO">
+
+<!-- <select id="readEmp" resultType="kr.or.proj3.DTO.Proj3DTO"> -->
+<!--         SELECT  -->
+<!--             *         -->
+<!--         FROM test_emp -->
+<!--     </select> -->
+
+</mapper>
+
+
+
+
