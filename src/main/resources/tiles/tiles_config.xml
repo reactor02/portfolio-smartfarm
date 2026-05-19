@@ -12,7 +12,7 @@
 	</definition>
 	
 	<definition name="*" extends="baseLayout">
-    <put-attribute name="content" value="/WEB-INF/views/home.jsp" />
+    <put-attribute name="content" value="/WEB-INF/views/content/stockSelect.jsp" />
 </definition>
 
 <!-- 	<definition name="login" extends="baseLayout"> -->
