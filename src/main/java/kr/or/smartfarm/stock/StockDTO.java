@@ -6,10 +6,10 @@ import lombok.Data;
 @Data
 public class StockDTO {
 	
-	private int strockId;	//시퀀스
-	private int count; //개수
+	private int strock_id;	//시퀀스
+	private int stock_qty; //개수
 	
 
-	private int itemNum; // item시퀀스
+	private int item_num; // item시퀀스
 
 }

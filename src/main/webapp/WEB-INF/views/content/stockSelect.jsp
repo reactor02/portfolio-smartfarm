@@ -372,14 +372,13 @@ select.form-control {
 						<thead>
 							<tr>
 								<th style="width: 60px;">번호</th>
-								<th>자재코드</th>
-								<th>자재명(규격)</th>
+								<th>재고코드</th>
+								<th>재고명</th>
 								<th>현재고 수량</th>
-								<th>최근 입고일</th>
-								<th>유통기한</th>
-								<th>적정재고</th>
+								<th>안전재고 수량</th>
+								<th>단위</th>
+								<th>가용여부</th>
 								<th>보관위치</th>
-								<th>담당자</th>
 							</tr>
 						</thead>
 						<tbody>
@@ -388,14 +387,13 @@ select.form-control {
 									<c:forEach var="item" items="${stockList}" varStatus="vs">
 										<tr>
 											<td style="font-weight: bold; color: #555;">${vs.count}</td>
-											<td>${item.mCode}</td>
-											<td><a href="#" class="link-txt">${item.mName}</a></td>
-											<td>${item.qty}</td>
-											<td>${item.inDate}</td>
-											<td>${item.expDate}</td>
-											<td>${item.optQty}</td>
-											<td>${item.loc}</td>
-											<td>${item.mgr}</td>
+											<td>${item.code}</td>
+											<td><a href="#" class="link-txt">${item.Name}</a></td>
+											<td>${item.stock_qty}</td>
+											<td>${item.safe}</td>
+											<td>${item.unit}</td>
+											<td>${item.item_status}</td>
+											<td>${item.facility}</td>
 										</tr>
 									</c:forEach>
 								</c:when>
