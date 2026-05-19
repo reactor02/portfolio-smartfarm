@@ -1,21 +1,29 @@
 package kr.or.smartfarm.prod;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 
 @Controller
+@RequestMapping("/prod")
 public class ProdController {
 	
 	@Autowired
-	ProdService prodService;
+	ProdServiceImpl prodService;
 	
 	@RequestMapping("/list")
-	public String list (@RequestBody ProdSearchDTO searchDTO) {
-		System.out.println("∞Ò∞Ò");
-		//¿¸√º ≥ªøÎ¿Ã ø¿¥¬ ∞˜¿∏∑Œ ∏∏µÁ¥Ÿ
+	public String list (@ModelAttribute ProdPageDTO pageDTO, Model model) {
+		System.out.println("prodlist Ï†ëÏÜç");
+		List<ProdDTO> list = prodService.getList(pageDTO);
+		System.out.println("list Ïª®Ìä∏Î°§Îü¨ ÎèÑÏ∞©" + list);
+		model.addAttribute("list", list);
+		model.addAttribute("page", pageDTO);
+		
 		
 		
 		return "prod.tiles";

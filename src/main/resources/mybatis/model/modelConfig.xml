@@ -3,11 +3,16 @@
 	PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
 	"http://mybatis.org/dtd/mybatis-3-config.dtd">
 <configuration>
-
+	
 
     <settings>
         <setting name="jdbcTypeForNull" value="NULL" />
     </settings>
+    
+	<typeAliases>    
+        <typeAlias type="kr.or.smartfarm.prod.ProdDTO" alias="ProdDTO"/>    
+        <typeAlias type="kr.or.smartfarm.prod.ProdPageDTO" alias="ProdPageDTO"/>
+    </typeAliases>
     
       
 
