@@ -22,5 +22,5 @@ public class ProdDTO {
 	    // work_order sum�� ����
 	    private int currentqty;
 	    
-	    private int totalCount; 
+	    private int total_count; 
 }

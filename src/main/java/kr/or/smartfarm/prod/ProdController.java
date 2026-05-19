@@ -26,7 +26,7 @@ public class ProdController {
 		
 		
 		
-		return "prod.tiles";
+		return "content/prod.tiles";
 	}
 	
 }

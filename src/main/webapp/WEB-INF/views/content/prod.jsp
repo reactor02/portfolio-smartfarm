@@ -1,94 +1,167 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<link rel="stylesheet" href="${pageContext.request.contextPath}/static/css/prod/prodPlan.css">
+<%
+request.setCharacterEncoding("utf-8");
+response.setContentType("text/html; charset=utf-8");
+%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+<%@ taglib prefix="tiles" uri="http://tiles.apache.org/tags-tiles"%>
 
-<!-- ===== 생산계획 관리 (content 영역) ===== -->
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>생산계획 관리</title>
+<link rel="stylesheet" href="${pageContext.request.contextPath}/css/page.css">
+</head>
+<body>
 
-<!-- 페이지 타이틀 + 등록 버튼 -->
-<div class="page-header">
-    <h2 class="page-title">생산계획 관리</h2>
-    <button class="btn-register" onclick="location.href='#'">+ 등록 버튼</button>
-</div>
+	<div class="mat-all">
+		<tiles:insertAttribute name="header" ignore="true" />
 
-<!-- 검색 영역 -->
-<div class="search-box">
-    <div class="search-row">
-        <div class="search-group">
-            <span class="search-label">▶ 기간</span>
-            <input type="date" class="date-start" placeholder="YYYY-MM-DD">
-            <span class="search-tilde">~</span>
-            <input type="date" class="date-end" placeholder="YYYY-MM-DD">
-        </div>
-    </div>
-    <div class="search-row">
-        <div class="search-group">
-            <span class="search-label">▶ 시설</span>
-            <select class="select-box">
-                <option value="">전체</option>
-            </select>
-        </div>
-        <div class="search-group">
-            <span class="search-label">▶ 제품명</span>
-            <select class="select-box">
-                <option value="">전체</option>
-            </select>
-        </div>
-        <div class="search-group search-keyword-group">
-            <input type="text" class="input-keyword" placeholder="검색">
-            <button class="btn-search">검색</button>
-        </div>
-    </div>
-</div>
+		<div class="mat-body">
+			<main class="main-cont">
 
-<!-- 목록 테이블 -->
-<div class="table-wrap">
-    <table class="list-table">
-        <thead>
-            <tr>
-                <th>번호</th>
-                <th>계획번호</th>
-                <th>품목</th>
-                <th>계획수량</th>
-                <th>생산일자</th>
-                <th>생산마감</th>
-                <th>진행률</th>
-                <th>상태</th>
-                <th>시설</th>
-                <th>담당자</th>
-            </tr>
-        </thead>
-        <tbody id="planTableBody">
-            <%-- JSTL c:forEach로 데이터 출력 예시
-            <c:forEach var="plan" items="${planList}" varStatus="vs">
-            <tr>
-                <td>${vs.count}</td>
-                <td>${plan.planNo}</td>
-                <td>${plan.itemName}</td>
-                <td>${plan.planQty}</td>
-                <td>${plan.startDate}</td>
-                <td>${plan.endDate}</td>
-                <td>${plan.progress}%</td>
-                <td>${plan.status}</td>
-                <td>${plan.facility}</td>
-                <td>${plan.manager}</td>
-            </tr>
-            </c:forEach>
-            --%>
-            <!-- 데이터 없을 때 빈 행 -->
-            <tr class="empty-row"><td colspan="10">데이터가 없습니다.</td></tr>
-        </tbody>
-    </table>
-</div>
+				<!-- 타이틀 & 등록 버튼 -->
+				<div class="hdr">
+					<h1>생산계획 관리</h1>
+					<button type="button" class="btn-reg">+ 등록하기</button>
+				</div>
 
-<!-- 페이지네이션 -->
-<div class="pagination">
-    <a href="#" class="page-btn">이전</a>
-    <a href="#" class="page-num active">1</a>
-    <a href="#" class="page-num">2</a>
-    <a href="#" class="page-num">3</a>
-    <a href="#" class="page-num">4</a>
-    <a href="#" class="page-num">5</a>
-    <a href="#" class="page-btn">다음</a>
-</div>
+				<!-- 검색 폼 -->
+				<form name="searchFrm" action="/prod/list" method="get">
+					<div class="sch-wrap">
+						<div class="sch-row">
+							<div class="sch-left">
+								<span class="label">▶ 기간</span>
+								<input type="date" name="startDate" id="startDate"
+									value="${param.startDate}" class="form-control"
+									onchange="validateDate()">
+								<span style="font-weight: bold; color: #666;">~</span>
+								<input type="date" name="endDate" id="endDate"
+									value="${param.endDate}" class="form-control"
+									onchange="validateDate()">
+							</div>
+						</div>
 
-<script src="${pageContext.request.contextPath}/static/js/prod/prodPlan.js"></script>
+						<div class="sch-row">
+							<div class="sch-left">
+								<span class="label">▶ 시설</span>
+								<select name="searchType" class="form-control">
+									<option value="">선택</option>
+									<option value="facility_name" ${param.searchType == 'facility_name' ? 'selected' : ''}>시설명</option>
+									<option value="ename"         ${param.searchType == 'ename'         ? 'selected' : ''}>담당자</option>
+									<option value="plan_status"   ${param.searchType == 'plan_status'   ? 'selected' : ''}>상태</option>
+								</select>
+
+								<span class="label" style="margin-left: 15px;">▶ 제품명</span>
+								<select name="itemFilter" class="form-control">
+									<option value="">선택</option>
+								</select>
+							</div>
+
+							<div class="sch-right">
+								<div class="sch-input-box">
+									<span style="color: #888;">&#128269;</span>
+									<input type="text" name="keyword" value="${param.keyword}" placeholder="검색">
+								</div>
+								<button type="submit" class="btn-sch">검색</button>
+							</div>
+						</div>
+					</div>
+				</form>
+
+				<!-- 테이블 -->
+				<div class="tbl-box">
+					<table class="stk-tbl">
+						<thead>
+							<tr>
+								<th style="width: 60px;">번호</th>
+								<th>계획번호</th>
+								<th>품목</th>
+								<th>계획수량</th>
+								<th>생산일자</th>
+								<th>생산마감</th>
+								<th>진행률</th>
+								<th>상태</th>
+								<th>시설</th>
+								<th>담당자</th>
+							</tr>
+						</thead>
+						<tbody>
+							<c:choose>
+								<c:when test="${not empty list}">
+									<c:forEach var="prod" items="${list}" varStatus="vs">
+										<tr>
+											<td style="font-weight: bold; color: #555;">
+												${page.totalCount - (page.page - 1) * page.size - vs.count + 1}
+											</td>
+											<td><a href="/prod/detail?planNum=${prod.plan_num}" class="link-txt">${prod.plan_num}</a></td>
+											<td>${prod.item_num}</td>
+											<td>${prod.plan_qty}</td>
+											<td>${prod.plan_start}</td>
+											<td>${prod.plan_end}</td>
+											<td>
+												<fmt:formatNumber
+													value="${prod.plan_qty > 0 ? (prod.currentqty / prod.plan_qty) * 100 : 0}"
+													maxFractionDigits="1"/>%
+											</td>
+											<td>${prod.plan_status}</td>
+											<td>${prod.facility_name}</td>
+											<td>${prod.ename}</td>
+										</tr>
+									</c:forEach>
+								</c:when>
+								<c:otherwise>
+									<c:forEach var="i" begin="1" end="5">
+										<tr>
+											<td style="font-weight: bold; color: #888;">${i}</td>
+											<td></td><td></td><td></td><td></td>
+											<td></td><td></td><td></td><td></td><td></td>
+										</tr>
+									</c:forEach>
+								</c:otherwise>
+							</c:choose>
+						</tbody>
+					</table>
+				</div>
+
+				<!-- 페이지네이션 -->
+				<div class="pg-wrap">
+					<c:if test="${page.startPage > 1}">
+						<a href="/prod/list?page=${page.startPage - 1}&searchType=${param.searchType}&keyword=${param.keyword}"
+						   class="pg-btn">이전</a>
+					</c:if>
+
+					<c:forEach begin="${page.startPage}" end="${page.endPage}" var="p">
+						<a href="/prod/list?page=${p}&searchType=${param.searchType}&keyword=${param.keyword}"
+						   class="pg-btn ${page.page == p ? 'pg-active' : ''}">${p}</a>
+					</c:forEach>
+
+					<c:if test="${page.endPage < page.totalPages}">
+						<a href="/prod/list?page=${page.endPage + 1}&searchType=${param.searchType}&keyword=${param.keyword}"
+						   class="pg-btn">다음</a>
+					</c:if>
+				</div>
+
+			</main>
+		</div>
+
+		<tiles:insertAttribute name="footer" ignore="true" />
+	</div>
+
+	<script>
+		function validateDate() {
+			const start = document.getElementById('startDate').value;
+			const end   = document.getElementById('endDate').value;
+			if (start && end && start > end) {
+				alert("시작 날짜는 종료 날짜보다 이후일 수 없습니다.");
+				document.getElementById('endDate').value = "";
+			}
+		}
+	</script>
+
+</body>
+</html>

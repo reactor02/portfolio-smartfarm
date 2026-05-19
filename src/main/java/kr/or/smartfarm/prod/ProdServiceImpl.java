@@ -23,7 +23,7 @@ public class ProdServiceImpl implements ProdService {
 
         // 첫 번째 행에서 전체 건수 꺼내서 PageDTO로 이동
         if (list != null && !list.isEmpty()) {
-            int totalCount = list.get(0).getTotalCount();
+            int totalCount = list.get(0).getTotal_count();
             page.setTotalCount(totalCount);
 
             // 전체 페이지 수 계산
