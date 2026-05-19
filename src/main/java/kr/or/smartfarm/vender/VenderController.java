@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
+@RequestMapping("/vender")
 public class VenderController {
 
 	private static final Logger logger = LoggerFactory.getLogger(VenderController.class);
@@ -18,7 +19,7 @@ public class VenderController {
 	@Autowired 
 	VenderService venderService;
 	
-	@RequestMapping("/vender")
+	@RequestMapping("")
 	public String vender() {
 		return "content/vender";
 	}

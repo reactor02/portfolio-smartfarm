@@ -19,6 +19,9 @@
 <!--     <put-attribute name="content" value="/WEB-INF/views/login.jsp" /> -->
 <!-- </definition> -->
 	
+	  <definition name="board/*" extends="baseLayout"> 
+    <put-attribute name="content" value="/WEB-INF/views/board/{1}.jsp" /> 
+ </definition>
 	
 	
 	
