@@ -313,17 +313,19 @@ select.form-control {
 					<div class="sch-wrap">
 						<div class="sch-row">
 							<div class="sch-left">
-								<span class="label">▶ 유통기한</span> <input type="date" name="sDate"
-									id="sDate" value="${param.sDate}" class="form-control"
-									onchange="validateDate()"> <span
+								<span class="label">▶ 유통기한</span> <input type="date"
+									name="sDate" id="sDate" value="${param.sDate}"
+									class="form-control" onchange="validateDate()"> <span
 									style="font-weight: bold; color: #666;">~</span> <input
 									type="date" name="eDate" id="eDate" value="${param.eDate}"
 									class="form-control" onchange="validateDate()">
 							</div>
 							<div class="sch-right">
 								<label class="radio-label"> <input type="radio"
-									name="io" value="in"
-									${empty param.io or param.io == 'in' ? 'checked' : ''}>
+									name="io" value="" ${empty param.io ? 'checked' : ''}>
+									전체
+								</label> <label class="radio-label"> <input type="radio"
+									name="io" value="in" ${param.io == 'in' ? 'checked' : ''}>
 									입고
 								</label> <label class="radio-label"> <input type="radio"
 									name="io" value="out" ${param.io == 'out' ? 'checked' : ''}>
@@ -334,23 +336,21 @@ select.form-control {
 
 						<div class="sch-row">
 							<div class="sch-left">
-								<span class="label">▶ 자재유형</span>
-								 <select name="mType" class="form-control">
+								<span class="label">▶ 자재유형</span> <select name="mType"
+									class="form-control">
 									<option value="">선택</option>
 									<option value="production"
-										${param.mType == 'production' ? 'selected' : ''}>생산/배양자재</option>
+										${param.mType == 'production' ? 'selected' : ''}>설비</option>
 									<option value="facility"
-										${param.mType == 'facility' ? 'selected' : ''}>시설/용기류</option>
+										${param.mType == 'facility' ? 'selected' : ''}>제품</option>
 									<option value="packaging"
-										${param.mType == 'packaging' ? 'selected' : ''}>포장/출하재</option>
-									<option value="etc" ${param.mType == 'etc' ? 'selected' : ''}>기타
-										소모품</option>
-								</select>
-								
-								 <span class="label" style="margin-left: 15px;">▶ 재고상태</span> 
-								 <select name="sStat" class="form-control">
+										${param.mType == 'packaging' ? 'selected' : ''}>반제품</option>
+									<option value="etc" ${param.mType == 'etc' ? 'selected' : ''}>재료</option>
+								</select> <span class="label" style="margin-left: 15px;">▶ 재고상태</span> <select
+									name="sStat" class="form-control">
 									<option value="">선택</option>
-									<option value="good" ${param.sStat == 'normal' ? 'selected' : ''}>정상</option>
+									<option value="good"
+										${param.sStat == 'normal' ? 'selected' : ''}>정상</option>
 									<option value="bad" ${param.sStat == 'low' ? 'selected' : ''}>수량부족</option>
 									<option value="bad" ${param.sStat == 'alert' ? 'selected' : ''}>사용불가</option>
 								</select>
