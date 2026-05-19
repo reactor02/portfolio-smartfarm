@@ -42,4 +42,12 @@ public class ProdServiceImpl implements ProdService {
 
         return list;
     }
+	
+	public List<SelectOptionDTO> getFacilityOptions() {
+	    return dao.getFacilityOptions();
+	}
+
+	public List<SelectOptionDTO> getItemOptions() {
+	    return dao.getItemOptions();
+	}
 }

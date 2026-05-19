@@ -29,5 +29,17 @@
     WHERE ROWNUM BETWEEN #{startRow} AND #{endRow}
 </select>
 
+<!-- 시설 드롭다운 옵션 조회 -->
+<select id="getFacilityOptions" resultType="SelectOptionDTO">
+    SELECT facility_num AS num, facility_name AS name
+    FROM facility
+</select>
+
+<!-- 제품 드롭다운 옵션 조회 -->
+<select id="getItemOptions" resultType="SelectOptionDTO">
+    SELECT item_num AS num, name AS name
+    FROM item
+</select>
+
 
 </mapper>

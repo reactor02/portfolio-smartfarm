@@ -17,16 +17,19 @@ public class ProdController {
 	ProdServiceImpl prodService;
 	
 	@RequestMapping("/list")
-	public String list (@ModelAttribute ProdPageDTO pageDTO, Model model) {
-		System.out.println("prodlist 접속");
+	public String list(@ModelAttribute ProdPageDTO pageDTO, Model model) {
+	   System.out.println("prod/list 접속");
+		
 		List<ProdDTO> list = prodService.getList(pageDTO);
-		System.out.println("list 컨트롤러 도착" + list);
-		model.addAttribute("list", list);
-		model.addAttribute("page", pageDTO);
-		
-		
-		
-		return "content/prod.tiles";
+	    List<SelectOptionDTO> facilityList = prodService.getFacilityOptions();
+	    List<SelectOptionDTO> itemList     = prodService.getItemOptions();
+
+	    model.addAttribute("list",         list);
+	    model.addAttribute("page",         pageDTO);
+	    model.addAttribute("facilityList", facilityList);
+	    model.addAttribute("itemList",     itemList);
+
+	    return "content/prod.tiles";
 	}
 	
 }

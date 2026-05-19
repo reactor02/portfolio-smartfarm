@@ -18,6 +18,14 @@ public class ProdDAOImpl implements ProdDAO  {
 		 System.out.println("list 돌려받기" + list);
 	        return list;
 	    }
+	 @Override
+	 public List<SelectOptionDTO> getFacilityOptions() {
+		    return session.selectList("kr.or.smartfarm.prod.getFacilityOptions");
+		}
+	 	@Override
+		public List<SelectOptionDTO> getItemOptions() {
+		    return session.selectList("kr.or.smartfarm.prod.getItemOptions");
+		}
 	 
 
 	 
