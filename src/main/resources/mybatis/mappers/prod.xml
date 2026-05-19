@@ -1,45 +1,54 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper
-	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="kr.or.smartfarm.prod">
 
- <select id="getList" parameterType="ProdPageDTO" resultType="ProdDTO">
-    SELECT plan_num, plan_qty, plan_status, plan_start, plan_end,
-           emp_num,
-            COUNT(*) OVER() AS total_count
-    FROM (
+    <!-- 목록 + 전체 건수 한 번에 조회 -->
+    <select id="getList" parameterType="ProdPageDTO" resultType="ProdDTO">
         SELECT plan_num, plan_qty, plan_status, plan_start, plan_end,
-               emp_num, item_num
-        FROM production_plan
-        <where>
-            <if test="keyword != null and keyword != ''">
-                <choose>
-                    <when test="searchType == 'plan_num'">
-                        AND plan_num LIKE '%' || #{keyword} || '%'
-                    </when>
-                    <when test="searchType == 'ename'">
-                        AND ename LIKE '%' || #{keyword} || '%'
-                    </when>
-                </choose>
-            </if>
-        </where>
-        ORDER BY plan_num DESC
-    )
-    WHERE ROWNUM BETWEEN #{startRow} AND #{endRow}
-</select>
+               emp_num, item_num, 
+               COUNT(*) OVER() AS total_count
+        FROM (
+            SELECT plan_num, plan_qty, plan_status, plan_start, plan_end,
+                   emp_num, item_num 
+            FROM production_plan
+            <where>
+                <!-- 기간 검색 -->
+                <if test="startDate != null and startDate != ''">
+                    AND plan_start >= TO_DATE(#{startDate}, 'YYYY-MM-DD')
+                </if>
+                <if test="endDate != null and endDate != ''">
+                    AND plan_end &lt;= TO_DATE(#{endDate}, 'YYYY-MM-DD')
+                </if>
+                <!-- 시설 필터 -->
+                <if test="facility_num != 0">
+                    AND facility_num = #{facility_num}
+                </if>
+                <!-- 제품 필터 -->
+                <if test="item_num != 0">
+                    AND item_num = #{item_num}
+                </if>
+                <!-- 계획번호 키워드 검색 -->
+                <if test="keyword != null and keyword != ''">
+                    AND TO_CHAR(plan_num) LIKE '%' || #{keyword} || '%'
+                </if>
+            </where>
+            ORDER BY plan_num DESC
+        )
+        WHERE ROWNUM BETWEEN #{startRow} AND #{endRow}
+    </select>
 
-<!-- 시설 드롭다운 옵션 조회 -->
-<select id="getFacilityOptions" resultType="SelectOptionDTO">
-    SELECT facility_num AS num, facility_name AS name
-    FROM facility
-</select>
+    <!-- 시설 드롭다운 옵션 조회 -->
+    <select id="getFacilityOptions" resultType="SelectOptionDTO">
+        SELECT facility_num AS num, facility_name AS name
+        FROM facility
+    </select>
 
-<!-- 제품 드롭다운 옵션 조회 -->
-<select id="getItemOptions" resultType="SelectOptionDTO">
-    SELECT item_num AS num, name AS name
-    FROM item
-</select>
-
+    <!-- 제품 드롭다운 옵션 조회 -->
+    <select id="getItemOptions" resultType="SelectOptionDTO">
+        SELECT item_num AS num, name AS name
+        FROM item
+    </select>
 
 </mapper>

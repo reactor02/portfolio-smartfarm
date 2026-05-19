@@ -15,6 +15,9 @@ public class ProdPageDTO {
     private int endPage;
     private int blockSize = 10;
     
+    private String startDate = "";
+    private String endDate = "";
+    private int facility_num;
+    private int item_num;
     private String keyword = "";
-  	private String searchType = "";
 }
