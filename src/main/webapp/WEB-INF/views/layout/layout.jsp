@@ -37,6 +37,8 @@
         .cont { flex: 1; padding: 2rem; background-color: #FFF; }
         .ftr { text-align: center; padding: 1rem 0; background-color: #EEE; font-size: 0.8rem; color: #777; margin-top: auto; }
     </style>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/page.css">
+    
 </head>
 <body>
 <div class="mat-all">
