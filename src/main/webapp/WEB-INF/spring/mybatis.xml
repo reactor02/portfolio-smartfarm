@@ -26,6 +26,18 @@
 		<property name="dataSource" ref="dataSource"></property>
 		<property name="configLocation" value="classpath:mybatis/model/modelConfig.xml"></property>
 		<property name="mapperLocations" value="classpath:mybatis/mappers/*.xml"></property> 
+		<property name="plugins">
+        <array>
+            <bean class="com.github.pagehelper.PageInterceptor">
+                <property name="properties">
+                    <value>
+                        helperDialect=oracle
+                        reasonable=true
+                    </value>
+                </property>
+            </bean>
+        </array>
+    </property>
 	</bean>
 
 	<bean id="sqlSession" class="org.mybatis.spring.SqlSessionTemplate">

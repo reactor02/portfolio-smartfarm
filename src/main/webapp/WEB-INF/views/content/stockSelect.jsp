@@ -383,17 +383,17 @@ select.form-control {
 						</thead>
 						<tbody>
 							<c:choose>
-								<c:when test="${not empty stockList}">
-									<c:forEach var="item" items="${stockList}" varStatus="vs">
+								<c:when test="${not empty result}">
+									<c:forEach var="item" items="${result}" varStatus="vs">
 										<tr>
 											<td style="font-weight: bold; color: #555;">${vs.count}</td>
-											<td>${item.code}</td>
-											<td><a href="#" class="link-txt">${item.Name}</a></td>
-											<td>${item.stock_qty}</td>
-											<td>${item.safe}</td>
-											<td>${item.unit}</td>
-											<td>${item.item_status}</td>
-											<td>${item.facility}</td>
+											<td>${item.CODE}</td>
+											<td><a href="#" class="link-txt">${item.NAME}</a></td>
+											<td>${item.STOCK_QTY}</td>
+											<td>${item.SAFE}</td>
+											<td>${item.UNIT}</td>
+											<td>${item.ITEM_STATUS}</td>
+											<td>${item.FACILITY_NAME}</td>
 										</tr>
 									</c:forEach>
 								</c:when>
@@ -417,11 +417,10 @@ select.form-control {
 					</table>
 				</div>
 
-				<div class="pg-wrap">
-					<a href="#" class="pg-btn">이전</a> <a href="#"
-						class="pg-btn pg-active">1</a> <a href="#" class="pg-btn">2</a> <a
-						href="#" class="pg-btn">3</a> <a href="#" class="pg-btn">다음</a>
-				</div>
+				<div class="table-responsive">
+    </div>
+
+<jsp:include page="/WEB-INF/views/common/paging.jsp" />
 			</main>
 		</div>
 

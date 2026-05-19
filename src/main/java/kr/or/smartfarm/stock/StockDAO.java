@@ -4,5 +4,5 @@ import java.util.List;
 
 public interface StockDAO {
 	
-	public List selectAll2(); 
+	public List selectAll2(int pageNum); 
 }

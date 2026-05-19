@@ -16,7 +16,7 @@
         f.facility_name
         FROM stock s
         JOIN item i ON s.item_num = i.item_num
-        JOIN facility f ON i.facility_name = f.facility_name; 
+        JOIN facility f ON f.facility_num = i.facility_num 
     </select>
 
 </mapper>

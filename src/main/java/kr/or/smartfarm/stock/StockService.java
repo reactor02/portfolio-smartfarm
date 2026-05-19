@@ -4,5 +4,5 @@ import java.util.List;
 
 public interface StockService {
 
-	public List selectAll();
+	public List selectAll(int pageNum);
 }

@@ -11,10 +11,10 @@ public class StockServiceImpl implements StockService{
 	@Autowired
 	StockDAO stockDAO;
 	
-	public List selectAll() {
+	public List selectAll(int pageNum) {
 		List result = null;
 		
-		result = stockDAO.selectAll2();
+		result = stockDAO.selectAll2(pageNum);
 		
 		return result;
 	}
