@@ -1,5 +1,8 @@
 package kr.or.smartfarm.stock;
 
-public interface StockDAO {
+import java.util.List;
 
+public interface StockDAO {
+	
+	public List selectAll2(int pageNum); 
 }

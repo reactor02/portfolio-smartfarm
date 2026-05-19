@@ -372,30 +372,28 @@ select.form-control {
 						<thead>
 							<tr>
 								<th style="width: 60px;">번호</th>
-								<th>자재코드</th>
-								<th>자재명(규격)</th>
+								<th>재고코드</th>
+								<th>재고명</th>
 								<th>현재고 수량</th>
-								<th>최근 입고일</th>
-								<th>유통기한</th>
-								<th>적정재고</th>
+								<th>안전재고 수량</th>
+								<th>단위</th>
+								<th>가용여부</th>
 								<th>보관위치</th>
-								<th>담당자</th>
 							</tr>
 						</thead>
 						<tbody>
 							<c:choose>
-								<c:when test="${not empty stockList}">
-									<c:forEach var="item" items="${stockList}" varStatus="vs">
+								<c:when test="${not empty result}">
+									<c:forEach var="item" items="${result}" varStatus="vs">
 										<tr>
 											<td style="font-weight: bold; color: #555;">${vs.count}</td>
-											<td>${item.mCode}</td>
-											<td><a href="#" class="link-txt">${item.mName}</a></td>
-											<td>${item.qty}</td>
-											<td>${item.inDate}</td>
-											<td>${item.expDate}</td>
-											<td>${item.optQty}</td>
-											<td>${item.loc}</td>
-											<td>${item.mgr}</td>
+											<td>${item.CODE}</td>
+											<td><a href="#" class="link-txt">${item.NAME}</a></td>
+											<td>${item.STOCK_QTY}</td>
+											<td>${item.SAFE}</td>
+											<td>${item.UNIT}</td>
+											<td>${item.ITEM_STATUS}</td>
+											<td>${item.FACILITY_NAME}</td>
 										</tr>
 									</c:forEach>
 								</c:when>
@@ -419,11 +417,10 @@ select.form-control {
 					</table>
 				</div>
 
-				<div class="pg-wrap">
-					<a href="#" class="pg-btn">이전</a> <a href="#"
-						class="pg-btn pg-active">1</a> <a href="#" class="pg-btn">2</a> <a
-						href="#" class="pg-btn">3</a> <a href="#" class="pg-btn">다음</a>
-				</div>
+				<div class="table-responsive">
+    </div>
+
+<jsp:include page="/WEB-INF/views/common/paging.jsp" />
 			</main>
 		</div>
 

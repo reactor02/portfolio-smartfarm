@@ -11,11 +11,18 @@ public class ProdDTO {
 	    private String plan_status;
 	    private Date plan_start;
 	    private Date plan_end;
-	    private int emp_num;
+
+	   
+	   
+//	    품목이름
 	    private int item_num;
+	    private String item_name;
+	    
+//	    사원이름
+	    private int emp_num;
 	    private String ename;
 	    
-	    
+//	    시설 모음
 	    private int facility_num;
 	    private String facility_name;
 	

@@ -1,4 +1,5 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
 <%
 request.setCharacterEncoding("utf-8");
 response.setContentType("text/html; charset=utf-8");
@@ -35,12 +36,11 @@ response.setContentType("text/html; charset=utf-8");
 					<div class="sch-wrap">
 						<div class="sch-row">
 							<div class="sch-left">
-								<span class="label">▶ 기간</span>
-								<input type="date" name="startDate" id="startDate"
-									value="${param.startDate}" class="form-control"
-									onchange="validateDate()">
-								<span style="font-weight: bold; color: #666;">~</span>
-								<input type="date" name="endDate" id="endDate"
+								<span class="label">▶ 기간</span> <input type="date"
+									name="startDate" id="startDate" value="${param.startDate}"
+									class="form-control" onchange="validateDate()"> <span
+									style="font-weight: bold; color: #666;">~</span> <input
+									type="date" name="endDate" id="endDate"
 									value="${param.endDate}" class="form-control"
 									onchange="validateDate()">
 							</div>
@@ -48,24 +48,27 @@ response.setContentType("text/html; charset=utf-8");
 
 						<div class="sch-row">
 							<div class="sch-left">
-								<span class="label">▶ 시설</span>
-								<select name="searchType" class="form-control">
-									<option value="">선택</option>
-									<option value="facility_name" ${param.searchType == 'facility_name' ? 'selected' : ''}>시설명</option>
-									<option value="ename"         ${param.searchType == 'ename'         ? 'selected' : ''}>담당자</option>
-									<option value="plan_status"   ${param.searchType == 'plan_status'   ? 'selected' : ''}>상태</option>
-								</select>
-
-								<span class="label" style="margin-left: 15px;">▶ 제품명</span>
-								<select name="itemFilter" class="form-control">
-									<option value="">선택</option>
+								<span class="label">▶ 시설</span> <select name="facility_num"
+									class="form-control">
+									<option value="0">선택</option>
+									<c:forEach var="f" items="${facilityList}">
+										<option value="${f.num}"
+											${param.facility_num == f.num ? 'selected' : ''}>${f.name}</option>
+									</c:forEach>
+								</select> <span class="label" style="margin-left: 15px;">▶ 제품명</span> <select
+									name="item_num" class="form-control">
+									<option value="0">선택</option>
+									<c:forEach var="i" items="${itemList}">
+										<option value="${i.num}"
+											${param.item_num == i.num ? 'selected' : ''}>${i.name}</option>
+									</c:forEach>
 								</select>
 							</div>
 
 							<div class="sch-right">
 								<div class="sch-input-box">
-									<span style="color: #888;">&#128269;</span>
-									<input type="text" name="keyword" value="${param.keyword}" placeholder="검색">
+									<span style="color: #888;">&#128269;</span> <input type="text"
+										name="keyword" value="${param.keyword}" placeholder="검색">
 								</div>
 								<button type="submit" class="btn-sch">검색</button>
 							</div>
@@ -98,16 +101,15 @@ response.setContentType("text/html; charset=utf-8");
 											<td style="font-weight: bold; color: #555;">
 												${page.totalCount - (page.page - 1) * page.size - vs.count + 1}
 											</td>
-											<td><a href="/prod/detail?planNum=${prod.plan_num}" class="link-txt">${prod.plan_num}</a></td>
-											<td>${prod.item_num}</td>
+											<td><a href="/prod/detail?planNum=${prod.plan_num}"
+												class="link-txt">${prod.plan_num}</a></td>
+											<td>${prod.item_name}</td>
 											<td>${prod.plan_qty}</td>
 											<td>${prod.plan_start}</td>
 											<td>${prod.plan_end}</td>
-											<td>
-												<fmt:formatNumber
+											<td><fmt:formatNumber
 													value="${prod.plan_qty > 0 ? (prod.currentqty / prod.plan_qty) * 100 : 0}"
-													maxFractionDigits="1"/>%
-											</td>
+													maxFractionDigits="1" />%</td>
 											<td>${prod.plan_status}</td>
 											<td>${prod.facility_name}</td>
 											<td>${prod.ename}</td>
@@ -118,8 +120,15 @@ response.setContentType("text/html; charset=utf-8");
 									<c:forEach var="i" begin="1" end="5">
 										<tr>
 											<td style="font-weight: bold; color: #888;">${i}</td>
-											<td></td><td></td><td></td><td></td>
-											<td></td><td></td><td></td><td></td><td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
 										</tr>
 									</c:forEach>
 								</c:otherwise>
@@ -131,18 +140,18 @@ response.setContentType("text/html; charset=utf-8");
 				<!-- 페이지네이션 -->
 				<div class="pg-wrap">
 					<c:if test="${page.startPage > 1}">
-						<a href="/prod/list?page=${page.startPage - 1}&searchType=${param.searchType}&keyword=${param.keyword}"
-						   class="pg-btn">이전</a>
+						<a href="/prod/list?page=${page.startPage - 1}&startDate=${param.startDate}&endDate=${param.endDate}&facility_num=${param.facility_num}&item_num=${param.item_num}&keyword=${param.keyword}"
+							class="pg-btn">이전</a>
 					</c:if>
 
 					<c:forEach begin="${page.startPage}" end="${page.endPage}" var="p">
-						<a href="/prod/list?page=${p}&searchType=${param.searchType}&keyword=${param.keyword}"
-						   class="pg-btn ${page.page == p ? 'pg-active' : ''}">${p}</a>
+						<a href="/prod/list?page=${p}&startDate=${param.startDate}&endDate=${param.endDate}&facility_num=${param.facility_num}&item_num=${param.item_num}&keyword=${param.keyword}"
+							class="pg-btn ${page.page == p ? 'pg-active' : ''}">${p}</a>
 					</c:forEach>
 
 					<c:if test="${page.endPage < page.totalPages}">
-						<a href="/prod/list?page=${page.endPage + 1}&searchType=${param.searchType}&keyword=${param.keyword}"
-						   class="pg-btn">다음</a>
+						<a href="/prod/list?page=${page.endPage + 1}&startDate=${param.startDate}&endDate=${param.endDate}&facility_num=${param.facility_num}&item_num=${param.item_num}&keyword=${param.keyword}"
+							class="pg-btn">다음</a>
 					</c:if>
 				</div>
 
@@ -155,7 +164,7 @@ response.setContentType("text/html; charset=utf-8");
 	<script>
 		function validateDate() {
 			const start = document.getElementById('startDate').value;
-			const end   = document.getElementById('endDate').value;
+			const end = document.getElementById('endDate').value;
 			if (start && end && start > end) {
 				alert("시작 날짜는 종료 날짜보다 이후일 수 없습니다.");
 				document.getElementById('endDate').value = "";
