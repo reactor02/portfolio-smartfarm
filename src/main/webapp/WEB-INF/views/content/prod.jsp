@@ -48,19 +48,19 @@ response.setContentType("text/html; charset=utf-8");
 
 						<div class="sch-row">
 							<div class="sch-left">
-								<span class="label">▶ 시설</span> <select name="facilityNum"
+								<span class="label">▶ 시설</span> <select name="facility_num"
 									class="form-control">
-									<option value="">선택</option>
+									<option value="0">선택</option>
 									<c:forEach var="f" items="${facilityList}">
 										<option value="${f.num}"
-											${param.facilityNum == f.num ? 'selected' : ''}>${f.name}</option>
+											${param.facility_num == f.num ? 'selected' : ''}>${f.name}</option>
 									</c:forEach>
 								</select> <span class="label" style="margin-left: 15px;">▶ 제품명</span> <select
-									name="itemNum" class="form-control">
-									<option value="">선택</option>
+									name="item_num" class="form-control">
+									<option value="0">선택</option>
 									<c:forEach var="i" items="${itemList}">
 										<option value="${i.num}"
-											${param.itemNum == i.num ? 'selected' : ''}>${i.name}</option>
+											${param.item_num == i.num ? 'selected' : ''}>${i.name}</option>
 									</c:forEach>
 								</select>
 							</div>
@@ -140,20 +140,17 @@ response.setContentType("text/html; charset=utf-8");
 				<!-- 페이지네이션 -->
 				<div class="pg-wrap">
 					<c:if test="${page.startPage > 1}">
-						<a
-							href="/prod/list?page=${page.startPage - 1}&searchType=${param.searchType}&keyword=${param.keyword}"
+						<a href="/prod/list?page=${page.startPage - 1}&startDate=${param.startDate}&endDate=${param.endDate}&facility_num=${param.facility_num}&item_num=${param.item_num}&keyword=${param.keyword}"
 							class="pg-btn">이전</a>
 					</c:if>
 
 					<c:forEach begin="${page.startPage}" end="${page.endPage}" var="p">
-						<a
-							href="/prod/list?page=${p}&searchType=${param.searchType}&keyword=${param.keyword}"
+						<a href="/prod/list?page=${p}&startDate=${param.startDate}&endDate=${param.endDate}&facility_num=${param.facility_num}&item_num=${param.item_num}&keyword=${param.keyword}"
 							class="pg-btn ${page.page == p ? 'pg-active' : ''}">${p}</a>
 					</c:forEach>
 
 					<c:if test="${page.endPage < page.totalPages}">
-						<a
-							href="/prod/list?page=${page.endPage + 1}&searchType=${param.searchType}&keyword=${param.keyword}"
+						<a href="/prod/list?page=${page.endPage + 1}&startDate=${param.startDate}&endDate=${param.endDate}&facility_num=${param.facility_num}&item_num=${param.item_num}&keyword=${param.keyword}"
 							class="pg-btn">다음</a>
 					</c:if>
 				</div>

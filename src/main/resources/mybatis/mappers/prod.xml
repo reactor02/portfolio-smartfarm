@@ -7,36 +7,50 @@
     <!-- 목록 + 전체 건수 한 번에 조회 -->
     <select id="getList" parameterType="ProdPageDTO" resultType="ProdDTO">
         SELECT plan_num, plan_qty, plan_status, plan_start, plan_end,
-               emp_num, item_num, 
-               COUNT(*) OVER() AS total_count
+               emp_num, item_num, item_name, ename,
+               facility_num, facility_name, currentqty, total_count
         FROM (
-            SELECT plan_num, plan_qty, plan_status, plan_start, plan_end,
-                   emp_num, item_num 
-            FROM production_plan
-            <where>
-                <!-- 기간 검색 -->
-                <if test="startDate != null and startDate != ''">
-                    AND plan_start >= TO_DATE(#{startDate}, 'YYYY-MM-DD')
-                </if>
-                <if test="endDate != null and endDate != ''">
-                    AND plan_end &lt;= TO_DATE(#{endDate}, 'YYYY-MM-DD')
-                </if>
-                <!-- 시설 필터 -->
-                <if test="facility_num != 0">
-                    AND facility_num = #{facility_num}
-                </if>
-                <!-- 제품 필터 -->
-                <if test="item_num != 0">
-                    AND item_num = #{item_num}
-                </if>
-                <!-- 계획번호 키워드 검색 -->
-                <if test="keyword != null and keyword != ''">
-                    AND TO_CHAR(plan_num) LIKE '%' || #{keyword} || '%'
-                </if>
-            </where>
-            ORDER BY plan_num DESC
+            SELECT inner_q.*, ROWNUM AS rn
+            FROM (
+                SELECT pp.plan_num, pp.plan_qty, pp.plan_status, pp.plan_start, pp.plan_end,
+                       pp.emp_num, pp.item_num,
+                       i.name            AS item_name,
+                       e.ename,
+                       f.facility_num,
+                       f.facility_name,
+                       NVL(wo.currentqty, 0) AS currentqty,
+                       COUNT(*) OVER()   AS total_count
+                FROM production_plan pp
+                LEFT JOIN item     i ON pp.item_num    = i.item_num
+                LEFT JOIN emp      e ON pp.emp_num     = e.emp_num
+                LEFT JOIN facility f ON i.facility_num = f.facility_num
+                LEFT JOIN (
+                    SELECT plan_num, SUM(current_qty) AS currentqty
+                    FROM work_order
+                    GROUP BY plan_num
+                ) wo ON pp.plan_num = wo.plan_num
+                <where>
+                    <if test="startDate != null and startDate != ''">
+                        AND pp.plan_start >= TO_DATE(#{startDate}, 'YYYY-MM-DD')
+                    </if>
+                    <if test="endDate != null and endDate != ''">
+                        AND pp.plan_end &lt;= TO_DATE(#{endDate}, 'YYYY-MM-DD')
+                    </if>
+                    <if test="facility_num != 0">
+                        AND f.facility_num = #{facility_num}
+                    </if>
+                    <if test="item_num != 0">
+                        AND pp.item_num = #{item_num}
+                    </if>
+                    <if test="keyword != null and keyword != ''">
+                        AND TO_CHAR(pp.plan_num) LIKE '%' || #{keyword} || '%'
+                    </if>
+                </where>
+                ORDER BY pp.plan_num DESC
+            ) inner_q
+            WHERE ROWNUM &lt;= #{endRow}
         )
-        WHERE ROWNUM BETWEEN #{startRow} AND #{endRow}
+        WHERE rn >= #{startRow}
     </select>
 
     <!-- 시설 드롭다운 옵션 조회 -->
@@ -45,10 +59,11 @@
         FROM facility
     </select>
 
-    <!-- 제품 드롭다운 옵션 조회 -->
+    <!-- 제품 드롭다운 옵션 조회 (PRODUCT 타입만) -->
     <select id="getItemOptions" resultType="SelectOptionDTO">
         SELECT item_num AS num, name AS name
         FROM item
+        WHERE type = 'PRODUCT'
     </select>
 
 </mapper>

@@ -16,7 +16,7 @@ public class ProdDTO {
 	   
 //	    품목이름
 	    private int item_num;
-	    private String name;
+	    private String item_name;
 	    
 //	    사원이름
 	    private int emp_num;
