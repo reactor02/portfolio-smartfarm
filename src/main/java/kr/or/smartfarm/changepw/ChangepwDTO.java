@@ -12,7 +12,7 @@ public class ChangepwDTO {
 	String hire_date;
 	String status;
 	String Termination_date;
-	String privat;
+	String secret;
 	String dept_num;
 
 }

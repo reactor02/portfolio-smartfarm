@@ -23,6 +23,15 @@ public class LoginDAOImpl implements LoginDAO{
 		
 		return result;
 	}
+
+	@Override
+	public LoginDTO loginCheck(LoginDTO loginDTO) {
+		// TODO Auto-generated method stub
+		
+		LoginDTO result = sqlSession.selectOne(NAMESPACE + "loginCheck", loginDTO.getEmp_num());
+		
+		return result;
+	}
 	
 	
 

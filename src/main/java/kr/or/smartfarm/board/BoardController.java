@@ -1,16 +1,23 @@
 package kr.or.smartfarm.board;
 
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.github.pagehelper.PageInfo;
+
 @Controller
+@RequestMapping("/board")
 public class BoardController {
 
 	private static final Logger logger = LoggerFactory.getLogger(BoardController.class);
@@ -18,22 +25,45 @@ public class BoardController {
 	@Autowired
 	BoardService boardService;
 
-	@RequestMapping("/board")
-	public String board() {
+	@RequestMapping("")
+	public String board(@RequestParam(value = "page", defaultValue = "1") int page, Model model) {
+		List result = null;
+		result = boardService.getBoardList(page);
+		
+		PageInfo<Map<String, Object>> pageInfo = new PageInfo<Map<String, Object>> (result);
+		model.addAttribute("pageInfo", pageInfo);
+		
 		return "content/board";
 	}
 
 	@RequestMapping(value = "/list", method = RequestMethod.GET)
 	@ResponseBody
-	public List<BoardDTO> list() {
+	public List<BoardDTO> list(@RequestParam(value="page", defaultValue="1") int page) {
+	
 		System.out.println("/list 실행");
 
-		List<BoardDTO> list = boardService.getBoardList();
+		List<BoardDTO> list = boardService.getBoardList(page);
 		System.out.println("BoardController: List: " + list);
 
 		return list;
 	}
+	
+	@GetMapping("/one")
+	public String one(int board_num, Model model) {
+		System.out.println("/one 실행");
+		
+		BoardDTO boardDTO = boardService.getBoard(board_num);
+		model.addAttribute("boardDTO", boardDTO);
+		System.out.println("/one: board_num: "+ board_num);
+		System.out.println(board_num);
+		
+		return "content/boarddetail";
+		
+		
+	}
 
+	
+	
 
 
 }

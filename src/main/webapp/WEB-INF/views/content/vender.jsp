@@ -225,14 +225,14 @@ select.form-control {
 	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
 }
 
-.stk-tbl {
+.ven-tbl {
 	width: 100%;
 	border-collapse: collapse;
 	border-top: 2px solid #555;
 	border-bottom: 2px solid #555;
 }
 
-.stk-tbl th {
+.ven-tbl th {
 	background-color: #e9ecef;
 	color: #222;
 	padding: 12px 10px;
@@ -242,7 +242,7 @@ select.form-control {
 	font-size: 0.95rem;
 }
 
-.stk-tbl td {
+.ven-tbl td {
 	padding: 12px 10px;
 	border: 1px solid #ccc;
 	text-align: center;
@@ -250,7 +250,7 @@ select.form-control {
 	font-size: 0.95rem;
 }
 
-.stk-tbl tbody tr:hover {
+.ven-tbl tbody tr:hover {
 	background-color: #f1f8f5;
 }
 
@@ -300,10 +300,12 @@ select.form-control {
 		bind()
 	})
 	
+		let page=${param.page != null ? param.page : 1};
+	
 	function bind(){
-		
 			
-			fetch("vender/list",{
+			
+			fetch(`vender/list?page=`+ page,{
 				method:'get'
 			}).then(
 				resp => resp.json()		
@@ -341,15 +343,27 @@ select.form-control {
 					<button type="button" class="btn-reg">+ 등록하기</button>
 				</div>
 				
-				<%-- 검색창 --%>
-				<form name="searchFrm" action="stockList.do" method="get">
+				<%-- 검색창 action --%>
+				<form name="searchFrm" action="" method="get">
 					<div class="sch-wrap">
 						<div class="sch-row">
+						
 							<div class="sch-left">
-								<span class="label">
+								<span class="label">▶ 거래처명</span>
+								<select class="form-control"> 
+									<option></option>
+								</select>
+						
+							
+							</div>
+							<div class="sch-right">
+								<div class="sch-input-box">
+									<span style="color: #888;">&#128269;</span>
+									<input type="text" id="keyword" value="" placeholder="거래처명 검색">
 								
-								
-								</span>
+								</div>
+								<button type="button" class="btn-sch" id="search">검색</button>
+								<button type="button" class="btn-sch" id="init">초기화</button>
 							</div>
 						</div>
 					</div>
@@ -358,7 +372,8 @@ select.form-control {
 				
 				<%-- 테이블 리스트 --%>
 				
-				<table border = "1">
+				<div class="tbl-box">
+				<table class="ven-tbl">
 					<thead>
 						<tr>
 							<th>no.</th>
@@ -371,9 +386,9 @@ select.form-control {
 					</thead>
 					<tbody id ="tbody"></tbody>
 				</table>
+				</div>
 				
-				
-			
+				<div class="table-responsive"></div>
 			
 			<jsp:include page="/WEB-INF/views/common/paging.jsp" />
 			</main>

@@ -11,242 +11,41 @@
 <meta charset="UTF-8">
 <title>Insert title here</title>
 <style>
-/* 기본 스타일 초기화 */
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-    font-family: sans-serif;
-}
+*{box-sizing:border-box;margin:0;padding:0;font-family:sans-serif}
+body{background-color:#fff;padding:20px}
+.page-path{font-size:14px;margin-bottom:10px;color:#333}
+.main-container{border:1px solid #ccc;display:flex;flex-direction:column;min-height:800px}
+.header-bar{display:flex;align-items:center;background-color:#555;color:#fff;padding:10px 20px;height:50px}
+.logo{font-weight:700;font-size:16px;width:150px}
+.header-title{flex:1;text-align:center;font-size:22px;font-weight:700;color:#333}
+.header-bar .header-title{color:#fff}
+.user-info{display:flex;gap:15px;font-size:14px}
+.logout-btn{color:#fff;text-decoration:none}
+.content-wrapper{display:flex;flex:1}
+.sidebar{width:180px;background-color:#eaeaea;padding:15px 10px;border-right:1px solid #ccc}
+코드를 사용할 때는 주의가 필요합니다.🛠️ 주요 최적화 내용공백 및 줄바꿈 제거: 파일 용량을 최소화했습니다.주석 제거: 불필요한 설명 글을 모두 삭제했습니다.색상 코드 단축: #ffffff 👉 #fff, #cccccc 👉 #ccc, #555555 👉 #555로 줄였습니다.폰트 두께 단축: bold 👉 700으로 변환했습니다.추가적인 용량 최적화(Sass 변수 적용 등)나 중복 코드 통합 작업이 필요하시면 언제든 말씀해 주세요!AI 대답에는 오류가 있을 수 있습니다. 자세히 알아보기사이트 1개스마트디자인 서포트설정 속성 값 font-weight font-weight 설명 글꼴 두께를 지정 글꼴 두께를 지정 값 속성 ...
 
-body {
-    background-color: #ffffff;
-    padding: 20px;
-}
-
-/* 상단 경로 표시 */
-.page-path {
-    font-size: 14px;
-    margin-bottom: 10px;
-    color: #333333;
-}
-
-/* 메인 구조 */
-.main-container {
-    border: 1px solid #cccccc;
-    display: flex;
-    flex-direction: column;
-    min-height: 800px;
-}
-
-/* 상단 헤더 바 */
-.header-bar {
-    display: flex;
-    align-items: center;
-    background-color: #555555;
-    color: #ffffff;
-    padding: 10px 20px;
-    height: 50px;
-}
-
-.logo {
-    font-weight: bold;
-    font-size: 16px;
-    width: 150px;
-}
-
-.header-title {
-    flex: 1;
-    text-align: center;
-    font-size: 22px;
-    font-weight: bold;
-    color: #333333; /* 설계서 상에서 '사용자 관리' 글씨 색상이 어두우므로 수정 가능 */
-}
-
-/* 실제 설계서처럼 헤더 텍스트를 밖으로 빼거나 다르게 처리하려면 조정 가능합니다 */
-.header-bar .header-title {
-    color: #ffffff; 
-}
-
-.user-info {
-    display: flex;
-    gap: 15px;
-    font-size: 14px;
-}
-
-.logout-btn {
-    color: #ffffff;
-    text-decoration: none;
-}
-
-/* 하단 레이아웃 (사이드바 + 본문) */
-.content-wrapper {
-    display: flex;
-    flex: 1;
-}
-
-/* 왼쪽 사이드바 */
-.sidebar {
-    width: 180px;
-    background-color: #eaeaea;
-    padding: 15px 10px;
-    border-right: 1px solid #cccccc;
-}
-
-.menu-group {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
-.menu-item {
-    font-size: 14px;
-    font-weight: bold;
-    color: #333333;
-    text-decoration: none;
-    margin-bottom: 5px;
-}
-
-.menu-section {
-    margin-bottom: 8px;
-}
-
-.section-name {
-    font-size: 14px;
-    font-weight: bold;
-    color: #333333;
-    margin-bottom: 4px;
-}
-
-.sub-item {
-    display: block;
-    font-size: 11px;
-    color: #666666;
-    text-decoration: none;
-    padding-left: 10px;
-    margin-bottom: 3px;
-}
-
-.sub-item.active {
-    font-weight: bold;
-    color: #000000;
-}
-
-/* 중앙 본문 영역 */
-.content-body {
-    flex: 1;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: #ffffff;
-    padding: 40px;
-}
-
-/* 등록 폼 박스 */
-.register-container {
-    width: 420px;
-    padding: 30px 25px;
-    background-color: #ffffff;
-    border: 1px solid #000000;
-    border-radius: 15px;
-}
-
-.register-title {
-    text-align: center;
-    font-size: 15px;
-    font-weight: bold;
-    color: #333333;
-    margin-bottom: 25px;
-}
-
-.register-form {
-    display: flex;
-    flex-direction: column;
-}
-
-/* 1. 입력창 영역 */
-.input-group-container {
-    margin-bottom: 20px;
-}
-
-.input-group {
-    display: flex;
-    align-items: center;
-    margin-bottom: 12px;
-}
-
-.input-group label {
-    width: 70px;
-    font-size: 13px;
-    color: #333333;
-    text-align: right;
-    margin-right: 10px;
-}
-
-.input-group input {
-    flex: 1;
-    height: 35px;
-    padding: 0 10px;
-    background-color: #aaaaaa;
-    border: 1px solid #777777;
-    color: #000000;
-    font-size: 14px;
-}
-
-/* 부서 및 내선번호 복합 행 */
-.flex-row {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    gap: 5px;
-}
-
-.flex-row select {
-    flex: 1;
-    height: 35px;
-    background-color: #aaaaaa;
-    border: 1px solid #777777;
-    padding: 0 5px;
-}
-
-.label-inline {
-    font-size: 12px;
-    white-space: nowrap;
-    color: #333333;
-}
-
-/* 2. 회원가입 버튼 */
-.submit-btn {
-    width: 80%;
-    height: 40px;
-    margin: 0 auto 20px auto;
-    background-color: #aaaaaa;
-    border: 1px solid #777777;
-    color: #333333;
-    font-size: 14px;
-    cursor: pointer;
-}
-
-.submit-btn:hover {
-    background-color: #999999;
-}
-
-/* 3. 하단 이동 링크 */
-.nav-section {
-    display: flex;
-    justify-content: flex-start;
-    padding-left: 10px;
-}
-
-.nav-link {
-    font-size: 13px;
-    color: #555555;
-    text-decoration: none;
-}
-
-.nav-link:hover {
-    text-decoration: underline;
-}
+.menu-group{display:flex;flex-direction:column;gap:8px}
+.menu-item{font-size:14px;font-weight:700;color:#333;text-decoration:none;margin-bottom:5px}
+.menu-section{margin-bottom:8px}
+.section-name{font-size:14px;font-weight:700;color:#333;margin-bottom:4px}.sub-item{display:block;font-size:11px;color:#666;text-decoration:none;padding-left:10px;margin-bottom:3px}
+.sub-item.active{font-weight:700;color:#000}
+.content-body{flex:1;display:flex;justify-content:center;align-items:center;background-color:#fff;padding:40px}
+.register-container{width:420px;padding:30px 25px;background-color:#fff;border:1px solid #000;border-radius:15px}
+.register-title{text-align:center;font-size:15px;font-weight:700;color:#333;margin-bottom:25px}
+.register-form{display:flex;flex-direction:column}
+.input-group-container{margin-bottom:20px}
+.input-group{display:flex;align-items:center;margin-bottom:12px}
+.input-group label{width:70px;font-size:13px;color:#333;text-align:right;margin-right:10px}
+.input-group input{flex:1;height:35px;padding:0 10px;background-color:#aaa;border:1px solid #777;color:#000;font-size:14px}
+.flex-row{flex:1;display:flex;align-items:center;gap:5px}
+.flex-row select{flex:1;height:35px;background-color:#aaa;border:1px solid #777;padding:0 5px}
+.label-inline{font-size:12px;white-space:nowrap;color:#333}
+.submit-btn{width:80%;height:40px;margin:0 auto 20px auto;background-color:#aaa;border:1px solid #777;color:#333;font-size:14px;cursor:pointer}
+.submit-btn:hover{background-color:#999}
+.nav-section{display:flex;justify-content:flex-start;padding-left:10px}
+.nav-link{font-size:13px;color:#555;text-decoration:none}
+.nav-link:hover{text-decoration:underline}
 </style>
 </head>
 <body>

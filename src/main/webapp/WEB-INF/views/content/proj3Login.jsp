@@ -49,18 +49,95 @@
     </div>
 
     <!-- 2. 로그인 입력 폼 -->
-    <form class="login-form">
+    <div class="login-form">
         <p class="section-title">사원 로그인</p>
-        <input type="text" placeholder="사원번호를 입력해주세요." class="input-field" required>
-        <input type="password" placeholder="비밀번호를 입력해주세요." class="input-field" required>
-        
+        <!-- 1. 사원번호 입력창 -->
+   <!-- 1. 사원번호 입력창: 1글자 이상 입력 조건 -->
+    <input type="text" 
+           name="emp_num" 
+           placeholder="사원번호를 입력해주세요." 
+           class="input-field" 
+           required
+           pattern="\S+"
+           title="사원번호를 입력해주세요.">
+           
+    <!-- 2. 비밀번호 입력창 -->
+    <input type="password" 
+           name="pw" 
+           placeholder="비밀번호를 입력해주세요." 
+           class="input-field" 
+           required
+           pattern="(?=.*[a-zA-Z])(?=.*\d)(?=.*[!@#$%^&*()_+~`\-={}\[\]:;&quot;'<>,.?\/]).{8,20}"
+           title="비밀번호는 영문, 숫자, 특수문자를 포함하여 8~20자로 입력해주세요.">
         <div class="find-account-section">
-            <a href="#" class="find-link">아이디/패스워드 찾기</a>
+            <a href="/changepw" class="find-link" >아이디/패스워드 찾기</a>
         </div>
 
         <button type="submit" class="submit-btn">로그인하기</button>
-    </form>
+    
+    </div>
+  
 </div>
+
+<script>
+	const login = document.querySelector('.submit-btn');
+	login.addEventListener('click', function() {
+	const id = document.querySelector('input[name="emp_num"]');
+	const pw = document.querySelector('input[name="pw"]');
+	
+	
+	if( !id.checkValidity() || !pw.checkValidity() ) {
+		
+		id.reportValidity() || pw.reportValidity(); 
+		console.log("규정에 맞춰 작성해주세요.")
+		return;
+	}
+	
+	let json = {
+			emp_num : id.value,
+			pw : pw.value	
+	};
+	
+	const url = "/login";
+	
+	fetch( url, {
+		method : 'POST',
+		headers: {                          // [2] 무엇을 (데이터의 종류)?
+		        'Content-Type': 'application/json' 
+		    },
+		body: JSON.stringify(json)
+		
+	}).then(response => {
+		// [1단계] 서버가 보낸 택배(응답)의 '겉포장'을 뜯고 JSON 데이터로 읽기 변환
+		 if (!response.ok) {
+        throw new Error('서버 오류 발생!');
+    	}
+		
+		return response.json();			
+	}).then(data => {
+	    // [2단계] 포장지 안의 '진짜 내용물(data)'을 꺼내서 화면 이동이나 알림창 띄우기
+	    console.log(data); 
+	    
+	    if (data.success === true) {
+	        alert(data.message);         // "로그인에 성공했습니다."
+	        window.location.href = '/home'; // 메인 화면으로 리다이렉트(이동)
+	    } else {
+	        alert(data.message);         // "사원번호 또는 비밀번호가 틀렸습니다."
+	        // 화면 새로고침이 없으므로, 사용자는 입력했던 아이디/비번을 안 지우고 그대로 수정 가능!
+	    }
+	    
+	}).catch(error => {
+        // 💡 [핵심] 인터넷이 끊겼거나, 서버(Tomcat)가 완전히 다운되었을 때 이리로 들어옵니다.
+        console.error('통신 에러 발생:', error); 
+        
+        // 유저에게 화면으로 친절하게 안내창을 띄워줍니다.
+        alert('서버와의 통신이 원활하지 않습니다. 관리자에게 문의해 주세요.');
+    });
+	
+	
+		
+	})
+</script>
 
 </body>
 </html>

@@ -4,6 +4,6 @@ import java.util.List;
 
 public interface BoardService {
 
-	List<BoardDTO> getBoardList();
-	
+	List<BoardDTO> getBoardList(int pageNum);
+	BoardDTO getBoard(int board_num);
 }

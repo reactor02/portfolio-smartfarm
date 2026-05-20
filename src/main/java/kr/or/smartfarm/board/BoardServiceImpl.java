@@ -12,9 +12,15 @@ public class BoardServiceImpl implements BoardService {
 	BoardDAO boardDAO;
 
 	@Override
-	public List<BoardDTO> getBoardList() {
-		List<BoardDTO> result = boardDAO.selectAllBoard();
+	public List<BoardDTO> getBoardList(int pageNum) {
+		List<BoardDTO> result = boardDAO.selectAllBoard(pageNum);
 		return result;
+	}
+
+	@Override
+	public BoardDTO getBoard(int board_num) {
+		BoardDTO boardDTO = boardDAO.selectOneBoard(board_num);
+		return boardDTO;
 	}
 	
 	

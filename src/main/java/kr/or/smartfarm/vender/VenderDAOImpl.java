@@ -17,8 +17,9 @@ public class VenderDAOImpl implements VenderDAO{
 	@Override 
 	public List<VenderDTO> selectAllVender(int pageNum) {
 		
-		List<VenderDTO> resultList = null;
 		PageHelper.startPage(pageNum, 5);
+		
+		List<VenderDTO> resultList = null;
 		resultList = sqlSession.selectList("mapper.vender.selectVender");
 		System.out.println("dao: resultList: " + resultList);
 		

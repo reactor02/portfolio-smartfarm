@@ -6,6 +6,8 @@ import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import com.github.pagehelper.PageHelper;
+
 @Repository
 public class BoardDAOImpl implements BoardDAO {
 
@@ -13,7 +15,9 @@ public class BoardDAOImpl implements BoardDAO {
 	SqlSession sqlSession;
 
 	@Override
-	public List<BoardDTO> selectAllBoard() {
+	public List<BoardDTO> selectAllBoard(int pageNum) {
+		
+		PageHelper.startPage(pageNum, 10);
 		
 		List<BoardDTO> resultList = null; 
 		
@@ -21,6 +25,15 @@ public class BoardDAOImpl implements BoardDAO {
 		System.out.println("dao : resultList: " + resultList);
 		
 		return resultList;
+	}
+
+	@Override
+	public BoardDTO selectOneBoard(int board_num) {
+		BoardDTO boardDTO = null;
+		
+		boardDTO = sqlSession.selectOne("mapper.board.selectOneBoard", board_num);
+		System.out.println("selectOneBoard: BoardDTO: " + boardDTO);
+		return boardDTO;
 	}
 	
 }
