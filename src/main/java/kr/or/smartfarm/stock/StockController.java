@@ -50,10 +50,11 @@ public class StockController {
 	        searchMap.put("page", page);
 	        searchMap.put("type", type);
 	        searchMap.put("keyword", keyword );
-
+System.out.println(searchMap);
 	        
 	        List searchResult = stockService.searchStock(searchMap);
 	        result.put("searchResult", searchResult);
+
 	        result.put("status", "good");
 	        if(searchResult != null) {
 	        	PageInfo<Map<String, Object>> pageInfo = new PageInfo<Map<String, Object>>(searchResult);

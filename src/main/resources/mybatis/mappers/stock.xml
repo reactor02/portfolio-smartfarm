@@ -37,6 +37,7 @@
         JOIN facility f ON f.facility_num = i.facility_num 
         <where>
 
+        <if test="type != null and type != 'all'">
         <choose>
         	<when test="type == 'equip'">
         		AND upper(i.type) = 'EQUIP'
@@ -51,8 +52,10 @@
         		AND (upper(i.type) = 'RAW' OR upper(i.type) = 'MATERIAL')
         	</when>
         </choose>
+        </if>
+        
         <if test="keyword != null and keyword != ''">
-        AND i.name LIKE CONCAT('%', #{keyword}, '%')
+        AND upper(i.name) LIKE ('%' || upper(#{keyword}) || '%')
    	 	</if>
     </where>
     </select>

@@ -15,6 +15,7 @@ response.setContentType("text/html; charset=utf-8");
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>재고 관리 시스템</title>
+<link rel="stylesheet" href="/resources/css/paging.css">
 <style>
 /* 기본 초기화 */
 * {
@@ -265,36 +266,6 @@ select.form-control {
 .link-txt:hover {
 	text-decoration: underline;
 }
-
-/* ========== 5. 페이징 ========== */
-.pg-wrap {
-	display: flex;
-	justify-content: center;
-	margin-top: 25px;
-	gap: 6px;
-}
-
-.pg-btn {
-	padding: 8px 12px;
-	border: 1px solid #ccc;
-	color: #555;
-	text-decoration: none;
-	border-radius: 4px;
-	background: #fff;
-	font-size: 0.9rem;
-	transition: 0.2s;
-}
-
-.pg-btn:hover {
-	background-color: #eee;
-}
-
-.pg-active {
-	background-color: #2D6A4F;
-	color: #fff;
-	border-color: #2D6A4F;
-	font-weight: bold;
-}
 </style>
 </head>
 <body>
@@ -312,18 +283,18 @@ select.form-control {
 				<form name="searchFrm" action="stockList.do" method="get">
 					<div class="sch-wrap">
 						<div class="sch-row">
-<!-- 							<div class="sch-right"> -->
-<!-- 								<label class="radio-label"> <input type="radio" -->
-<!-- 									name="io" value="all" checked="cheked"> -->
-<!-- 									전체 -->
-<!-- 								</label> <label class="radio-label"> <input type="radio" -->
-<!-- 									name="io" value="in"> -->
-<!-- 									입고 -->
-<!-- 								</label> <label class="radio-label"> <input type="radio" -->
-<!-- 									name="io" value="out"> -->
-<!-- 									출고 -->
-<!-- 								</label> -->
-<!-- 							</div> -->
+							<!-- 							<div class="sch-right"> -->
+							<!-- 								<label class="radio-label"> <input type="radio" -->
+							<!-- 									name="io" value="all" checked="cheked"> -->
+							<!-- 									전체 -->
+							<!-- 								</label> <label class="radio-label"> <input type="radio" -->
+							<!-- 									name="io" value="in"> -->
+							<!-- 									입고 -->
+							<!-- 								</label> <label class="radio-label"> <input type="radio" -->
+							<!-- 									name="io" value="out"> -->
+							<!-- 									출고 -->
+							<!-- 								</label> -->
+							<!-- 							</div> -->
 						</div>
 
 						<div class="sch-row">
@@ -398,10 +369,10 @@ select.form-control {
 					</table>
 				</div>
 
-				<div class="table-responsive">
-    </div>
-
-<jsp:include page="/WEB-INF/views/common/paging.jsp" />
+				<div class="table-responsive"></div>
+				<div id="paging-area">
+					<jsp:include page="/WEB-INF/views/common/paging.jsp" />
+				</div>
 			</main>
 		</div>
 
@@ -420,50 +391,90 @@ select.form-control {
 			}
 		}
 		
+		
+		
+		
+		function renderPagination(pInfo) {
+		    let pagingHtml = "";
+		    
+		    // 이전
+		    if (!pInfo.isFirstPage) {
+		        // pg-btn -> page-link
+		        pagingHtml += `<a class="page-link prev-next" href="javascript:movePage(${pInfo.pageNum - 1})">이전</a>`;
+		    }
+		    
+		    // 번호
+		    pInfo.navigatepageNums.forEach(num => {
+		        // pg-btn -> page-link, pg-active -> active (원하시는 명칭으로)
+		        pagingHtml += `<a class="page-link prev-next \${num === pInfo.pageNum ? 'active' : ''}" href="javascript:movePage(\${num})">\${num}</a>`;
+		    });
+		    
+		    // 다음
+		    if (!pInfo.isLastPage) {
+		        // pg-btn -> page-link
+		        pagingHtml += `<a class="page-link prev-next" href="javascript:movePage(${pInfo.pageNum + 1})">다음</a>`;
+		    }
+		    
+		    document.querySelector(".pagination-container").innerHTML = pagingHtml;
+		}
+		
+		
+		
+		
 // 		검색 버튼 클릭시 아작스
 		const btn_sch = document.querySelector(".btn-sch");
 		btn_sch.addEventListener('click', ()=>{
-			//값 추출
-// 			let io = document.querySelector("input[name='io']:checked").value;
-			let type = document.querySelector("#mType").value;
-			let keyword = document.querySelector("#keyword").value;
-			
-			const params = new URLSearchParams();
-			params.append("page", 1);
-			params.append("type", type);
-			params.append("keyword", keyword);
-// 			params.append("io", io);
-			
-			fetch(`${pageContext.request.contextPath}/searchStock?\${params.toString()}`)
-			.then(response => response.json())
-			.then(data => {
-				if(data.status === "good"){
-					let tbody = document.querySelector("#stock-body");
-					tbody.innerHTML = "";
-					if(data.searchResult.length == 0){
-						tbody.innerHTML = "<tr><td colspan='8'>조회된 결과가 없습니다.</td></tr>";
-						return;
-					}//if(data.searchResult.length === 0)
-						
-						let html ="";
-						for(let i = 0; i < data.searchResult.length; i++) {
-				            let item = data.searchResult[i];
-				            
-				            html += "<tr>";
-				            html += "    <td style='font-weight: bold; color: #555;'>" + (i + 1) + "</td>";
-				            html += "    <td>" + item.CODE + "</td>";
-				            html += "    <td><a href='#' class='link-txt'>" + item.NAME + "</a></td>";
-				            html += "    <td>" + item.TYPE + "</td>";
-				            html += "    <td>" + item.STOCK_QTY + "</td>";
-				            html += "    <td>" + item.SAFE + "</td>";
-				            html += "    <td>" + item.UNIT + "</td>";
-				            html += "    <td>" + item.FACILITY_NAME + "</td>";
-				            html += "</tr>";
-				        }
-					tbody.innerHTML = html;
-				}//if(data.status === "good")
-			})
+			movePage(1)
 		})
+		
+		
+		//페이징 관련 함수
+	function movePage(pageNum) {
+    let type = document.querySelector("#mType").value;
+    let keyword = document.querySelector("#keyword").value;
+    
+    const params = new URLSearchParams();
+    params.append("page", pageNum); // 누른 페이지 번호를 전달
+    params.append("type", type);
+    params.append("keyword", keyword);
+    
+    fetch(`${pageContext.request.contextPath}/searchStock?\${params.toString()}`)
+    .then(response => response.json())
+    .then(data => {
+    	if(data.searchResult.length == 0){
+    		 let tbody = document.querySelector("#stock-body");
+    	    tbody.innerHTML = "<tr><td colspan='8'>조회된 결과가 없습니다.</td></tr>";
+    	    renderPagination(data.pageInfo); // 페이지 정보도 갱신하여 페이징 버튼도 사라지게 처리
+    	    return;
+    	}
+        if(data.status === "good"){
+            // 1. 테이블 데이터 갱신
+            let tbody = document.querySelector("#stock-body");
+            tbody.innerHTML = "";
+            
+            let html = "";
+            for(let i = 0; i < data.searchResult.length; i++) {
+                let item = data.searchResult[i];
+                html += `<tr>
+                    <td style='font-weight: bold; color: #555;'>\${i + 1 + (data.pageInfo.pageNum - 1) * 5}</td>
+                    <td>\${item.CODE}</td>
+                    <td><a href='#' class='link-txt'>\${item.NAME}</a></td>
+                    <td>\${item.TYPE}</td>
+                    <td>\${item.STOCK_QTY}</td>
+                    <td>\${item.SAFE}</td>
+                    <td>\${item.UNIT}</td>
+                    <td>\${item.FACILITY_NAME}</td>
+                </tr>`;
+            }
+            tbody.innerHTML = html;
+            
+            renderPagination(data.pageInfo);
+
+            const newUrl = window.location.pathname + `?page=\${pageNum}&type=\${type}&keyword=\${keyword}`;
+            window.history.pushState({path: newUrl}, '', newUrl);
+        }
+    });
+}
 	</script>
 
 </body>
