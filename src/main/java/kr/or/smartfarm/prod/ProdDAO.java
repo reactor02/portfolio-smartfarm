@@ -9,4 +9,8 @@ public interface ProdDAO {
 	public List<SelectOptionDTO> getFacilityOptions();
 	public List<SelectOptionDTO> getItemOptions();
 	
+	public ProdDTO getSelectOne(String plan_id);
+	
+	public int create(ProdDTO prodDTO);
+	
 }

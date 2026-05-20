@@ -50,4 +50,17 @@ public class ProdServiceImpl implements ProdService {
 	public List<SelectOptionDTO> getItemOptions() {
 	    return dao.getItemOptions();
 	}
+	
+	
+	public ProdDTO selectOne(String plan_id) {
+		
+		ProdDTO prodDTO= dao.getSelectOne(plan_id);
+		
+		return prodDTO;
+	}
+	
+	public int creat(ProdDTO prodDTO) {
+		int a = dao.create(prodDTO);
+		return a;
+	}
 }
