@@ -1,12 +1,9 @@
-<%@ page language="java" contentType="text/html; charset=EUC-KR"
-	pageEncoding="EUC-KR"%>
+<%@ page language="java" contentType="text/html; charset=EUC-KR" pageEncoding="EUC-KR"%>
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 <%@ taglib prefix="tiles" uri="http://tiles.apache.org/tags-tiles"%>
-
-
 
 <!DOCTYPE html>
 <html>
@@ -14,53 +11,39 @@
 <meta charset="UTF-8">
 <title>NodeFarm MES</title>
 <style>
-        :root { --m-cl: #2D6A4F; --s-cl: #49A47A; --p-cl: #B7E4C7; --bg: #F8F9FA; --txt: #333; }
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Malgun Gothic', sans-serif; color: var(--txt); background-color: var(--bg); }
-        .mat-all { display: flex; flex-direction: column; min-height: 100vh; }
-        .hdr { display: flex; justify-content: space-between; align-items: center; background-color: var(--m-cl); color: #FFF; padding: 0 20px; height: 60px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .hdr-logo-area { display: flex; align-items: center; text-decoration: none; color: #FFF; }
-        .hdr-logo-img { height: 40px; width: auto; margin-right: 10px; }
-        .hdr-logo-txt { font-size: 1.4rem; font-weight: bold; letter-spacing: -1px; }
-        .hdr-user { font-size: 0.9rem; }
-        .hdr-user a { color: var(--p-cl); text-decoration: none; margin-left: 10px; }
-        .wrap { display: flex; flex: 1; }
-        .side { width: 240px; background-color: #FFF; border-right: 1px solid #DDD; }
-        .nav-list { list-style: none; }
-        .nav-item { border-bottom: 1px solid #EEE; }
-        .nav-btn { display: block; padding: 1rem 1.5rem; cursor: pointer; font-weight: bold; color: var(--m-cl); transition: background 0.3s; text-decoration: none; user-select: none; }
-        .nav-btn:hover { background-color: var(--p-cl); }
-        .sub-nav { list-style: none; display: none; background-color: #F9FDFB; }
-        .sub-nav.on { display: block; }
-        .sub-nav a { display: block; padding: 0.7rem 1.5rem 0.7rem 2.5rem; font-size: 0.9rem; color: #555; text-decoration: none; }
-        .sub-nav a:hover { color: var(--m-cl); font-weight: bold; text-decoration: underline; text-underline-offset: 4px; }
-        .cont { flex: 1; padding: 2rem; background-color: #FFF; }
-        .ftr { text-align: center; padding: 1rem 0; background-color: #EEE; font-size: 0.8rem; color: #777; margin-top: auto; }
-    </style>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/page.css">
-    
+    * { 
+        box-sizing: border-box; 
+        margin: 0; 
+        padding: 0; 
+    }
+    body { 
+        font-family: 'Malgun Gothic', sans-serif; 
+        background-color: #F8F9FA; 
+    }
+    /* 화면 전체를 flex 컨테이너로 만들어 정중앙 정렬 */
+    .mat-all { 
+        display: flex; 
+        justify-content: center; 
+        align-items: center; 
+        min-height: 100vh; 
+        width: 100vw;
+    }
+    /* 본문 영역 최적화 */
+    .cont { 
+        width: 100%;
+        max-width: 500px; /* 로그인 박스가 너무 퍼지지 않도록 최대 너비 제한 */
+        padding: 2rem; 
+    }
+</style>
+<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/page.css">
 </head>
 <body>
+
 <div class="mat-all">
-  
-        <main class="cont">
-            <tiles:insertAttribute name="content" />
-        </main>
-   
+    <main class="cont">
+        <tiles:insertAttribute name="content" />
+    </main>
 </div>
 
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const toggles = document.querySelectorAll('.toggle-btn');
-        toggles.forEach(btn => {
-            btn.addEventListener('click', () => {
-                const subNav = btn.nextElementSibling;
-                if (subNav && subNav.classList.contains('sub-nav')) {
-                    subNav.classList.toggle('on');
-                }
-            });
-        });
-    });
-</script>
 </body>
 </html>
