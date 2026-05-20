@@ -7,12 +7,12 @@
     <!-- 목록 + 전체 건수 한 번에 조회 -->
     <select id="getList" parameterType="ProdPageDTO" resultType="ProdDTO">
         SELECT plan_num, plan_qty, plan_status, plan_start, plan_end,
-               emp_num, item_num, item_name, ename,
+               emp_num,plan_id, item_num, item_name, ename,
                facility_num, facility_name, currentqty, total_count
         FROM (
             SELECT inner_q.*, ROWNUM AS rn
             FROM (
-                SELECT pp.plan_num, pp.plan_qty, pp.plan_status, pp.plan_start, pp.plan_end,
+                SELECT pp.plan_num, pp.plan_id, pp.plan_qty, pp.plan_status, pp.plan_start, pp.plan_end,
                        pp.emp_num, pp.item_num,
                        i.name            AS item_name,
                        e.ename,
@@ -65,5 +65,41 @@
         FROM item
         WHERE type = 'PRODUCT'
     </select>
+    
+    <select id="getOne" parameterType="String" resultType="ProdDTO">
+    	 SELECT pp.plan_num, pp.plan_id, pp.plan_qty, pp.plan_status, pp.plan_start, pp.plan_end,
+           pp.emp_num, pp.item_num,pp.created_at,
+           i.name         AS item_name, i.code, i.type,
+           e.ename,
+           f.facility_num,
+           f.facility_name,
+           NVL(wo.currentqty, 0) AS currentqty
+    FROM production_plan pp
+    LEFT JOIN item     i ON pp.item_num    = i.item_num
+    LEFT JOIN emp      e ON pp.emp_num     = e.emp_num
+    LEFT JOIN facility f ON i.facility_num = f.facility_num
+    LEFT JOIN (
+        SELECT plan_num, SUM(current_qty) AS currentqty
+        FROM work_order
+        GROUP BY plan_num
+    ) wo ON pp.plan_num = wo.plan_num
+    WHERE pp.plan_id = #{plan_id}
+    </select>
+    
+    <insert id="insert" parameterType="prodDTO">
+    INSERT INTO production_plan (plan_num, plan_id, plan_qty, plan_status, plan_start, plan_end, emp_num, item_num, content, created_at)
+    VALUES (
+        PROD_SEQ.NEXTVAL,
+        #{plan_qty},
+        '대기',
+        #{plan_start},
+        #{plan_end},
+        #{emp_num},
+        #{item_num},
+        #{content},
+        #{plan_id}
+        #{created_at}
+    )
+</insert>
 
 </mapper>

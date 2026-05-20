@@ -5,6 +5,7 @@ import lombok.Data;
 @Data
 public class LoginDTO {
 	
+	String emp_num;
 	String ename;
 	String pw;
 	String e_level;
@@ -12,7 +13,7 @@ public class LoginDTO {
 	String hire_date;
 	String status;
 	String Termination_date;
-	String privat;
+	String secret;
 	String dept_num;
 
 }

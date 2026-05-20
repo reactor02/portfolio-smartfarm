@@ -13,13 +13,22 @@ public class LoginDAOImpl implements LoginDAO{
 	private SqlSession sqlSession;
 	
 	// 매퍼 XML의 namespace를 상수로 지정해두면 편리합니다.
-		private static final String NAMESPACE = "kr.or.proj3.Proj3DAO.Proj3DAO";
+		private static final String NAMESPACE = "kr.or.smartfarm.login.LoginDAO.";
 
 	@Override
 	public List<LoginDTO> login() {
 		// TODO Auto-generated method stub
 		
 		List<LoginDTO> result = sqlSession.selectList(NAMESPACE + "login");
+		
+		return result;
+	}
+
+	@Override
+	public LoginDTO loginCheck(LoginDTO loginDTO) {
+		// TODO Auto-generated method stub
+		
+		LoginDTO result = sqlSession.selectOne(NAMESPACE + "loginCheck", loginDTO.getEmp_num());
 		
 		return result;
 	}

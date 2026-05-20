@@ -8,6 +8,9 @@
       select * from board
     </select>
 
+<select id="selectOneBoard" resultType="kr.or.smartfarm.board.BoardDTO">
+	select * from board where board_num = #{board_num}
+</select>
 </mapper>
 
 

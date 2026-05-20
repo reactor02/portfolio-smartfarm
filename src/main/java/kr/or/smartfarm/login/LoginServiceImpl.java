@@ -23,5 +23,21 @@ public class LoginServiceImpl implements LoginService{
 		
 		
 	}
+	
+	
+
+	@Override
+	public LoginDTO loginCheck( LoginDTO loginDTO ) {
+		// TODO Auto-generated method stub		
+		String pw = SHA256Util.encrypt(loginDTO.getPw());
+				
+		LoginDTO result = loginDAO.loginCheck(loginDTO);		
+		
+		if(result != null && result.getPw().equals(pw)) {
+			return result;
+		}		
+		
+		return null;
+	}
 
 }
