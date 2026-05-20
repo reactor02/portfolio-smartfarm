@@ -4,8 +4,12 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
+
+import kr.or.smartfarm.login.LoginDTO;
+import kr.or.smartfarm.login.LoginService;
 
 @Controller
 public class LoginController {
@@ -15,35 +19,27 @@ public class LoginController {
 	
 	@RequestMapping("/login")
 	public ModelAndView login() {
+		System.out.println("login 실행");
 		
 		
-		
-		ModelAndView mav = new ModelAndView("login.nohead");
+		ModelAndView mav = new ModelAndView("proj3Login.nohead");
 		
 		return mav;
 		
 	}
 	
-	@RequestMapping("/changepw")
-	public ModelAndView changepw() {
-		
-		ModelAndView mav = new ModelAndView("proj3Changepw.nohead");
-		
-		return mav;
-		
-	}
+	
 	
 	@RequestMapping("/permission")
-	public ModelAndView permission() {
+	public String permission( Model model ) {
+		
+		System.out.println("permission 실행");
 		
 		List<LoginDTO> empList = loginService.login();
 		
-		ModelAndView mav = new ModelAndView("permission.tiles");
+		model.addAttribute("empList",empList);
 		
-		// 3. 뷰에서 사용할 이름("empList")으로 데이터를 저장합니다.
-	    mav.addObject("empList", empList); 
-		
-		return mav;
+		return "content/permission.tiles";
 		
 	}
 	

@@ -4,5 +4,5 @@ import java.util.List;
 
 public interface VenderDAO {
 
-	List<VenderDTO> selectAllVender();
+	List<VenderDTO> selectAllVender(int pageNum);
 }
