@@ -4,11 +4,19 @@
 	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="kr.or.smartfarm.login.LoginDAO">
 
-<select id="login" resultType="kr.or.smartfarm.login.LoginDTO">
-        SELECT 
-            *        
+   <select id="loginCheck" 
+   resultType="kr.or.smartfarm.login.LoginDTO">
+        SELECT emp_num, pw 
         FROM emp
+        where emp_num = #{ emp_num }
     </select>
+    
+    
+   <update id="changepw">
+        update emp
+        set pw = #{ pw }
+        where emp_num = #{ emp_num }
+    </update>
 
 </mapper>
 

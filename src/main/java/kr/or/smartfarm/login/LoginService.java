@@ -5,5 +5,6 @@ import java.util.List;
 public interface LoginService {
 	
 	public List<LoginDTO> login();
+	public LoginDTO loginCheck( LoginDTO loginDTO );
 
 }
