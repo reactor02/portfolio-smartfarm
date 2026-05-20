@@ -31,7 +31,7 @@
 	
 	
 	<!-- Application Loggers -->
-	<logger name="kr.or.human4">
+	<logger name="kr.or.smartfarm">
 		<level value="info" />
 		<appender-ref ref="daily" />
 		<appender-ref ref="rolling" />
