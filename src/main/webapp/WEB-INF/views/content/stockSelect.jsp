@@ -312,23 +312,15 @@ select.form-control {
 				<form name="searchFrm" action="stockList.do" method="get">
 					<div class="sch-wrap">
 						<div class="sch-row">
-							<div class="sch-left">
-								<span class="label">▶ 유통기한</span> <input type="date"
-									name="sDate" id="sDate" value="${param.sDate}"
-									class="form-control" onchange="validateDate()"> <span
-									style="font-weight: bold; color: #666;">~</span> <input
-									type="date" name="eDate" id="eDate" value="${param.eDate}"
-									class="form-control" onchange="validateDate()">
-							</div>
 							<div class="sch-right">
 								<label class="radio-label"> <input type="radio"
-									name="io" value="" ${empty param.io ? 'checked' : ''}>
+									name="io" value="all" checked="cheked">
 									전체
 								</label> <label class="radio-label"> <input type="radio"
-									name="io" value="in" ${param.io == 'in' ? 'checked' : ''}>
+									name="io" value="in">
 									입고
 								</label> <label class="radio-label"> <input type="radio"
-									name="io" value="out" ${param.io == 'out' ? 'checked' : ''}>
+									name="io" value="out">
 									출고
 								</label>
 							</div>
@@ -336,9 +328,9 @@ select.form-control {
 
 						<div class="sch-row">
 							<div class="sch-left">
-								<span class="label">▶ 자재유형</span> <select name="mType"
+								<span class="label">▶ 자재유형</span> <select id="mType"
 									class="form-control">
-									<option value="">선택</option>
+									<option value="all">선택</option>
 									<option value="production"
 										${param.mType == 'production' ? 'selected' : ''}>설비</option>
 									<option value="facility"
@@ -346,22 +338,15 @@ select.form-control {
 									<option value="packaging"
 										${param.mType == 'packaging' ? 'selected' : ''}>반제품</option>
 									<option value="etc" ${param.mType == 'etc' ? 'selected' : ''}>재료</option>
-								</select> <span class="label" style="margin-left: 15px;">▶ 재고상태</span> <select
-									name="sStat" class="form-control">
-									<option value="">선택</option>
-									<option value="good"
-										${param.sStat == 'normal' ? 'selected' : ''}>정상</option>
-									<option value="bad" ${param.sStat == 'low' ? 'selected' : ''}>수량부족</option>
-									<option value="bad" ${param.sStat == 'alert' ? 'selected' : ''}>사용불가</option>
 								</select>
 							</div>
 
 							<div class="sch-right">
 								<div class="sch-input-box">
 									<span style="color: #888;">&#128269;</span> <input type="text"
-										name="kw" value="${param.kw}" placeholder="검색">
+										id="keyword" value="" placeholder="자재 명 검색">
 								</div>
-								<button type="submit" class="btn-sch">검색</button>
+								<button type="button" class="btn-sch">검색</button>
 							</div>
 						</div>
 					</div>
@@ -372,12 +357,12 @@ select.form-control {
 						<thead>
 							<tr>
 								<th style="width: 60px;">번호</th>
-								<th>재고코드</th>
-								<th>재고명</th>
+								<th>자재 코드</th>
+								<th>자재 명</th>
+								<th>자재 구분</th>
 								<th>현재고 수량</th>
 								<th>안전재고 수량</th>
 								<th>단위</th>
-								<th>가용여부</th>
 								<th>보관위치</th>
 							</tr>
 						</thead>
@@ -389,10 +374,10 @@ select.form-control {
 											<td style="font-weight: bold; color: #555;">${vs.count}</td>
 											<td>${item.CODE}</td>
 											<td><a href="#" class="link-txt">${item.NAME}</a></td>
+											<td>${item.TYPE}</td>
 											<td>${item.STOCK_QTY}</td>
 											<td>${item.SAFE}</td>
 											<td>${item.UNIT}</td>
-											<td>${item.ITEM_STATUS}</td>
 											<td>${item.FACILITY_NAME}</td>
 										</tr>
 									</c:forEach>
@@ -401,7 +386,6 @@ select.form-control {
 									<c:forEach var="i" begin="1" end="5">
 										<tr>
 											<td style="font-weight: bold; color: #888;">${i}</td>
-											<td></td>
 											<td></td>
 											<td></td>
 											<td></td>
@@ -438,6 +422,27 @@ select.form-control {
 				document.getElementById('eDate').value = "";
 			}
 		}
+		
+// 		검색 버튼 클릭시 아작스
+		const btn_sch = document.querySelector(".btn-sch");
+		btn_sch.addEventListener('click', ()=>{
+			let io = document.querySelector("input[name='io']:checked").value;
+			let type = document.querySelector("#mType").value;
+			
+			const date = {
+					io: io,
+					type: type
+			}//data
+			
+			const response = await fetch("/Zmartfarm/searchStock",{
+				method: 'POST',
+				headers: {"Content-Type": "application/json"},
+				body: JSON.stringify(data)
+			});//response
+			
+			const result = await response.json();
+			
+		})
 	</script>
 
 </body>

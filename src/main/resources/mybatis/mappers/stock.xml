@@ -10,6 +10,7 @@
         s.stock_qty,
         i.code,
         i.name,
+        i.type,
         i.unit,
         i.safe,
         i.item_status,
