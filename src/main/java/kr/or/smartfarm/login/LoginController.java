@@ -19,23 +19,16 @@ public class LoginController {
 	
 	@RequestMapping("/login")
 	public ModelAndView login() {
+		System.out.println("login 실행");
 		
 		
-		
-		ModelAndView mav = new ModelAndView("login.nohead");
+		ModelAndView mav = new ModelAndView("proj3Login.nohead");
 		
 		return mav;
 		
 	}
 	
-	@RequestMapping("/changepw")
-	public ModelAndView changepw() {
-		
-		ModelAndView mav = new ModelAndView("proj3Changepw.nohead");
-		
-		return mav;
-		
-	}
+	
 	
 	@RequestMapping("/permission")
 	public String permission( Model model ) {
