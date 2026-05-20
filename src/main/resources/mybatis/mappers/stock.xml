@@ -18,6 +18,7 @@
         FROM stock s
         JOIN item i ON s.item_num = i.item_num
         JOIN facility f ON f.facility_num = i.facility_num 
+         ORDER BY s.stock_id DESC
     </select>
 
 <!-- 검색 조건에 맞게 검색하는 로직 -->
@@ -58,7 +59,26 @@
         AND upper(i.name) LIKE ('%' || upper(#{keyword}) || '%')
    	 	</if>
     </where>
+    ORDER BY s.stock_id DESC
     </select>
+    
+    
+<!--     모달에서 ajax로 input창에 검색  -->
+<select id="modalSearch" resultType="hashMap" parameterType="string">
+SELECT i.*
+FROM item i
+	LEFT OUTER JOIN (
+		SELECT ITEM_NUM FROM ITEM
+ 		MINUS
+ 		SELECT ITEM_NUM FROM STOCK
+	) num ON i.item_num = num.item_num
+WHERE NAMe = 'Humidifier'
+</select>
+
+
+
+
+
 </mapper>
 
 

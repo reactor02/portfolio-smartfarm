@@ -71,5 +71,13 @@ System.out.println(searchMap);
 	    
 	    return result;
 	}
+	
+	//모달 등록 ajax
+	@RequestMapping("/modal")
+	public Map modal(@RequestParam(value = "search")String keyword,Model model) {
+		Map result = null;
+		
+		return result;
+	}
 }
 

@@ -31,4 +31,12 @@ public class StockDAOImpl implements StockDAO{
 		result = sqlSession.selectList("kr.or.stock.searchStock", map);
 		return result;
 	}
+	
+	//모달 셀렉트 
+	public Map modalSearch2(String str) {
+		Map result = null;
+		
+		
+		return result;
+	}
 }
