@@ -4,5 +4,5 @@ import java.util.List;
 
 public interface VenderService {
 
-	List<VenderDTO> getVenderList();
+	List<VenderDTO> getVenderList(int pageNum);
 }

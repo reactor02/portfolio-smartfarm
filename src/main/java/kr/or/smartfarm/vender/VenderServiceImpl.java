@@ -13,8 +13,8 @@ public class VenderServiceImpl implements VenderService {
 	
 
 	@Override
-	public List<VenderDTO> getVenderList() {
-		List<VenderDTO> result = venderDAO.selectAllVender();
+	public List<VenderDTO> getVenderList(int pageNum) {
+		List<VenderDTO> result = venderDAO.selectAllVender(pageNum);
 		return result;
 	}
 

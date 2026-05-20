@@ -301,12 +301,9 @@ select.form-control {
 	})
 	
 	function bind(){
-		document.getElementById("list").addEventListener('click',function(event){
-			console.log('submit')
+		
 			
-			event.preventDefault();
-			
-			fetch("./list",{
+			fetch("vender/list",{
 				method:'get'
 			}).then(
 				resp => resp.json()		
@@ -316,7 +313,7 @@ select.form-control {
 				
 				document.getElementById("tbody").innerHTML=``
 				for(let i = 0; i<data.length;i++){
-					document.getElementById("tbody").innerHTML=`
+					document.getElementById("tbody").innerHTML+=`
 					<tr>
 						<td>\${data[i].vender_num}</td>
 						<td>\${data[i].vender_name}</td>
@@ -328,9 +325,9 @@ select.form-control {
 					`
 				}
 			})
-		})
+		}
 		
-	}
+	
 </script>
 </head>
 <body>
@@ -375,7 +372,7 @@ select.form-control {
 					<tbody id ="tbody"></tbody>
 				</table>
 				
-			
+				
 			
 			
 			<jsp:include page="/WEB-INF/views/common/paging.jsp" />
