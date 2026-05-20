@@ -3,7 +3,7 @@
 	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="kr.or.stock">
-
+<!-- 기본 전체 조회 로직 -->
 <select id="loadStock" resultType="hashMap">
         SELECT 
         s.stock_id,
@@ -20,6 +20,42 @@
         JOIN facility f ON f.facility_num = i.facility_num 
     </select>
 
+<!-- 검색 조건에 맞게 검색하는 로직 -->
+	<select id="searchStock" resultType="hashMap" parameterType="map">
+         SELECT 
+        s.stock_id,
+        s.stock_qty,
+        i.code,
+        i.name,
+        i.type,
+        i.unit,
+        i.safe,
+        i.item_status,
+        f.facility_name
+        FROM stock s
+        JOIN item i ON s.item_num = i.item_num
+        JOIN facility f ON f.facility_num = i.facility_num 
+        <where>
+
+        <choose>
+        	<when test="type == 'equip'">
+        		AND upper(i.type) = 'EQUIP'
+        	</when>
+        	<when test="type == 'product'">
+        		AND upper(i.type) = 'PRODUCT'
+        	</when>
+        	<when test="type == 'semiproduct'">
+        		AND upper(i.type) = 'SEMIPRODUCT'
+        	</when>
+        	<when test="type == 'raw'">
+        		AND (upper(i.type) = 'RAW' OR upper(i.type) = 'MATERIAL')
+        	</when>
+        </choose>
+        <if test="keyword != null and keyword != ''">
+        AND i.name LIKE CONCAT('%', #{keyword}, '%')
+   	 	</if>
+    </where>
+    </select>
 </mapper>
 
 

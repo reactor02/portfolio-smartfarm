@@ -312,18 +312,18 @@ select.form-control {
 				<form name="searchFrm" action="stockList.do" method="get">
 					<div class="sch-wrap">
 						<div class="sch-row">
-							<div class="sch-right">
-								<label class="radio-label"> <input type="radio"
-									name="io" value="all" checked="cheked">
-									전체
-								</label> <label class="radio-label"> <input type="radio"
-									name="io" value="in">
-									입고
-								</label> <label class="radio-label"> <input type="radio"
-									name="io" value="out">
-									출고
-								</label>
-							</div>
+<!-- 							<div class="sch-right"> -->
+<!-- 								<label class="radio-label"> <input type="radio" -->
+<!-- 									name="io" value="all" checked="cheked"> -->
+<!-- 									전체 -->
+<!-- 								</label> <label class="radio-label"> <input type="radio" -->
+<!-- 									name="io" value="in"> -->
+<!-- 									입고 -->
+<!-- 								</label> <label class="radio-label"> <input type="radio" -->
+<!-- 									name="io" value="out"> -->
+<!-- 									출고 -->
+<!-- 								</label> -->
+<!-- 							</div> -->
 						</div>
 
 						<div class="sch-row">
@@ -331,13 +331,10 @@ select.form-control {
 								<span class="label">▶ 자재유형</span> <select id="mType"
 									class="form-control">
 									<option value="all">선택</option>
-									<option value="production"
-										${param.mType == 'production' ? 'selected' : ''}>설비</option>
-									<option value="facility"
-										${param.mType == 'facility' ? 'selected' : ''}>제품</option>
-									<option value="packaging"
-										${param.mType == 'packaging' ? 'selected' : ''}>반제품</option>
-									<option value="etc" ${param.mType == 'etc' ? 'selected' : ''}>재료</option>
+									<option value="equip">설비</option>
+									<option value="product">제품</option>
+									<option value="semiproduct">반제품</option>
+									<option value="raw">재료</option>
 								</select>
 							</div>
 
@@ -366,7 +363,7 @@ select.form-control {
 								<th>보관위치</th>
 							</tr>
 						</thead>
-						<tbody>
+						<tbody id="stock-body">
 							<c:choose>
 								<c:when test="${not empty result}">
 									<c:forEach var="item" items="${result}" varStatus="vs">
@@ -426,22 +423,46 @@ select.form-control {
 // 		검색 버튼 클릭시 아작스
 		const btn_sch = document.querySelector(".btn-sch");
 		btn_sch.addEventListener('click', ()=>{
-			let io = document.querySelector("input[name='io']:checked").value;
+			//값 추출
+// 			let io = document.querySelector("input[name='io']:checked").value;
 			let type = document.querySelector("#mType").value;
+			let keyword = document.querySelector("#keyword").value;
 			
-			const date = {
-					io: io,
-					type: type
-			}//data
+			const params = new URLSearchParams();
+			params.append("page", 1);
+			params.append("type", type);
+			params.append("keyword", keyword);
+// 			params.append("io", io);
 			
-			const response = await fetch("/Zmartfarm/searchStock",{
-				method: 'POST',
-				headers: {"Content-Type": "application/json"},
-				body: JSON.stringify(data)
-			});//response
-			
-			const result = await response.json();
-			
+			fetch(`${pageContext.request.contextPath}/searchStock?\${params.toString()}`)
+			.then(response => response.json())
+			.then(data => {
+				if(data.status === "good"){
+					let tbody = document.querySelector("#stock-body");
+					tbody.innerHTML = "";
+					if(data.searchResult.length == 0){
+						tbody.innerHTML = "<tr><td colspan='8'>조회된 결과가 없습니다.</td></tr>";
+						return;
+					}//if(data.searchResult.length === 0)
+						
+						let html ="";
+						for(let i = 0; i < data.searchResult.length; i++) {
+				            let item = data.searchResult[i];
+				            
+				            html += "<tr>";
+				            html += "    <td style='font-weight: bold; color: #555;'>" + (i + 1) + "</td>";
+				            html += "    <td>" + item.CODE + "</td>";
+				            html += "    <td><a href='#' class='link-txt'>" + item.NAME + "</a></td>";
+				            html += "    <td>" + item.TYPE + "</td>";
+				            html += "    <td>" + item.STOCK_QTY + "</td>";
+				            html += "    <td>" + item.SAFE + "</td>";
+				            html += "    <td>" + item.UNIT + "</td>";
+				            html += "    <td>" + item.FACILITY_NAME + "</td>";
+				            html += "</tr>";
+				        }
+					tbody.innerHTML = html;
+				}//if(data.status === "good")
+			})
 		})
 	</script>
 
