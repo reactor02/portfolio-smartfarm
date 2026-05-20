@@ -28,7 +28,7 @@ response.setContentType("text/html; charset=utf-8");
 				<!-- 타이틀 & 등록 버튼 -->
 				<div class="hdr">
 					<h1>생산계획 관리</h1>
-					<button type="button" class="btn-reg">+ 등록하기</button>
+					<button type="button" id="btnOpenModal" class="btn-reg">+ 등록하기</button>
 				</div>
 
 				<!-- 검색 폼 -->
@@ -68,7 +68,7 @@ response.setContentType("text/html; charset=utf-8");
 							<div class="sch-right">
 								<div class="sch-input-box">
 									<span style="color: #888;">&#128269;</span> <input type="text"
-										name="keyword" value="${param.keyword}" placeholder="검색">
+										name="keyword" value="${param.keyword}" placeholder="계획번호">
 								</div>
 								<button type="submit" class="btn-sch">검색</button>
 							</div>
@@ -101,15 +101,16 @@ response.setContentType("text/html; charset=utf-8");
 											<td style="font-weight: bold; color: #555;">
 												${page.totalCount - (page.page - 1) * page.size - vs.count + 1}
 											</td>
-											<td><a href="/prod/detail?planNum=${prod.plan_num}"
-												class="link-txt">${prod.plan_num}</a></td>
+											<td><a href="/prod/${prod.plan_id}">${prod.plan_id}</a></td>
 											<td>${prod.item_name}</td>
 											<td>${prod.plan_qty}</td>
 											<td>${prod.plan_start}</td>
 											<td>${prod.plan_end}</td>
-											<td><fmt:formatNumber
-													value="${prod.plan_qty > 0 ? (prod.currentqty / prod.plan_qty) * 100 : 0}"
-													maxFractionDigits="1" />%</td>
+											<td>
+												<fmt:formatNumber
+													value="${(prod.currentqty / prod.plan_qty) * 100 > 100 ? 100 : (prod.currentqty / prod.plan_qty) * 100}"
+													maxFractionDigits="1" />%
+													</td>
 											<td>${prod.plan_status}</td>
 											<td>${prod.facility_name}</td>
 											<td>${prod.ename}</td>
@@ -140,17 +141,20 @@ response.setContentType("text/html; charset=utf-8");
 				<!-- 페이지네이션 -->
 				<div class="pg-wrap">
 					<c:if test="${page.startPage > 1}">
-						<a href="/prod/list?page=${page.startPage - 1}&startDate=${param.startDate}&endDate=${param.endDate}&facility_num=${param.facility_num}&item_num=${param.item_num}&keyword=${param.keyword}"
+						<a
+							href="/prod/list?page=${page.startPage - 1}&startDate=${param.startDate}&endDate=${param.endDate}&facility_num=${param.facility_num}&item_num=${param.item_num}&keyword=${param.keyword}"
 							class="pg-btn">이전</a>
 					</c:if>
 
 					<c:forEach begin="${page.startPage}" end="${page.endPage}" var="p">
-						<a href="/prod/list?page=${p}&startDate=${param.startDate}&endDate=${param.endDate}&facility_num=${param.facility_num}&item_num=${param.item_num}&keyword=${param.keyword}"
+						<a
+							href="/prod/list?page=${p}&startDate=${param.startDate}&endDate=${param.endDate}&facility_num=${param.facility_num}&item_num=${param.item_num}&keyword=${param.keyword}"
 							class="pg-btn ${page.page == p ? 'pg-active' : ''}">${p}</a>
 					</c:forEach>
 
 					<c:if test="${page.endPage < page.totalPages}">
-						<a href="/prod/list?page=${page.endPage + 1}&startDate=${param.startDate}&endDate=${param.endDate}&facility_num=${param.facility_num}&item_num=${param.item_num}&keyword=${param.keyword}"
+						<a
+							href="/prod/list?page=${page.endPage + 1}&startDate=${param.startDate}&endDate=${param.endDate}&facility_num=${param.facility_num}&item_num=${param.item_num}&keyword=${param.keyword}"
 							class="pg-btn">다음</a>
 					</c:if>
 				</div>
@@ -160,7 +164,54 @@ response.setContentType("text/html; charset=utf-8");
 
 		<tiles:insertAttribute name="footer" ignore="true" />
 	</div>
-
+	<!-- ===== 등록 모달 ===== -->
+	<div id="regModal" class="modal-overlay" style="display:none;">
+    <div class="modal-box">
+        <h3 class="modal-title">생산계획 등록</h3>
+        <form id="regForm" action="/prod/create" method="post">
+            <div class="modal-grid">
+                <div class="modal-field">
+                    <label>계획수량</label>
+                    <input type="number" name="plan_qty" placeholder="수량 입력">
+                </div>
+                <div class="modal-field">
+                    <label>담당자</label>
+                    <select name="emp_num">
+                        <option value="">선택</option>
+                        <c:forEach var="e" items="${empList}">
+                            <option value="${e.emp_num}">${e.ename}</option>
+                        </c:forEach>
+                    </select>
+                </div>
+                <div class="modal-field">
+                    <label>생산일자</label>
+                    <input type="date" name="plan_start">
+                </div>
+                <div class="modal-field">
+                    <label>생산마감</label>
+                    <input type="date" name="plan_end">
+                </div>
+                <div class="modal-field">
+                    <label>품목</label>
+                    <select name="item_num">
+                        <option value="">선택</option>
+                        <c:forEach var="i" items="${itemList}">
+                            <option value="${i.num}">${i.name}</option>
+                        </c:forEach>
+                    </select>
+                </div>
+                <div class="modal-field modal-field-full">
+                    <label>추가지시사항</label>
+                    <textarea name="content" rows="4" placeholder="추가지시사항 입력"></textarea>
+                </div>
+            </div>
+            <div class="modal-btn-wrap">
+                <button type="submit" class="btn-reg">등록</button>
+                <button type="button" class="btn-cancel">취소</button>
+            </div>
+        </form>
+    </div>
+</div>
 	<script>
 		function validateDate() {
 			const start = document.getElementById('startDate').value;

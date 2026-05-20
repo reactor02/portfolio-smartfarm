@@ -38,7 +38,8 @@
         .ftr { text-align: center; padding: 1rem 0; background-color: #EEE; font-size: 0.8rem; color: #777; margin-top: auto; }
     </style>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/page.css">
-    
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/modal.css">
+    <script src="${pageContext.request.contextPath}/resources/js/modal.js"></script>
 </head>
 <body>
 <div class="mat-all">

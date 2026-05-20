@@ -23,4 +23,12 @@ public class StockDAOImpl implements StockDAO{
 		System.out.println(result);
 		return result;
 	}
+	
+	public List searchStock2(Map map) {
+		List result = null;
+		int pageNum = (Integer)map.get("page");
+		PageHelper.startPage(pageNum, 5);
+		result = sqlSession.selectList("kr.or.stock.searchStock", map);
+		return result;
+	}
 }

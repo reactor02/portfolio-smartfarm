@@ -26,6 +26,18 @@ public class ProdDAOImpl implements ProdDAO  {
 		public List<SelectOptionDTO> getItemOptions() {
 		    return session.selectList("kr.or.smartfarm.prod.getItemOptions");
 		}
+	 	
+	 @Override
+	 public ProdDTO getSelectOne(String plan_id) {
+		 ProdDTO prodDTO= session.selectOne("kr.or.smartfarm.prod.getOne", plan_id);
+		 return prodDTO;
+	 }
+	 
+	 @Override
+	 public int create(ProdDTO prodDTO) {
+		 int a =session.insert("kr.or.smartfarm.prod.insert", prodDTO);
+		 return a;
+	 }
 	 
 
 	 
