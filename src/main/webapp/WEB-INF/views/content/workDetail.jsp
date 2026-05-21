@@ -12,7 +12,6 @@
 <meta charset="UTF-8">
 <title>작업지시 상세</title>
 <style>
-    /* prodDetail.jsp CSS 그대로 + 추가 스타일 */
     :root {
         --m-cl: #2D6A4F;
         --s-cl: #49A47A;
@@ -45,51 +44,44 @@
     .cont { flex: 1; padding: 2rem; background-color: #FFF; }
     .ftr { text-align: center; padding: 1rem 0; background-color: #EEE; font-size: 0.8rem; color: #777; margin-top: auto; }
 
-    .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 2px solid var(--m-cl); }
+    .page-header { display: flex; flex-direction: column; margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 2px solid var(--m-cl); }
     .page-title { font-size: 1.5rem; font-weight: bold; color: var(--txt); }
+    .btn-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; }
 
-    .btn-group button { padding: 8px 18px; border-radius: 6px; border: 1px solid var(--border-cl); background: #FFF; cursor: pointer; font-weight: bold; margin-left: 6px; font-size: 13px; transition: background 0.2s; }
-    .btn-group .btn-back { background-color: var(--m-cl); color: #FFF; border: none; }
-    .btn-group .btn-back:hover { background-color: var(--s-cl); }
-    .btn-group .btn-reg { background-color: var(--s-cl); color: #FFF; border: none; }
-    .btn-group .btn-reg:hover { background-color: var(--m-cl); }
-    .btn-group .btn-cancel:hover { background-color: var(--bg); }
+    .btn-row button { padding: 8px 18px; border-radius: 6px; border: 1px solid var(--border-cl); background: #FFF; cursor: pointer; font-weight: bold; font-size: 13px; transition: background 0.2s; }
+    .btn-row .btn-back { background-color: var(--m-cl); color: #FFF; border: none; }
+    .btn-row .btn-back:hover { background-color: var(--s-cl); }
+    .btn-row .btn-reg  { background-color: var(--s-cl); color: #FFF; border: none; }
+    .btn-row .btn-reg:hover  { background-color: var(--m-cl); }
+    .btn-row .btn-cancel { background-color: #DC3545; color: #FFF; border: none; }
+    .btn-row .btn-cancel:active { background-color: #C82333; }
 
     .section-title { font-size: 1.1rem; font-weight: bold; margin: 2rem 0 1rem 0; color: var(--m-cl); }
 
-    /* 기본 정보 그리드 */
     .info-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; background-color: var(--bg); padding: 20px; border: 1px solid var(--border-cl); border-radius: 8px; }
     .info-item { display: flex; flex-direction: column; gap: 6px; }
     .info-label { font-size: 12px; color: #777; font-weight: bold; }
     .info-value { font-size: 14px; font-weight: bold; }
     .badge { background-color: var(--p-cl); color: var(--m-cl); padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: bold; width: fit-content; }
 
-    /* 작업 현황 */
-    .status-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 1.5rem; text-align: center; }
+    .status-grid { display: grid; gap: 15px; margin-bottom: 1.5rem; text-align: center; }
     .status-card { background-color: #FFF; border: 1px solid var(--border-cl); padding: 16px; border-radius: 8px; }
     .status-num { font-size: 1.3rem; font-weight: bold; margin-top: 6px; }
 
-    /* 진행률 바 */
     .progress-box { background-color: var(--bg); border: 1px solid var(--border-cl); padding: 20px; border-radius: 8px; }
     .progress-bar-bg { background-color: #E9ECEF; height: 12px; border-radius: 6px; overflow: hidden; margin-top: 8px; }
-    .progress-bar-fill { background-color: var(--s-cl); height: 100%; transition: width 0.3s ease; }
+    .progress-bar-fill { background-color: var(--s-cl); height: 100%; width: 0%; transition: width 0.3s ease; }
     .progress-text { display: flex; justify-content: flex-end; font-size: 13px; font-weight: bold; color: var(--s-cl); margin-top: 6px; }
 
-    /* 하단 2열 레이아웃 (공정 정보 + 불량 기록) */
-    .bottom-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 0.5rem; }
-
-    /* 데이터 테이블 */
     .data-table { width: 100%; border-collapse: collapse; margin-top: 0.5rem; }
     .data-table th { background-color: var(--bg); border-bottom: 2px solid var(--s-cl); color: var(--txt); font-weight: bold; padding: 12px; text-align: center; font-size: 13px; }
     .data-table td { padding: 12px; border-bottom: 1px solid var(--border-cl); text-align: center; color: #555; }
     .data-table tbody tr:hover { background-color: rgba(183, 228, 199, 0.15); }
 
-    /* 공정 정보 */
     .link-text { color: var(--s-cl); font-weight: bold; text-decoration: none; }
     .link-text:hover { text-decoration: underline; }
     .instruction-box { background-color: var(--bg); padding: 18px; border-left: 4px solid var(--s-cl); margin-top: 15px; border-top: 1px solid var(--border-cl); border-right: 1px solid var(--border-cl); border-bottom: 1px solid var(--border-cl); border-radius: 0 8px 8px 0; }
 
-    /* 섹션 박스 */
     .section-box { border: 1px solid var(--border-cl); border-radius: 8px; padding: 20px; background-color: #FFF; }
     .section-box .section-title { margin-top: 0; }
 </style>
@@ -100,12 +92,14 @@
 
         <!-- 페이지 헤더 -->
         <div class="page-header">
-            <h1 class="page-title">작업지시 상세</h1>
-            <div class="btn-group">
-                <button class="btn-back" onclick="history.back();">목록으로</button>
-                <button class="btn-reg">작업 등록</button>
-                <button class="btn-cancel">취소</button>
+            <div class="btn-row">
+                <button class="btn-back" onclick="location.href='/work'">목록으로</button>
+                <div>
+                    <button class="btn-cancel" style="margin-left:6px;"
+                            onclick="cancelWork()">취소</button>
+                </div>
             </div>
+            <h1 class="page-title">작업지시 상세</h1>
         </div>
 
         <!-- 1. 기본 정보 -->
@@ -137,21 +131,21 @@
             </div>
             <div class="info-item">
                 <span class="info-label">작업일</span>
-                <span class="info-value">${workDTO.order_start}</span>
+                <span class="info-value"><fmt:formatDate value="${workDTO.order_start}" pattern="yyyy-MM-dd"/></span>
             </div>
             <div class="info-item">
                 <span class="info-label">작업완료</span>
-                <span class="info-value">${workDTO.order_end}</span>
+                <span class="info-value"><fmt:formatDate value="${workDTO.order_end}" pattern="yyyy-MM-dd"/></span>
             </div>
             <div class="info-item">
                 <span class="info-label">등록일</span>
-                <span class="info-value">${workDTO.created_at}</span>
+                <span class="info-value"><fmt:formatDate value="${workDTO.created_at}" pattern="yyyy-MM-dd"/></span>
             </div>
         </div>
 
         <!-- 2. 작업 현황 -->
         <div class="section-title">■ 작업 현황</div>
-        <div class="status-grid">
+        <div class="status-grid" style="grid-template-columns: repeat(3, 1fr);">
             <div class="status-card">
                 <div class="info-label">계획 수량</div>
                 <div class="status-num">${workDTO.plan_qty}</div>
@@ -166,10 +160,6 @@
                     ${workDTO.plan_qty - workDTO.current_qty < 0 ? 0 : workDTO.plan_qty - workDTO.current_qty}
                 </div>
             </div>
-            <div class="status-card">
-                <div class="info-label" style="color: var(--danger-cl);">불량 수량</div>
-                <div class="status-num" style="color: var(--danger-cl);">${workDTO.scrap_qty}</div>
-            </div>
         </div>
         <div class="progress-box">
             <div class="info-label">진행률</div>
@@ -179,70 +169,39 @@
             <div class="progress-text" id="progressText"></div>
         </div>
 
-        <!-- 3. 공정 정보 + 불량 기록 -->
-        <div class="bottom-grid">
-
-            <!-- 공정 정보 -->
-            <div class="section-box">
-                <div class="section-title">■ 공정 정보</div>
-                <div style="margin-bottom: 8px;">
-                    <span class="info-label">공정 정보 링크:</span>
-                    <a href="#" class="link-text">${workDTO.item_name} 공정관리 링크</a>
-                </div>
-                <div class="instruction-box">
-                    <span class="info-label" style="display:block; margin-bottom:6px;">상세 지시사항</span>
-                    <strong>${workDTO.content}</strong>
-                </div>
-            </div>
-
-            <!-- 불량 기록 -->
-            <div class="section-box">
-                <div class="section-title">■ 불량 기록</div>
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th>불량 종류</th>
-                            <th>수량</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <c:choose>
-                            <c:when test="${not empty defectList}">
-                                <c:forEach var="d" items="${defectList}">
-                                    <tr>
-                                        <td>${d.defect_type}</td>
-                                        <td>${d.defect_qty}</td>
-                                    </tr>
-                                </c:forEach>
-                            </c:when>
-                            <c:otherwise>
-                                <tr><td colspan="2">불량 기록 없음</td></tr>
-                            </c:otherwise>
-                        </c:choose>
-                    </tbody>
-                </table>
-            </div>
-
+        <!-- 3. 공정 정보 -->
+        <div class="section-title">■ 공정 정보</div>
+        <div style="margin-bottom: 8px;">
+            <span class="info-label">공정 정보 링크:</span>
+            <a href="/process/item/${workDTO.item_num}" class="link-text">${workDTO.item_name} 공정관리 링크</a>
+        </div>
+        <div class="instruction-box">
+            <span class="info-label" style="display:block; margin-bottom:6px;">상세 지시사항</span>
+            <strong>${workDTO.content}</strong>
         </div>
 
     </main>
 
 <script>
-    window.onload = function () {
-        setProgress();
-    }
+    var WORK_ORDER_ID = '${workDTO.work_order_id}';
 
-    function setProgress() {
-        var planQty  = ${workDTO.plan_qty};
-        var currentQty = ${workDTO.current_qty};
+    window.onload = function () {
+        var planQty    = parseInt('${workDTO.plan_qty}')    || 0;
+        var currentQty = parseInt('${workDTO.current_qty}') || 0;
 
         if (planQty <= 0) return;
 
-        var pct = (currentQty / planQty) * 100;
-        if (pct > 100) pct = 100;
-
+        var pct = Math.min((currentQty / planQty) * 100, 100);
         document.getElementById('progressBar').style.width = pct.toFixed(1) + '%';
-        document.getElementById('progressText').innerText = pct.toFixed(1) + '%';
+        document.getElementById('progressText').innerText  = pct.toFixed(1) + '%';
+    };
+
+    function cancelWork() {
+        if (!confirm('해당 작업지시를 취소하시겠습니까?')) return;
+        fetch('/work/' + WORK_ORDER_ID + '/cancel', { method: 'POST' })
+            .then(function(r) { return r.text(); })
+            .then(function() { location.reload(); })
+            .catch(function() { alert('처리 중 오류가 발생했습니다.'); });
     }
 </script>
 

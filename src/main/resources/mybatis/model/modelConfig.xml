@@ -11,10 +11,17 @@
     
    
     
-	<typeAliases>    
-        <typeAlias type="kr.or.smartfarm.prod.ProdDTO" alias="ProdDTO"/>    
-        <typeAlias type="kr.or.smartfarm.prod.SelectOptionDTO" alias="SelectOptionDTO"/>    
-        <typeAlias type="kr.or.smartfarm.prod.ProdPageDTO" alias="ProdPageDTO"/>
+	<typeAliases>
+        <!-- prod -->
+        <typeAlias type="kr.or.smartfarm.prod.ProdDTO"         alias="ProdDTO"/>
+        <typeAlias type="kr.or.smartfarm.prod.SelectOptionDTO" alias="SelectOptionDTO"/>
+        <typeAlias type="kr.or.smartfarm.prod.ProdPageDTO"     alias="ProdPageDTO"/>
+        <!-- work -->
+        <typeAlias type="kr.or.smartfarm.work.WorkDTO"         alias="WorkDTO"/>
+        <typeAlias type="kr.or.smartfarm.work.WorkPageDTO"     alias="WorkPageDTO"/>
+        <!-- lot -->
+        <typeAlias type="kr.or.smartfarm.lot.LotDTO"           alias="LotDTO"/>
+        <typeAlias type="kr.or.smartfarm.lot.LotPageDTO"       alias="LotPageDTO"/>
     </typeAliases>
     
       

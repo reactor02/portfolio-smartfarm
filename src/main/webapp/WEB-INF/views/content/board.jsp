@@ -14,6 +14,8 @@
 <head>
 <meta charset="UTF-8">
 <title>게시판</title>
+
+<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/paging.css">
 <style>
 /* 기본 초기화 */
 * {
@@ -294,6 +296,16 @@ select.form-control {
 	border-color: #2D6A4F;
 	font-weight: bold;
 }
+
+.link-txt {
+	color: #2D6A4F;
+	text-decoration: none;
+	font-weight: bold;
+}
+
+.link-txt:hover {
+	text-decoration: underline;
+}
 </style>
 
 
@@ -320,14 +332,14 @@ select.form-control {
 					<tr>
 						<td>\${data[i].board_num}</td>
 						<td>\${data[i].category}</td>
-						<td><a href="\${contextPath}/board/one?board_num=\${data[i].board_num}">\${data[i].title}</a></td>
+						<td><a href="\${contextPath}/board/one?board_num=\${data[i].board_num}" class="link-txt">\${data[i].title}</a></td>
 						<td>\${data[i].content}</td>
 						<td>\${data[i].view_cnt}</td>
-						<td>\${data[i].created_at}</td>
-						<td>\${data[i].updated_at}</td>
+						<td>\${formatDate(data[i].created_at)}</td>
+						<td>\${formatDate(data[i].updated_at)}</td>
 						<td>\${data[i].board_status}</td>
 						<td>\${data[i].files_num}</td>
-						<td>\${data[i].emp_num}</td>
+						<td>\${data[i].ename}</td>
 						
 					</tr>
 					`
@@ -336,6 +348,19 @@ select.form-control {
 		
 		
 	}
+	
+	
+
+	function formatDate(ts){
+	    return ts ? new Date(ts).toLocaleString('ko-KR', {
+	        year:'numeric',
+	        month:'2-digit',
+	        day:'2-digit',
+	        hour:'2-digit',
+	        minute:'2-digit'
+	    }) : "";
+	}
+	</script>
 </script>
 </head>
 <body>
@@ -347,7 +372,7 @@ select.form-control {
 			<main class="main-cont">
 				<div class="hdr">
 					<h1>board</h1>
-					<button type="button" class="btn-reg">+ 글쓰기</button>
+					<button type="button" class="btn-reg"><a href="${pageContext.request.contextPath}/board/write" class="link-txt">+ 글쓰기</a></button>
 				</div>
 				
 				<%-- 검색창 action  --%>
@@ -389,7 +414,9 @@ select.form-control {
 				</table>
 				
 				<div class="table-responsive"></div>
-				<jsp:include page="/WEB-INF/views/common/paging.jsp" />
+								<div id="paging-area">
+					<jsp:include page="/WEB-INF/views/common/paging.jsp" />
+				</div>
 			</main>
 			
 		</div>

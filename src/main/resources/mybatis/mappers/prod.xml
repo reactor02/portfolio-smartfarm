@@ -4,15 +4,22 @@
     "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="kr.or.smartfarm.prod">
 
-    <!-- 목록 + 전체 건수 한 번에 조회 -->
+    <!-- 목록 + 전체 건수 한 번에 조회 (날짜 기반 상태 자동 갱신) -->
     <select id="getList" parameterType="ProdPageDTO" resultType="ProdDTO">
         SELECT plan_num, plan_qty, plan_status, plan_start, plan_end,
-               emp_num,plan_id, item_num, item_name, ename,
+               emp_num, plan_id, item_num, item_name, ename,
                facility_num, facility_name, currentqty, total_count
         FROM (
             SELECT inner_q.*, ROWNUM AS rn
             FROM (
-                SELECT pp.plan_num, pp.plan_id, pp.plan_qty, pp.plan_status, pp.plan_start, pp.plan_end,
+                SELECT pp.plan_num, pp.plan_id, pp.plan_qty,
+                       CASE
+                           WHEN pp.plan_status = '취소'       THEN '취소'
+                           WHEN SYSDATE > pp.plan_end         THEN '완료'
+                           WHEN SYSDATE >= pp.plan_start      THEN '진행'
+                           ELSE '대기'
+                       END AS plan_status,
+                       pp.plan_start, pp.plan_end,
                        pp.emp_num, pp.item_num,
                        i.name            AS item_name,
                        e.ename,
@@ -36,6 +43,14 @@
                     <if test="endDate != null and endDate != ''">
                         AND pp.plan_end &lt;= TO_DATE(#{endDate}, 'YYYY-MM-DD')
                     </if>
+                    <if test="plan_status != null and plan_status != ''">
+                        AND CASE
+                                WHEN pp.plan_status = '취소'  THEN '취소'
+                                WHEN SYSDATE > pp.plan_end    THEN '완료'
+                                WHEN SYSDATE >= pp.plan_start THEN '진행'
+                                ELSE '대기'
+                            END = #{plan_status}
+                    </if>
                     <if test="facility_num != 0">
                         AND f.facility_num = #{facility_num}
                     </if>
@@ -43,7 +58,8 @@
                         AND pp.item_num = #{item_num}
                     </if>
                     <if test="keyword != null and keyword != ''">
-                        AND TO_CHAR(pp.plan_num) LIKE '%' || #{keyword} || '%'
+                        AND (pp.plan_id LIKE '%' || #{keyword} || '%'
+                          OR i.name     LIKE '%' || #{keyword} || '%')
                     </if>
                 </where>
                 ORDER BY pp.plan_num DESC
@@ -53,53 +69,107 @@
         WHERE rn >= #{startRow}
     </select>
 
+    <!-- 직원 드롭다운 옵션 조회 -->
+    <select id="getEmpList" resultType="SelectOptionDTO">
+        SELECT emp_num AS num, ename AS name
+        FROM emp
+        ORDER BY emp_num
+    </select>
+
     <!-- 시설 드롭다운 옵션 조회 -->
     <select id="getFacilityOptions" resultType="SelectOptionDTO">
         SELECT facility_num AS num, facility_name AS name
         FROM facility
     </select>
 
-    <!-- 제품 드롭다운 옵션 조회 (PRODUCT 타입만) -->
+    <!-- 제품 드롭다운 옵션 조회 (PRODUCT + SEMIPRODUCT) -->
     <select id="getItemOptions" resultType="SelectOptionDTO">
         SELECT item_num AS num, name AS name
         FROM item
-        WHERE type = 'PRODUCT'
+        WHERE type IN ('PRODUCT', 'SEMIPRODUCT')
+        ORDER BY type, name
     </select>
-    
+
+    <!-- 단건 조회 -->
     <select id="getOne" parameterType="String" resultType="ProdDTO">
-    	 SELECT pp.plan_num, pp.plan_id, pp.plan_qty, pp.plan_status, pp.plan_start, pp.plan_end,
-           pp.emp_num, pp.item_num,pp.created_at,
-           i.name         AS item_name, i.code, i.type,
-           e.ename,
-           f.facility_num,
-           f.facility_name,
-           NVL(wo.currentqty, 0) AS currentqty
-    FROM production_plan pp
-    LEFT JOIN item     i ON pp.item_num    = i.item_num
-    LEFT JOIN emp      e ON pp.emp_num     = e.emp_num
-    LEFT JOIN facility f ON i.facility_num = f.facility_num
-    LEFT JOIN (
-        SELECT plan_num, SUM(current_qty) AS currentqty
-        FROM work_order
-        GROUP BY plan_num
-    ) wo ON pp.plan_num = wo.plan_num
-    WHERE pp.plan_id = #{plan_id}
+        SELECT pp.plan_num, pp.plan_id, pp.plan_qty,
+               CASE
+                   WHEN pp.plan_status = '취소'       THEN '취소'
+                   WHEN SYSDATE > pp.plan_end         THEN '완료'
+                   WHEN SYSDATE >= pp.plan_start      THEN '진행'
+                   ELSE '대기'
+               END AS plan_status,
+               pp.plan_start, pp.plan_end,
+               pp.emp_num, pp.item_num, pp.created_at,
+               i.name         AS item_name, i.code, i.type,
+               e.ename,
+               f.facility_num,
+               f.facility_name,
+               NVL(wo.currentqty, 0) AS currentqty
+        FROM production_plan pp
+        LEFT JOIN item     i ON pp.item_num    = i.item_num
+        LEFT JOIN emp      e ON pp.emp_num     = e.emp_num
+        LEFT JOIN facility f ON i.facility_num = f.facility_num
+        LEFT JOIN (
+            SELECT plan_num, SUM(current_qty) AS currentqty
+            FROM work_order
+            GROUP BY plan_num
+        ) wo ON pp.plan_num = wo.plan_num
+        WHERE pp.plan_id = #{plan_id}
     </select>
-    
-    <insert id="insert" parameterType="prodDTO">
-    INSERT INTO production_plan (plan_num, plan_id, plan_qty, plan_status, plan_start, plan_end, emp_num, item_num, content, created_at)
-    VALUES (
-        PROD_SEQ.NEXTVAL,
-        #{plan_qty},
-        '대기',
-        #{plan_start},
-        #{plan_end},
-        #{emp_num},
-        #{item_num},
-        #{content},
-        #{plan_id}
-        #{created_at}
-    )
-</insert>
+
+    <!-- 등록 (plan_id 자동 생성) -->
+    <insert id="insert" parameterType="ProdDTO">
+        <selectKey keyProperty="plan_id" resultType="String" order="BEFORE">
+            SELECT 'PROD-' || LPAD(PROD_SEQ.NEXTVAL, 4, '0') FROM DUAL
+        </selectKey>
+        INSERT INTO production_plan
+            (plan_num, plan_id, plan_qty, plan_status, plan_start, plan_end,
+             emp_num, item_num, content, created_at)
+        VALUES (
+            PROD_SEQ.CURRVAL,
+            #{plan_id},
+            #{plan_qty},
+            '대기',
+            #{plan_start},
+            #{plan_end},
+            #{emp_num},
+            #{item_num},
+            #{content},
+            SYSDATE
+        )
+    </insert>
+
+    <!-- 상태 변경 (취소 처리) -->
+    <update id="updateStatus" parameterType="ProdDTO">
+        UPDATE production_plan
+        SET plan_status = #{plan_status}
+        WHERE plan_id = #{plan_id}
+    </update>
+
+    <!-- 작업 이력 조회 (plan_num 기준, 페이징) -->
+    <select id="getWorkOrders" parameterType="map" resultType="WorkDTO">
+        SELECT work_order_id, order_qty, work_status, order_start, order_end,
+               current_qty, ename, total_count
+        FROM (
+            SELECT inner_q.*, ROWNUM AS rn
+            FROM (
+                SELECT wo.order_id    AS work_order_id,
+                       wo.order_qty,
+                       wo.order_status AS work_status,
+                       wo.order_start,
+                       wo.order_end,
+                       wo.current_qty,
+                       e.ename,
+                       COUNT(*) OVER() AS total_count
+                FROM work_order wo
+                LEFT JOIN emp e ON wo.emp_num = e.emp_num
+                WHERE wo.plan_num = #{plan_num}
+                ORDER BY wo.order_num DESC
+            ) inner_q
+            WHERE ROWNUM &lt;= #{endRow}
+        )
+        WHERE rn >= #{startRow}
+    </select>
 
 </mapper>
