@@ -17,6 +17,7 @@ public class ProdPageDTO {
     
     private String startDate = "";
     private String endDate = "";
+    private String plan_status = "";
     private int facility_num;
     private int item_num;
     private String keyword = "";

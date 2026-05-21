@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.smartfarm.lot">
+
+    <!-- 목록 조회 (페이징 + 필터) -->
+    <select id="getList" parameterType="LotPageDTO" resultType="LotDTO">
+        SELECT lot_num, lot_code, item_name, code, current_qty,
+               lot_date, lot_status, total_count
+        FROM (
+            SELECT inner_q.*, ROWNUM AS rn
+            FROM (
+                SELECT l.lot_num,
+                       l.lot_code,
+                       i.name         AS item_name,
+                       i.code,
+                       l.current_qty,
+                       l.lot_date,
+                       l.lot_status,
+                       COUNT(*) OVER() AS total_count
+                FROM lot l
+                LEFT JOIN item i ON l.item_num = i.item_num
+                <where>
+                    <if test="startDate != null and startDate != ''">
+                        AND l.lot_date &gt;= TO_DATE(#{startDate}, 'YYYY-MM-DD')
+                    </if>
+                    <if test="endDate != null and endDate != ''">
+                        AND l.lot_date &lt;= TO_DATE(#{endDate}, 'YYYY-MM-DD')
+                    </if>
+                    <if test="lot_status != null and lot_status != ''">
+                        AND l.lot_status = #{lot_status}
+                    </if>
+                    <if test="item_num != 0">
+                        AND l.item_num = #{item_num}
+                    </if>
+                    <if test="keyword != null and keyword != ''">
+                        AND (l.lot_code LIKE '%' || #{keyword} || '%'
+                          OR i.name     LIKE '%' || #{keyword} || '%')
+                    </if>
+                </where>
+                ORDER BY l.lot_num DESC
+            ) inner_q
+            WHERE ROWNUM &lt;= #{endRow}
+        )
+        WHERE rn &gt;= #{startRow}
+    </select>
+
+    <!-- 단건 조회 -->
+    <select id="getOne" parameterType="String" resultType="LotDTO">
+        SELECT l.lot_num, l.lot_code, l.expiry_date,
+               l.item_num, l.lot_date, l.init_qty,
+               l.current_qty, l.lot_status,
+               i.name AS item_name, i.code, i.type
+        FROM lot l
+        LEFT JOIN item i ON l.item_num = i.item_num
+        WHERE l.lot_code = #{lot_code}
+    </select>
+
+</mapper>

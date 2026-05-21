@@ -33,10 +33,18 @@ public class StockDAOImpl implements StockDAO{
 	}
 	
 	//모달 셀렉트 
-	public Map modalSearch2(String str) {
-		Map result = null;
+	public List modalSearch2(String str) {
+
+		System.out.println("!" + str);
+		List result = sqlSession.selectList("kr.or.stock.modalSearch", str);
+		System.out.println(result);
+		return result;
+	}
+	
+	public int insertStock2(StockDTO dto) {
 		
-		
+		int result = sqlSession.insert("kr.or.stock.insert", dto);
+		System.out.println("DAO에서 result == "+ result);
 		return result;
 	}
 }

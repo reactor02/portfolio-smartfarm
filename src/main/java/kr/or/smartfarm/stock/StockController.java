@@ -1,6 +1,5 @@
 package kr.or.smartfarm.stock;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,11 +22,11 @@ public class StockController {
 	StockService stockService;
 	
 	@RequestMapping("/stockSelect")
-	public String goStock(@RequestParam(value = "page", defaultValue = "1")int page,Model model) {
+	public String goStock(@RequestParam(value = "page", defaultValue = "1")int page,@RequestParam(value="msg", required=false)String msg,Model model) {
 		List result = null;
 		 result = stockService.selectAll(page);
 		 model.addAttribute("result" , result);
-		 
+		 model.addAttribute("msg", msg);
 		 PageInfo<Map<String, Object>> pageInfo = new PageInfo<Map<String, Object>>(result);
 		 model.addAttribute("pageInfo", pageInfo);
 		return "content/stockSelect";
@@ -72,12 +71,27 @@ System.out.println(searchMap);
 	    return result;
 	}
 	
-	//모달 등록 ajax
+	//모달에서 검색
 	@RequestMapping("/modal")
-	public Map modal(@RequestParam(value = "search")String keyword,Model model) {
+	@ResponseBody
+	public Map modal(@RequestParam(value = "search")String keyword) {
 		Map result = null;
-		
+		System.out.println(keyword);
+		result = stockService.modalSearch(keyword);
 		return result;
+	}
+	//모달 등록
+	@RequestMapping("/insertController")
+	public String insertController(StockDTO dto, Model model) {
+		System.out.println("insertController들어옴");
+		int result = stockService.insertStock(dto);
+		model.addAttribute("inertResult", result);
+		if(result > 0) {
+			return "redirect:/stockSelect?msg=true";
+		}else {
+			return "redirect:/stockSelect?msg=false";
+		}
+		
 	}
 }
 
