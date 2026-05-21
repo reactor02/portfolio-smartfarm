@@ -169,6 +169,7 @@ select.form-control {
 							<option value="">카테고리 선택</option>
 							<option value="공지">공지</option>
 							<option value="일반">일반</option>
+							<option value="자유">자유</option>
 						</select>
 
 						<!-- 제목 -->

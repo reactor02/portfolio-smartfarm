@@ -56,30 +56,52 @@ public class BoardController {
 		BoardDTO boardDTO = boardService.getBoard(board_num);
 		model.addAttribute("boardDTO", boardDTO);
 		System.out.println("/one: board_num: "+ board_num);
-		System.out.println(board_num);
 		
 		// 조회수 증가 
 		boardService.updateViewCnt(board_num);
 		
-		
-		
 		return "content/boarddetail";
-		
-		
 	}
 	
 	@GetMapping("/write")
 	public String writeForm() {
 		System.out.println("get /write 실행");
-	    return "content/writeboard";
+	    
+		return "content/writeboard";
 	}
 	
 	@PostMapping("/write")
 	public String write(BoardDTO boardDTO) {
 		System.out.println("post /write 실행");
+		
 		boardService.insertBoard(boardDTO);
+		
 		return "redirect:/board";
 	}
+	
+	@GetMapping("/modify")
+	public String modifyForm(BoardDTO boardDTO, Model model) {
+		System.out.println("/modify 실행");
+	
+		int result = boardService.updateBoard(boardDTO);
+		model.addAttribute("result", result);
+		model.addAttribute("mode","modify");
+		
+		return "redirect:/board";
+	}
+	
+	@RequestMapping("/deleteBoard")
+	public String deleteBoard(BoardDTO boardDTO, Model model) {
+		System.out.println("/deleteBoard 실행");
+		logger.info("boardDTO :" + boardDTO); 
+		
+		int result = boardService.deleteBoard(boardDTO);
+		
+		return "redirect:/board";
+	}
+	
+	
+	
 	
 	
 

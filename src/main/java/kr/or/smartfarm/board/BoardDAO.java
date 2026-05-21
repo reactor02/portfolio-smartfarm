@@ -13,4 +13,7 @@ public interface BoardDAO {
 	// viewcnt 업데이트 
 	void updateViewCnt(int board_num);
 	
+	int updateBoard(BoardDTO boardDTO);
+	int deleteBoard(BoardDTO boardDTO);
+	
 }
