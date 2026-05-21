@@ -1,12 +1,15 @@
 package kr.or.smartfarm.prod;
 
 import java.util.List;
+import java.util.Map;
 
-import org.springframework.stereotype.Service;
-
-@Service
 public interface ProdService {
-	public List<ProdDTO> getList(ProdPageDTO page);
-	public ProdDTO selectOne(String plan_id);
-	public int creat(ProdDTO prodDTO);
+    List<ProdDTO>         getList(ProdPageDTO page);
+    ProdDTO               selectOne(String plan_id);
+    int                   create(ProdDTO prodDTO);
+    List<SelectOptionDTO> getEmpList();
+    List<SelectOptionDTO> getFacilityOptions();
+    List<SelectOptionDTO> getItemOptions();
+    void                  updateStatus(String plan_id, String status);
+    Map<String, Object>   getWorkOrders(int plan_num, int page);
 }
