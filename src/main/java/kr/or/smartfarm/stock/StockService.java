@@ -8,4 +8,5 @@ public interface StockService {
 	public List selectAll(int pageNum);
 	public List searchStock(Map map);
 	public Map modalSearch(String str);
+	public int insertStock(StockDTO dto);
 }

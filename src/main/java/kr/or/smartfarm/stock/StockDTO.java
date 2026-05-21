@@ -11,5 +11,9 @@ public class StockDTO {
 	
 
 	private int item_num; // item시퀀스
-
+	private String code;
+	private String name;
+	private String type;
+	private String unit;
+	
 }

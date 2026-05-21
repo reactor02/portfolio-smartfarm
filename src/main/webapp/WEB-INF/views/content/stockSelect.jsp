@@ -85,6 +85,23 @@ response.setContentType("text/html; charset=utf-8");
 	transition: background-color 0.2s;
 }
 
+.btn-plus:hover {
+	background-color: #B7E4C7;
+}
+.btn-plus {
+	background-color: #fff;
+	color: #2D6A4F; /* 텍스트가 아닌 명확한 버튼 디자인 */
+	padding: 10px 24px;
+	border-radius: 6px;
+	border: 1px solid #2D6A4F;
+	font-weight: bold;
+	font-size: 1.05rem;
+	cursor: pointer;
+	box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 2px 3px
+		rgba(0, 0, 0, 0.2);
+	transition: background-color 0.2s;
+}
+
 .btn-reg:hover {
 	background-color: #B7E4C7;
 }
@@ -366,69 +383,73 @@ select.form-control {
 
 		<tiles:insertAttribute name="footer" ignore="true" />
 	</div>
-<!-- 재고 등록 -->
-<div id="regModal" class="modal-overlay" style="display:none;">
-    <div class="modal-box">
-        <h3 class="modal-title">재고 등록</h3>
-        <form id="regForm" action="/prod/create" method="post" autocomplete="off">
-            
-            <div class="modal-grid">
-                <div class="modal-field">
-                    <label for="itemSearch">품목명 검색</label>
-                    <input type="text" id="itemSearch" placeholder="품목명 검색">
-                    <input type="hidden" name="item_num" id="itemNum">
-                </div>
+	<!-- 재고 등록 -->
+	<div id="regModal" class="modal-overlay" style="display: none;">
+		<div class="modal-box">
+			<h3 class="modal-title">재고 등록</h3>
 
-                <div class="modal-field">
-                    <label for="quantity">개수</label>
-                    <input type="number" name="quantity" id="quantity" min="1" placeholder="수량 입력">
-                </div>
+			<form method="POST" action="/insertController" id="insert-form">
+				<div class="modal-grid">
+					<div class="modal-field">
+						<label for="itemSearch">품목명 검색</label> 
+						<input type="text" id="itemSearch" placeholder="품목명 검색"> 
+					</div>
+					
+					<div class="modal-field">
+						<label for="quantity">개수</label> 
+						<input type="number" name="stock_qty" id="quantity" min="1" placeholder="수량 입력">
+					</div>
 
-                <div class="modal-field modal-field-full" id="selectedItemContainer" style="display:none; margin-top: 10px;">
-                    <span style="display: inline-block; padding: 6px 12px; background-color: #e6f7ff; color: #1890ff; border: 1px solid #91d5ff; border-radius: 4px; font-weight: bold; font-size: 14px;">
-                        📌 선택된 품목: <span id="selectedItemName" style="color: #0050b3;">-</span>
-                    </span>
-                </div>
+					<div class="modal-field modal-field-full" id="selectedItemContainer" style="display: none; margin-top: 10px;">
+						<span style="display: inline-block; padding: 6px 12px; background-color: #e6f7ff; color: #1890ff; border: 1px solid #91d5ff; border-radius: 4px; font-weight: bold; font-size: 14px;">
+							📌 선택된 품목: <span id="selectedItemName" style="color: #0050b3;">-</span>
+						</span>
+					</div>
 
-                <div class="modal-field modal-field-full" style="margin-top: 15px;">
-                    <label>선택 가능한 품목 리스트 (아래 행을 클릭하여 선택하세요)</label>
-                    
-                    <div id="searchResultArea" style="width: 100%; height: 200px; border: 1px solid #ccc; background: #fff; overflow-y: scroll; border-radius: 4px;">
-                        <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 14px; table-layout: fixed;">
-                            <colgroup>
-                                <col style="width: 10%;"> <col style="width: 25%;"> <col style="width: 35%;"> <col style="width: 15%;"> <col style="width: 15%;"> </colgroup>
-                            <thead style="background: #f5f5f5; position: sticky; top: 0; border-bottom: 1px solid #ddd; z-index: 10;">
-                                <tr>
-                                    <th style="padding: 10px; text-align: center;">선택</th> 
-                                    <th style="padding: 10px;">품목코드</th>
-                                    <th style="padding: 10px;">품목명</th>
-                                    <th style="padding: 10px;">타입</th>
-                                    <th style="padding: 10px;">단위</th>
-                                </tr>
-                            </thead>
-                            <tbody id="suggestList">
-                                <tr id="emptyMessage">
-                                    <td colspan="5" style="padding: 50px 10px; text-align: center; color: #999;">
-                                        품목명을 입력하면 조건에 맞는 기준관리 항목이 여기에 표시됩니다.
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="modal-btn-wrap" style="margin-top: 20px;">
-                <button type="submit" class="btn-reg">등록</button>
-                <button type="button" class="btn-cancel">취소</button>
-            </div>
-        </form>
-    </div>
-</div>
+					<div class="modal-field modal-field-full" style="margin-top: 15px;">
+						<label>선택 가능한 품목 리스트 (아래 행을 클릭하여 선택하세요)</label>
+
+						<div id="searchResultArea" style="width: 100%; height: 200px; border: 1px solid #ccc; background: #fff; overflow-y: scroll; border-radius: 4px;">
+							<table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 14px; table-layout: fixed;">
+								<colgroup>
+									<col style="width: 10%;">
+									<col style="width: 25%;">
+									<col style="width: 35%;">
+									<col style="width: 15%;">
+									<col style="width: 15%;">
+								</colgroup>
+								<thead style="background: #f5f5f5; position: sticky; top: 0; border-bottom: 1px solid #ddd; z-index: 10;">
+									<tr>
+										<th style="padding: 10px; text-align: center;">선택</th>
+										<th style="padding: 10px;">품목코드</th>
+										<th style="padding: 10px;">품목명</th>
+										<th style="padding: 10px;">타입</th>
+										<th style="padding: 10px;">단위</th>
+									</tr>
+								</thead>
+								<tbody id="suggestList">
+									<tr id="emptyMessage">
+										<td colspan="5" style="padding: 50px 10px; text-align: center; color: #999;">
+											품목명을 입력하면 조건에 맞는 기준관리 항목이 여기에 표시됩니다.
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+
+				<div class="modal-btn-wrap" style="margin-top: 20px;">
+					<button type="button" class="btn-plus">등록</button>
+					<button type="button" class="btn-cancel">취소</button>
+				</div>
+			</form>
+		</div>
+	</div>
 
 
 
-<!-- 스크립트 -->
+	<!-- 스크립트 -->
 	<script>
 		/* 날짜 유효성 검사 로직 */
 		function validateDate() {
@@ -488,7 +509,7 @@ select.form-control {
     params.append("type", type);
     params.append("keyword", keyword);
     
-    fetch(`${pageContext.request.contextPath}/searchStock?\${params.toString()}`)
+    fetch(`\${pageContext.request.contextPath}/searchStock?\${params.toString()}`)
     .then(response => response.json())
     .then(data => {
     	if(data.searchResult.length == 0){
@@ -547,34 +568,106 @@ select.form-control {
 		//모달 검색창 인풋 ajax
 		const itemSearch = document.querySelector("#itemSearch");
 			itemSearch.addEventListener('input', ()=>{
-				const query = itemSearch.trim();
+				const query = itemSearch.value.trim();
 				
 				if(query === ""){
 					document.querySelector("#suggestList").innerHTML = "";
+					suggestList.innerHTML = `
+			            <tr id="emptyMessage">
+			                <td colspan="5" style="padding: 50px 10px; text-align: center; color: #999;">
+			                    품목명을 입력하면 조건에 맞는 기준관리 항목이 여기에 표시됩니다.
+			                </td>
+			            </tr>
+			        `;
 					return;
 				}
 				
-				fetch(`/modal/plus?search=?\${encodeURIComponent(query)}`)
+				fetch(`/modal?search=\${encodeURIComponent(query)}`)
 				.then(response => response.json())
 				.then(data=>{
 					//여기에 받은 데이터 화면 갱신 로직 넣기 메서드 만들어서 넣으면 될듯 전달인자로 data넣어서
+					uploadData(data);
 				})
 				.catch(error=>{
 					console.log("등록모달 검색 에러 났음", error);
 				});
 			})
 			
-			function modalSearchResult(items){
-				const viewModalResult = document.querySelector("#suggestList");
-				
-				if(itmes.length === 0){
-					viewModalResult.innerHTML ="<tr><td colspan='5'>조회된 결과가 없습니다.</td></tr>";
-					return;					
-				}
-				
-				
-			}
 			
+			
+			//받은 data를 들고 테이블 만드는 함수
+			function uploadData(data){
+				const suggestList = document.getElementById('suggestList');
+				const Message = document.getElementById('emptyMessage');
+				
+				
+				const rows = suggestList.querySelectorAll('tr');
+				rows.forEach(row=>{
+					//테이블에 있는 tr중에 id가 emptyMessage(메시지)인것 빼고 제거
+					if(row.id !== 'emptyMessage'){
+						row.remove();
+					}
+				});//rows.forEach
+				const itemList = data.result;
+				if(itemList && itemList.length> 0){
+					Message.style.display = 'none';
+					
+					let html = "";
+					itemList.forEach(item =>{
+						html += `<tr>
+							<td style="text-align:center;"><input type="radio" name="item_num" value="\${item.ITEM_NUM || ''}"></td>
+			                <td>\${item.CODE || ''}</td>
+			                <td>\${item.NAME || ''}</td>
+			                <td>\${item.TYPE || ''}</td>
+			                <td>\${item.UNIT || 0}</td>
+			            </tr>`;
+			        });//data.forEach
+					
+			        //insertAdjacentHTML: html문자열을 태그로 바꿔서 넣음
+			        //'beforeend': suggestList의 태그가 닫히기 직전에 넣음
+					suggestList.insertAdjacentHTML('beforeend', html);
+					}//if(data && data.length> 0)
+					else{
+						Message.querySelector('td').innerText = '검색한 조건에 맞는 항목이 없습니다.';
+						Message.style.display = 'table-row';
+					}
+				}	//메서드 끝	
+				
+				
+				
+				//등록버튼 누르면 insert
+				const btn_plus = document.querySelector(".btn-plus");
+				btn_plus.addEventListener('click',()=>{
+					
+					//개수 인풋 값
+					const quantity = document.querySelector("#quantity").value;
+					//체크된 라디오 
+					const radio = document.querySelector("input[type='radio']:checked");
+					if(radio == null){//방어로직 : 아무 것도 선택하지 않았다면 작동
+						alert("선택된 항목이 없습니다.");
+					return;
+					}
+					if(quantity < 0){
+						alert("개수를 제대로 확인해주세요");
+						return;
+					}
+					const insert_form = document.querySelector("#insert-form");
+					insert_form.submit();
+				});
+					const msgFlag = "${msg}";
+					console.log("msgFlag:  ",msgFlag);
+					if(msgFlag == "true"){
+						
+						alert("등록되었습니다.");
+						//알림창 뜬 후에 주소창 쿼리스트링 제거
+						window.history.replaceState({}, document.title, window.location.pathname);
+					}else if(msgFlag == "false"){
+						alert("등록에 실패했습니다.");
+					}
+					
+					
+
+				
 	</script>
 
 </body>

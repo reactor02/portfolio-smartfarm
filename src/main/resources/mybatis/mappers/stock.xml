@@ -65,20 +65,21 @@
     
 <!--     모달에서 ajax로 input창에 검색  -->
 <select id="modalSearch" resultType="hashMap" parameterType="string">
-SELECT i.*
+SELECT i.CODE, i.NAME, i.TYPE, i.UNIT, i.iTEM_NUM
 FROM item i
 	LEFT OUTER JOIN (
 		SELECT ITEM_NUM FROM ITEM
  		MINUS
  		SELECT ITEM_NUM FROM STOCK
 	) num ON i.item_num = num.item_num
-WHERE NAMe = 'Humidifier'
+WHERE UPPER(NAME) LIKE  '%' || UPPER(#{_parameter}) || '%'
 </select>
 
 
-
-
-
+<insert id="insert"  parameterType="kr.or.smartfarm.stock.StockDTO">
+INSERT INTO STOCK(STOCK_ID,STOCK_QTY,ITEM_NUM)
+VALUES(STOCK_SEQ.NEXTVAL, #{stock_qty}, #{item_num})
+</insert>
 </mapper>
 
 
