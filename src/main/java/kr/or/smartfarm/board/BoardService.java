@@ -6,4 +6,8 @@ public interface BoardService {
 
 	List<BoardDTO> getBoardList(int pageNum);
 	BoardDTO getBoard(int board_num);
+	
+	// richtext용
+	void insertBoard(BoardDTO boardDTO);
+	
 }

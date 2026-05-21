@@ -13,6 +13,13 @@
 <title>Insert title here</title>
 <style>
 
+*{
+	box-sizing : border-box;
+	margin: 0; 
+	padding : 0; 
+	font-family: 'Malgun Gothic', sans-serif;
+}
+
 .detail-top{
 	background: #fff;
 	border-radius: 8px;

@@ -347,7 +347,7 @@ select.form-control {
 			<main class="main-cont">
 				<div class="hdr">
 					<h1>board</h1>
-					<button type="button" class="btn-reg">+ 글쓰기</button>
+					<button type="button" class="btn-reg"><a href="${pageContext.request.contextPath}/board/write">+ 글쓰기</a></button>
 				</div>
 				
 				<%-- 검색창 action  --%>
@@ -389,7 +389,9 @@ select.form-control {
 				</table>
 				
 				<div class="table-responsive"></div>
-				<jsp:include page="/WEB-INF/views/common/paging.jsp" />
+								<div id="paging-area">
+					<jsp:include page="/WEB-INF/views/common/paging.jsp" />
+				</div>
 			</main>
 			
 		</div>

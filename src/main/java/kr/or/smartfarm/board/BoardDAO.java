@@ -7,4 +7,7 @@ public interface BoardDAO {
 	List<BoardDTO> selectAllBoard(int pageNum);
 	public BoardDTO selectOneBoard(int board_num);
 	
+	// richtext용 
+	void insertBoard(BoardDTO boardDTO);
+	
 }

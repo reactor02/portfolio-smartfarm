@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -60,6 +61,19 @@ public class BoardController {
 		return "content/boarddetail";
 		
 		
+	}
+	
+	@GetMapping("/write")
+	public String writeForm() {
+		System.out.println("get /write 실행");
+	    return "content/writeboard";
+	}
+	
+	@PostMapping("/write")
+	public String write(BoardDTO boardDTO) {
+		System.out.println("post /write 실행");
+		boardService.insertBoard(boardDTO);
+		return "redirect:/board";
 	}
 
 	

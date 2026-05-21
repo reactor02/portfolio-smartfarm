@@ -35,5 +35,12 @@ public class BoardDAOImpl implements BoardDAO {
 		System.out.println("selectOneBoard: BoardDTO: " + boardDTO);
 		return boardDTO;
 	}
+
+	@Override
+	public void insertBoard(BoardDTO boardDTO) {
+		
+		sqlSession.insert("mapper.board.insertBoard", boardDTO);
+		
+	}
 	
 }

@@ -11,6 +11,16 @@
 <select id="selectOneBoard" resultType="kr.or.smartfarm.board.BoardDTO">
 	select * from board where board_num = #{board_num}
 </select>
+
+<insert id="insertBoard">
+	insert into board (board_num, category, title, content, created_at)
+	values (board_seq.nextval,#{category},#{title}, #{content}, sysdate)
+</insert>
+
+<select id="findById" resultType="kr.or.smartfarm.board.BoardDTO"> 
+	select board_num, title, content from board where board_num = #{board_num}
+</select>
+
 </mapper>
 
 
