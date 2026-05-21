@@ -58,6 +58,11 @@ public class BoardController {
 		System.out.println("/one: board_num: "+ board_num);
 		System.out.println(board_num);
 		
+		// 조회수 증가 
+		boardService.updateViewCnt(board_num);
+		
+		
+		
 		return "content/boarddetail";
 		
 		
@@ -75,6 +80,8 @@ public class BoardController {
 		boardService.insertBoard(boardDTO);
 		return "redirect:/board";
 	}
+	
+	
 
 	
 	

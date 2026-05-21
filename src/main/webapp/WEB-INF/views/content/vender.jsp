@@ -12,6 +12,7 @@
 <head>
 <meta charset="UTF-8">
 <title>거래처 관리</title>
+<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/paging.css">
 
 <style>
 /* 기본 초기화 */
@@ -340,7 +341,7 @@ select.form-control {
 			<main class="main-cont">
 				<div class="hdr">
 					<h1>거래처 관리</h1>
-					<button type="button" class="btn-reg">+ 등록하기</button>
+					<button type="button" class="btn-reg link-txt" >+ 등록하기</button>
 				</div>
 				
 				<%-- 검색창 action --%>

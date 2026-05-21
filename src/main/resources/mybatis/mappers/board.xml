@@ -4,22 +4,34 @@
 	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="mapper.board">
 
-<select id="selectBoard" resultType="kr.or.smartfarm.board.BoardDTO">
-      select * from board
-    </select>
+	<select id="selectBoard"
+		resultType="kr.or.smartfarm.board.BoardDTO">
+		SELECT b.*, e.ename
+		FROM board b
+		JOIN emp e ON b.emp_num = e.emp_num
+		ORDER BY
+		CASE WHEN b.category = '공지' THEN 0 ELSE 1 END,
+		b.board_num DESC
+	</select>
 
-<select id="selectOneBoard" resultType="kr.or.smartfarm.board.BoardDTO">
-	select * from board where board_num = #{board_num}
-</select>
+	<select id="selectOneBoard"
+		resultType="kr.or.smartfarm.board.BoardDTO">
+		select * from board where board_num = #{board_num}
+	</select>
 
-<insert id="insertBoard">
-	insert into board (board_num, category, title, content, created_at)
-	values (board_seq.nextval,#{category},#{title}, #{content}, sysdate)
-</insert>
+	<insert id="insertBoard">
+		insert into board (board_num, category, title, content, created_at)
+		values (board_seq.nextval,#{category},#{title}, #{content}, sysdate)
+	</insert>
 
-<select id="findById" resultType="kr.or.smartfarm.board.BoardDTO"> 
-	select board_num, title, content from board where board_num = #{board_num}
-</select>
+	<select id="findById"
+		resultType="kr.or.smartfarm.board.BoardDTO">
+		select board_num, title, content from board where board_num = #{board_num}
+	</select>
+	
+	<update id="updateViewCnt">
+		update board set view_cnt = view_cnt + 1 where board_num = #{board_num}
+	</update>
 
 </mapper>
 

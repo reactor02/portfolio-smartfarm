@@ -165,7 +165,8 @@
 			<button type="button" class="btn-reg">삭제</button>
 		</div>
 		<div class="right">
-			<button type="button" class="btn-reg">목록</button>
+			<button type="button" class="btn-reg"
+						onclick="location.href='${pageContext.request.contextPath}/board'">목록</button>
 			<button type="button" class="btn-reg">TOP</button>
 		</div>
 	</div>

@@ -10,4 +10,7 @@ public interface BoardDAO {
 	// richtext용 
 	void insertBoard(BoardDTO boardDTO);
 	
+	// viewcnt 업데이트 
+	void updateViewCnt(int board_num);
+	
 }

@@ -10,4 +10,7 @@ public interface BoardService {
 	// richtext용
 	void insertBoard(BoardDTO boardDTO);
 	
+	// viewcnt 
+	void updateViewCnt(int board_num);
+	
 }

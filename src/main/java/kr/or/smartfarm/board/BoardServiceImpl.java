@@ -28,6 +28,12 @@ public class BoardServiceImpl implements BoardService {
 		boardDAO.insertBoard(boardDTO);
 		
 	}
+
+	@Override
+	public void updateViewCnt(int board_num) {
+		boardDAO.updateViewCnt(board_num);
+		
+	}
 	
 	
 	

@@ -20,6 +20,9 @@ public class BoardDTO {
 	private int flies_num; 
 	private int emp_num;
 	
+	// board 페이지 용 emp 테이블 
+	private String ename;
+	
 	
 	// 검색조회
 	private String type; 
