@@ -138,10 +138,10 @@
         WHERE pp.plan_id = #{plan_id}
     </select>
 
-    <!-- 등록 (plan_id: 알파벳 순차 자동 생성) -->
+    <!-- 등록 (plan_id: 알파벳 순차 자동 생성, 테이블이 비어있으면 'A'부터 시작) -->
     <insert id="insert" parameterType="ProdDTO">
         <selectKey keyProperty="plan_id" resultType="String" order="BEFORE">
-            SELECT CHR(MAX(ASCII(plan_id)) + 1) FROM production_plan
+            SELECT CHR(NVL(MAX(ASCII(plan_id)), 64) + 1) FROM production_plan
         </selectKey>
         INSERT INTO production_plan
             (plan_num, plan_id, plan_qty, plan_status, plan_start, plan_end,

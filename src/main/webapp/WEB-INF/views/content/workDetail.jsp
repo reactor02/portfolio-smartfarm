@@ -157,8 +157,8 @@
         <div class="section-title">■ 작업 현황</div>
         <div class="status-grid" style="grid-template-columns: repeat(3, 1fr);">
             <div class="status-card">
-                <div class="info-label">계획 수량</div>
-                <div class="status-num">${workDTO.plan_qty}</div>
+                <div class="info-label">지시 수량</div>
+                <div class="status-num">${workDTO.order_qty}</div>
             </div>
             <div class="status-card">
                 <div class="info-label" style="color: var(--s-cl);">생산 완료</div>
@@ -167,7 +167,7 @@
             <div class="status-card">
                 <div class="info-label">잔여 수량</div>
                 <div class="status-num">
-                    ${workDTO.plan_qty - workDTO.current_qty < 0 ? 0 : workDTO.plan_qty - workDTO.current_qty}
+                    ${workDTO.order_qty - workDTO.current_qty < 0 ? 0 : workDTO.order_qty - workDTO.current_qty}
                 </div>
             </div>
         </div>
@@ -196,12 +196,12 @@
     var WORK_ORDER_ID = '${workDTO.work_order_id}';
 
     window.onload = function () {
-        var planQty    = parseInt('${workDTO.plan_qty}')    || 0;
+        var orderQty   = parseInt('${workDTO.order_qty}')   || 0;
         var currentQty = parseInt('${workDTO.current_qty}') || 0;
 
-        if (planQty <= 0) return;
+        if (orderQty <= 0) return;
 
-        var pct = Math.min((currentQty / planQty) * 100, 100);
+        var pct = Math.min((currentQty / orderQty) * 100, 100);
         document.getElementById('progressBar').style.width = pct.toFixed(1) + '%';
         document.getElementById('progressText').innerText  = pct.toFixed(1) + '%';
     };
