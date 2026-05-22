@@ -13,6 +13,7 @@ public class BomDTO {
 	private String bom_code;//봄코드
 	private Date created_at;//등록일자
 
+
 	private int item_num; // item부모 시퀀스
 	private int item_num2;// item자식 시퀀스
 	private String name;//item name

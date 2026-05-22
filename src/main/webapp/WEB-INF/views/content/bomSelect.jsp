@@ -251,7 +251,7 @@ select.form-control {
 							<div class="sch-right">
 								<div class="sch-input-box">
 									<span style="color: #888;">&#128269;</span> 
-									<input type="text" id="keyword" value="" placeholder="모품목명 혹은 BOM코드 검색">
+									<input type="text" id="keyword" value="" placeholder="품목명 혹은 BOM코드 검색">
 								</div>
 								<button type="button" class="btn-sch">검색</button>
 							</div>
@@ -265,10 +265,9 @@ select.form-control {
 							<tr>
 								<th style="width: 60px;">번호</th>
 								<th>BOM코드</th>
-								<th>대상 품목명</th>
-								<th>대상 품목코드</th>
+								<th>품목명</th>
+								<th>품목코드</th>
 								<th>기준 생산 수량</th>
-								<th>버전</th>
 								<th>상태</th>
 								<th>등록일</th>
 								<th>담당자</th>
@@ -284,7 +283,6 @@ select.form-control {
 											<td>${item.ITEM_NAME}</td>
 											<td>${item.ITEM_CODE}</td>
 											<td>${item.BASE_QTY}</td>
-											<td>${item.VERSION}</td>
 											<td>${item.STATUS}</td>
 											<td>${item.REG_DATE}</td>
 											<td>${item.MANAGER}</td>
