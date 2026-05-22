@@ -8,7 +8,7 @@
 		resultType="kr.or.smartfarm.board.BoardDTO">
 		SELECT b.*, e.ename
 		FROM board b
-		JOIN emp e ON b.emp_num = e.emp_num
+		LEFT JOIN emp e ON b.emp_num = e.emp_num
 		ORDER BY
 		CASE WHEN b.category = '공지' THEN 0 ELSE 1 END,
 		b.board_num DESC
@@ -20,18 +20,39 @@
 	</select>
 
 	<insert id="insertBoard">
-		insert into board (board_num, category, title, content, created_at)
-		values (board_seq.nextval,#{category},#{title}, #{content}, sysdate)
+		insert into board (board_num, category, title,
+		content, created_at)
+		values (board_seq.nextval,#{category},#{title},
+		#{content}, sysdate)
 	</insert>
 
 	<select id="findById"
 		resultType="kr.or.smartfarm.board.BoardDTO">
-		select board_num, title, content from board where board_num = #{board_num}
+		select board_num, title, content from board where board_num
+		= #{board_num}
 	</select>
-	
+
 	<update id="updateViewCnt">
-		update board set view_cnt = view_cnt + 1 where board_num = #{board_num}
+		update board set view_cnt = view_cnt + 1 where
+		board_num = #{board_num}
 	</update>
+	
+	<update id="updateBoard" parameterType="kr.or.smartfarm.board.BoardDTO">
+		update board set 
+		category = #{category},
+		title = ${title},
+		content = ${content},
+		updated_at = sysdate, 
+		where board_num = ${board_num}
+	</update>
+	
+	<delete id="deleteBoard" parameterType="kr.or.smartfarm.board.BoardDTO"> 
+		delete from board where board_num = #{board_num}
+	</delete>
+	
+	<delete id="deletefiles" parameterType="kr.or.smartfarm.board.BoardDTO"> 
+		delete from files where files_num = #{files_num} 
+	</delete>
 
 </mapper>
 

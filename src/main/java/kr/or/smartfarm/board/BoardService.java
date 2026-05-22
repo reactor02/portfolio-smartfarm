@@ -13,4 +13,7 @@ public interface BoardService {
 	// viewcnt 
 	void updateViewCnt(int board_num);
 	
+	int updateBoard(BoardDTO boardDTO);
+	int deleteBoard(BoardDTO boardDTO);
+	
 }
