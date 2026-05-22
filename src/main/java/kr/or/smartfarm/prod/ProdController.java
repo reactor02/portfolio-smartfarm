@@ -84,9 +84,9 @@ public class ProdController {
         ProdDTO prodDTO = prodService.selectOne(plan_id);
         if (prodDTO == null) {
             java.util.Map<String, Object> err = new java.util.HashMap<String, Object>();
-            err.put("list", new java.util.ArrayList<>());
-            err.put("totalPages", 0);
-            err.put("currentPage", 1);
+//            err.put("list", new java.util.ArrayList<>());
+//            err.put("totalPages", 0);
+//            err.put("currentPage", 1);
             return err;
         }
         return prodService.getWorkOrders(prodDTO.getPlan_num(), page);

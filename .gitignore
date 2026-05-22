@@ -8,3 +8,4 @@ target/
 springBeans
 project
 classpath
+.claude/settings.local.json

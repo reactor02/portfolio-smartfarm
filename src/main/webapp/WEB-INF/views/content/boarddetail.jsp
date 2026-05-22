@@ -161,8 +161,8 @@
 
 	<div class="btn-area">
 		<div class="left">
-			<button type="button" class="btn-reg">수정</button>
-			<button type="button" class="btn-reg">삭제</button>
+			<button type="button" class="btn-reg" onclick="location.href='${pageContext.request.contextPath}/board/modify?board_num=${boardDTO.board_num}'">수정</button>
+			<button type="button" class="btn-reg" onclick="if(confirm('정말 삭제하시겠습니까?')) {location.href='${pageContext.request.contextPath}/board/delete?board_num=${boardDTO.board_num}';}">삭제</button>
 		</div>
 		<div class="right">
 			<button type="button" class="btn-reg"

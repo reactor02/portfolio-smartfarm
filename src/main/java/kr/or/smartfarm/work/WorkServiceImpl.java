@@ -2,6 +2,8 @@ package kr.or.smartfarm.work;
 
 import java.util.List;
 
+import kr.or.smartfarm.prod.SelectOptionDTO;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -50,5 +52,31 @@ public class WorkServiceImpl implements WorkService {
         dto.setWork_order_id(work_order_id);
         dto.setWork_status("취소");
         dao.updateStatus(dto);
+    }
+
+    @Override
+    public void start(String work_order_id) {
+        WorkDTO dto = new WorkDTO();
+        dto.setWork_order_id(work_order_id);
+        dto.setWork_status("IN_PROGRESS");
+        dao.updateStatus(dto);
+    }
+
+    @Override
+    public void complete(String work_order_id) {
+        WorkDTO dto = new WorkDTO();
+        dto.setWork_order_id(work_order_id);
+        dto.setWork_status("DONE");
+        dao.updateStatus(dto);
+    }
+
+    @Override
+    public List<SelectOptionDTO> getEmpOptions() {
+        return dao.getEmpOptions();
+    }
+
+    @Override
+    public List<SelectOptionDTO> getPlanOptions() {
+        return dao.getPlanOptions();
     }
 }

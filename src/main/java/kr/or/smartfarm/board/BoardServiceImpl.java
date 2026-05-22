@@ -50,6 +50,13 @@ public class BoardServiceImpl implements BoardService {
 		result = boardDAO.deleteBoard(boardDTO);
 		return result;
 	}
+
+	@Override
+	public BoardDTO findById(int board_num) {
+		BoardDTO boardDTO = null;
+		boardDTO = boardDAO.findById(board_num);
+		return boardDTO;
+	}
 	
 	
 	

@@ -65,5 +65,12 @@ public class BoardDAOImpl implements BoardDAO {
 		result = sqlSession.delete("mapper.board.deleteBoard", boardDTO);
 		return result;
 	}
+
+	@Override
+	public BoardDTO findById(int board_num) {
+		BoardDTO boardDTO = null;
+		boardDTO = sqlSession.selectOne("mapper.board.findById", board_num);
+		return boardDTO;
+	}
 	
 }

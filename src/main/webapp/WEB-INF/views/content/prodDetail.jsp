@@ -111,7 +111,8 @@
             <div class="btn-row">
                 <button class="btn-back" onclick="location.href='/prod'">목록으로</button>
                 <div>
-                    <button class="btn-reg" id="btnOpenWorkModal">작업 등록</button>
+<!--                 공통틀로 가져온 녀석이라 삭제예정 -->
+<!--                     <button class="btn-reg" id="btnOpenWorkModal">작업 등록</button> -->
                     <button class="btn-cancel" style="margin-left:6px;"
                             onclick="cancelPlan()">취소</button>
                 </div>
@@ -266,9 +267,9 @@
                     var html = '';
                     for (var i = 0; i < list.length; i++) {
                         var w = list[i];
-                        html += '<tr style="cursor:pointer;" onclick="location.href=\'/work/' + (w.work_order_id || '') + '\'">'
+                        html += '<tr>'
                               + '<td>' + ((curPage - 1) * 5 + i + 1) + '</td>'
-                              + '<td>' + (w.work_order_id || '-') + '</td>'
+                              + '<td><a href="/work/' + (w.work_order_id || '') + '" class="link-text">' + (w.work_order_id || '-') + '</a></td>'
                               + '<td>' + (w.ename         || '-') + '</td>'
                               + '<td>' + (w.order_qty     || 0)   + '</td>'
                               + '<td>' + (w.current_qty   || 0)   + '</td>'
@@ -307,7 +308,8 @@
     }
 
     /* 작업등록 모달 */
-    document.getElementById('btnOpenWorkModal').addEventListener('click', function() {
+    var btnOpenWork = document.getElementById('btnOpenWorkModal');
+    if (btnOpenWork) btnOpenWork.addEventListener('click', function() {
         document.getElementById('workModal').style.display = 'flex';
     });
     document.getElementById('btnCloseWorkModal').addEventListener('click', function() {

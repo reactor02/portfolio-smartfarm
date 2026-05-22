@@ -80,25 +80,39 @@ public class BoardController {
 	}
 	
 	@GetMapping("/modify")
-	public String modifyForm(BoardDTO boardDTO, Model model) {
+	public String modifyForm(@RequestParam("board_num") int board_num, Model model) {
 		System.out.println("/modify 실행");
-	
-		int result = boardService.updateBoard(boardDTO);
-		model.addAttribute("result", result);
+		
+		BoardDTO board = boardService.findById(board_num);
+		
+		model.addAttribute("board", board);
 		model.addAttribute("mode","modify");
 		
-		return "redirect:/board";
+		return "content/writeboard";
 	}
 	
-	@RequestMapping("/deleteBoard")
+	@PostMapping("/modify")
+	public String updateBoard(BoardDTO boardDTO, Model model) {
+		System.out.println("/update 실행");
+		logger.info("boardDTO :" + boardDTO);
+		
+		int result = boardService.updateBoard(boardDTO);
+		
+		return "redirect:/board";
+		
+	}
+	
+	@RequestMapping("/delete")
 	public String deleteBoard(BoardDTO boardDTO, Model model) {
-		System.out.println("/deleteBoard 실행");
+		System.out.println("/delete 실행");
 		logger.info("boardDTO :" + boardDTO); 
 		
 		int result = boardService.deleteBoard(boardDTO);
 		
 		return "redirect:/board";
 	}
+	
+
 	
 	
 	
