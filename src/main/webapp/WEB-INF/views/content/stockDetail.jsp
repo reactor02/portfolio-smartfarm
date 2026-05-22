@@ -205,7 +205,7 @@ response.setContentType("text/html; charset=utf-8");
 				
 				<div class="hdr">
 					<h1>재고관리 상세</h1>
-					<a href="/stockList.do" class="btn-list">목록으로</a>
+					<a href="/stockSelect" class="btn-list">목록으로</a>
 				</div>
 
 				<div class="detail-section">

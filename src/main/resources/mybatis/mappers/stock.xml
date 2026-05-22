@@ -17,7 +17,7 @@
         f.facility_name
         FROM stock s
         JOIN item i ON s.item_num = i.item_num
-        JOIN facility f ON f.facility_num = i.facility_num 
+        JOIN facility f ON f.facility_num = s.facility_num 
          ORDER BY s.stock_id DESC
     </select>
 
@@ -35,7 +35,7 @@
         f.facility_name
         FROM stock s
         JOIN item i ON s.item_num = i.item_num
-        JOIN facility f ON f.facility_num = i.facility_num 
+        JOIN facility f ON f.facility_num = s.facility_num 
         <where>
 
         <if test="type != null and type != 'all'">
@@ -80,8 +80,26 @@ WHERE UPPER(NAME) LIKE  '%' || UPPER(#{_parameter}) || '%'
 INSERT INTO STOCK(STOCK_ID,STOCK_QTY,ITEM_NUM)
 VALUES(STOCK_SEQ.NEXTVAL, #{stock_qty}, #{item_num})
 </insert>
+
+<!-- 디테일 셀렉트 -->
+<select id="detailSelect" resultType="hashMap" parameterType="kr.or.smartfarm.stock.StockDTO">
+  SELECT 
+        s.stock_id,
+        s.stock_qty,
+        i.code,
+        i.name,
+        i.type,
+        i.unit,
+        i.safe,
+        i.item_status,
+        f.facility_name,
+        l.lot_code,
+        l.expiry_date,
+        l.lot_date
+        FROM stock s
+        JOIN item i ON s.item_num = i.item_num
+        JOIN facility f ON f.facility_num = i.facility_num
+        JOIN LOT l ON l.item_num = i.item_num
+        where i.item_status = 'A'
+</select>
 </mapper>
-
-
-
-

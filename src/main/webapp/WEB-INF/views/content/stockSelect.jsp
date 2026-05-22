@@ -509,7 +509,7 @@ select.form-control {
     params.append("type", type);
     params.append("keyword", keyword);
     
-    fetch(`\${pageContext.request.contextPath}/searchStock?\${params.toString()}`)
+    fetch(`/searchStock?\${params.toString()}`)
     .then(response => response.json())
     .then(data => {
     	if(data.searchResult.length == 0){

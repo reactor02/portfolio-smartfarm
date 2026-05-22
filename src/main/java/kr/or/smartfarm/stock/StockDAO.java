@@ -9,4 +9,5 @@ public interface StockDAO {
 	public List searchStock2(Map map);
 	public List modalSearch2(String str);
 	public int insertStock2(StockDTO dto);
+	public List selectDetail2(StockDTO dto);
 }
