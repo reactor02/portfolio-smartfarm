@@ -194,9 +194,24 @@ select.form-control {
 	cursor: pointer;
 	transition: 0.2s;
 }
+.select-reset{
+	height: 38px;
+	padding: 0 20px;
+	background-color: #fff;
+	color: #2D6A4F;
+	border: 1px solid #2D6A4F;
+	border-radius: 4px;
+	font-size: 1rem;
+	font-weight: bold;
+	cursor: pointer;
+	transition: 0.2s;
+}
 
 .btn-sch:hover {
 	background-color: #B7E4C7;
+}
+.select-reset:hover{
+background-color: #FFB703;
 }
 
 /* ========== 3. 커스텀 라디오 버튼 ========== */
@@ -320,6 +335,7 @@ select.form-control {
 										id="keyword" value="" placeholder="자재 명 검색">
 								</div>
 								<button type="button" class="btn-sch">검색</button>
+								<button type="button" class="select-reset">검색 초기화</button>
 							</div>
 						</div>
 					</div>
@@ -665,7 +681,10 @@ select.form-control {
 						alert("등록에 실패했습니다.");
 					}
 					
-					
+					const select_reset = document.querySelector(".select-reset");
+					select_reset.addEventListener('click', ()=>{
+						location.reload();
+					})
 
 				
 	</script>
