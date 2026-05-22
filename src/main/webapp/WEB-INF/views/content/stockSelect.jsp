@@ -529,7 +529,7 @@ select.form-control {
                 html += `<tr>
                     <td style='font-weight: bold; color: #555;'>\${i + 1 + (data.pageInfo.pageNum - 1) * 5}</td>
                     <td>\${item.CODE}</td>
-                    <td><a href='#' class='link-txt'>\${item.NAME}</a></td>
+                    <td><a href='/stockDetail?stock_id=\${item.STOCK_ID}' class='link-txt'>\${item.NAME}</a></td>
                     <td>\${item.TYPE}</td>
                     <td>\${item.STOCK_QTY}</td>
                     <td>\${item.SAFE}</td>

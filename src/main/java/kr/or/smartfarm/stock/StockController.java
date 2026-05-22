@@ -91,7 +91,13 @@ System.out.println(searchMap);
 		}else {
 			return "redirect:/stockSelect?msg=false";
 		}
-		
+	}
+	
+	@RequestMapping("/goingStockDetail")
+	//상세페이지 들어가는 로직
+	public String Detail(@RequestParam(value="stock_id", required=false)String stockId) {
+		System.out.println("/stockDetail들어옴");
+		return "content/stockDetail";
 	}
 }
 
