@@ -114,35 +114,32 @@ response.setContentType("text/html; charset=utf-8");
                             <c:choose>
                                 <c:when test="${not empty list}">
                                     <c:forEach var="prod" items="${list}" varStatus="vs">
-                                        <tr style="cursor:pointer;"
-                                            onclick="location.href='/prod/${prod.plan_id}'">
+                                        <tr>
                                             <td style="font-weight:bold;color:#555;">
                                                 ${page.totalCount - (page.page-1)*page.size - vs.count + 1}
                                             </td>
-                                            <td>${prod.plan_id}</td>
+                                            <td><a href="/prod/${prod.plan_id}" >${prod.plan_id}</a></td>
                                             <td>${prod.item_name}</td>
                                             <td>${prod.plan_qty}</td>
                                             <td><fmt:formatDate value="${prod.plan_start}" pattern="yyyy-MM-dd"/></td>
                                             <td><fmt:formatDate value="${prod.plan_end}"   pattern="yyyy-MM-dd"/></td>
-                                            <td>
-                                                <fmt:formatNumber
-                                                    value="${prod.plan_qty > 0 ? (prod.currentqty / prod.plan_qty) * 100 : 0}"
-                                                    maxFractionDigits="1"/>%
-                                            </td>
-                                            <td>${prod.plan_status}</td>
+											<td><fmt:formatNumber
+													value="${prod.plan_qty > 0 ? (prod.currentqty / prod.plan_qty * 100 > 100 ? 100 : prod.currentqty / prod.plan_qty * 100) : 0}"
+													maxFractionDigits="1" />%</td>
+											<td>${prod.plan_status}</td>
                                             <td>${prod.facility_name}</td>
                                             <td>${prod.ename}</td>
                                         </tr>
                                     </c:forEach>
                                 </c:when>
                                 <c:otherwise>
-                                    <c:forEach var="i" begin="1" end="5">
-                                        <tr>
-                                            <td style="font-weight:bold;color:#888;">${i}</td>
-                                            <td></td><td></td><td></td><td></td>
-                                            <td></td><td></td><td></td><td></td><td></td>
-                                        </tr>
-                                    </c:forEach>
+<%--                                     <c:forEach var="i" begin="1" end="5"> --%>
+<!--                                         <tr> -->
+<%--                                             <td style="font-weight:bold;color:#888;">${i}</td> --%>
+<!--                                             <td></td><td></td><td></td><td></td> -->
+<!--                                             <td></td><td></td><td></td><td></td><td></td> -->
+<!--                                         </tr> -->
+<%--                                     </c:forEach> --%>
                                 </c:otherwise>
                             </c:choose>
                         </tbody>

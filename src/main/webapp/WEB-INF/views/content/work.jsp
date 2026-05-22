@@ -82,8 +82,8 @@
         <thead>
             <tr>
                 <th style="width:6%">번호</th>
-                <th>작업번호</th>
-                <th>생산계획번호</th>
+                <th>작업코드</th>
+                <th>생산계획코드</th>
                 <th>품목명</th>
                 <th>지시수량</th>
                 <th>담당자</th>
