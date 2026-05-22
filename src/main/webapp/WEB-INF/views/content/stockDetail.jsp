@@ -103,10 +103,18 @@ response.setContentType("text/html; charset=utf-8");
 
 /* 2-1. 상단 요약 정보 (그리드 레이아웃) */
 .info-grid-top {
-	display: grid;
-	grid-template-columns: repeat(6, 1fr);
-	gap: 15px;
-	text-align: center;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr); /* 5개 등분 */
+    gap: 15px;
+    margin-bottom: 20px; /* 하단 행과 간격 */
+    padding-bottom: 20px;
+    border-bottom: 1px solid #eee; /* 구분선 (선택사항) */
+}
+
+.info-grid-sub {
+    display: grid;
+    grid-template-columns: repeat(2, 200px); /* 2개 항목을 왼쪽에 배치 */
+    gap: 40px; /* 두 항목 사이 간격 */
 }
 
 .info-item {
@@ -158,11 +166,14 @@ response.setContentType("text/html; charset=utf-8");
 	font-weight: bold;
 }
 
-/* ================= 3. 데이터 테이블 (기존 동일) ================= */
+/* ================= 3. 데이터 테이블 ================= */
 .tbl-box {
 	background: #fff;
 	border-radius: 8px;
 	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+	/* 아래 테이블 영역 박스 사이즈 늘림 (데이터 5개 이상 넉넉히 보임) 및 스크롤 생성 */
+	height: 350px;
+	overflow-y: auto;
 }
 
 .stk-tbl {
@@ -180,6 +191,10 @@ response.setContentType("text/html; charset=utf-8");
 	border-top: none;
 	font-weight: bold;
 	font-size: 0.95rem;
+	/* 스크롤 시 헤더 상단 고정 */
+	position: sticky;
+	top: 0;
+	z-index: 10;
 }
 
 .stk-tbl td {
@@ -209,36 +224,43 @@ response.setContentType("text/html; charset=utf-8");
 				</div>
 
 				<div class="detail-section">
-					<div class="info-grid-top">
-						<div class="info-item">
-							<span class="info-label">자재명</span>
-							<span class="info-value">${detail.NAME}</span>
-						</div>
-						<div class="info-item">
-							<span class="info-label">자재 코드</span>
-							<span class="info-value">${detail.CODE}</span>
-						</div>
-						<div class="info-item">
-							<span class="info-label">자재 구분</span>
-							<span class="info-value">${detail.TYPE}</span>
-						</div>
-						<div class="info-item">
-							<span class="info-label">보관 위치</span>
-							<span class="info-value">${detail.FACILITY_NAME}</span>
-						</div>
-						<div class="info-item">
-							<span class="info-label">재고 총 수량</span>
-							<span class="info-value">${detail.STOCK_QTY}</span>
-						</div>
-						<div class="info-item">
-							<span class="info-label">안전 재고량</span>
-							<span class="info-value">${detail.SAFE}</span>
-						</div>
-					</div>
-				</div>
+    <div class="info-grid-top">
+        <div class="info-item">
+            <span class="info-label">자재 코드</span>
+            <span class="info-value">${resultList[0].CODE}</span>
+        </div>
+        <div class="info-item">
+            <span class="info-label">자재명</span>
+            <span class="info-value">${resultList[0].NAME}</span>
+        </div>
+        <div class="info-item">
+            <span class="info-label">자재 구분</span>
+            <span class="info-value">${resultList[0].TYPE}</span>
+        </div>
+        <div class="info-item">
+            <span class="info-label">자재 단위</span>
+            <span class="info-value">${resultList[0].UNIT}</span>
+        </div>
+        <div class="info-item">
+            <span class="info-label">보관 위치</span>
+            <span class="info-value">${resultList[0].FACILITY_NAME}</span>
+        </div>
+    </div>
+    
+    <div class="info-grid-sub">
+        <div class="info-item">
+            <span class="info-label">총 수량</span>
+            <span class="info-value">${resultList[0].STOCK_QTY}</span>
+        </div>
+        <div class="info-item">
+            <span class="info-label">안전 재고량</span>
+            <span class="info-value">${resultList[0].SAFE}</span>
+        </div>
+    </div>
+</div>
 
-				<div class="detail-section" style="padding: 0; border: none; background: transparent; box-shadow: none;">
-					<div class="section-title" style="margin-left: 5px;">입/출고 및 사용 이력</div>
+				<div class="detail-section">
+					<div class="section-title">상세 내용</div>
 					<div class="tbl-box">
 						<table class="stk-tbl">
 							<thead>
@@ -253,15 +275,15 @@ response.setContentType("text/html; charset=utf-8");
 							</thead>
 							<tbody>
 								<c:choose>
-									<c:when test="${not empty historyList}">
-										<c:forEach var="history" items="${historyList}" varStatus="vs">
+									<c:when test="${not empty resultList}">
+										<c:forEach var="history" items="${resultList}" varStatus="vs">
 											<tr>
 												<td style="font-weight: bold; color: #555;">${vs.count}</td>
 												<td>${history.LOT_CODE}</td>
-												<td>${history.QTY}</td>
-												<td>${history.IN_DATE}</td>
-												<td>${history.EXP_DATE}</td>
-												<td>${history.MANAGER}</td>
+												<td>${history.STOCK_QTY}</td>
+												<td><fmt:formatDate value="${history.LOT_DATE}" pattern="yyyy-MM-dd" /></td>
+												<td><fmt:formatDate value="${history.EXPIRY_DATE}" pattern="yyyy-MM-dd" /></td>
+												<td>하드코딩</td>
 											</tr>
 										</c:forEach>
 									</c:when>
@@ -273,30 +295,6 @@ response.setContentType("text/html; charset=utf-8");
 								</c:choose>
 							</tbody>
 						</table>
-					</div>
-				</div>
-
-				<div class="detail-section">
-					<div class="section-title">품질/보관 상세 정보</div>
-					<div class="info-grid-bottom">
-						<div class="info-row">
-							<span class="label">보관 조건 :</span>
-							<span class="value">${detail.STORAGE_COND} (예: 냉장 4°C 유지, 차광 보관)</span>
-						</div>
-						<div class="info-row">
-							<span class="label">공급업체 연락처 :</span>
-							<span class="value">${detail.SUPPLIER_CONTACT} (예: 041-987-1234)</span>
-						</div>
-						<div class="info-row">
-							<span class="label">소독 이력 :</span>
-							<span class="value">${detail.DISINFECT_HISTORY} (예: 2026-05-07 고압증기멸균 완료)</span>
-						</div>
-						<div class="info-row">
-							<span class="label">관련 문서 :</span>
-							<span class="value">
-								<a href="${detail.DOC_LINK}" target="_blank">MSDS(물질안전보건자료) / 성적서 PDF 링크</a>
-							</span>
-						</div>
 					</div>
 				</div>
 

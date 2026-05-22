@@ -9,5 +9,5 @@ public interface StockService {
 	public List searchStock(Map map);
 	public Map modalSearch(String str);
 	public int insertStock(StockDTO dto);
-	public List selectDetail(StockDTO dto);
+	public List selectDetail(String stockId);
 }

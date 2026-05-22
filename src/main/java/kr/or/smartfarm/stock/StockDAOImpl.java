@@ -49,9 +49,9 @@ public class StockDAOImpl implements StockDAO{
 	}
 	
 	//디테일 셀렉트
-	public List selectDetail2(StockDTO dto) {
+	public List selectDetail2(String stockId) {
 		List result = null;
-		result = sqlSession.selectList("kr.or.stock.insert", dto);
+		result = sqlSession.selectList("kr.or.stock.detailSelect", stockId);
 		return result;
 		
 	}

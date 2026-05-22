@@ -95,8 +95,10 @@ System.out.println(searchMap);
 	
 	@RequestMapping("/stockDetail")
 	//상세페이지 들어가는 로직
-	public String Detail(@RequestParam(value="stock_id", required=false)StockDTO dto, Model model) {
-		
+	public String Detail(@RequestParam(value="stock_id", required=false)String stockId, Model model) {
+		List result = null;
+		result = stockService.selectDetail(stockId);
+		model.addAttribute("resultList", result);
 		return "content/stockDetail";
 	}
 }

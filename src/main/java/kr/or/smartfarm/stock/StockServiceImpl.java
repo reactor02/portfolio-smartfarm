@@ -41,10 +41,14 @@ public int insertStock(StockDTO dto) {
 	}
 
 //디테일 셀렉트
-public List selectDetail(StockDTO dto) {
+public List selectDetail(String stockId) {
 	List result = null;
-	
+	result = stockDAO.selectDetail2(stockId);
 	return result;
-	
 }
+
+
+
+
+
 }
