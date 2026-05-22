@@ -15,7 +15,7 @@
                        wo.order_id    AS work_order_id,
                        pp.plan_id,
                        i.name         AS item_name,
-                       wo.order_qty,
+                       wo.order_qty   AS order_qty,
                        e.ename,
                        wo.order_start,
                        wo.order_status AS work_status,
@@ -63,7 +63,7 @@
         SELECT wo.order_num,
                wo.order_id     AS work_order_id,
                wo.plan_num,
-               wo.order_qty,
+               wo.order_qty   AS order_qty,
                pp.plan_qty,
                pp.plan_id,
                pp.item_num,
@@ -116,18 +116,13 @@
         INSERT INTO work_order
             (order_num, order_id, order_qty, order_status, emp_num,
              plan_num, current_qty, content, created_at, order_start, order_end)
-        VALUES (
-            WO_SEQ.NEXTVAL,
-            #{work_order_id},
-            #{order_qty},
-            'WAIT',
-            #{emp_num},
-            #{plan_num},
-            0,
-            #{content},
-            SYSDATE,
-            #{order_start},
-            #{order_end}
+        SELECT WO_SEQ.NEXTVAL, #{work_order_id}, #{order_qty}, 'WAIT', #{emp_num},
+               #{plan_num}, 0, #{content}, SYSDATE, #{order_start}, #{order_end}
+        FROM DUAL
+        WHERE NOT EXISTS (
+            SELECT 1 FROM production_plan
+            WHERE plan_num = #{plan_num}
+              AND (plan_status = '취소' OR SYSDATE > plan_end)
         )
     </insert>
 
@@ -144,11 +139,23 @@
         ORDER BY plan_num
     </select>
 
-    <!-- 상태 변경 (취소 처리) -->
+    <!-- 상태 변경 (완료/취소 상태에서는 변경 차단) -->
     <update id="updateStatus" parameterType="WorkDTO">
         UPDATE work_order
         SET order_status = #{work_status}
         WHERE order_id = #{work_order_id}
+          AND order_status NOT IN ('DONE', '취소')
+    </update>
+
+    <!-- 작업 등록: current_qty=order_qty, order_end=SYSDATE, status=DONE (DONE/취소면 무시) -->
+    <update id="produce" parameterType="WorkDTO">
+        UPDATE work_order
+        SET current_qty  = order_qty,
+            order_end    = SYSDATE,
+            order_status = 'DONE'
+        WHERE order_id = #{work_order_id}
+          AND order_status != 'DONE'
+          AND order_status != '취소'
     </update>
 
 </mapper>

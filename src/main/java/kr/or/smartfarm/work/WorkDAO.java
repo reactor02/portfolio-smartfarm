@@ -9,6 +9,7 @@ public interface WorkDAO {
     WorkDTO               getSelectOne(String work_order_id);
     int                   create(WorkDTO workDTO);
     int                   updateStatus(WorkDTO workDTO);
+    int                   produce(WorkDTO workDTO);
     List<SelectOptionDTO> getEmpOptions();
     List<SelectOptionDTO> getPlanOptions();
 }

@@ -71,6 +71,13 @@ public class WorkServiceImpl implements WorkService {
     }
 
     @Override
+    public void produce(String work_order_id) {
+        WorkDTO dto = new WorkDTO();
+        dto.setWork_order_id(work_order_id);
+        dao.produce(dto);
+    }
+
+    @Override
     public List<SelectOptionDTO> getEmpOptions() {
         return dao.getEmpOptions();
     }

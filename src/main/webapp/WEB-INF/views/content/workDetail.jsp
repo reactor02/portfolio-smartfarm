@@ -59,6 +59,8 @@
     .btn-row .btn-start:hover { background-color: var(--s-cl); }
     .btn-row .btn-complete { background-color: var(--warning-cl); color: #333; border: none; }
     .btn-row .btn-complete:hover { filter: brightness(0.92); }
+    .btn-row .btn-cancel { background-color: #DC3545; color: #FFF; border: none; }
+    .btn-row .btn-cancel:active { background-color: #C82333; }
 
     .section-title { font-size: 1.1rem; font-weight: bold; margin: 2rem 0 1rem 0; color: var(--m-cl); }
 
@@ -105,8 +107,10 @@
                     <c:if test="${workDTO.work_status == 'IN_PROGRESS'}">
                         <button class="btn-complete" onclick="completeWork()">작업종료</button>
                     </c:if>
-                    <button class="btn-cancel" style="margin-left:6px;"
-                            onclick="cancelWork()">취소</button>
+                    <c:if test="${workDTO.work_status != 'DONE' and workDTO.work_status != '취소'}">
+                        <button class="btn-reg" style="margin-left:6px;" onclick="produceWork()">작업등록</button>
+                        <button class="btn-cancel" style="margin-left:6px;" onclick="cancelWork()">취소</button>
+                    </c:if>
                 </div>
             </div>
             <h1 class="page-title">작업지시 상세</h1>
@@ -206,14 +210,6 @@
         document.getElementById('progressText').innerText  = pct.toFixed(1) + '%';
     };
 
-    function cancelWork() {
-        if (!confirm('해당 작업지시를 취소하시겠습니까?')) return;
-        fetch('/work/' + WORK_ORDER_ID + '/cancel', { method: 'POST' })
-            .then(function(r) { return r.text(); })
-            .then(function() { location.reload(); })
-            .catch(function() { alert('처리 중 오류가 발생했습니다.'); });
-    }
-
     function startWork() {
         if (!confirm('작업을 시작하시겠습니까?')) return;
         fetch('/work/' + WORK_ORDER_ID + '/start', { method: 'POST' })
@@ -225,6 +221,23 @@
     function completeWork() {
         if (!confirm('작업을 완료하시겠습니까?')) return;
         fetch('/work/' + WORK_ORDER_ID + '/complete', { method: 'POST' })
+            .then(function(r) { return r.text(); })
+            .then(function() { location.reload(); })
+            .catch(function() { alert('처리 중 오류가 발생했습니다.'); });
+    }
+
+    function produceWork() {
+        var qty = parseInt('${workDTO.order_qty}') || 0;
+        if (!confirm('지시수량(' + qty + ')만큼 생산 완료 처리하시겠습니까?')) return;
+        fetch('/work/' + WORK_ORDER_ID + '/produce', { method: 'POST' })
+            .then(function(r) { return r.text(); })
+            .then(function() { location.reload(); })
+            .catch(function() { alert('처리 중 오류가 발생했습니다.'); });
+    }
+
+    function cancelWork() {
+        if (!confirm('작업지시를 취소하시겠습니까? 취소 후에는 변경이 불가합니다.')) return;
+        fetch('/work/' + WORK_ORDER_ID + '/cancel', { method: 'POST' })
             .then(function(r) { return r.text(); })
             .then(function() { location.reload(); })
             .catch(function() { alert('처리 중 오류가 발생했습니다.'); });
