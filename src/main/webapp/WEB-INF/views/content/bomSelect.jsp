@@ -300,7 +300,6 @@ select.form-control {
 											<td></td>
 											<td></td>
 											<td></td>
-											<td></td>
 										</tr>
 									</c:forEach>
 								</c:otherwise>
@@ -398,7 +397,6 @@ select.form-control {
 							<td>\${item.ITEM_NAME}</td>
 							<td>\${item.ITEM_CODE}</td>
 							<td>\${item.BASE_QTY}</td>
-							<td>\${item.VERSION}</td>
 							<td>\${item.STATUS}</td>
 							<td>\${item.REG_DATE}</td>
 							<td>\${item.MANAGER}</td>
