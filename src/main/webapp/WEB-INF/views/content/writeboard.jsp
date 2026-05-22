@@ -163,30 +163,32 @@ select.form-control {
 				</div>
 
 				<div class="write-content">
-					<form action="${pageContext.request.contextPath}/board/write" method="post">
-
+					<form action="${pageContext.request.contextPath}/board/${mode == 'modify' ? 'modify' : 'write'}" method="post">
+						
+						
+						
 						<select name="category" class="form-control">
 							<option value="">카테고리 선택</option>
-							<option value="공지">공지</option>
-							<option value="일반">일반</option>
-							<option value="자유">자유</option>
+							<option value="공지" ${board.category == '공지' ? 'selected' : ''}>공지</option>
+							<option value="일반" ${board.category ==  '일반' ? 'selected' : ''}>일반</option>
+							<option value="자유" ${board.category ==  '자유' ? 'selected' : ''}>일반</option>
 						</select>
 
 						<!-- 제목 -->
 						<div style="margin-bottom: 15px;">
-							<input type="text" name="title" placeholder="제목을 입력하세요" 
+							<input type="text" name="title" value="${board.title}" placeholder="제목을 입력하세요" 
 							class="form-control" style="width:100%;" />
 						</div>
 
 						<!-- 에디터 영역 -->
-						<div id="editor"></div>
+						<div id="editor">${board.content}</div>
 
 						<!-- 실제 전송될 값 -->
-						<input type="hidden" name="content" id="content" />
+						<input type="hidden" name="content" id="content" value="${board.content}" />
 
 						<!-- 버튼 -->
 						<div class="btn-area">
-							<button type="submit" class="btn-reg">등록</button>
+							<button type="submit" class="btn-reg">${mode == 'modify' ? '수정완료' : '등록'}</button>
 						</div>
 					</form>
 

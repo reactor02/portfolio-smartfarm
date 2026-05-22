@@ -37,8 +37,8 @@
 		board_num = #{board_num}
 	</update>
 	
-	<update id="updateBoard" parameterType="boardDTO">
-		updatd board set 
+	<update id="updateBoard" parameterType="kr.or.smartfarm.board.BoardDTO">
+		update board set 
 		category = #{category},
 		title = ${title},
 		content = ${content},
@@ -46,11 +46,11 @@
 		where board_num = ${board_num}
 	</update>
 	
-	<delete id="deleteBoard" parameterType="boardDTO"> 
+	<delete id="deleteBoard" parameterType="kr.or.smartfarm.board.BoardDTO"> 
 		delete from board where board_num = #{board_num}
 	</delete>
 	
-	<delete id="deletefiles" parameterType="boardDTO"> 
+	<delete id="deletefiles" parameterType="kr.or.smartfarm.board.BoardDTO"> 
 		delete from files where files_num = #{files_num} 
 	</delete>
 
