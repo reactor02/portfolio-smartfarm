@@ -111,10 +111,11 @@
             <div class="btn-row">
                 <button class="btn-back" onclick="location.href='/prod'">목록으로</button>
                 <div>
-<!--                 공통틀로 가져온 녀석이라 삭제예정 -->
-<!--                     <button class="btn-reg" id="btnOpenWorkModal">작업 등록</button> -->
-                    <button class="btn-cancel" style="margin-left:6px;"
-                            onclick="cancelPlan()">취소</button>
+                    <c:if test="${prodDTO.plan_status != '취소' and prodDTO.plan_status != '완료'}">
+                        <button class="btn-reg" id="btnOpenWorkModal">작업 등록</button>
+                        <button class="btn-cancel" style="margin-left:6px;"
+                                onclick="cancelPlan()">취소</button>
+                    </c:if>
                 </div>
             </div>
             <h1 class="page-title">생산계획 상세</h1>

@@ -18,8 +18,6 @@
     .btn-row button { padding:8px 18px; border-radius:6px; border:1px solid var(--border-cl); background:#FFF; cursor:pointer; font-weight:bold; font-size:13px; transition:background 0.2s; }
     .btn-row .btn-back   { background:var(--m-cl); color:#FFF; border:none; }
     .btn-row .btn-back:hover { background:var(--s-cl); }
-    .btn-row .btn-cancel { background:#DC3545; color:#FFF; border:none; }
-    .btn-row .btn-cancel:active { background:#C82333; }
 
     .section-title { font-size:1.1rem; font-weight:bold; margin:2rem 0 1rem 0; color:var(--m-cl); }
     .info-grid  { display:grid; grid-template-columns:repeat(3,1fr); gap:20px; background:var(--bg); padding:20px; border:1px solid var(--border-cl); border-radius:8px; }
@@ -50,7 +48,6 @@
     <div class="page-header">
         <div class="btn-row">
             <button class="btn-back" onclick="location.href='/lot'">목록으로</button>
-            <button class="btn-cancel">취소</button>
         </div>
         <h1 class="page-title">LOT 관리 상세</h1>
     </div>

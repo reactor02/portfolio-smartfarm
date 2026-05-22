@@ -35,6 +35,11 @@ public class WorkDAOImpl implements WorkDAO {
     }
 
     @Override
+    public int produce(WorkDTO workDTO) {
+        return session.update("kr.or.smartfarm.work.produce", workDTO);
+    }
+
+    @Override
     public List<SelectOptionDTO> getEmpOptions() {
         return session.selectList("kr.or.smartfarm.work.getEmpOptions");
     }

@@ -87,4 +87,12 @@ public class WorkController {
         workService.complete(work_order_id);
         return "ok";
     }
+
+    /* ── 작업등록 POST (AJAX): current_qty=order_qty, order_end=SYSDATE, status=DONE ── */
+    @RequestMapping(value = "/{work_order_id}/produce", method = RequestMethod.POST)
+    @ResponseBody
+    public String produce(@PathVariable String work_order_id) {
+        workService.produce(work_order_id);
+        return "ok";
+    }
 }

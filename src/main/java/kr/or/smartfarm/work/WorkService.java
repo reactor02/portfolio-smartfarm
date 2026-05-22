@@ -11,6 +11,7 @@ public interface WorkService {
     void                  cancel(String work_order_id);
     void                  start(String work_order_id);
     void                  complete(String work_order_id);
+    void                  produce(String work_order_id);
     List<SelectOptionDTO> getEmpOptions();
     List<SelectOptionDTO> getPlanOptions();
 }
