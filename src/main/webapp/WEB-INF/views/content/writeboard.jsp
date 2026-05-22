@@ -165,13 +165,16 @@ select.form-control {
 				<div class="write-content">
 					<form action="${pageContext.request.contextPath}/board/${mode == 'modify' ? 'modify' : 'write'}" method="post">
 						
+						<c:if test="${mode == 'modify'}">
+							<input type="hidden" name="board_num" value="${board.board_num}" />
+						</c:if>
 						
 						
 						<select name="category" class="form-control">
 							<option value="">카테고리 선택</option>
 							<option value="공지" ${board.category == '공지' ? 'selected' : ''}>공지</option>
 							<option value="일반" ${board.category ==  '일반' ? 'selected' : ''}>일반</option>
-							<option value="자유" ${board.category ==  '자유' ? 'selected' : ''}>일반</option>
+							<option value="자유" ${board.category ==  '자유' ? 'selected' : ''}>자유</option>
 						</select>
 
 						<!-- 제목 -->

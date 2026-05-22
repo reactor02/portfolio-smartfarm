@@ -13,6 +13,9 @@ public interface BoardService {
 	// viewcnt 
 	void updateViewCnt(int board_num);
 	
+	// 아이디로 찾기
+	BoardDTO findById(int board_num);
+	
 	int updateBoard(BoardDTO boardDTO);
 	int deleteBoard(BoardDTO boardDTO);
 	

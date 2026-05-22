@@ -39,11 +39,10 @@
 	
 	<update id="updateBoard" parameterType="kr.or.smartfarm.board.BoardDTO">
 		update board set 
-		category = #{category},
-		title = ${title},
-		content = ${content},
-		updated_at = sysdate, 
-		where board_num = ${board_num}
+		title = #{title},
+		content = #{content},
+		updated_at = sysdate 
+		where board_num = #{board_num}
 	</update>
 	
 	<delete id="deleteBoard" parameterType="kr.or.smartfarm.board.BoardDTO"> 
@@ -53,6 +52,19 @@
 	<delete id="deletefiles" parameterType="kr.or.smartfarm.board.BoardDTO"> 
 		delete from files where files_num = #{files_num} 
 	</delete>
+	
+	<!-- 검색용 -->
+	<select id="selectTitleBoard" resultType="kr.or.smartfarm.board.BoardDTO">
+		select * from board where title like ('%' || #{title} || '%')
+	</select>
+	
+	<select id="selectenameBoard" resultType="kr.or.smartfarm.board.BoardDTO">
+		SELECT b.*, e.ename
+		FROM board b
+		LEFT JOIN emp e ON b.emp_num = e.emp_num
+		where e.ename like ('%' || #{ename} || '%')
+	</select>
+	
 
 </mapper>
 

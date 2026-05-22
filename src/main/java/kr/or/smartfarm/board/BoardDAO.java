@@ -16,4 +16,6 @@ public interface BoardDAO {
 	int updateBoard(BoardDTO boardDTO);
 	int deleteBoard(BoardDTO boardDTO);
 	
+	public BoardDTO findById(int board_num);
+	
 }

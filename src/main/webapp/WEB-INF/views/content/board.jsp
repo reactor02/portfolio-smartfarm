@@ -15,7 +15,8 @@
 <meta charset="UTF-8">
 <title>게시판</title>
 
-<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/paging.css">
+<link rel="stylesheet"
+	href="${pageContext.request.contextPath}/resources/css/paging.css">
 <style>
 /* 기본 초기화 */
 * {
@@ -220,53 +221,72 @@ select.form-control {
 	background-color: #4A90E2; /* 선택 시 파란색 원 */
 }
 
-/* ========== 4. 데이터 테이블 ========== */
+/* ========== 4. 데이터 테이블 (세련된 스타일) ========== */
 .tbl-box {
-	background: #fff;
-	border-radius: 8px;
-	padding: 15px;
-	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+    background: #fff;
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
 }
 
 .board-tbl {
-	width: 100%;
-	border-collapse: collapse;
-	border-top: 2px solid #555;
-	border-bottom: 2px solid #555;
+    width: 100%;
+    border-collapse: collapse;
+    border-top: 2px solid #2D6A4F; /* 상단 헤더 강조 */
+    margin-bottom: 20px;
 }
 
 .board-tbl th {
-	background-color: #e9ecef;
-	color: #222;
-	padding: 12px 10px;
-	border: 1px solid #ccc;
-	border-top: none;
-	font-weight: bold;
-	font-size: 0.95rem;
+    background-color: #f8f9fa;
+    color: #222;
+    padding: 14px 10px;
+    border-bottom: 1px solid #ddd;
+    font-weight: 700;
+    font-size: 0.95rem;
 }
 
 .board-tbl td {
-	padding: 12px 10px;
-	border: 1px solid #ccc;
-	text-align: center;
-	color: #333;
-	font-size: 0.95rem;
+    padding: 12px 10px;
+    border-bottom: 1px solid #eee;
+    text-align: center;
+    color: #444;
+    font-size: 0.95rem;
 }
 
+/* 행 호버 효과 */
 .board-tbl tbody tr:hover {
-	background-color: #f1f8f5;
+    background-color: #f9fdfb;
+}
+
+/* [핵심] 공지사항 스타일 */
+.board-tbl tr.notice {
+    background-color: #f1f8f5; /* 연한 초록 배경 */
+    font-weight: bold;
+}
+
+.board-tbl tr.notice td {
+    color: #2D6A4F; /* 글자 색상 강조 */
+}
+
+/* 공지 라벨 디자인 */
+.notice-badge {
+    background-color: #2D6A4F;
+    color: #fff;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    margin-right: 5px;
 }
 
 .link-txt {
-	color: #2D6A4F;
-	text-decoration: none;
-	font-weight: bold;
+    color: #333;
+    text-decoration: none;
 }
 
 .link-txt:hover {
-	text-decoration: underline;
+    color: #2D6A4F;
+    text-decoration: underline;
 }
-
 /* ========== 5. 페이징 ========== */
 .pg-wrap {
 	display: flex;
@@ -306,6 +326,59 @@ select.form-control {
 .link-txt:hover {
 	text-decoration: underline;
 }
+
+.col-title {
+	width: 50%;
+}
+
+/* 검색 조건 드롭다운 스타일 */
+.select_option {
+	position: relative;
+	width: 120px;
+	height: 38px;
+	border: 1px solid #aaa;
+	border-radius: 4px;
+	cursor: pointer;
+	background: #fff;
+}
+
+.select_option .option_text {
+	display: block;
+	padding: 8px 10px;
+	font-size: 0.95rem;
+}
+
+.option_list {
+	display: none; /* 기본 숨김 */
+	position: absolute;
+	top: 100%;
+	left: 0;
+	width: 100%;
+	background: #fff;
+	border: 1px solid #aaa;
+	border-radius: 4px;
+	list-style: none;
+	z-index: 10;
+	margin-top: 2px;
+}
+
+.option_list .item button {
+	width: 100%;
+	padding: 8px 10px;
+	border: none;
+	background: none;
+	text-align: left;
+	cursor: pointer;
+}
+
+.option_list .item button:hover {
+	background-color: #f1f8f5;
+}
+
+/* 활성화 상태 */
+.select_option.on .option_list {
+	display: block;
+}
 </style>
 
 
@@ -327,23 +400,26 @@ select.form-control {
 				console.log('data.list',data.length)
 				
 				document.getElementById("tbody").innerHTML=``
-				for(let i = 0; i<data.length;i++){
-					document.getElementById("tbody").innerHTML+=`
-					<tr>
-						<td>\${data[i].board_num}</td>
-						<td>\${data[i].category}</td>
-						<td><a href="\${contextPath}/board/one?board_num=\${data[i].board_num}" class="link-txt">\${data[i].title}</a></td>
-						<td>\${data[i].content}</td>
-						<td>\${data[i].view_cnt}</td>
-						<td>\${formatDate(data[i].created_at)}</td>
-						<td>\${formatDate(data[i].updated_at)}</td>
-						<td>\${data[i].board_status}</td>
-						<td>\${data[i].files_num}</td>
-						<td>\${data[i].ename}</td>
-						
-					</tr>
-					`
-				}
+					for(let i = 0; i < data.length; i++) {
+					    // 카테고리가 공지인지 체크
+					    let isNotice = data[i].category === '공지';
+					    let trClass = isNotice ? 'class="notice"' : '';
+					    let badge = isNotice ? '<span class="notice-badge">공지</span>' : '';
+
+					    document.getElementById("tbody").innerHTML += `
+					    <tr ${trClass}>
+					        <td>\${isNotice ? '!' : data[i].board_num}</td>
+					        <td>\${data[i].category}</td>
+					        <td style="text-align: left; padding-left: 20px;">
+					            \${badge}
+					            <a href="\${contextPath}/board/one?board_num=\${data[i].board_num}" class="link-txt">\${data[i].title}</a>
+					        </td>
+					        <td>\${data[i].ename}</td>
+					        <td>\${formatDate(data[i].created_at)}</td>
+					        <td>\${data[i].view_cnt}</td>
+					    </tr>
+					    `;
+					}
 			})
 		
 		
@@ -360,36 +436,67 @@ select.form-control {
 	        minute:'2-digit'
 	    }) : "";
 	}
+	
+	function selectOption(text){
+		document.getElementById('selectedText').innerText = text;
+	}
+	
+	document.addEventListener('click', function(e){
+		const select = document.getElementById('selectOption');
+		if(!select.contains(e.target)){
+			select.classList.remove('on');
+		}
+	})
 	</script>
 </script>
 </head>
 <body>
 
 	<div class="mat-all">
-		<tiles:insertAttribute name="header" ignore="true"/>
+		<tiles:insertAttribute name="header" ignore="true" />
 
 		<div class="mat-body">
 			<main class="main-cont">
 				<div class="hdr">
 					<h1>board</h1>
-					<button type="button" class="btn-reg"><a href="${pageContext.request.contextPath}/board/write" class="link-txt">+ 글쓰기</a></button>
+					<button type="button" class="btn-reg">
+						<a href="${pageContext.request.contextPath}/board/write"
+							class="link-txt">+ 글쓰기</a>
+					</button>
 				</div>
-				
+
 				<%-- 검색창 action  --%>
-				<form name="searchFrm" action="${pageContent.request.contextPath}/board" method="get">
+				<form name="searchFrm"
+					action="${pageContent.request.contextPath}/board" method="get">
+
 					<div class="sch-wrap">
 						<div class="sch-row">
+							<div class="sch-left">
+								<!-- 드롭다운 컨테이너 -->
+								<div class="select_option" id="selectOption"
+									onclick="this.classList.toggle('on')">
+									<span class="option_text" id="selectedText">선택 ⩢</span>
+									<ul class="option_list">
+										<li class="item"><button type="button"
+												onclick="selectOption('제목만')">제목만</button></li>
+										<li class="item"><button type="button"
+												onclick="selectOption('글작성자')">글작성자</button></li>
+									</ul>
+								</div>
+							</div>
+
+
 							<div class="sch-right">
 								<div class="sch-input-box">
-									<span style="color: #888;">&#128269;</span>
-									<input type="text" id="keyword" value="" placeholder="제목 검색">
+									<span style="color: #888;">&#128269;</span> <input type="text"
+										id="keyword" value="" placeholder="제목 검색">
 								</div>
 								<button type="button" class="btn-sch" id="search">검색</button>
 								<button type="button" class="btn-sch" id="init">초기화</button>
 							</div>
 						</div>
 					</div>
-				
+
 				</form>
 
 
@@ -400,27 +507,23 @@ select.form-control {
 						<tr>
 							<th>no.</th>
 							<th>카테고리</th>
-							<th>제목</th>
-							<th>내용</th>
-							<th>조회횟수</th>
-							<th>생성일</th>
-							<th>수정일</th>
-							<th>상태</th>
-							<th>파일no.</th>
+							<th class="col-title">제목</th>
 							<th>작성자</th>
+							<th>작성일</th>
+							<th>조회수</th>
 						</tr>
 					</thead>
 					<tbody id="tbody"></tbody>
 				</table>
-				
+
 				<div class="table-responsive"></div>
-								<div id="paging-area">
+				<div id="paging-area">
 					<jsp:include page="/WEB-INF/views/common/paging.jsp" />
 				</div>
 			</main>
-			
+
 		</div>
-		<tiles:insertAttribute name="footer" ignore="true"/>
+		<tiles:insertAttribute name="footer" ignore="true" />
 	</div>
 
 </body>
