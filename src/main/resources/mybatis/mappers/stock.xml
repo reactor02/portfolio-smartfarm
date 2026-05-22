@@ -17,6 +17,7 @@
         f.facility_name
         FROM stock s
         JOIN item i ON s.item_num = i.item_num
+
         JOIN facility f ON f.facility_num = s.facility_num 
          ORDER BY s.stock_id DESC
     </select>
@@ -36,6 +37,8 @@
         FROM stock s
         JOIN item i ON s.item_num = i.item_num
         JOIN facility f ON f.facility_num = s.facility_num 
+
+
         <where>
 
         <if test="type != null and type != 'all'">

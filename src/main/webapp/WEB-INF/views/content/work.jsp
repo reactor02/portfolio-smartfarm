@@ -33,7 +33,9 @@
     .data-table { width:100%; border-collapse:collapse; }
     .data-table th { background:var(--bg); border-bottom:2px solid var(--s-cl); padding:12px; text-align:center; font-size:13px; font-weight:bold; }
     .data-table td { padding:12px; border-bottom:1px solid var(--border-cl); text-align:center; font-size:13px; color:#555; }
-    .data-table tbody tr:hover { background:rgba(183,228,199,0.2); cursor:pointer; }
+    .data-table tbody tr:hover { background:rgba(183,228,199,0.2); }
+    .link-txt { color:var(--m-cl); text-decoration:none; font-weight:bold; }
+    .link-txt:hover { text-decoration:underline; }
     .badge { display:inline-block; padding:3px 10px; border-radius:12px; font-size:11px; font-weight:bold; background:var(--p-cl); color:var(--m-cl); }
 
     /* 페이징 */
@@ -48,7 +50,7 @@
 
     <div class="page-header">
         <h1 class="page-title">작업지시 관리</h1>
-        <button class="btn-add">+ 등록</button>
+        <button class="btn-add" onclick="document.getElementById('workRegModal').style.display='flex'">+ 등록</button>
     </div>
 
     <!-- 검색 필터 -->
@@ -62,9 +64,10 @@
                 <span class="search-label">▶ 상태</span>
                 <select name="work_status">
                     <option value="">상태 선택</option>
-                    <option value="대기"   <c:if test="${page.work_status == '대기'}">selected</c:if>>대기</option>
-                    <option value="진행중" <c:if test="${page.work_status == '진행중'}">selected</c:if>>진행중</option>
-                    <option value="완료"   <c:if test="${page.work_status == '완료'}">selected</c:if>>완료</option>
+                    <option value="WAIT"        <c:if test="${page.work_status == 'WAIT'}">selected</c:if>>대기</option>
+                    <option value="IN_PROGRESS" <c:if test="${page.work_status == 'IN_PROGRESS'}">selected</c:if>>진행중</option>
+                    <option value="DONE"        <c:if test="${page.work_status == 'DONE'}">selected</c:if>>완료</option>
+                    <option value="취소"         <c:if test="${page.work_status == '취소'}">selected</c:if>>취소</option>
                 </select>
             </div>
             <div class="search-row">
@@ -95,9 +98,9 @@
             <c:choose>
                 <c:when test="${not empty list}">
                     <c:forEach var="w" items="${list}" varStatus="s">
-                        <tr onclick="location.href='/work/${w.work_order_id}'">
+                        <tr>
                             <td>${(page.page-1)*page.size + s.index + 1}</td>
-                            <td>${w.work_order_id}</td>
+                            <td><a href="/work/${w.work_order_id}" class="link-txt">${w.work_order_id}</a></td>
                             <td>${w.plan_id}</td>
                             <td>${w.item_name}</td>
                             <td>${w.order_qty}</td>
@@ -131,11 +134,65 @@
     </div>
 
 </main>
+<!-- ===== 등록 모달 ===== -->
+<div id="workRegModal" class="modal-overlay" style="display:none;">
+    <div class="modal-box">
+        <h3 class="modal-title">작업지시 등록</h3>
+        <form action="/work" method="post">
+            <div class="modal-grid">
+                <div class="modal-field">
+                    <label>생산계획</label>
+                    <select name="plan_num" required>
+                        <option value="">선택</option>
+                        <c:forEach var="p" items="${planList}">
+                            <option value="${p.num}">${p.name}</option>
+                        </c:forEach>
+                    </select>
+                </div>
+                <div class="modal-field">
+                    <label>담당자</label>
+                    <select name="emp_num" required>
+                        <option value="">선택</option>
+                        <c:forEach var="e" items="${empList}">
+                            <option value="${e.num}">${e.name}</option>
+                        </c:forEach>
+                    </select>
+                </div>
+                <div class="modal-field">
+                    <label>지시수량</label>
+                    <input type="number" name="order_qty" min="1" required>
+                </div>
+                <div class="modal-field">
+                    <label>작업시작일</label>
+                    <input type="date" name="order_start" required>
+                </div>
+                <div class="modal-field">
+                    <label>작업종료일</label>
+                    <input type="date" name="order_end" required>
+                </div>
+                <div class="modal-field modal-field-full">
+                    <label>지시사항</label>
+                    <textarea name="content" placeholder="지시사항 입력"></textarea>
+                </div>
+            </div>
+            <div class="modal-btn-wrap">
+                <button type="submit" class="btn-add" style="padding:8px 24px;">등록</button>
+                <button type="button" class="btn-cancel"
+                        onclick="document.getElementById('workRegModal').style.display='none'">취소</button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <script>
 function movePage(p) {
     document.getElementById('pageInput').value = p;
     document.getElementById('searchForm').submit();
 }
+// 모달 배경 클릭 시 닫기
+document.getElementById('workRegModal').addEventListener('click', function(e) {
+    if (e.target === this) this.style.display = 'none';
+});
 </script>
 </body>
 </html>

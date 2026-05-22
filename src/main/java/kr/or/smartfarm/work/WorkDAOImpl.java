@@ -2,6 +2,8 @@ package kr.or.smartfarm.work;
 
 import java.util.List;
 
+import kr.or.smartfarm.prod.SelectOptionDTO;
+
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -30,5 +32,15 @@ public class WorkDAOImpl implements WorkDAO {
     @Override
     public int updateStatus(WorkDTO workDTO) {
         return session.update("kr.or.smartfarm.work.updateStatus", workDTO);
+    }
+
+    @Override
+    public List<SelectOptionDTO> getEmpOptions() {
+        return session.selectList("kr.or.smartfarm.work.getEmpOptions");
+    }
+
+    @Override
+    public List<SelectOptionDTO> getPlanOptions() {
+        return session.selectList("kr.or.smartfarm.work.getPlanOptions");
     }
 }

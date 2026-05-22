@@ -30,7 +30,17 @@
                 FROM production_plan pp
                 LEFT JOIN item     i ON pp.item_num    = i.item_num
                 LEFT JOIN emp      e ON pp.emp_num     = e.emp_num
-                LEFT JOIN facility f ON i.facility_num = f.facility_num
+                LEFT JOIN (
+                    SELECT item_num, facility_num
+                    FROM (
+                        SELECT item_num, facility_num,
+                               ROW_NUMBER() OVER (PARTITION BY item_num ORDER BY flow) AS rn
+                        FROM process
+                        WHERE facility_num IS NOT NULL
+                    )
+                    WHERE rn = 1
+                ) pr ON pp.item_num = pr.item_num
+                LEFT JOIN facility f ON pr.facility_num = f.facility_num
                 LEFT JOIN (
                     SELECT plan_num, SUM(current_qty) AS currentqty
                     FROM work_order
@@ -109,7 +119,17 @@
         FROM production_plan pp
         LEFT JOIN item     i ON pp.item_num    = i.item_num
         LEFT JOIN emp      e ON pp.emp_num     = e.emp_num
-        LEFT JOIN facility f ON i.facility_num = f.facility_num
+        LEFT JOIN (
+            SELECT item_num, facility_num
+            FROM (
+                SELECT item_num, facility_num,
+                       ROW_NUMBER() OVER (PARTITION BY item_num ORDER BY flow) AS rn
+                FROM process
+                WHERE facility_num IS NOT NULL
+            )
+            WHERE rn = 1
+        ) pr ON pp.item_num = pr.item_num
+        LEFT JOIN facility f ON pr.facility_num = f.facility_num
         LEFT JOIN (
             SELECT plan_num, SUM(current_qty) AS currentqty
             FROM work_order
@@ -118,16 +138,16 @@
         WHERE pp.plan_id = #{plan_id}
     </select>
 
-    <!-- 등록 (plan_id 자동 생성) -->
+    <!-- 등록 (plan_id: 알파벳 순차 자동 생성) -->
     <insert id="insert" parameterType="ProdDTO">
         <selectKey keyProperty="plan_id" resultType="String" order="BEFORE">
-            SELECT 'PROD-' || LPAD(PROD_SEQ.NEXTVAL, 4, '0') FROM DUAL
+            SELECT CHR(MAX(ASCII(plan_id)) + 1) FROM production_plan
         </selectKey>
         INSERT INTO production_plan
             (plan_num, plan_id, plan_qty, plan_status, plan_start, plan_end,
              emp_num, item_num, content, created_at)
         VALUES (
-            PROD_SEQ.CURRVAL,
+            PROD_SEQ.NEXTVAL,
             #{plan_id},
             #{plan_qty},
             '대기',

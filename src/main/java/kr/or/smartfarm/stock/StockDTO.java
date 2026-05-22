@@ -15,5 +15,5 @@ public class StockDTO {
 	private String name;
 	private String type;
 	private String unit;
-	
+
 }

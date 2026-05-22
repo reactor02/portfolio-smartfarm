@@ -28,7 +28,9 @@
     .data-table { width:100%; border-collapse:collapse; }
     .data-table th { background:var(--bg); border-bottom:2px solid var(--s-cl); padding:12px; text-align:center; font-size:13px; font-weight:bold; }
     .data-table td { padding:12px; border-bottom:1px solid var(--border-cl); text-align:center; font-size:13px; color:#555; }
-    .data-table tbody tr:hover { background:rgba(183,228,199,0.2); cursor:pointer; }
+    .data-table tbody tr:hover { background:rgba(183,228,199,0.2); }
+    .link-txt { color:var(--m-cl); text-decoration:none; font-weight:bold; }
+    .link-txt:hover { text-decoration:underline; }
     .badge { display:inline-block; padding:3px 10px; border-radius:12px; font-size:11px; font-weight:bold; background:var(--p-cl); color:var(--m-cl); }
 
     .paging { text-align:center; margin-top:1.5rem; }
@@ -54,10 +56,9 @@
                 <span class="search-label">▶ 상태</span>
                 <select name="lot_status">
                     <option value="">상태 선택</option>
-                    <option value="대기"   <c:if test="${page.lot_status == '대기'}">selected</c:if>>대기</option>
-                    <option value="진행중" <c:if test="${page.lot_status == '진행중'}">selected</c:if>>진행중</option>
-                    <option value="소진"   <c:if test="${page.lot_status == '소진'}">selected</c:if>>소진</option>
-                    <option value="완료"   <c:if test="${page.lot_status == '완료'}">selected</c:if>>완료</option>
+                    <option value="AVAILABLE" <c:if test="${page.lot_status == 'AVAILABLE'}">selected</c:if>>사용가능</option>
+                    <option value="USED"      <c:if test="${page.lot_status == 'USED'}">selected</c:if>>소진</option>
+                    <option value="EXPIRED"   <c:if test="${page.lot_status == 'EXPIRED'}">selected</c:if>>만료</option>
                 </select>
             </div>
             <div class="search-row">
@@ -86,9 +87,9 @@
             <c:choose>
                 <c:when test="${not empty list}">
                     <c:forEach var="l" items="${list}" varStatus="s">
-                        <tr onclick="location.href='/lot/${l.lot_code}'">
+                        <tr>
                             <td>${(page.page-1)*page.size + s.index + 1}</td>
-                            <td>${l.lot_code}</td>
+                            <td><a href="/lot/${l.lot_code}" class="link-txt">${l.lot_code}</a></td>
                             <td>${l.item_name}</td>
                             <td>${l.code}</td>
                             <td>${l.current_qty}</td>

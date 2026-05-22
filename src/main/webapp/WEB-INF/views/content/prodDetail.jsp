@@ -267,9 +267,9 @@
                     var html = '';
                     for (var i = 0; i < list.length; i++) {
                         var w = list[i];
-                        html += '<tr style="cursor:pointer;" onclick="location.href=\'/work/' + (w.work_order_id || '') + '\'">'
+                        html += '<tr>'
                               + '<td>' + ((curPage - 1) * 5 + i + 1) + '</td>'
-                              + '<td>' + (w.work_order_id || '-') + '</td>'
+                              + '<td><a href="/work/' + (w.work_order_id || '') + '" class="link-text">' + (w.work_order_id || '-') + '</a></td>'
                               + '<td>' + (w.ename         || '-') + '</td>'
                               + '<td>' + (w.order_qty     || 0)   + '</td>'
                               + '<td>' + (w.current_qty   || 0)   + '</td>'
@@ -308,7 +308,8 @@
     }
 
     /* 작업등록 모달 */
-    document.getElementById('btnOpenWorkModal').addEventListener('click', function() {
+    var btnOpenWork = document.getElementById('btnOpenWorkModal');
+    if (btnOpenWork) btnOpenWork.addEventListener('click', function() {
         document.getElementById('workModal').style.display = 'flex';
     });
     document.getElementById('btnCloseWorkModal').addEventListener('click', function() {

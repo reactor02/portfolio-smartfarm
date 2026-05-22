@@ -6,6 +6,8 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import kr.or.smartfarm.prod.SelectOptionDTO;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -25,9 +27,13 @@ public class WorkController {
     /* ── 목록 ───────────────────────────────────────── */
     @RequestMapping
     public String list(@ModelAttribute WorkPageDTO pageDTO, Model model) {
-        List<WorkDTO> list = workService.getList(pageDTO);
-        model.addAttribute("list", list);
-        model.addAttribute("page", pageDTO);
+        List<WorkDTO>         list     = workService.getList(pageDTO);
+        List<SelectOptionDTO> empList  = workService.getEmpOptions();
+        List<SelectOptionDTO> planList = workService.getPlanOptions();
+        model.addAttribute("list",     list);
+        model.addAttribute("page",     pageDTO);
+        model.addAttribute("empList",  empList);
+        model.addAttribute("planList", planList);
         return "content/work.tiles";
     }
 
@@ -63,6 +69,22 @@ public class WorkController {
     @ResponseBody
     public String cancel(@PathVariable String work_order_id) {
         workService.cancel(work_order_id);
+        return "ok";
+    }
+
+    /* ── 작업시작 POST (AJAX): WAIT → IN_PROGRESS ── */
+    @RequestMapping(value = "/{work_order_id}/start", method = RequestMethod.POST)
+    @ResponseBody
+    public String start(@PathVariable String work_order_id) {
+        workService.start(work_order_id);
+        return "ok";
+    }
+
+    /* ── 작업종료 POST (AJAX): IN_PROGRESS → DONE ── */
+    @RequestMapping(value = "/{work_order_id}/complete", method = RequestMethod.POST)
+    @ResponseBody
+    public String complete(@PathVariable String work_order_id) {
+        workService.complete(work_order_id);
         return "ok";
     }
 }

@@ -19,11 +19,23 @@
                        e.ename,
                        wo.order_start,
                        wo.order_status AS work_status,
+                       f.facility_name,
                        COUNT(*) OVER() AS total_count
                 FROM work_order wo
                 LEFT JOIN emp             e  ON wo.emp_num  = e.emp_num
                 LEFT JOIN production_plan pp ON wo.plan_num = pp.plan_num
                 LEFT JOIN item            i  ON pp.item_num = i.item_num
+                LEFT JOIN (
+                    SELECT item_num, facility_num
+                    FROM (
+                        SELECT item_num, facility_num,
+                               ROW_NUMBER() OVER (PARTITION BY item_num ORDER BY flow) AS rn
+                        FROM process
+                        WHERE facility_num IS NOT NULL
+                    )
+                    WHERE rn = 1
+                ) pr ON i.item_num = pr.item_num
+                LEFT JOIN facility f ON pr.facility_num = f.facility_num
                 <where>
                     <if test="startDate != null and startDate != ''">
                         AND wo.order_start &gt;= TO_DATE(#{startDate}, 'YYYY-MM-DD')
@@ -64,27 +76,50 @@
                e.ename,
                i.name           AS item_name,
                i.code,
-               i.type
+               i.type,
+               f.facility_num,
+               f.facility_name
         FROM work_order wo
         LEFT JOIN emp             e  ON wo.emp_num  = e.emp_num
         LEFT JOIN production_plan pp ON wo.plan_num = pp.plan_num
         LEFT JOIN item            i  ON pp.item_num = i.item_num
+        LEFT JOIN (
+            SELECT item_num, facility_num
+            FROM (
+                SELECT item_num, facility_num,
+                       ROW_NUMBER() OVER (PARTITION BY item_num ORDER BY flow) AS rn
+                FROM process
+                WHERE facility_num IS NOT NULL
+            )
+            WHERE rn = 1
+        ) pr ON i.item_num = pr.item_num
+        LEFT JOIN facility f ON pr.facility_num = f.facility_num
         WHERE wo.order_id = #{work_order_id}
     </select>
 
-    <!-- 등록 (order_id 자동 생성) -->
+    <!-- 등록 (order_id: plan_id + '-' + 순번 자동 생성) -->
     <insert id="insert" parameterType="WorkDTO">
         <selectKey keyProperty="work_order_id" resultType="String" order="BEFORE">
-            SELECT 'WO-' || LPAD(WO_SEQ.NEXTVAL, 4, '0') FROM DUAL
+            SELECT pp.plan_id || '-' || (
+                SELECT NVL(MAX(
+                    CASE WHEN REGEXP_LIKE(wo.order_id, pp.plan_id || '-[0-9]+')
+                         THEN TO_NUMBER(SUBSTR(wo.order_id, LENGTH(pp.plan_id)+2))
+                         ELSE 0 END
+                ), 0) + 1
+                FROM work_order wo
+                WHERE wo.plan_num = #{plan_num}
+            )
+            FROM production_plan pp
+            WHERE pp.plan_num = #{plan_num}
         </selectKey>
         INSERT INTO work_order
             (order_num, order_id, order_qty, order_status, emp_num,
              plan_num, current_qty, content, created_at, order_start, order_end)
         VALUES (
-            WO_SEQ.CURRVAL,
+            WO_SEQ.NEXTVAL,
             #{work_order_id},
             #{order_qty},
-            '대기',
+            'WAIT',
             #{emp_num},
             #{plan_num},
             0,
@@ -94,6 +129,19 @@
             #{order_end}
         )
     </insert>
+
+    <!-- 담당자 옵션 -->
+    <select id="getEmpOptions" resultType="SelectOptionDTO">
+        SELECT emp_num AS num, ename AS name FROM emp ORDER BY emp_num
+    </select>
+
+    <!-- 생산계획 옵션 (취소 제외) -->
+    <select id="getPlanOptions" resultType="SelectOptionDTO">
+        SELECT plan_num AS num, plan_id AS name
+        FROM production_plan
+        WHERE plan_status != '취소'
+        ORDER BY plan_num
+    </select>
 
     <!-- 상태 변경 (취소 처리) -->
     <update id="updateStatus" parameterType="WorkDTO">
