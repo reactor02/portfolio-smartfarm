@@ -39,4 +39,16 @@ public int insertStock(StockDTO dto) {
 		result = stockDAO.insertStock2(dto);
 	return result;
 	}
+
+//디테일 셀렉트
+public List selectDetail(String stockId) {
+	List result = null;
+	result = stockDAO.selectDetail2(stockId);
+	return result;
+}
+
+
+
+
+
 }

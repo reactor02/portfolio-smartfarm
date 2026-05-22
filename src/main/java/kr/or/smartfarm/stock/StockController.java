@@ -20,7 +20,7 @@ public class StockController {
 	
 	@Autowired
 	StockService stockService;
-	
+	//목록페이지
 	@RequestMapping("/stockSelect")
 	public String goStock(@RequestParam(value = "page", defaultValue = "1")int page,@RequestParam(value="msg", required=false)String msg,Model model) {
 		List result = null;
@@ -91,7 +91,15 @@ System.out.println(searchMap);
 		}else {
 			return "redirect:/stockSelect?msg=false";
 		}
-		
+	}
+	
+	@RequestMapping("/stockDetail")
+	//상세페이지 들어가는 로직
+	public String Detail(@RequestParam(value="stock_id", required=false)String stockId, Model model) {
+		List result = null;
+		result = stockService.selectDetail(stockId);
+		model.addAttribute("resultList", result);
+		return "content/stockDetail";
 	}
 }
 

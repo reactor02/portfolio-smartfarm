@@ -47,4 +47,12 @@ public class StockDAOImpl implements StockDAO{
 		System.out.println("DAO에서 result == "+ result);
 		return result;
 	}
+	
+	//디테일 셀렉트
+	public List selectDetail2(String stockId) {
+		List result = null;
+		result = sqlSession.selectList("kr.or.stock.detailSelect", stockId);
+		return result;
+		
+	}
 }
