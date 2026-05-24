@@ -1,4 +1,5 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
 <%
 request.setCharacterEncoding("utf-8");
 response.setContentType("text/html; charset=utf-8");
@@ -54,7 +55,26 @@ response.setContentType("text/html; charset=utf-8");
 	margin-bottom: 25px;
 	box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
+.btn-plus {
+	background-color: #fff;
+	color: #2D6A4F; /* 텍스트가 아닌 명확한 버튼 디자인 */
+	padding: 10px 24px;
+	border-radius: 6px;
+	border: 1px solid #2D6A4F;
+	font-weight: bold;
+	font-size: 1.05rem;
+	cursor: pointer;
+	box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 2px 3px
+		rgba(0, 0, 0, 0.2);
+	transition: background-color 0.2s;
+}
 
+.btn-reg:hover {
+	background-color: #B7E4C7;
+}
+.btn-plus:hover {
+	background-color: #B7E4C7;
+}
 .hdr h1 {
 	font-size: 1.8rem;
 	color: #ffffff;
@@ -71,7 +91,8 @@ response.setContentType("text/html; charset=utf-8");
 	font-weight: bold;
 	font-size: 1.05rem;
 	cursor: pointer;
-	box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 2px 3px rgba(0, 0, 0, 0.2);
+	box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 2px 3px
+		rgba(0, 0, 0, 0.2);
 	transition: background-color 0.2s;
 }
 
@@ -104,6 +125,21 @@ response.setContentType("text/html; charset=utf-8");
 	display: flex;
 	align-items: center;
 	gap: 12px;
+}
+.select-reset{
+	height: 38px;
+	padding: 0 20px;
+	background-color: #fff;
+	color: #2D6A4F;
+	border: 1px solid #2D6A4F;
+	border-radius: 4px;
+	font-size: 1rem;
+	font-weight: bold;
+	cursor: pointer;
+	transition: 0.2s;
+}
+.select-reset:hover{
+background-color: #FFB703;
 }
 
 .label {
@@ -206,6 +242,49 @@ select.form-control {
 .stk-tbl tbody tr:hover {
 	background-color: #f1f8f5;
 }
+
+/* ========== BOM 등록 모달 추가 스타일 ========== */
+.modal-box {
+    max-width: 800px !important; /* 모달창 너비 여유롭게 확장 */
+    width: 90% !important;
+}
+
+.section-title {
+    font-size: 1.1rem;
+    color: #2D6A4F;
+    margin-bottom: 15px;
+    font-weight: bold;
+    border-left: 4px solid #2D6A4F;
+    padding-left: 8px;
+}
+
+/* 자식 품목(체크박스) UI 스타일 */
+.child-row {
+    transition: background-color 0.2s, color 0.2s;
+}
+.child-row.disabled {
+    background-color: #f4f4f4;
+    color: #a0a0a0;
+}
+.child-row.disabled input[type="number"] {
+    background-color: #e9e9e9;
+    cursor: not-allowed;
+    border-color: #ddd;
+    color: #a0a0a0;
+}
+.qty-input {
+    width: 100%;
+    max-width: 100px;
+    padding: 6px;
+    border: 1px solid #aaa;
+    border-radius: 4px;
+    text-align: right;
+    outline: none;
+    transition: border-color 0.2s;
+}
+.qty-input:focus {
+    border-color: #2D6A4F;
+}
 </style>
 </head>
 <body>
@@ -217,43 +296,43 @@ select.form-control {
 			<main class="main-cont">
 				<div class="hdr">
 					<h1>BOM 관리</h1>
-					<button type="button" class="btn-reg">+ 등록 버튼</button>
+					<button type="button" class="btn-reg">+ 등록 하기</button>
 				</div>
 
 				<form name="searchFrm" action="bomList.do" method="get">
 					<div class="sch-wrap">
 						<div class="sch-row">
 							<div class="sch-left">
-								<span class="label">▶ 등록일자</span>
-								<input type="date" id="sDate" class="form-control" onchange="validateDate()">
-								<span style="margin: 0 10px; font-weight: bold;">~</span>
-								<input type="date" id="eDate" class="form-control" onchange="validateDate()">
+								<span class="label">▶ 등록일자</span> <input type="date" id="sDate"
+									class="form-control" onchange="validateDate()"> <span
+									style="margin: 0 10px; font-weight: bold;">~</span> <input
+									type="date" id="eDate" class="form-control"
+									onchange="validateDate()">
 							</div>
 						</div>
 
 						<div class="sch-row">
 							<div class="sch-left">
-								<span class="label">▶ 사용여부</span> 
-								<select id="useYn" class="form-control">
+								<span class="label">▶ 사용여부</span> <select id="useYn"
+									class="form-control">
 									<option value="all">전체</option>
 									<option value="Y" selected>사용 중</option>
 									<option value="N">미사용</option>
-								</select>
-
-								<span class="label" style="margin-left: 20px;">▶ 품목 분류</span> 
-								<select id="itemCat" class="form-control">
+								</select> <span class="label" style="margin-left: 20px;">▶ 품목 분류</span> <select
+									id="type" class="form-control">
 									<option value="all">전체</option>
-									<option value="finished" selected>완제품</option>
-									<option value="semi">반제품</option>
+									<option value="product" selected>완제품</option>
+									<option value="semiproduct">반제품</option>
 								</select>
 							</div>
 
 							<div class="sch-right">
 								<div class="sch-input-box">
-									<span style="color: #888;">&#128269;</span> 
-									<input type="text" id="keyword" value="" placeholder="품목명 혹은 BOM코드 검색">
+									<span style="color: #888;">&#128269;</span> <input type="text"
+										id="keyword" value="" placeholder="품목명 혹은 BOM코드 검색">
 								</div>
 								<button type="button" class="btn-sch">검색</button>
+								<button type="button" class="select-reset">검색 초기화</button>
 							</div>
 						</div>
 					</div>
@@ -280,12 +359,12 @@ select.form-control {
 										<tr>
 											<td style="font-weight: bold; color: #555;">${vs.count}</td>
 											<td>${item.BOM_CODE}</td>
-											<td>${item.ITEM_NAME}</td>
-											<td>${item.ITEM_CODE}</td>
-											<td>${item.BASE_QTY}</td>
-											<td>${item.STATUS}</td>
-											<td>${item.REG_DATE}</td>
-											<td>${item.MANAGER}</td>
+											<td>${item.NAME}</td>
+											<td>${item.CODE}</td>
+											<td>${item.REQUIRED_QTY}</td>
+											<td>${item.BOM_STATUS}</td>
+											<td>${item.CREATED_AT}</td>
+											<td>하드코딩</td>
 										</tr>
 									</c:forEach>
 								</c:when>
@@ -315,6 +394,118 @@ select.form-control {
 		</div>
 
 		<tiles:insertAttribute name="footer" ignore="true" />
+	</div>
+
+
+	<div id="regModal" class="modal-overlay" style="display: none;">
+		<div class="modal-box">
+			<h3 class="modal-title">BOM 등록</h3>
+
+			<form method="POST" action="/insertController" id="insert-form">
+				
+				<h4 class="section-title">1. 부모 품목 (생산품) 선택</h4>
+				<div class="modal-grid">
+					<div class="modal-field">
+						<label for="itemSearch">품목명 검색</label>
+						<input type="text" id="itemSearch" placeholder="품목 명 혹은 품목 코드 검색">
+					</div>
+					
+					<div class="modal-field">
+						<label for="quantity">기준 생산 수량</label>
+						<input type="number" name="stock_qty" id="quantity" min="1" placeholder="수량 입력">
+					</div>
+
+					<div class="modal-field modal-field-full" id="selectedItemContainer" style="display: none; margin-top: 10px;">
+						<span style="display: inline-block; padding: 6px 12px; background-color: #e6f7ff; color: #1890ff; border: 1px solid #91d5ff; border-radius: 4px; font-weight: bold; font-size: 14px;">
+							📌 선택된 품목: <span id="selectedItemName" style="color: #0050b3;">-</span>
+						</span>
+					</div>
+
+					<div class="modal-field modal-field-full" style="margin-top: 15px;">
+						<label>선택 가능한 부모 품목 리스트 (클릭하여 선택하세요)</label>
+
+						<div id="searchResultArea" style="width: 100%; height: 180px; border: 1px solid #ccc; background: #fff; overflow-y: scroll; border-radius: 4px;">
+							<table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 14px; table-layout: fixed;">
+								<colgroup>
+									<col style="width: 10%;">
+									<col style="width: 25%;">
+									<col style="width: 35%;">
+									<col style="width: 15%;">
+									<col style="width: 15%;">
+								</colgroup>
+								<thead style="background: #f5f5f5; position: sticky; top: 0; border-bottom: 1px solid #ddd; z-index: 10;">
+									<tr>
+										<th style="padding: 10px; text-align: center;">선택</th>
+										<th style="padding: 10px;">품목코드</th>
+										<th style="padding: 10px;">품목명</th>
+										<th style="padding: 10px;">타입</th>
+										<th style="padding: 10px;">단위</th>
+									</tr>
+								</thead>
+								<tbody id="suggestList">
+									<tr id="emptyMessage">
+										<td colspan="5" style="padding: 40px 10px; text-align: center; color: #999;">
+											품목명을 입력하면 조건에 맞는 기준관리 항목이 여기에 표시됩니다.
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+
+				<hr style="margin: 25px 0; border: 0; border-top: 1px dashed #ccc;">
+
+				<h4 class="section-title">2. 자식 품목 (소요 자재) 등록</h4>
+				<div class="modal-grid">
+					<div class="modal-field modal-field-full">
+						<label>등록할 자식 품목을 체크하고 소요 수량을 입력하세요.</label>
+
+						<div id="childResultArea" style="width: 100%; height: 220px; border: 1px solid #ccc; background: #fff; overflow-y: scroll; border-radius: 4px; margin-top: 5px;">
+							<table style="width: 100%; border-collapse: collapse; text-align: center; font-size: 14px; table-layout: fixed;">
+								<colgroup>
+									<col style="width: 10%;">
+									<col style="width: 30%;">
+									<col style="width: 30%;">
+									<col style="width: 10%;">
+									<col style="width: 20%;">
+								</colgroup>
+								<thead style="background: #f5f5f5; position: sticky; top: 0; border-bottom: 1px solid #ddd; z-index: 10;">
+									<tr>
+										<th style="padding: 10px;">선택</th>
+										<th style="padding: 10px;">품목명</th>
+										<th style="padding: 10px;">품목코드</th>
+										<th style="padding: 10px;">단위</th>
+										<th style="padding: 10px;">소요수량</th>
+									</tr>
+								</thead>
+								<tbody id="childList">
+									<tr class="child-row disabled">
+										<td style="padding: 8px;"><input type="checkbox" onchange="toggleChildRow(this)"></td>
+										<td style="padding: 8px;">나사 (Screw)</td>
+										<td style="padding: 8px;">ITEM_C_001</td>
+										<td style="padding: 8px;">EA</td>
+										<td style="padding: 8px;"><input type="number" class="qty-input" min="1" disabled placeholder="수량 입력"></td>
+									</tr>
+									<tr class="child-row disabled">
+										<td style="padding: 8px;"><input type="checkbox" onchange="toggleChildRow(this)"></td>
+										<td style="padding: 8px;">철판 (Plate)</td>
+										<td style="padding: 8px;">ITEM_C_002</td>
+										<td style="padding: 8px;">KG</td>
+										<td style="padding: 8px;"><input type="number" class="qty-input" min="1" disabled placeholder="수량 입력"></td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+
+				<div class="modal-btn-wrap" style="margin-top: 25px;">
+					<button type="button" class="btn-plus">등록</button>
+					<button type="button" class="btn-cancel">취소</button>
+				</div>
+			</form>
+		</div>
 	</div>
 
 	<script>
@@ -360,20 +551,20 @@ select.form-control {
 		function movePage(pageNum) {
 			let sDate = document.querySelector("#sDate").value;
 			let eDate = document.querySelector("#eDate").value;
-			let useYn = document.querySelector("#useYn").value;
-			let itemCat = document.querySelector("#itemCat").value;
+			let status = document.querySelector("#useYn").value;
+			let type = document.querySelector("#type").value;
 			let keyword = document.querySelector("#keyword").value;
 			
 			const params = new URLSearchParams();
 			params.append("page", pageNum);
 			params.append("sDate", sDate);
 			params.append("eDate", eDate);
-			params.append("useYn", useYn);
-			params.append("itemCat", itemCat);
+			params.append("status", status);
+			params.append("type", type);
 			params.append("keyword", keyword);
 			
 			// BOM 검색 API 호출 (URL을 프로젝트 환경에 맞게 수정해주세요)
-			fetch(`/searchBom?\${params.toString()}`)
+			fetch(`/searchBOM?\${params.toString()}`)
 			.then(response => response.json())
 			.then(data => {
 				if(data.searchResult.length == 0){
@@ -384,22 +575,25 @@ select.form-control {
 				}
 				
 				if(data.status === "good"){
+					console.log("서버에서 받은 데이터 전체:", data);
 					let tbody = document.querySelector("#bom-body");
 					tbody.innerHTML = "";
 					
 					let html = "";
 					for(let i = 0; i < data.searchResult.length; i++) {
 						let item = data.searchResult[i];
+						console.log("아이템 확인:", item);
+						console.log(JSON.stringify(item));
 						// 페이징 번호 계산 및 테이블 행 추가
 						html += `<tr>
 							<td style='font-weight: bold; color: #555;'>\${i + 1 + (data.pageInfo.pageNum - 1) * data.pageInfo.pageSize}</td>
 							<td>\${item.BOM_CODE}</td>
-							<td>\${item.ITEM_NAME}</td>
-							<td>\${item.ITEM_CODE}</td>
-							<td>\${item.BASE_QTY}</td>
-							<td>\${item.STATUS}</td>
-							<td>\${item.REG_DATE}</td>
-							<td>\${item.MANAGER}</td>
+							<td>\${item.NAME}</td>
+							<td>\${item.CODE}</td>
+							<td>\${item.REQUIRED_QTY}</td>
+							<td>\${item.BOM_STATUS}</td>
+							<td>\${item.CREATED_AT}</td>
+							<td>하드코딩</td>
 						</tr>`;
 					}
 					tbody.innerHTML = html;
@@ -408,13 +602,50 @@ select.form-control {
 					renderPagination(data.pageInfo);
 
 					// 브라우저 URL 갱신 (뒤로가기 지원용)
-					const newUrl = window.location.pathname + `?\${params.toString()}`;
+					const newUrl = window.location.pathname + `?page=\${pageNum}&type=\${type}&keyword=\${keyword}`
 					window.history.pushState({path: newUrl}, '', newUrl);
 				}
 			})
 			.catch(error => {
 				console.error("데이터 통신 중 오류가 발생했습니다.", error);
 			});
+		}
+		
+		const select_reset = document.querySelector(".select-reset");
+		select_reset.addEventListener('click', ()=>{
+			location.reload();
+		})
+		
+		//////// 모달 영역 로직
+		const plus_btn = document.querySelector(".btn-reg");
+		const modal =  document.querySelector(".modal-overlay");
+		
+		plus_btn.addEventListener('click', ()=>{
+			modal.style.display = "flex"; // 화면에 맞게 flex 블록 처리
+		})
+		
+		// 취소 버튼 클릭
+		const cancel = document.querySelector(".btn-cancel");
+		cancel.addEventListener('click',()=>{
+			modal.style.display = "none";
+		})
+
+		// [신규 추가] 자식 품목 체크박스 활성화/비활성화 토글 로직
+		function toggleChildRow(checkbox) {
+			const row = checkbox.closest('tr');
+			const input = row.querySelector('.qty-input');
+			
+			if (checkbox.checked) {
+				// 체크 시: disabled 클래스 제거, input 활성화 및 포커스
+				row.classList.remove('disabled');
+				input.disabled = false;
+				input.focus();
+			} else {
+				// 체크 해제 시: disabled 클래스 추가, input 비활성화 및 값 초기화
+				row.classList.add('disabled');
+				input.disabled = true;
+				input.value = ''; 
+			}
 		}
 	</script>
 </body>

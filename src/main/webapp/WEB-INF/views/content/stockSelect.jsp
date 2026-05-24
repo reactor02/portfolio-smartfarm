@@ -194,6 +194,10 @@ select.form-control {
 	cursor: pointer;
 	transition: 0.2s;
 }
+
+.btn-sch:hover {
+	background-color: #B7E4C7;
+}
 .select-reset{
 	height: 38px;
 	padding: 0 20px;
@@ -205,10 +209,6 @@ select.form-control {
 	font-weight: bold;
 	cursor: pointer;
 	transition: 0.2s;
-}
-
-.btn-sch:hover {
-	background-color: #B7E4C7;
 }
 .select-reset:hover{
 background-color: #FFB703;
