@@ -110,8 +110,8 @@
 
 <!-- 페이지네이션 -->
 <div class="pg-wrap">
-    <c:if test="${page.startPage > 1}">
-        <a href="#" onclick="movePage(${page.startPage-1})" class="pg-btn">이전</a>
+    <c:if test="${page.page > 1}">
+        <a href="#" onclick="movePage(${page.page-1})" class="pg-btn">이전</a>
     </c:if>
     <c:forEach begin="${page.startPage}" end="${page.endPage}" var="p">
         <c:choose>
@@ -119,8 +119,8 @@
             <c:otherwise><a href="#" onclick="movePage(${p})" class="pg-btn">${p}</a></c:otherwise>
         </c:choose>
     </c:forEach>
-    <c:if test="${page.endPage < page.totalPages}">
-        <a href="#" onclick="movePage(${page.endPage+1})" class="pg-btn">다음</a>
+    <c:if test="${page.page < page.totalPages}">
+        <a href="#" onclick="movePage(${page.page+1})" class="pg-btn">다음</a>
     </c:if>
 </div>
 

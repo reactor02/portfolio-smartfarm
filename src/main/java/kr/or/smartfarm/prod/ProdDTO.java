@@ -2,8 +2,6 @@ package kr.or.smartfarm.prod;
 
 import java.sql.Date;
 
-import org.springframework.format.annotation.DateTimeFormat;
-
 import lombok.Data;
 
 @Data
@@ -11,9 +9,7 @@ public class ProdDTO {
     private int    plan_num;
     private int    plan_qty;
     private String plan_status;
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date   plan_start;
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date   plan_end;
     private Date   created_at;
     private String content;

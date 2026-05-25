@@ -1,6 +1,7 @@
 package kr.or.smartfarm.work;
 
 import java.util.List;
+import java.util.Map;
 
 import kr.or.smartfarm.prod.SelectOptionDTO;
 
@@ -15,4 +16,5 @@ public interface WorkService {
     List<SelectOptionDTO> getEmpOptions();
     List<SelectOptionDTO> getPlanOptions();
     List<SelectOptionDTO> getItemOptions();
+    Map<String, Object>   searchPlans(String keyword, int page);
 }

@@ -73,6 +73,14 @@
                wo.order_qty   AS order_qty,
                pp.plan_qty,
                pp.plan_id,
+               CASE
+                   WHEN pp.plan_status IN ('취소', '완료') THEN pp.plan_status
+                   WHEN pp.plan_status = '진행'            THEN '진행'
+                   WHEN SYSDATE >= pp.plan_start           THEN '진행'
+                   ELSE '대기'
+               END AS plan_status,
+               pp.plan_start,
+               pp.plan_end,
                pp.item_num,
                wo.order_status  AS work_status,
                wo.emp_num,
@@ -129,7 +137,7 @@
         WHERE NOT EXISTS (
             SELECT 1 FROM production_plan
             WHERE plan_num = #{plan_num}
-              AND (plan_status = '취소' OR SYSDATE > plan_end)
+              AND (plan_status IN ('취소', '완료') OR SYSDATE > plan_end)
         )
     </insert>
 
@@ -172,5 +180,55 @@
           AND order_status != '완료'
           AND order_status != '취소'
     </update>
+
+    <!-- 작업완료 시 생산계획 완료 처리: SUM(current_qty) >= plan_qty 이면 '완료' 저장 -->
+    <update id="completePlanIfDone" parameterType="String">
+        UPDATE production_plan pp
+        SET pp.plan_status = '완료'
+        WHERE pp.plan_num = (
+            SELECT plan_num FROM work_order WHERE order_id = #{value}
+        )
+        AND pp.plan_status NOT IN ('취소', '완료')
+        AND pp.plan_qty &lt;= (
+            SELECT NVL(SUM(wo.current_qty), 0)
+            FROM work_order wo
+            WHERE wo.plan_num = pp.plan_num
+        )
+    </update>
+
+    <!-- 생산계획 검색 (AJAX 모달용, 취소·완료 제외) -->
+    <select id="searchPlans" parameterType="map" resultType="ProdDTO">
+        SELECT plan_id, plan_num, plan_qty, item_name, plan_status,
+               plan_start, plan_end, ename, total_count
+        FROM (
+            SELECT inner_q.*, ROWNUM AS rn
+            FROM (
+                SELECT pp.plan_id,
+                       pp.plan_num,
+                       pp.plan_qty,
+                       i.name AS item_name,
+                       CASE
+                           WHEN SYSDATE > pp.plan_end    THEN '완료'
+                           WHEN SYSDATE >= pp.plan_start THEN '진행'
+                           ELSE '대기'
+                       END AS plan_status,
+                       pp.plan_start,
+                       pp.plan_end,
+                       e.ename,
+                       COUNT(*) OVER() AS total_count
+                FROM production_plan pp
+                LEFT JOIN item i ON pp.item_num = i.item_num
+                LEFT JOIN emp  e ON pp.emp_num  = e.emp_num
+                WHERE pp.plan_status NOT IN ('취소', '완료')
+                <if test="keyword != null and keyword != ''">
+                    AND (pp.plan_id LIKE '%' || #{keyword} || '%'
+                      OR i.name     LIKE '%' || #{keyword} || '%')
+                </if>
+                ORDER BY pp.plan_num DESC
+            ) inner_q
+            WHERE ROWNUM &lt;= #{endRow}
+        )
+        WHERE rn &gt;= #{startRow}
+    </select>
 
 </mapper>

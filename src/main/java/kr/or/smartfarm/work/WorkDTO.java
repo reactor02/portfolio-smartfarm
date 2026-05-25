@@ -2,7 +2,6 @@ package kr.or.smartfarm.work;
 
 import java.sql.Date;
 
-import org.springframework.format.annotation.DateTimeFormat;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import lombok.Data;
@@ -18,11 +17,9 @@ public class WorkDTO {
 	private int    emp_num;
 	private int    current_qty;
 	private String content;
-	private Date   created_at;
-	@DateTimeFormat(pattern = "yyyy-MM-dd")
+	private java.sql.Timestamp created_at;
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
 	private Date   order_start;
-	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
 	private Date   order_end;
 
@@ -34,6 +31,9 @@ public class WorkDTO {
 	private int    item_num;       // item (공정 링크용)
 	private int    plan_qty;       // production_plan
 	private String plan_id;        // production_plan
+	private String plan_status;    // production_plan
+	private Date   plan_start;     // production_plan
+	private Date   plan_end;       // production_plan
 	private int    facility_num;   // process 경유
 	private String facility_name;
 

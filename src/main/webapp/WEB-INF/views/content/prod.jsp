@@ -149,16 +149,16 @@ response.setContentType("text/html; charset=utf-8");
 
                 <!-- 페이지네이션 -->
                 <div class="pg-wrap">
-                    <c:if test="${page.startPage > 1}">
-                        <a href="/prod?page=${page.startPage-1}&startDate=${param.startDate}&endDate=${param.endDate}&plan_status=${param.plan_status}&item_type=${param.item_type}&item_num=${param.item_num}&keyword=${param.keyword}"
+                    <c:if test="${page.page > 1}">
+                        <a href="/prod?page=${page.page-1}&startDate=${page.startDate}&endDate=${page.endDate}&plan_status=${page.plan_status}&item_type=${page.item_type}&item_num=${page.item_num}&keyword=${page.keyword}"
                            class="pg-btn">이전</a>
                     </c:if>
                     <c:forEach begin="${page.startPage}" end="${page.endPage}" var="p">
-                        <a href="/prod?page=${p}&startDate=${param.startDate}&endDate=${param.endDate}&plan_status=${param.plan_status}&item_type=${param.item_type}&item_num=${param.item_num}&keyword=${param.keyword}"
+                        <a href="/prod?page=${p}&startDate=${page.startDate}&endDate=${page.endDate}&plan_status=${page.plan_status}&item_type=${page.item_type}&item_num=${page.item_num}&keyword=${page.keyword}"
                            class="pg-btn ${page.page == p ? 'pg-active' : ''}">${p}</a>
                     </c:forEach>
-                    <c:if test="${page.endPage < page.totalPages}">
-                        <a href="/prod?page=${page.endPage+1}&startDate=${param.startDate}&endDate=${param.endDate}&plan_status=${param.plan_status}&item_type=${param.item_type}&item_num=${param.item_num}&keyword=${param.keyword}"
+                    <c:if test="${page.page < page.totalPages}">
+                        <a href="/prod?page=${page.page+1}&startDate=${page.startDate}&endDate=${page.endDate}&plan_status=${page.plan_status}&item_type=${page.item_type}&item_num=${page.item_num}&keyword=${page.keyword}"
                            class="pg-btn">다음</a>
                     </c:if>
                 </div>

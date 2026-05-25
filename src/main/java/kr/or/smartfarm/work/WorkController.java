@@ -11,6 +11,8 @@ import kr.or.smartfarm.prod.SelectOptionDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,6 +25,16 @@ public class WorkController {
 
     @Autowired
     WorkService workService;
+
+    @InitBinder
+    public void initBinder(WebDataBinder binder) {
+        binder.registerCustomEditor(java.sql.Date.class, new java.beans.PropertyEditorSupport() {
+            @Override
+            public void setAsText(String text) {
+                setValue(text == null || text.trim().isEmpty() ? null : java.sql.Date.valueOf(text.trim()));
+            }
+        });
+    }
 
     /* ── 목록 ───────────────────────────────────────── */
     @RequestMapping
@@ -96,5 +108,14 @@ public class WorkController {
     public String produce(@PathVariable String work_order_id) {
         workService.produce(work_order_id);
         return "ok";
+    }
+
+    /* ── 생산계획 검색 AJAX (등록 모달용, 대기/진행만) ── */
+    @RequestMapping(value = "/plans", method = RequestMethod.GET)
+    @ResponseBody
+    public java.util.Map<String, Object> searchPlans(
+            @org.springframework.web.bind.annotation.RequestParam(defaultValue = "") String keyword,
+            @org.springframework.web.bind.annotation.RequestParam(defaultValue = "1") int page) {
+        return workService.searchPlans(keyword, page);
     }
 }

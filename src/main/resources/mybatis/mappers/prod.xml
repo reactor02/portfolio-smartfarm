@@ -14,9 +14,9 @@
             FROM (
                 SELECT pp.plan_num, pp.plan_id, pp.plan_qty,
                        CASE
-                           WHEN pp.plan_status = '취소'       THEN '취소'
-                           WHEN SYSDATE > pp.plan_end         THEN '완료'
-                           WHEN SYSDATE >= pp.plan_start      THEN '진행'
+                           WHEN pp.plan_status IN ('취소', '완료') THEN pp.plan_status
+                           WHEN pp.plan_status = '진행'            THEN '진행'
+                           WHEN SYSDATE >= pp.plan_start           THEN '진행'
                            ELSE '대기'
                        END AS plan_status,
                        pp.plan_start, pp.plan_end,
@@ -56,9 +56,9 @@
                     </if>
                     <if test="plan_status != null and plan_status != ''">
                         AND CASE
-                                WHEN pp.plan_status = '취소'  THEN '취소'
-                                WHEN SYSDATE > pp.plan_end    THEN '완료'
-                                WHEN SYSDATE >= pp.plan_start THEN '진행'
+                                WHEN pp.plan_status IN ('취소', '완료') THEN pp.plan_status
+                                WHEN pp.plan_status = '진행'            THEN '진행'
+                                WHEN SYSDATE >= pp.plan_start           THEN '진행'
                                 ELSE '대기'
                             END = #{plan_status}
                     </if>
@@ -82,6 +82,14 @@
         )
         WHERE rn >= #{startRow}
     </select>
+
+    <!-- 상태 동기화: plan_start 지난 대기 → 진행 으로 일괄 업데이트 -->
+    <update id="syncPlanStatus">
+        UPDATE production_plan
+        SET plan_status = '진행'
+        WHERE plan_status = '대기'
+          AND SYSDATE >= plan_start
+    </update>
 
     <!-- 직원 드롭다운 옵션 조회 -->
     <select id="getEmpList" resultType="SelectOptionDTO">

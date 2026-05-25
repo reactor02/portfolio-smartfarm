@@ -1,7 +1,11 @@
 package kr.or.smartfarm.work;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import kr.or.smartfarm.prod.ProdDAO;
+import kr.or.smartfarm.prod.ProdDTO;
 import kr.or.smartfarm.prod.SelectOptionDTO;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +16,9 @@ public class WorkServiceImpl implements WorkService {
 
     @Autowired
     private WorkDAO dao;
+
+    @Autowired
+    private ProdDAO prodDao;
 
     @Override
     public List<WorkDTO> getList(WorkPageDTO page) {
@@ -75,6 +82,7 @@ public class WorkServiceImpl implements WorkService {
         WorkDTO dto = new WorkDTO();
         dto.setWork_order_id(work_order_id);
         dao.produce(dto);
+        dao.completePlanIfDone(work_order_id);  // SUM >= plan_qty 이면 생산계획 완료 처리
     }
 
     @Override
@@ -90,5 +98,29 @@ public class WorkServiceImpl implements WorkService {
     @Override
     public List<SelectOptionDTO> getItemOptions() {
         return dao.getItemOptions();
+    }
+
+    @Override
+    public Map<String, Object> searchPlans(String keyword, int page) {
+        prodDao.syncPlanStatus();   // plan_start 지난 대기 → 진행 동기화
+        int size     = 5;
+        int startRow = (page - 1) * size + 1;
+        int endRow   = page * size;
+
+        Map<String, Object> params = new HashMap<String, Object>();
+        params.put("keyword",  keyword);
+        params.put("startRow", startRow);
+        params.put("endRow",   endRow);
+
+        List<ProdDTO> list       = dao.searchPlans(params);
+        int totalCount = (list != null && !list.isEmpty()) ? list.get(0).getTotal_count() : 0;
+        int totalPages = (totalCount == 0) ? 1 : (int) Math.ceil((double) totalCount / size);
+
+        Map<String, Object> result = new HashMap<String, Object>();
+        result.put("list",        list);
+        result.put("currentPage", page);
+        result.put("totalPages",  totalPages);
+        result.put("totalCount",  totalCount);
+        return result;
     }
 }

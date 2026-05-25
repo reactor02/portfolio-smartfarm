@@ -1,7 +1,9 @@
 package kr.or.smartfarm.work;
 
 import java.util.List;
+import java.util.Map;
 
+import kr.or.smartfarm.prod.ProdDTO;
 import kr.or.smartfarm.prod.SelectOptionDTO;
 
 import org.apache.ibatis.session.SqlSession;
@@ -40,6 +42,11 @@ public class WorkDAOImpl implements WorkDAO {
     }
 
     @Override
+    public int completePlanIfDone(String work_order_id) {
+        return session.update("kr.or.smartfarm.work.completePlanIfDone", work_order_id);
+    }
+
+    @Override
     public List<SelectOptionDTO> getEmpOptions() {
         return session.selectList("kr.or.smartfarm.work.getEmpOptions");
     }
@@ -52,5 +59,10 @@ public class WorkDAOImpl implements WorkDAO {
     @Override
     public List<SelectOptionDTO> getItemOptions() {
         return session.selectList("kr.or.smartfarm.work.getItemOptions");
+    }
+
+    @Override
+    public List<ProdDTO> searchPlans(Map<String, Object> params) {
+        return session.selectList("kr.or.smartfarm.work.searchPlans", params);
     }
 }
