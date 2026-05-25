@@ -14,6 +14,8 @@ response.setContentType("text/html; charset=utf-8");
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>생산계획 관리</title>
+<link rel="stylesheet" href="/resources/css/list-common.css">
+<link rel="stylesheet" href="/resources/css/modal.css">
 </head>
 <body>
 
@@ -24,7 +26,7 @@ response.setContentType("text/html; charset=utf-8");
             <main class="main-cont">
 
                 <!-- 타이틀 & 등록 버튼 -->
-                <div class="hdr">
+                <div class="page-hdr">
                     <h1>생산계획 관리</h1>
                     <button type="button" id="btnOpenModal" class="btn-reg">+ 등록하기</button>
                 </div>
@@ -56,23 +58,22 @@ response.setContentType("text/html; charset=utf-8");
                             </div>
                         </div>
 
-                        <!-- 시설 + 품목 + 키워드 -->
+                        <!-- 품목분류 + 품목명 + 키워드 -->
                         <div class="sch-row">
                             <div class="sch-left">
-                                <span class="label">▶ 시설</span>
-                                <select name="facility_num" class="form-control">
-                                    <option value="0">선택</option>
-                                    <c:forEach var="f" items="${facilityList}">
-                                        <option value="${f.num}"
-                                            ${param.facility_num == f.num ? 'selected' : ''}>${f.name}</option>
-                                    </c:forEach>
+                                <span class="label">▶ 품목분류</span>
+                                <select name="item_type" id="prodItemType" class="form-control"
+                                        onchange="filterProdItems()">
+                                    <option value="">선택</option>
+                                    <option value="SEMIPRODUCT" ${param.item_type == 'SEMIPRODUCT' ? 'selected' : ''}>반제품</option>
+                                    <option value="PRODUCT"     ${param.item_type == 'PRODUCT'     ? 'selected' : ''}>완제품</option>
                                 </select>
 
                                 <span class="label" style="margin-left:15px;">▶ 품목명</span>
-                                <select name="item_num" class="form-control">
+                                <select name="item_num" id="prodItemNum" class="form-control">
                                     <option value="0">선택</option>
                                     <c:forEach var="i" items="${itemList}">
-                                        <option value="${i.num}"
+                                        <option value="${i.num}" data-type="${i.type}"
                                             ${param.item_num == i.num ? 'selected' : ''}>${i.name}</option>
                                     </c:forEach>
                                 </select>
@@ -85,7 +86,7 @@ response.setContentType("text/html; charset=utf-8");
                                            value="${param.keyword}" placeholder="계획번호 / 품목명">
                                 </div>
                                 <button type="submit" class="btn-sch">검색</button>
-                                <button type="button" class="btn-reset"
+                                <button type="button" class="select-reset"
                                         onclick="location.href='/prod'">초기화</button>
                             </div>
                         </div>
@@ -98,15 +99,15 @@ response.setContentType("text/html; charset=utf-8");
                     <table class="stk-tbl">
                         <thead>
                             <tr>
-                                <th style="width:60px;">번호</th>
+                                <th class="col-no">번호</th>
                                 <th>계획번호</th>
                                 <th>품목</th>
+                                <th>품목분류</th>
                                 <th>계획수량</th>
                                 <th>생산일자</th>
                                 <th>생산마감</th>
                                 <th>진행률</th>
                                 <th>상태</th>
-                                <th>시설</th>
                                 <th>담당자</th>
                             </tr>
                         </thead>
@@ -115,31 +116,31 @@ response.setContentType("text/html; charset=utf-8");
                                 <c:when test="${not empty list}">
                                     <c:forEach var="prod" items="${list}" varStatus="vs">
                                         <tr>
-                                            <td style="font-weight:bold;color:#555;">
+                                            <td class="num-cell">
                                                 ${page.totalCount - (page.page-1)*page.size - vs.count + 1}
                                             </td>
-                                            <td><a href="/prod/${prod.plan_id}" >${prod.plan_id}</a></td>
+                                            <td><a href="/prod/${prod.plan_id}" class="link-txt">${prod.plan_id}</a></td>
                                             <td>${prod.item_name}</td>
+                                            <td><c:choose>
+                                                <c:when test="${prod.type == 'PRODUCT'}">완제품</c:when>
+                                                <c:when test="${prod.type == 'SEMIPRODUCT'}">반제품</c:when>
+                                                <c:otherwise>${prod.type}</c:otherwise>
+                                            </c:choose></td>
                                             <td>${prod.plan_qty}</td>
                                             <td><fmt:formatDate value="${prod.plan_start}" pattern="yyyy-MM-dd"/></td>
                                             <td><fmt:formatDate value="${prod.plan_end}"   pattern="yyyy-MM-dd"/></td>
-											<td><fmt:formatNumber
-													value="${prod.plan_qty > 0 ? (prod.currentqty / prod.plan_qty * 100 > 100 ? 100 : prod.currentqty / prod.plan_qty * 100) : 0}"
-													maxFractionDigits="1" />%</td>
-											<td>${prod.plan_status}</td>
-                                            <td>${prod.facility_name}</td>
+                                            <td><fmt:formatNumber
+                                                    value="${prod.plan_qty > 0 ? (prod.currentqty / prod.plan_qty * 100 > 100 ? 100 : prod.currentqty / prod.plan_qty * 100) : 0}"
+                                                    maxFractionDigits="1" />%</td>
+                                            <td>
+                                                <span class="badge <c:choose><c:when test="${prod.plan_status == '대기'}">badge-wait</c:when><c:when test="${prod.plan_status == '진행'}">badge-progress</c:when><c:when test="${prod.plan_status == '완료'}">badge-done</c:when><c:when test="${prod.plan_status == '취소'}">badge-cancel</c:when></c:choose>">${prod.plan_status}</span>
+                                            </td>
                                             <td>${prod.ename}</td>
                                         </tr>
                                     </c:forEach>
                                 </c:when>
                                 <c:otherwise>
-<%--                                     <c:forEach var="i" begin="1" end="5"> --%>
-<!--                                         <tr> -->
-<%--                                             <td style="font-weight:bold;color:#888;">${i}</td> --%>
-<!--                                             <td></td><td></td><td></td><td></td> -->
-<!--                                             <td></td><td></td><td></td><td></td><td></td> -->
-<!--                                         </tr> -->
-<%--                                     </c:forEach> --%>
+                                    <tr><td colspan="9" class="empty-cell">등록된 생산계획이 없습니다.</td></tr>
                                 </c:otherwise>
                             </c:choose>
                         </tbody>
@@ -149,15 +150,15 @@ response.setContentType("text/html; charset=utf-8");
                 <!-- 페이지네이션 -->
                 <div class="pg-wrap">
                     <c:if test="${page.startPage > 1}">
-                        <a href="/prod?page=${page.startPage-1}&startDate=${param.startDate}&endDate=${param.endDate}&plan_status=${param.plan_status}&facility_num=${param.facility_num}&item_num=${param.item_num}&keyword=${param.keyword}"
+                        <a href="/prod?page=${page.startPage-1}&startDate=${param.startDate}&endDate=${param.endDate}&plan_status=${param.plan_status}&item_type=${param.item_type}&item_num=${param.item_num}&keyword=${param.keyword}"
                            class="pg-btn">이전</a>
                     </c:if>
                     <c:forEach begin="${page.startPage}" end="${page.endPage}" var="p">
-                        <a href="/prod?page=${p}&startDate=${param.startDate}&endDate=${param.endDate}&plan_status=${param.plan_status}&facility_num=${param.facility_num}&item_num=${param.item_num}&keyword=${param.keyword}"
+                        <a href="/prod?page=${p}&startDate=${param.startDate}&endDate=${param.endDate}&plan_status=${param.plan_status}&item_type=${param.item_type}&item_num=${param.item_num}&keyword=${param.keyword}"
                            class="pg-btn ${page.page == p ? 'pg-active' : ''}">${p}</a>
                     </c:forEach>
                     <c:if test="${page.endPage < page.totalPages}">
-                        <a href="/prod?page=${page.endPage+1}&startDate=${param.startDate}&endDate=${param.endDate}&plan_status=${param.plan_status}&facility_num=${param.facility_num}&item_num=${param.item_num}&keyword=${param.keyword}"
+                        <a href="/prod?page=${page.endPage+1}&startDate=${param.startDate}&endDate=${param.endDate}&plan_status=${param.plan_status}&item_type=${param.item_type}&item_num=${param.item_num}&keyword=${param.keyword}"
                            class="pg-btn">다음</a>
                     </c:if>
                 </div>
@@ -218,6 +219,18 @@ response.setContentType("text/html; charset=utf-8");
     </div>
 
     <script>
+        /* 품목분류 → 품목명 연계 드롭다운 */
+        function filterProdItems() {
+            var type = document.getElementById('prodItemType').value;
+            var sel  = document.getElementById('prodItemNum');
+            sel.value = '0';
+            Array.from(sel.options).forEach(function(opt) {
+                if (!opt.value || opt.value === '0') return;
+                opt.style.display = (!type || opt.dataset.type === type) ? '' : 'none';
+            });
+        }
+        window.addEventListener('load', function() { filterProdItems(); });
+
         /* 날짜 유효성 */
         function validateDate() {
             var start = document.getElementById('startDate').value;

@@ -7,8 +7,8 @@
     <!-- 목록 + 전체 건수 한 번에 조회 (날짜 기반 상태 자동 갱신) -->
     <select id="getList" parameterType="ProdPageDTO" resultType="ProdDTO">
         SELECT plan_num, plan_qty, plan_status, plan_start, plan_end,
-               emp_num, plan_id, item_num, item_name, ename,
-               facility_num, facility_name, currentqty, total_count
+               emp_num, plan_id, item_num, item_name, type,
+               ename, facility_num, facility_name, currentqty, total_count
         FROM (
             SELECT inner_q.*, ROWNUM AS rn
             FROM (
@@ -22,6 +22,7 @@
                        pp.plan_start, pp.plan_end,
                        pp.emp_num, pp.item_num,
                        i.name            AS item_name,
+                       i.type,
                        e.ename,
                        f.facility_num,
                        f.facility_name,
@@ -67,6 +68,9 @@
                     <if test="item_num != 0">
                         AND pp.item_num = #{item_num}
                     </if>
+                    <if test="item_type != null and item_type != ''">
+                        AND i.type = #{item_type}
+                    </if>
                     <if test="keyword != null and keyword != ''">
                         AND (pp.plan_id LIKE '%' || #{keyword} || '%'
                           OR i.name     LIKE '%' || #{keyword} || '%')
@@ -94,7 +98,7 @@
 
     <!-- 제품 드롭다운 옵션 조회 (PRODUCT + SEMIPRODUCT) -->
     <select id="getItemOptions" resultType="SelectOptionDTO">
-        SELECT item_num AS num, name AS name
+        SELECT item_num AS num, name AS name, type AS type
         FROM item
         WHERE type IN ('PRODUCT', 'SEMIPRODUCT')
         ORDER BY type, name

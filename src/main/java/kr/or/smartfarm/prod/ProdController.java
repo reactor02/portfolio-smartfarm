@@ -27,16 +27,14 @@ public class ProdController {
     /* ── 목록 ───────────────────────────────────────── */
     @RequestMapping
     public String list(@ModelAttribute ProdPageDTO pageDTO, Model model) {
-        List<ProdDTO>         list         = prodService.getList(pageDTO);
-        List<SelectOptionDTO> facilityList = prodService.getFacilityOptions();
-        List<SelectOptionDTO> itemList     = prodService.getItemOptions();
-        List<SelectOptionDTO> empList      = prodService.getEmpList();
+        List<ProdDTO>         list     = prodService.getList(pageDTO);
+        List<SelectOptionDTO> itemList = prodService.getItemOptions();
+        List<SelectOptionDTO> empList  = prodService.getEmpList();
 
-        model.addAttribute("list",         list);
-        model.addAttribute("page",         pageDTO);
-        model.addAttribute("facilityList", facilityList);
-        model.addAttribute("itemList",     itemList);
-        model.addAttribute("empList",      empList);
+        model.addAttribute("list",     list);
+        model.addAttribute("page",     pageDTO);
+        model.addAttribute("itemList", itemList);
+        model.addAttribute("empList",  empList);
         return "content/prod.tiles";
     }
 
