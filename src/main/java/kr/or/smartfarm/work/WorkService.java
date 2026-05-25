@@ -14,4 +14,5 @@ public interface WorkService {
     void                  produce(String work_order_id);
     List<SelectOptionDTO> getEmpOptions();
     List<SelectOptionDTO> getPlanOptions();
+    List<SelectOptionDTO> getItemOptions();
 }

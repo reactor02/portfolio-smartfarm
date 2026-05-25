@@ -1,93 +1,76 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c"   uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<title>작업지시 관리</title>
-<style>
-    :root { --m-cl:#2D6A4F; --s-cl:#49A47A; --p-cl:#B7E4C7; --bg:#F8F9FA; --txt:#333; --border-cl:#E9ECEF; }
-    * { box-sizing:border-box; margin:0; padding:0; }
-    body { font-family:'Malgun Gothic',sans-serif; color:var(--txt); background:var(--bg); }
-    .cont { flex:1; padding:2rem; background:#FFF; }
+<link rel="stylesheet" href="/resources/css/list-common.css">
+<link rel="stylesheet" href="/resources/css/modal.css">
 
-    /* 헤더 */
-    .page-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem; }
-    .page-title  { font-size:1.8rem; font-weight:bold; }
-    .btn-add     { padding:9px 20px; background:var(--m-cl); color:#FFF; border:none; border-radius:6px; cursor:pointer; font-size:14px; font-weight:bold; }
-    .btn-add:hover { background:var(--s-cl); }
+<!-- 타이틀 헤더 -->
+<div class="page-hdr">
+    <h1>작업지시 관리</h1>
+    <button class="btn-reg" onclick="document.getElementById('workRegModal').style.display='flex'">+ 등록</button>
+</div>
 
-    /* 검색 필터 */
-    .search-box  { background:var(--bg); border:1px solid var(--border-cl); border-radius:8px; padding:16px 20px; margin-bottom:1.5rem; }
-    .search-row  { display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:8px; }
-    .search-row:last-child { margin-bottom:0; }
-    .search-label { font-weight:bold; font-size:13px; white-space:nowrap; }
-    .search-row input[type=date], .search-row select { padding:6px 10px; border:1px solid var(--border-cl); border-radius:6px; font-size:13px; }
-    .search-row input[type=text] { padding:6px 10px; border:1px solid var(--border-cl); border-radius:6px; font-size:13px; width:180px; }
-    .btn-search  { padding:7px 18px; background:var(--m-cl); color:#FFF; border:none; border-radius:6px; cursor:pointer; font-size:13px; font-weight:bold; }
-    .btn-reset   { padding:7px 18px; background:#FFF; border:1px solid var(--border-cl); border-radius:6px; cursor:pointer; font-size:13px; }
-    .btn-search:hover { background:var(--s-cl); }
-
-    /* 테이블 */
-    .data-table { width:100%; border-collapse:collapse; }
-    .data-table th { background:var(--bg); border-bottom:2px solid var(--s-cl); padding:12px; text-align:center; font-size:13px; font-weight:bold; }
-    .data-table td { padding:12px; border-bottom:1px solid var(--border-cl); text-align:center; font-size:13px; color:#555; }
-    .data-table tbody tr:hover { background:rgba(183,228,199,0.2); }
-    .link-txt { color:var(--m-cl); text-decoration:none; font-weight:bold; }
-    .link-txt:hover { text-decoration:underline; }
-    .badge { display:inline-block; padding:3px 10px; border-radius:12px; font-size:11px; font-weight:bold; background:var(--p-cl); color:var(--m-cl); }
-
-    /* 페이징 */
-    .paging { text-align:center; margin-top:1.5rem; }
-    .paging a, .paging span { display:inline-block; padding:6px 12px; margin:0 2px; border:1px solid var(--border-cl); border-radius:4px; text-decoration:none; color:var(--txt); font-size:13px; }
-    .paging a:hover  { background:var(--p-cl); }
-    .paging .current { background:var(--m-cl); color:#FFF; border-color:var(--m-cl); }
-</style>
-</head>
-<body>
-<main class="cont">
-
-    <div class="page-header">
-        <h1 class="page-title">작업지시 관리</h1>
-        <button class="btn-add" onclick="document.getElementById('workRegModal').style.display='flex'">+ 등록</button>
-    </div>
-
-    <!-- 검색 필터 -->
-    <form id="searchForm" method="get" action="/work">
-        <div class="search-box">
-            <div class="search-row">
-                <span class="search-label">▶ 기간</span>
-                <input type="date" name="startDate" value="${page.startDate}">
-                <span>~</span>
-                <input type="date" name="endDate"   value="${page.endDate}">
-                <span class="search-label">▶ 상태</span>
-                <select name="work_status">
+<!-- 검색 필터 -->
+<form id="searchForm" method="get" action="/work">
+    <div class="sch-wrap">
+        <div class="sch-row">
+            <div class="sch-left">
+                <span class="label">▶ 기간</span>
+                <input type="date" name="startDate" value="${page.startDate}" class="form-control">
+                <span style="font-weight:bold;color:#666;">~</span>
+                <input type="date" name="endDate"   value="${page.endDate}"   class="form-control">
+                <span class="label" style="margin-left:10px;">▶ 상태</span>
+                <select name="work_status" class="form-control">
                     <option value="">상태 선택</option>
-                    <option value="WAIT"        <c:if test="${page.work_status == 'WAIT'}">selected</c:if>>대기</option>
-                    <option value="IN_PROGRESS" <c:if test="${page.work_status == 'IN_PROGRESS'}">selected</c:if>>진행중</option>
-                    <option value="DONE"        <c:if test="${page.work_status == 'DONE'}">selected</c:if>>완료</option>
-                    <option value="취소"         <c:if test="${page.work_status == '취소'}">selected</c:if>>취소</option>
+                    <option value="대기"  <c:if test="${page.work_status == '대기'}">selected</c:if>>대기</option>
+                    <option value="진행"  <c:if test="${page.work_status == '진행'}">selected</c:if>>진행</option>
+                    <option value="완료"  <c:if test="${page.work_status == '완료'}">selected</c:if>>완료</option>
+                    <option value="취소"  <c:if test="${page.work_status == '취소'}">selected</c:if>>취소</option>
                 </select>
             </div>
-            <div class="search-row">
-                <span class="search-label">▶ 검색</span>
-                <input type="text" name="keyword" value="${page.keyword}" placeholder="작업번호 / 품목명">
-                <button type="submit" class="btn-search">검색</button>
-                <button type="button" class="btn-reset" onclick="location.href='/work'">초기화</button>
+        </div>
+        <div class="sch-row">
+            <div class="sch-left">
+                <span class="label">▶ 품목분류</span>
+                <select name="item_type" id="workItemType" class="form-control"
+                        onchange="filterWorkItems()">
+                    <option value="">선택</option>
+                    <option value="SEMIPRODUCT" <c:if test="${page.item_type == 'SEMIPRODUCT'}">selected</c:if>>반제품</option>
+                    <option value="PRODUCT"     <c:if test="${page.item_type == 'PRODUCT'}">selected</c:if>>완제품</option>
+                </select>
+
+                <span class="label" style="margin-left:10px;">▶ 품목명</span>
+                <select name="item_num" id="workItemNum" class="form-control">
+                    <option value="0">선택</option>
+                    <c:forEach var="i" items="${itemList}">
+                        <option value="${i.num}" data-type="${i.type}"
+                            <c:if test="${page.item_num == i.num}">selected</c:if>>${i.name}</option>
+                    </c:forEach>
+                </select>
+            </div>
+            <div class="sch-right">
+                <div class="sch-input-box">
+                    <span style="color:#888;">&#128269;</span>
+                    <input type="text" name="keyword" value="${page.keyword}" placeholder="작업번호 / 품목명">
+                </div>
+                <button type="submit" class="btn-sch">검색</button>
+                <button type="button" class="select-reset" onclick="location.href='/work'">초기화</button>
             </div>
         </div>
-        <input type="hidden" name="page" id="pageInput" value="1">
-    </form>
+    </div>
+    <input type="hidden" name="page" id="pageInput" value="1">
+</form>
 
-    <!-- 목록 테이블 -->
-    <table class="data-table">
+<!-- 목록 테이블 -->
+<div class="tbl-box">
+    <table class="stk-tbl">
         <thead>
             <tr>
-                <th style="width:6%">번호</th>
+                <th class="col-no">번호</th>
                 <th>작업코드</th>
                 <th>생산계획코드</th>
                 <th>품목명</th>
+                <th>품목분류</th>
                 <th>지시수량</th>
                 <th>담당자</th>
                 <th>작업일</th>
@@ -99,41 +82,48 @@
                 <c:when test="${not empty list}">
                     <c:forEach var="w" items="${list}" varStatus="s">
                         <tr>
-                            <td>${(page.page-1)*page.size + s.index + 1}</td>
+                            <td class="num-cell">${(page.page-1)*page.size + s.index + 1}</td>
                             <td><a href="/work/${w.work_order_id}" class="link-txt">${w.work_order_id}</a></td>
                             <td>${w.plan_id}</td>
                             <td>${w.item_name}</td>
+                            <td><c:choose>
+                                <c:when test="${w.type == 'PRODUCT'}">완제품</c:when>
+                                <c:when test="${w.type == 'SEMIPRODUCT'}">반제품</c:when>
+                                <c:otherwise>${w.type}</c:otherwise>
+                            </c:choose></td>
                             <td>${w.order_qty}</td>
                             <td>${w.ename}</td>
                             <td><fmt:formatDate value="${w.order_start}" pattern="yyyy-MM-dd"/></td>
-                            <td><span class="badge">${w.work_status}</span></td>
+                            <td>
+                                <span class="badge <c:choose><c:when test="${w.work_status == '대기'}">badge-wait</c:when><c:when test="${w.work_status == '진행'}">badge-progress</c:when><c:when test="${w.work_status == '완료'}">badge-done</c:when><c:when test="${w.work_status == '취소'}">badge-cancel</c:when></c:choose>">${w.work_status}</span>
+                            </td>
                         </tr>
                     </c:forEach>
                 </c:when>
                 <c:otherwise>
-                    <tr><td colspan="8" style="padding:40px; color:#aaa;">등록된 작업지시가 없습니다.</td></tr>
+                    <tr><td colspan="9" class="empty-cell">등록된 작업지시가 없습니다.</td></tr>
                 </c:otherwise>
             </c:choose>
         </tbody>
     </table>
+</div>
 
-    <!-- 페이징 -->
-    <div class="paging">
-        <c:if test="${page.startPage > 1}">
-            <a href="#" onclick="movePage(${page.startPage-1})">이전</a>
-        </c:if>
-        <c:forEach begin="${page.startPage}" end="${page.endPage}" var="p">
-            <c:choose>
-                <c:when test="${p == page.page}"><span class="current">${p}</span></c:when>
-                <c:otherwise><a href="#" onclick="movePage(${p})">${p}</a></c:otherwise>
-            </c:choose>
-        </c:forEach>
-        <c:if test="${page.endPage < page.totalPages}">
-            <a href="#" onclick="movePage(${page.endPage+1})">다음</a>
-        </c:if>
-    </div>
+<!-- 페이지네이션 -->
+<div class="pg-wrap">
+    <c:if test="${page.startPage > 1}">
+        <a href="#" onclick="movePage(${page.startPage-1})" class="pg-btn">이전</a>
+    </c:if>
+    <c:forEach begin="${page.startPage}" end="${page.endPage}" var="p">
+        <c:choose>
+            <c:when test="${p == page.page}"><a href="#" class="pg-btn pg-active">${p}</a></c:when>
+            <c:otherwise><a href="#" onclick="movePage(${p})" class="pg-btn">${p}</a></c:otherwise>
+        </c:choose>
+    </c:forEach>
+    <c:if test="${page.endPage < page.totalPages}">
+        <a href="#" onclick="movePage(${page.endPage+1})" class="pg-btn">다음</a>
+    </c:if>
+</div>
 
-</main>
 <!-- ===== 등록 모달 ===== -->
 <div id="workRegModal" class="modal-overlay" style="display:none;">
     <div class="modal-box">
@@ -176,7 +166,7 @@
                 </div>
             </div>
             <div class="modal-btn-wrap">
-                <button type="submit" class="btn-add" style="padding:8px 24px;">등록</button>
+                <button type="submit" class="btn-reg">등록</button>
                 <button type="button" class="btn-cancel"
                         onclick="document.getElementById('workRegModal').style.display='none'">취소</button>
             </div>
@@ -189,10 +179,19 @@ function movePage(p) {
     document.getElementById('pageInput').value = p;
     document.getElementById('searchForm').submit();
 }
-// 모달 배경 클릭 시 닫기
 document.getElementById('workRegModal').addEventListener('click', function(e) {
     if (e.target === this) this.style.display = 'none';
 });
+
+/* 품목분류 → 품목명 연계 드롭다운 */
+function filterWorkItems() {
+    var type = document.getElementById('workItemType').value;
+    var sel  = document.getElementById('workItemNum');
+    sel.value = '0';
+    Array.from(sel.options).forEach(function(opt) {
+        if (!opt.value || opt.value === '0') return;
+        opt.style.display = (!type || opt.dataset.type === type) ? '' : 'none';
+    });
+}
+window.addEventListener('load', function() { filterWorkItems(); });
 </script>
-</body>
-</html>

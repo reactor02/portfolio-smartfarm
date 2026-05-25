@@ -12,4 +12,5 @@ public interface WorkDAO {
     int                   produce(WorkDTO workDTO);
     List<SelectOptionDTO> getEmpOptions();
     List<SelectOptionDTO> getPlanOptions();
+    List<SelectOptionDTO> getItemOptions();
 }

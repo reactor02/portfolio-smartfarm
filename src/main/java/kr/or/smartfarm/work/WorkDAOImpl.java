@@ -48,4 +48,9 @@ public class WorkDAOImpl implements WorkDAO {
     public List<SelectOptionDTO> getPlanOptions() {
         return session.selectList("kr.or.smartfarm.work.getPlanOptions");
     }
+
+    @Override
+    public List<SelectOptionDTO> getItemOptions() {
+        return session.selectList("kr.or.smartfarm.work.getItemOptions");
+    }
 }

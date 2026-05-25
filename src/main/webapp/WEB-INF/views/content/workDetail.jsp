@@ -101,13 +101,13 @@
             <div class="btn-row">
                 <button class="btn-back" onclick="location.href='/work'">목록으로</button>
                 <div>
-                    <c:if test="${workDTO.work_status == 'WAIT'}">
+                    <c:if test="${workDTO.work_status == '대기'}">
                         <button class="btn-start" onclick="startWork()">작업시작</button>
                     </c:if>
-                    <c:if test="${workDTO.work_status == 'IN_PROGRESS'}">
+                    <c:if test="${workDTO.work_status == '진행'}">
                         <button class="btn-complete" onclick="completeWork()">작업종료</button>
                     </c:if>
-                    <c:if test="${workDTO.work_status != 'DONE' and workDTO.work_status != '취소'}">
+                    <c:if test="${workDTO.work_status != '완료' and workDTO.work_status != '취소'}">
                         <button class="btn-reg" style="margin-left:6px;" onclick="produceWork()">작업등록</button>
                         <button class="btn-cancel" style="margin-left:6px;" onclick="cancelWork()">취소</button>
                     </c:if>

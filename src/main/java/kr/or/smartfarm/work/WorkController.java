@@ -30,10 +30,12 @@ public class WorkController {
         List<WorkDTO>         list     = workService.getList(pageDTO);
         List<SelectOptionDTO> empList  = workService.getEmpOptions();
         List<SelectOptionDTO> planList = workService.getPlanOptions();
+        List<SelectOptionDTO> itemList = workService.getItemOptions();
         model.addAttribute("list",     list);
         model.addAttribute("page",     pageDTO);
         model.addAttribute("empList",  empList);
         model.addAttribute("planList", planList);
+        model.addAttribute("itemList", itemList);
         return "content/work.tiles";
     }
 

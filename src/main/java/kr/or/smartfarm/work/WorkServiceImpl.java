@@ -58,7 +58,7 @@ public class WorkServiceImpl implements WorkService {
     public void start(String work_order_id) {
         WorkDTO dto = new WorkDTO();
         dto.setWork_order_id(work_order_id);
-        dto.setWork_status("IN_PROGRESS");
+        dto.setWork_status("진행");
         dao.updateStatus(dto);
     }
 
@@ -66,7 +66,7 @@ public class WorkServiceImpl implements WorkService {
     public void complete(String work_order_id) {
         WorkDTO dto = new WorkDTO();
         dto.setWork_order_id(work_order_id);
-        dto.setWork_status("DONE");
+        dto.setWork_status("완료");
         dao.updateStatus(dto);
     }
 
@@ -85,5 +85,10 @@ public class WorkServiceImpl implements WorkService {
     @Override
     public List<SelectOptionDTO> getPlanOptions() {
         return dao.getPlanOptions();
+    }
+
+    @Override
+    public List<SelectOptionDTO> getItemOptions() {
+        return dao.getItemOptions();
     }
 }
