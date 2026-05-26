@@ -97,9 +97,11 @@
           AND current_qty >= #{deduct_qty}
     </update>
 
-    <!-- QC pass + 유통기한 내 재료 LOT FIFO 조회 -->
+    <!-- QC pass + 유통기한 내 재료 LOT FIFO 조회 (qc_num 포함) -->
     <select id="getQcPassedLotsFIFO" parameterType="int" resultType="LotDTO">
-        SELECT l.lot_num, l.current_qty, l.lot_date
+        SELECT l.lot_num, l.current_qty, l.lot_date,
+               (SELECT MIN(io2.qc_num) FROM io io2 JOIN qc q2 ON io2.qc_num = q2.qc_num
+                WHERE io2.lot_num = l.lot_num AND UPPER(q2.qc_pass) = 'PASS') AS qc_num
         FROM lot l
         WHERE l.item_num    = #{item_num}
           AND l.current_qty > 0
@@ -108,15 +110,15 @@
               SELECT 1 FROM io i
               JOIN qc q ON i.qc_num = q.qc_num
               WHERE i.lot_num  = l.lot_num
-                AND q.qc_pass  = 'PASS'
+                AND UPPER(q.qc_pass) = 'PASS'
           )
         ORDER BY l.lot_date ASC
     </select>
 
     <!-- lot_relation 등록 -->
     <insert id="insertLotRelation" parameterType="LotRelationDTO">
-        INSERT INTO lot_relation (lot_parent, lot_child)
-        VALUES (#{parent_lot_num}, #{child_lot_num})
+        INSERT INTO lot_relation (lot_relation_num, lot_parent, lot_child)
+        VALUES (LOT_RELATION_SEQ.NEXTVAL, #{parent_lot_num}, #{child_lot_num})
     </insert>
 
     <!-- lotDetail: 이 LOT을 만들기 위해 소모된 재료 LOT 목록 -->

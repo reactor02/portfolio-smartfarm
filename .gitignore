@@ -9,3 +9,16 @@ springBeans
 project
 classpath
 .claude/settings.local.json
+AlterIO.java
+DBCheck.class
+DBCheck.java
+DBDebug.class
+DBDebug.java
+DBFix.class
+DBFix.java
+DBSetup.class
+DBSetup.java
+DBTestState.class
+DBTestState.java
+DBVerify.class
+DBVerify.java

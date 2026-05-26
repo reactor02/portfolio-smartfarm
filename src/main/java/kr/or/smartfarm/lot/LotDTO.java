@@ -21,6 +21,9 @@ public class LotDTO {
     private String code;
     private String type;
 
+    // QC PASS 조회 시 매핑용
+    private int qc_num;
+
     // 페이징
     private int total_count;
 }

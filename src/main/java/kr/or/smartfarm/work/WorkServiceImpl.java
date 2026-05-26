@@ -90,11 +90,12 @@ public class WorkServiceImpl implements WorkService {
 
     @Override
     public void produce(String work_order_id) {
-        // [1] 작업지시 상세 조회 (item_num, type, order_qty, order_num 포함)
+        // [1] 작업지시 상세 조회 (item_num, type, order_qty, order_num, plan_num 포함)
         WorkDTO work = dao.getSelectOne(work_order_id);
         int itemNum  = work.getItem_num();
         int orderQty = work.getOrder_qty();
         int orderNum = work.getOrder_num();
+        int planNum  = work.getPlan_num();
         String type  = work.getType();
 
         // [2] BOM 재료 목록 조회
@@ -136,9 +137,10 @@ public class WorkServiceImpl implements WorkService {
                 // ② io 출고 기록
                 Map<String, Object> ioMap = new HashMap<String, Object>();
                 ioMap.put("ioType",   "출고");
-                ioMap.put("ioCount",  deduct);
+                ioMap.put("ioQty",    deduct);
+                ioMap.put("qcNum",    lot.getQc_num());
                 ioMap.put("lotNum",   lot.getLot_num());
-                ioMap.put("orderNum", orderNum);
+                ioMap.put("planNum",  planNum);   // io.plan_num NOT NULL (삭제예정)
                 ioMap.put("ioReason", "생산투입");
                 dao.insertIo(ioMap);
 

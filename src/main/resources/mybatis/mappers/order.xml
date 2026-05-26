@@ -207,8 +207,8 @@
 
     <!-- 재료 출고 io 기록 -->
     <insert id="insertIo" parameterType="map">
-        INSERT INTO io (io_num, io_type, io_count, io_date, lot_num, order_num, io_reason)
-        VALUES (IO_SEQ.NEXTVAL, #{ioType}, #{ioCount}, SYSDATE, #{lotNum}, #{orderNum}, #{ioReason})
+        INSERT INTO io (io_num, io_type, io_qty, io_date, qc_num, lot_num, plan_num, io_reason)
+        VALUES (IO_SEQ.NEXTVAL, #{ioType}, #{ioQty}, SYSDATE, #{qcNum}, #{lotNum}, #{planNum}, #{ioReason})
     </insert>
 
     <!-- 생산계획 검색 (AJAX 모달용, 취소·완료 제외) -->
