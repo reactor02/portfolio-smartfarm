@@ -33,6 +33,15 @@ public class UserManageServiceImpl implements UserManageService {
 		
 	}
 	@Override
+	public List<UserManageDTO> selectm() {
+		// TODO Auto-generated method stub
+		
+		List<UserManageDTO> result = userManageDAO.selectm();
+		
+		return result;
+		
+	}
+	@Override
 	public List<UserManageDTO> selectl() {
 		// TODO Auto-generated method stub
 		

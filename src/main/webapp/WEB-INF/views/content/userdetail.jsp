@@ -69,7 +69,12 @@ response.setContentType("text/html; charset=utf-8");
 
 				<div class="hdr">
 					<h1>사용자 상세</h1>
-					<a href="/stockSelect" class="btn-list">목록으로</a>
+					<div>
+					<a href="/usermanage" class="btn-list">권한</a>
+					<a href="/usermanage" class="btn-list">수정</a>
+					<a href="/usermanage" class="btn-list">퇴사</a>
+					<a href="/usermanage" class="btn-list">목록으로</a>
+					</div>
 				</div>
 
 				<div class="detail-section">
@@ -101,47 +106,7 @@ response.setContentType("text/html; charset=utf-8");
 					</div>
 				</div>
 
-				<div class="detail-section">
-					<div class="section-title">상세 내용</div>
-					<div class="tbl-box">
-						<table class="stk-tbl">
-							<thead>
-								<tr>
-									<th style="width: 60px;">번호</th>
-									<th>LOT 코드</th>
-									<th>수량</th>
-									<th>입고일</th>
-									<th>유통기한</th>
-									<th>담당자</th>
-								</tr>
-							</thead>
-							<tbody>
-								<c:choose>
-									<c:when test="${not empty resultList}">
-										<c:forEach var="history" items="${resultList}" varStatus="vs">
-											<tr>
-												<td style="font-weight: bold; color: #555;">${vs.count}</td>
-												<td>${history.LOT_CODE}</td>
-												<td>${history.STOCK_QTY}</td>
-												<td><fmt:formatDate value="${history.LOT_DATE}"
-														pattern="yyyy-MM-dd" /></td>
-												<td><fmt:formatDate value="${history.EXPIRY_DATE}"
-														pattern="yyyy-MM-dd" /></td>
-												<td>하드코딩</td>
-											</tr>
-										</c:forEach>
-									</c:when>
-									<c:otherwise>
-										<tr>
-											<td colspan="6" style="padding: 30px; color: #888;">조회된
-												이력 데이터가 없습니다.</td>
-										</tr>
-									</c:otherwise>
-								</c:choose>
-							</tbody>
-						</table>
-					</div>
-				</div>
+				
 
 			</main>
 		</div>

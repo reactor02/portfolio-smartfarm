@@ -32,6 +32,14 @@ public class UserManageDAOImpl implements UserManageDAO {
 		return result;
 	}
 	@Override
+	public List<UserManageDTO> selectm() {
+		// TODO Auto-generated method stub
+		
+		List<UserManageDTO> result = sqlSession.selectList(NAMESPACE + "selectm");
+		
+		return result;
+	}
+	@Override
 	public List<UserManageDTO> selectl() {
 		// TODO Auto-generated method stub
 		

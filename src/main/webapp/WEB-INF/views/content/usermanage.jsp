@@ -72,6 +72,23 @@ select.form-control { width: 110px; }
 .link-txt { color: #2D6A4F; text-decoration: none; font-weight: bold; }
 .link-txt:hover { text-decoration: underline; }
 
+/* 모달 배경 암전 처리 */
+.modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(0, 0, 0, .5); z-index: 1000; }
+
+/* 모달 컨텐츠 박스 (화면 정중앙 절대 좌표 고정) */
+.modal-box { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 100%; max-width: 600px; padding: 30px; background-color: #fff; border-radius: 10px; box-shadow: 0 4px 15px rgba(0, 0, 0, .15); box-sizing: border-box; }
+
+/* 모달 정렬 골격 */
+.modal-grid { display: flex; flex-wrap: wrap; gap: 15px 20px; margin-bottom: 20px; width: 100%; box-sizing: border-box; }
+.modal-field { display: flex; flex-direction: column; gap: 6px; width: calc(50% - 10px); box-sizing: border-box; }
+
+/* 너비 가변형 클래스 분리 */
+.modal-field.quarter { width: calc(25% - 15px); }
+.modal-field.full { width: 100%; }
+
+/* 내부 인풋 및 셀렉트 박스 100% 확장 */
+.modal-grid .modal-field input, .modal-grid .modal-field select { width: 100%; height: 38px; padding: 0 10px; border: 1px solid #aaa; border-radius: 4px; font-size: .95rem; outline: none; box-sizing: border-box; }
+
 </style>
 </head>
 <body>
@@ -182,57 +199,74 @@ select.form-control { width: 110px; }
 	<!-- 재고 등록 -->
 	<div id="regModal" class="modal-overlay" style="display: none;">
 		<div class="modal-box">
-			<h3 class="modal-title">재고 등록</h3>
+			<h3 class="modal-title">사용자 등록</h3>
 
 			<form method="POST" action="/insertController" id="insert-form">
 				<div class="modal-grid">
-					<div class="modal-field">
-						<label for="itemSearch">품목명 검색</label> 
-						<input type="text" id="itemSearch" placeholder="품목명 검색"> 
-					</div>
+					
 					
 					<div class="modal-field">
-						<label for="quantity">개수</label> 
-						<input type="number" name="stock_qty" id="quantity" min="1" placeholder="수량 입력">
+						<label for="quantity">이름</label> 
+						<input type="text" name="stock_qty" id="quantity" min="1" placeholder="이름">
 					</div>
-
-					<div class="modal-field modal-field-full" id="selectedItemContainer" style="display: none; margin-top: 10px;">
-						<span style="display: inline-block; padding: 6px 12px; background-color: #e6f7ff; color: #1890ff; border: 1px solid #91d5ff; border-radius: 4px; font-weight: bold; font-size: 14px;">
-							📌 선택된 품목: <span id="selectedItemName" style="color: #0050b3;">-</span>
-						</span>
+					<div class="modal-field">
+						<label for="quantity">연락처</label> 
+						<input type="text" name="tel" id="tel" placeholder="연락처">
 					</div>
-
-					<div class="modal-field modal-field-full" style="margin-top: 15px;">
-						<label>선택 가능한 품목 리스트 (아래 행을 클릭하여 선택하세요)</label>
-
-						<div id="searchResultArea" style="width: 100%; height: 200px; border: 1px solid #ccc; background: #fff; overflow-y: scroll; border-radius: 4px;">
-							<table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 14px; table-layout: fixed;">
-								<colgroup>
-									<col style="width: 10%;">
-									<col style="width: 25%;">
-									<col style="width: 35%;">
-									<col style="width: 15%;">
-									<col style="width: 15%;">
-								</colgroup>
-								<thead style="background: #f5f5f5; position: sticky; top: 0; border-bottom: 1px solid #ddd; z-index: 10;">
-									<tr>
-										<th style="padding: 10px; text-align: center;">선택</th>
-										<th style="padding: 10px;">품목코드</th>
-										<th style="padding: 10px;">품목명</th>
-										<th style="padding: 10px;">타입</th>
-										<th style="padding: 10px;">단위</th>
-									</tr>
-								</thead>
-								<tbody id="suggestList">
-									<tr id="emptyMessage">
-										<td colspan="5" style="padding: 50px 10px; text-align: center; color: #999;">
-											품목명을 입력하면 조건에 맞는 기준관리 항목이 여기에 표시됩니다.
-										</td>
-									</tr>
-								</tbody>
-							</table>
-						</div>
+					<div class="modal-field">
+						<label for="quantity">비밀번호</label> 
+						<input type="text" name="pw" id="pw"  placeholder="비밀번호">
 					</div>
+					<div class="modal-field">
+						<label for="quantity">비밀번호 확인</label> 
+						<input type="text" name="tel" id="tel" placeholder="연락처">
+					</div>
+					<div class="modal-field">
+						<label for="quantity">개인정보</label> 
+						<input type="text" name="tel" id="tel" placeholder="개인정보">
+					</div>
+					
+    <!-- 상사 영역 (다른 인풋창과 동일하게 우측 절반 48.5%를 차지하도록 수정) -->
+<div class="modal-field" style="width: 48% !important; display: flex !important; flex-direction: column !important; gap: 6px !important; box-sizing: border-box !important;">
+    <label for="mType-e">상사</label> 
+    <select id="mType-e" class="form-control" style="width: 100% !important; min-width: 100% !important; height: 38px !important; box-sizing: border-box !important;">
+        <option value="all">선택</option>
+        <c:forEach var="m" items="${ selectm }">
+            <option value="${m.emp_num}">${ m.ename } (${ m.dept_name } / ${ m.e_level })</option>                                     
+        </c:forEach>
+    </select>                      
+</div>                 
+					<!-- 1. 맨 위 div를 modal-grid로 바꾸고 flex 스타일 주입 -->
+<!-- 부서와 권한을 한 세트로 묶어 오른쪽 48.5% 공간을 정확하게 차지하도록 설정 -->
+<div class="dept-auth-wrap" style="width: 48.5% !important; display: flex !important; justify-content: space-between !important; align-items: flex-end !important; box-sizing: border-box !important;">
+    
+    <!-- 부서 영역 (우측 세트 내부에서 왼쪽 반 차지) -->
+    <div class="modal-field" style="width: 47% !important; display: flex !important; flex-direction: column !important; gap: 6px !important;">
+        <label for="dType-e">부서</label> 
+        <select id="dType-e" class="form-control" style="width: 100% !important; min-width: 100% !important; height: 38px !important; box-sizing: border-box !important;">
+            <option value="all">선택</option>
+            <c:forEach var="b" items="${ selectd }">
+                <option value="${b.dept_num}">${ b.dept_name }</option>                                     
+            </c:forEach>
+        </select>                      
+    </div>
+    
+    <!-- 권한 영역 (우측 세트 내부에서 오른쪽 반 차지) -->
+    <div class="modal-field" style="width: 47% !important; display: flex !important; flex-direction: column !important; gap: 6px !important;">
+        <label for="lType-e">권한</label> 
+        <select id="lType-e" class="form-control" style="width: 100% !important; min-width: 100% !important; height: 38px !important; box-sizing: border-box !important;">
+            <option value="all">선택</option>
+            <c:forEach var="b" items="${ selectl }">
+                <option value="${b.e_level}">${ b.e_level }</option>                                     
+            </c:forEach>
+        </select>                      
+    </div>                  
+
+</div>
+		
+
+					
+					
 				</div>
 
 				<div class="modal-btn-wrap" style="margin-top: 20px;">
