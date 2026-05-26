@@ -1,5 +1,7 @@
 package kr.or.smartfarm.vender;
 
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.request;
+
 import java.util.List;
 import java.util.Map;
 
@@ -34,7 +36,7 @@ public class VenderController {
 		PageInfo<Map<String, Object>> pageInfo = new PageInfo<Map<String, Object>>(result);
 		model.addAttribute("pageInfo", pageInfo);
 				
-		return "content/vender";
+		return "content/vender.tiles";
 	}
 	
 	@RequestMapping(value="/list", method= RequestMethod.GET)
@@ -56,19 +58,16 @@ public class VenderController {
 		model.addAttribute("venderDTO", venderDTO);
 		System.out.println("/one: vender_num: " + vender_num);
 		
-		return "content/venderdetail";
+		return "content/venderdetail.tiles";
 	}
 	
-	@GetMapping("/insert")
-	public String insert() {
-		System.out.println("get /insert 실행");
-		
-		return "content/vender";
-	}
 	
 	@PostMapping("/insert")
 	public String insert(VenderDTO venderDTO) {
 		System.out.println("post /insert 실행");
+		 
+		 System.out.println(venderDTO.getVender_type());
+		
 		
 		venderService.insertVender(venderDTO);
 		return "redirect:/vender";
@@ -76,11 +75,11 @@ public class VenderController {
 	
 	@GetMapping("/update")
 	public String update(@RequestParam("vender_num") int vender_num, Model model) {
-		System.out.println("/update 실행");
+		System.out.println("get /update 실행");
 		
-		VenderDTO vender = venderService.findById(vender_num);
+		VenderDTO venderDTO = venderService.findById(vender_num);
 		
-		model.addAttribute("vender", vender);
+		model.addAttribute("venderDTO", venderDTO);
 		model.addAttribute("mode", "update");
 		
 		return "content/vender";
@@ -88,7 +87,7 @@ public class VenderController {
 	
 	@PostMapping("/update")
 	public String update(VenderDTO venderDTO, Model model) {
-		System.out.println("/update 실행");
+		System.out.println("post /update 실행");
 		logger.info("venderDTO : " + venderDTO);
 		
 		int result = venderService.updateVender(venderDTO);
