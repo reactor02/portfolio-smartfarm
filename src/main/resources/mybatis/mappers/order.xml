@@ -130,9 +130,9 @@
         </selectKey>
         INSERT INTO work_order
             (order_num, order_id, order_qty, order_status, emp_num,
-             plan_num, current_qty, content, created_at, order_start, order_end)
+             plan_num, current_qty, content, created_at, order_start)
         SELECT WO_SEQ.NEXTVAL, #{work_order_id}, #{order_qty}, '대기', #{emp_num},
-               #{plan_num}, 0, #{content}, SYSDATE, #{order_start}, #{order_end}
+               #{plan_num}, 0, #{content}, SYSDATE, #{order_start}
         FROM DUAL
         WHERE NOT EXISTS (
             SELECT 1 FROM production_plan
@@ -165,7 +165,8 @@
     <!-- 상태 변경 (완료/취소 상태에서는 변경 차단) -->
     <update id="updateStatus" parameterType="WorkDTO">
         UPDATE work_order
-        SET order_status = #{work_status}
+        SET order_status = #{work_status},
+            order_end = CASE WHEN #{work_status} IN ('대기', '취소') THEN NULL ELSE order_end END
         WHERE order_id = #{work_order_id}
           AND order_status NOT IN ('완료', '취소')
     </update>
@@ -195,6 +196,20 @@
             WHERE wo.plan_num = pp.plan_num
         )
     </update>
+
+    <!-- BOM 재료 목록 조회 (완성품 item_num 기준, 생산 시 소모 재료 산출용) -->
+    <select id="getMaterialsByItem" parameterType="int" resultType="BomDTO">
+        SELECT item_num2, required_qty
+        FROM bom
+        WHERE item_num   = #{item_num}
+          AND bom_status = 'Y'
+    </select>
+
+    <!-- 재료 출고 io 기록 -->
+    <insert id="insertIo" parameterType="map">
+        INSERT INTO io (io_num, io_type, io_count, io_date, lot_num, order_num, io_reason)
+        VALUES (IO_SEQ.NEXTVAL, #{ioType}, #{ioCount}, SYSDATE, #{lotNum}, #{orderNum}, #{ioReason})
+    </insert>
 
     <!-- 생산계획 검색 (AJAX 모달용, 취소·완료 제외) -->
     <select id="searchPlans" parameterType="map" resultType="ProdDTO">
