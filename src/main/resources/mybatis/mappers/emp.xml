@@ -9,6 +9,44 @@
         SELECT emp_num, pw 
         FROM emp
         where emp_num = #{ emp_num }
+        and pw = #{ pw }
+    </select>
+    
+   <select id="getUserDetail" 
+   resultType="kr.or.smartfarm.usermanage.UserManageDTO">
+        SELECT *
+        FROM emp e left outer join dept d 
+        on e.dept_num = d.dept_num
+        where emp_num = #{ emp_num }
+    </select>
+    
+   <select id="selectd" 
+   resultType="kr.or.smartfarm.usermanage.UserManageDTO">
+        SELECT dept_name
+        FROM dept
+    </select>
+    
+   <select id="selectl" 
+   resultType="kr.or.smartfarm.usermanage.UserManageDTO">
+        SELECT distinct e_level
+        FROM emp e left outer join dept d 
+        on e.dept_num = d.dept_num
+    </select>
+    
+    
+   <select id="getUsers" 
+   resultType="kr.or.smartfarm.usermanage.UserManageDTO">
+        SELECT *
+        FROM emp e left outer join dept d 
+        on e.dept_num = d.dept_num
+    </select>
+    
+   <select id="searchpw" 
+   resultType="kr.or.smartfarm.changepw.ChangepwDTO">
+        SELECT emp_num, secret 
+        FROM emp
+        where emp_num = #{ emp_num }
+        and secret = #{ secret }
     </select>
     
     
@@ -17,6 +55,11 @@
         set pw = #{ pw }
         where emp_num = #{ emp_num }
     </update>
+
+
+
+
+
 
 </mapper>
 
