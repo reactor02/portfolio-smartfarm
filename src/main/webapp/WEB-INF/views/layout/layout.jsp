@@ -12,6 +12,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>NodeFarm MES</title>
 <style>
         :root { --m-cl: #2D6A4F; --s-cl: #49A47A; --p-cl: #B7E4C7; --bg: #F8F9FA; --txt: #333; }
@@ -36,6 +37,18 @@
         .sub-nav a:hover { color: var(--m-cl); font-weight: bold; text-decoration: underline; text-underline-offset: 4px; }
         .cont { flex: 1; padding: 2rem; background-color: #FFF; }
         .ftr { text-align: center; padding: 1rem 0; background-color: #EEE; font-size: 0.8rem; color: #777; margin-top: auto; }
+
+        /* ── 반응형 (태블릿 ≤ 768px) ── */
+        @media (max-width: 768px) {
+            .side { display: none; }
+            .cont { padding: 1.2rem 1rem; }
+        }
+        /* ── 반응형 (모바일 ≤ 480px) ── */
+        @media (max-width: 480px) {
+            .cont { padding: 0.8rem; }
+            .hdr  { padding: 0 12px; }
+            .hdr-logo-txt { font-size: 1.1rem; }
+        }
     </style>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/page.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/modal.css">

@@ -61,6 +61,10 @@
     .info-label { font-size: 12px; color: #777; font-weight: bold; }
     .info-value { font-size: 14px; font-weight: bold; }
     .badge { background-color: var(--p-cl); color: var(--m-cl); padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: bold; width: fit-content; }
+    .badge-wait     { background: #E9ECEF; color: #6C757D; }
+    .badge-progress { background: #FFF3CD; color: #856404; }
+    .badge-done     { background: #D1E7DD; color: #0A3622; }
+    .badge-cancel   { background: #F8D7DA; color: #842029; }
 
     .status-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 1.5rem; text-align: center; }
     .status-card { background-color: #FFF; border: 1px solid var(--border-cl); padding: 16px; border-radius: 8px; }
@@ -125,7 +129,7 @@
         <div class="section-title">■ 기본 정보</div>
         <div class="info-grid">
             <div class="info-item"><span class="info-label">계획번호</span><span class="info-value">${prodDTO.plan_id}</span></div>
-            <div class="info-item"><span class="info-label">상태</span><span class="badge">${prodDTO.plan_status}</span></div>
+            <div class="info-item"><span class="info-label">상태</span><span class="badge <c:choose><c:when test="${prodDTO.plan_status == '대기'}">badge-wait</c:when><c:when test="${prodDTO.plan_status == '진행'}">badge-progress</c:when><c:when test="${prodDTO.plan_status == '완료'}">badge-done</c:when><c:when test="${prodDTO.plan_status == '취소'}">badge-cancel</c:when></c:choose>">${prodDTO.plan_status}</span></div>
             <div class="info-item"><span class="info-label">담당자</span><span class="info-value">${prodDTO.ename}</span></div>
             <div class="info-item"><span class="info-label">품목명</span><span class="info-value">${prodDTO.item_name}</span></div>
             <div class="info-item"><span class="info-label">품목 코드</span><span class="info-value">${prodDTO.code}</span></div>
@@ -201,7 +205,7 @@
     <div id="workModal" class="modal-overlay">
         <div class="modal-box">
             <h3 class="modal-title">작업지시 등록</h3>
-            <form id="workRegForm" action="/work" method="post">
+            <form id="workRegForm" action="/work" method="post" accept-charset="UTF-8">
                 <input type="hidden" name="plan_num" value="${prodDTO.plan_num}">
                 <div class="modal-grid">
                     <div class="modal-field">
@@ -241,6 +245,14 @@
 <script>
     var PLAN_ID = '${prodDTO.plan_id}';
 
+    function getBadgeClass(status) {
+        if (status === '대기') return 'badge-wait';
+        if (status === '진행') return 'badge-progress';
+        if (status === '완료') return 'badge-done';
+        if (status === '취소') return 'badge-cancel';
+        return '';
+    }
+
     /* 진행률 바 */
     window.onload = function () {
         var planQty    = parseInt('${prodDTO.plan_qty}')    || 0;
@@ -276,7 +288,7 @@
                               + '<td>' + (w.current_qty   || 0)   + '</td>'
                               + '<td>' + (w.order_start   ? w.order_start.substring(0, 10) : '-') + '</td>'
                               + '<td>' + (w.order_end     ? w.order_end.substring(0, 10)   : '-') + '</td>'
-                              + '<td><span class="badge">' + (w.work_status || '-') + '</span></td>'
+                              + '<td><span class="badge ' + getBadgeClass(w.work_status) + '">' + (w.work_status || '-') + '</span></td>'
                               + '</tr>';
                     }
                     tbody.innerHTML = html;

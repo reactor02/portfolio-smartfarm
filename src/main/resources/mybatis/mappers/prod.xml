@@ -122,7 +122,7 @@
                    ELSE '대기'
                END AS plan_status,
                pp.plan_start, pp.plan_end,
-               pp.emp_num, pp.item_num, pp.created_at,
+               pp.emp_num, pp.item_num, pp.created_at, pp.content,
                i.name         AS item_name, i.code, i.type,
                e.ename,
                f.facility_num,
