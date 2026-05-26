@@ -47,7 +47,9 @@ public class LotController {
             );
             return null;
         }
-        model.addAttribute("lotDTO", lotDTO);
+        model.addAttribute("lotDTO",     lotDTO);
+        model.addAttribute("materials",  lotService.getMaterialsByChildLot(lotDTO.getLot_num()));
+        model.addAttribute("usedIn",     lotService.getParentsByLot(lotDTO.getLot_num()));
         return "content/lotDetail.tiles";
     }
 }

@@ -69,4 +69,80 @@
         WHERE l.lot_code = #{lot_code}
     </select>
 
+    <!-- LOT 등록 (생산 완료 시) -->
+    <insert id="insertLot" parameterType="LotDTO">
+        <selectKey keyProperty="lot_num" resultType="int" order="BEFORE">
+            SELECT LOT_SEQ.NEXTVAL FROM DUAL
+        </selectKey>
+        INSERT INTO lot (lot_num, lot_code, item_num, order_num, init_qty, current_qty,
+                         lot_status, lot_date, expiry_date)
+        VALUES (
+            #{lot_num},
+            'LOT-' || TO_CHAR(SYSDATE, 'YYYYMMDD') || '-' || #{lot_num},
+            #{item_num},
+            #{order_num},
+            #{init_qty},
+            #{current_qty},
+            '생산완료',
+            SYSDATE,
+            CASE WHEN #{type} = 'SEMIPRODUCT' THEN SYSDATE + 10 ELSE SYSDATE + 20 END
+        )
+    </insert>
+
+    <!-- 현재 수량 차감 -->
+    <update id="deductQty">
+        UPDATE lot
+        SET current_qty = current_qty - #{deduct_qty}
+        WHERE lot_num = #{lot_num}
+          AND current_qty >= #{deduct_qty}
+    </update>
+
+    <!-- QC pass + 유통기한 내 재료 LOT FIFO 조회 -->
+    <select id="getQcPassedLotsFIFO" parameterType="int" resultType="LotDTO">
+        SELECT l.lot_num, l.current_qty, l.lot_date
+        FROM lot l
+        WHERE l.item_num    = #{item_num}
+          AND l.current_qty > 0
+          AND l.expiry_date >= SYSDATE
+          AND EXISTS (
+              SELECT 1 FROM io i
+              JOIN qc q ON i.qc_num = q.qc_num
+              WHERE i.lot_num  = l.lot_num
+                AND q.qc_pass  = 'PASS'
+          )
+        ORDER BY l.lot_date ASC
+    </select>
+
+    <!-- lot_relation 등록 -->
+    <insert id="insertLotRelation" parameterType="LotRelationDTO">
+        INSERT INTO lot_relation (lot_parent, lot_child)
+        VALUES (#{parent_lot_num}, #{child_lot_num})
+    </insert>
+
+    <!-- lotDetail: 이 LOT을 만들기 위해 소모된 재료 LOT 목록 -->
+    <select id="getMaterialsByChildLot" parameterType="int" resultType="LotRelationDTO">
+        SELECT lr.lot_parent AS parent_lot_num,
+               lr.lot_child  AS child_lot_num,
+               l.lot_code    AS parent_lot_code,
+               i.name        AS item_name,
+               l.lot_date,
+               l.lot_status
+        FROM lot_relation lr
+        JOIN lot  l ON lr.lot_parent = l.lot_num
+        JOIN item i ON l.item_num = i.item_num
+        WHERE lr.lot_child = #{lot_num}
+    </select>
+
+    <!-- lotDetail: 이 LOT이 투입된 생산 LOT 목록 (공정 이력) -->
+    <select id="getParentsByLot" parameterType="int" resultType="LotRelationDTO">
+        SELECT lr.lot_parent AS parent_lot_num,
+               lr.lot_child  AS child_lot_num,
+               l.lot_code    AS child_lot_code,
+               i.name        AS item_name
+        FROM lot_relation lr
+        JOIN lot  l ON lr.lot_child = l.lot_num
+        JOIN item i ON l.item_num = i.item_num
+        WHERE lr.lot_parent = #{lot_num}
+    </select>
+
 </mapper>

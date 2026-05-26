@@ -22,6 +22,9 @@
         <!-- lot -->
         <typeAlias type="kr.or.smartfarm.lot.LotDTO"           alias="LotDTO"/>
         <typeAlias type="kr.or.smartfarm.lot.LotPageDTO"       alias="LotPageDTO"/>
+        <typeAlias type="kr.or.smartfarm.lot.LotRelationDTO"   alias="LotRelationDTO"/>
+        <!-- bom -->
+        <typeAlias type="kr.or.smartfarm.bom.BomDTO"           alias="BomDTO"/>
     </typeAliases>
     
       
