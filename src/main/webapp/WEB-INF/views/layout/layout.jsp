@@ -25,7 +25,7 @@
         .hdr-user { font-size: 0.9rem; }
         .hdr-user a { color: var(--p-cl); text-decoration: none; margin-left: 10px; }
         .wrap { display: flex; flex: 1; }
-        .side { width: 240px; background-color: #FFF; border-right: 1px solid #DDD; }
+        .side { width: 200px; background-color: #FFF; border-right: 1px solid #DDD; }
         .nav-list { list-style: none; }
         .nav-item { border-bottom: 1px solid #EEE; }
         .nav-btn { display: block; padding: 1rem 1.5rem; cursor: pointer; font-weight: bold; color: var(--m-cl); transition: background 0.3s; text-decoration: none; user-select: none; }
@@ -34,7 +34,7 @@
         .sub-nav.on { display: block; }
         .sub-nav a { display: block; padding: 0.7rem 1.5rem 0.7rem 2.5rem; font-size: 0.9rem; color: #555; text-decoration: none; }
         .sub-nav a:hover { color: var(--m-cl); font-weight: bold; text-decoration: underline; text-underline-offset: 4px; }
-        .cont { flex: 1; padding: 2rem; background-color: #FFF; }
+        .cont { flex: 1; padding: 0rem; background-color: #FFF; }
         .ftr { text-align: center; padding: 1rem 0; background-color: #EEE; font-size: 0.8rem; color: #777; margin-top: auto; }
     </style>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/page.css">
