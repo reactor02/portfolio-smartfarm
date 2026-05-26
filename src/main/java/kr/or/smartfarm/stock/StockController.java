@@ -29,7 +29,7 @@ public class StockController {
 		 model.addAttribute("msg", msg);
 		 PageInfo<Map<String, Object>> pageInfo = new PageInfo<Map<String, Object>>(result);
 		 model.addAttribute("pageInfo", pageInfo);
-		return "content/stockSelect";
+		return "content/stockSelect.tiles";
 	}
 	
 	@RequestMapping("/searchStock")
@@ -99,7 +99,7 @@ System.out.println(searchMap);
 		List result = null;
 		result = stockService.selectDetail(stockId);
 		model.addAttribute("resultList", result);
-		return "content/stockDetail";
+		return "content/stockDetail.tiles";
 	}
 }
 
