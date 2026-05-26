@@ -34,7 +34,6 @@ public class BomDAOImpl implements BomDAO{
 		result = sqlSession.selectList("kr.or.bom.searchBom", map);
 		return result;
 	}
-
 	
 	//모달 부모 검색
 	@Override
@@ -78,5 +77,4 @@ public class BomDAOImpl implements BomDAO{
 		sqlSession.update("kr.or.bom.updateBomStatus", bomDTO);
 		return;
 	}
-
 }

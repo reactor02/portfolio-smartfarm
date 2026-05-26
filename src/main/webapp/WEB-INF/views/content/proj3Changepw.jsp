@@ -39,19 +39,29 @@
     <form class="pw-change-form">
         <div class="input-group-container">
             <!-- 사원번호 입력 -->
-            <div class="input-group">
-                <label for="emp-no">사원번호 :</label>
-                <input type="text" id="emp-no" required>
-            </div>
             <!-- 현재 비밀번호 입력 -->
             <div class="input-group">
-                <label for="current-pw">현재 PW :</label>
-                <input type="password" id="current-pw" required>
+                <label for="current-pw">새 비밀번호 :</label>
+                 <input type="password" 
+                 id="current-pw"
+           name="pw" 
+           placeholder="비밀번호를 입력해주세요." 
+           class="input-field" 
+           required
+           pattern="(?=.*[a-zA-Z])(?=.*\d)(?=.*[!@#$%^&*()_+~`\-={}\[\]:;&quot;'<>,.?\/]).{8,20}"
+           title="비밀번호는 영문, 숫자, 특수문자를 포함하여 8~20자로 입력해주세요.">
             </div>
             <!-- 새 비밀번호 입력 -->
             <div class="input-group">
-                <label for="new-pw">새 PW :</label>
-                <input type="password" id="new-pw" required>
+                <label for="new-pw" style="font-size : 0.75em;">비밀번호확인 :</label>
+                 <input type="password" 
+                 id="new-pw"
+           name="pw" 
+           placeholder="비밀번호를 입력해주세요." 
+           class="input-field" 
+           required
+           pattern="(?=.*[a-zA-Z])(?=.*\d)(?=.*[!@#$%^&*()_+~`\-={}\[\]:;&quot;'<>,.?\/]).{8,20}"
+           title="비밀번호는 영문, 숫자, 특수문자를 포함하여 8~20자로 입력해주세요.">
             </div>
         </div>
 
@@ -60,10 +70,31 @@
 
         <!-- 로그인 화면 복귀 링크 -->
         <div class="nav-section">
-            <a href="#" class="nav-link">← 로그인으로 돌아가기</a>
+            <a href="/login" class="nav-link">← 로그인으로 돌아가기</a>
         </div>
     </form>
 </div>
+
+<script>
+
+// 프론트엔드 Ajax 요청 예시 (fetch 사용 시)
+fetch('/changepw', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(passwordData)
+})
+.then(res => res.json())
+.then(data => {
+    if (data.success) {
+        alert(data.message); // "비밀번호가 변경되었습니다."
+        location.href = "/login"; // [성공] 로그인 페이지로 이동!
+    } else {
+        alert(data.message); // "비밀번호 변경에 실패했습니다." 또는 "인증 만료"
+        // [실패] 페이지 이동 없이 현재 화면 유지 (입력란 초기화 등)
+        document.getElementById("newPassword").value = "";
+    }
+});
+</script>
 
 </body>
 </html>

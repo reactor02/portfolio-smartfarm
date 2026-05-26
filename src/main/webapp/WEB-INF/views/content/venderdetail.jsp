@@ -1,6 +1,9 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
-	
+	<%
+request.setCharacterEncoding("utf-8");
+response.setContentType("text/html; charset=utf-8");
+%>
 	 
     <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
     <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
@@ -475,7 +478,11 @@ body {
 				<button class="btn-back" onclick="location.href='/vender'">목록으로</button>
 				<div>
 					<button class="btn_reg" id="btnOpenWorkModal">수정</button>
-					<button class="btn_cancel" onclick="location.href='/vender'">취소</button>
+					<button class="btn_reg" onclick="deleteVender()">삭제</button>
+					
+					<form id="deleteForm" action="/vender/delete" method="post"> 
+						<input type="hidden" name="vender_num" value="${venderDTO.vender_num}">
+					</form>
 				</div>
 			</div>
 			<h1 class=page-title">거래처 페이지 상세</h1>
@@ -533,36 +540,44 @@ body {
 		<div id="workModal" class="modal-overlay">
 			<div class="modal-box">
 				<h3 class="modal-title">거래처 수정</h3>
-				<form id="venRegForm" action="/vender" method="post">
+				<form id="venRegForm" action="/vender/update" method="post" accept-charset="UTF-8" >
 					<input type="hidden" name="vender_num"
 						value="${venderDTO.vender_num}">
 					<div class="modal-grid">
 						<div class="modal-field">
-							<label>거래처명</label> <select name="ven_name">
-								<option name="">선택</option>
-								<c:forEach var="v" items="${venderList}">
-									<option value="${v.vender_num}">${v.vender_name}</option>
-								</c:forEach>
-							</select>
+							<label>거래처명</label> 
+							<input type="text" name="vender_name"
+								placeholder="거래처명" value="${venderDTO.vender_name}">
 						</div>
 						<div class="modal-field">
-							<label>대표자명</label> <input type="string" name="ven_ename"
-								placeholder="대표자명">
+							<label>대표자명</label> 
+							<input type="text" name="ven_ename"
+								placeholder="대표자명" value="${venderDTO.ven_ename}">
 						</div>
 						<div class="modal-field">
 							<label>사업자등록번호</label>
+							<input type="text" name="biz_no"
+								placeholder="사업자 등록번호" value="${venderDTO.biz_no}">
 						</div>
 						<div class="modal-field">
 							<label>거래처 타입</label>
+							<input type="text" name="vender_type"
+								placeholder="거래처 타입" value="${venderDTO.vender_type}">
 						</div>
 						<div class="modal-field">
 							<label>연락처</label>
+							<input type="number" name="vender_phone"
+								placeholder="연락처" value="${venderDTO.vender_phone}">
 						</div>
 						<div class="modal-field">
 							<label>주소</label>
+							<input type="text" name="vender_addr"
+								placeholder="주소" value="${venderDTO.vender_addr}">
 						</div>
 						<div class="modal-field">
 							<label>담당 사원</label>
+							<input type="text" name="emp_num"
+								placeholder="사원번호" value="${venderDTO.emp_num}">
 						</div>
 					</div>
 					<div class="modal-btn-wrap">
@@ -638,8 +653,14 @@ body {
 					});
 
 		});
+		
+		function deleteVender(){
+			if(confirm("삭제하시겠습니까?")){
+				document.getElementById("deleteForm").submit();
+			}
+		}
 	</script>
 
-	</script>
+
 </body>
 </html>

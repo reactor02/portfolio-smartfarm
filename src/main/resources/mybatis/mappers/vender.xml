@@ -65,6 +65,10 @@
 		emp_num = #{emp_num}
 		WHERE vender_num = #{vender_num}
 	</update>
+	
+	<delete id="deleteVender" parameterType="kr.or.smartfarm.vender.VenderDTO"> 
+		delete from vender where vender_num = #{vender_num}	
+	</delete>
 
 </mapper>
 

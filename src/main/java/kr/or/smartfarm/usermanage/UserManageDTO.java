@@ -1,9 +1,9 @@
-package kr.or.smartfarm.changepw;
+package kr.or.smartfarm.usermanage;
 
 import lombok.Data;
 
 @Data
-public class ChangepwDTO {
+public class UserManageDTO {
 	
 	String emp_num;
 	String ename;
@@ -14,6 +14,8 @@ public class ChangepwDTO {
 	String status;
 	String Termination_date;
 	String secret;
+	
 	String dept_num;
+	String dept_name;
 
 }

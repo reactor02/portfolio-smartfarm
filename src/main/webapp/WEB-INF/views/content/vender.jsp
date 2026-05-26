@@ -1,6 +1,11 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
     
+ <%
+request.setCharacterEncoding("utf-8");
+String vender_type = request.getParameter("vender_type");
+%>
+    
     <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
     <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
     <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
@@ -11,8 +16,11 @@
 <html>
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>거래처 관리</title>
 <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/paging.css">
+<link rel="stylesheet" href="/resources/css/list-common.css">
+<link rel="stylesheet" href="/resources/css/modal.css">
 
 <style>
 /* 기본 초기화 */
@@ -377,6 +385,7 @@ select.form-control {
 		
 		<div class="mat-body">
 			<main class="main-cont">
+			
 				<div class="hdr">
 					<h1>거래처 관리</h1>
 					<button type="button" class="btn-reg link-txt" id="btnOpenWorkModal" >+ 등록하기</button>
@@ -437,52 +446,45 @@ select.form-control {
 		<tiles:insertAttribute name="footer" ignore="true" />
 	</div>
 	
-	<!-- 거래처 수정 모달 -->
+	<!-- 거래처 등록 모달 -->
 		<div id="workModal" class="modal-overlay">
 			<div class="modal-box">
 				<h3 class="modal-title">거래처 등록</h3>
-				<form id="venRegForm" action = "/vender/insert" method="post">
-					<input type="hidden" name="vender_num" value="${venderDTO.vender_num}">
+				<form id="venRegForm" action = "/vender/insert" method="post" accept-charset="UTF-8">
 					<div class="modal-grid"> 
 						<div class="modal-field">
-							<label>거래처명</label>
-							<select name="ven_name"> 
-								<option name="">선택</option>
-								<c:forEach var="v" items="${venderList}">
-									<option value="${v.vender_num}">${v.vender_name}</option>
-								</c:forEach>
-							</select>
+							<label>거래처명</label> 
+								<input type="text" name="vender_name" placeholder="거래처명">
 						</div>
 						<div class="modal-field"> 
 							<label>대표자명</label>
-							<input type="string" name="ven_ename" placeholder="대표자명">
+							<input type="text" name="ven_ename" placeholder="대표자명">
 						</div>
 						<div class="modal-field"> 
 							<label>사업자등록번호</label>
-							<input type="string" name="biz_no" placeholder="사업자등록번호">
+							<input type="text" name="biz_no" placeholder="사업자등록번호">
 						</div>
 						<div class="modal-field"> 
 							<label>거래처 타입</label>
-							<input type="string" name="vender_type" placeholder="타입">
+							<select name="vender_type" >
+								<option value="">선택</option>
+								<option value="공급업체">공급업체</option>
+								<option value="고객사">고객사</option>
+								<option value="협력업체">협력업체</option>
+								<option value="유통업체">유통업체</option>
+							</select>
 						</div>
 						<div class="modal-field"> 
 							<label>연락처</label>
-							<input type="string" name="vender_phone" placeholder="연락처">
+							<input type="text" name="vender_phone" placeholder="연락처">
 						</div>
 						<div class="modal-field"> 
 							<label>주소</label>
-							<input type="string" name="vender-addr" placeholder="주소">
+							<input type="text" name="vender_addr" placeholder="주소">
 						</div>
 						<div class="modal-field"> 
 							<label>담당 사원</label>
-							<select name="emp_num">
-								<option value=""> 선택</option>
-								<c:forEach var="e" items="${empList}"> 
-									<option value="${e.emp_num}">
-										${e.ename}
-									</option>
-								</c:forEach>
-							</select>
+							<input type="number" name="emp_num" placeholder="사원번호">
 						</div>
 					</div>
 					<div class="modal-btn-wrap">
