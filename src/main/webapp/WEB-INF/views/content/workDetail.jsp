@@ -101,14 +101,14 @@
             <div class="btn-row">
                 <button class="btn-back" onclick="location.href='/work'">목록으로</button>
                 <div>
-                    <c:if test="${workDTO.work_status == 'WAIT'}">
+                    <c:if test="${workDTO.work_status == '대기'}">
                         <button class="btn-start" onclick="startWork()">작업시작</button>
                     </c:if>
-                    <c:if test="${workDTO.work_status == 'IN_PROGRESS'}">
+                    <c:if test="${workDTO.work_status == '진행'}">
                         <button class="btn-complete" onclick="completeWork()">작업종료</button>
+                        <button class="btn-reg" style="margin-left:6px;" onclick="produceWork()">작업완료</button>
                     </c:if>
-                    <c:if test="${workDTO.work_status != 'DONE' and workDTO.work_status != '취소'}">
-                        <button class="btn-reg" style="margin-left:6px;" onclick="produceWork()">작업등록</button>
+                    <c:if test="${workDTO.work_status != '완료' and workDTO.work_status != '취소'}">
                         <button class="btn-cancel" style="margin-left:6px;" onclick="cancelWork()">취소</button>
                     </c:if>
                 </div>
@@ -152,8 +152,10 @@
                 <span class="info-value"><fmt:formatDate value="${workDTO.order_end}" pattern="yyyy-MM-dd"/></span>
             </div>
             <div class="info-item">
-                <span class="info-label">등록일</span>
-                <span class="info-value"><fmt:formatDate value="${workDTO.created_at}" pattern="yyyy-MM-dd"/></span>
+                <span class="info-label">등록일시</span>
+                <fmt:timeZone value="Asia/Seoul">
+                <span class="info-value"><fmt:formatDate value="${workDTO.created_at}" pattern="yyyy-MM-dd HH:mm:ss"/></span>
+                </fmt:timeZone>
             </div>
         </div>
 
@@ -183,7 +185,32 @@
             <div class="progress-text" id="progressText"></div>
         </div>
 
-        <!-- 3. 공정 정보 -->
+        <!-- 3. 생산계획 정보 -->
+        <div class="section-title">■ 생산계획정보</div>
+        <div class="info-grid">
+            <div class="info-item">
+                <span class="info-label">계획번호</span>
+                <span class="info-value">${workDTO.plan_id}</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">계획상태</span>
+                <span class="badge">${workDTO.plan_status}</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">계획수량</span>
+                <span class="info-value">${workDTO.plan_qty}</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">생산시작일</span>
+                <span class="info-value"><fmt:formatDate value="${workDTO.plan_start}" pattern="yyyy-MM-dd"/></span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">생산마감일</span>
+                <span class="info-value"><fmt:formatDate value="${workDTO.plan_end}" pattern="yyyy-MM-dd"/></span>
+            </div>
+        </div>
+
+        <!-- 4. 공정 정보 -->
         <div class="section-title">■ 공정 정보</div>
         <div style="margin-bottom: 8px;">
             <span class="info-label">공정 정보 링크:</span>

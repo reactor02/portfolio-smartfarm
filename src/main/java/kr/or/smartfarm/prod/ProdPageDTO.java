@@ -5,7 +5,7 @@ import lombok.Data;
 @Data
 public class ProdPageDTO {
 	private int page = 1;
-    private int size = 10;
+    private int size = 5;
 
     private int totalCount;
     private int totalPages;
@@ -20,5 +20,6 @@ public class ProdPageDTO {
     private String plan_status = "";
     private int facility_num;
     private int item_num;
+    private String item_type = "";
     private String keyword = "";
 }

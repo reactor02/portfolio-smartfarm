@@ -22,6 +22,7 @@ public class ProdServiceImpl implements ProdService {
         page.setStartRow(startRow);
         page.setEndRow(endRow);
 
+        dao.syncPlanStatus();   // plan_start 지난 대기 → 진행 동기화
         List<ProdDTO> list = dao.getList(page);
 
         if (list != null && !list.isEmpty()) {

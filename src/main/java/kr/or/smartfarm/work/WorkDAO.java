@@ -1,7 +1,9 @@
 package kr.or.smartfarm.work;
 
 import java.util.List;
+import java.util.Map;
 
+import kr.or.smartfarm.prod.ProdDTO;
 import kr.or.smartfarm.prod.SelectOptionDTO;
 
 public interface WorkDAO {
@@ -10,6 +12,9 @@ public interface WorkDAO {
     int                   create(WorkDTO workDTO);
     int                   updateStatus(WorkDTO workDTO);
     int                   produce(WorkDTO workDTO);
+    int                   completePlanIfDone(String work_order_id);
     List<SelectOptionDTO> getEmpOptions();
     List<SelectOptionDTO> getPlanOptions();
+    List<SelectOptionDTO> getItemOptions();
+    List<ProdDTO>         searchPlans(Map<String, Object> params);
 }

@@ -7,7 +7,7 @@
     <!-- 목록 조회 (페이징 + 필터) -->
     <select id="getList" parameterType="LotPageDTO" resultType="LotDTO">
         SELECT lot_num, lot_code, item_name, code, current_qty,
-               lot_date, lot_status, total_count
+               lot_date, lot_status, type, total_count
         FROM (
             SELECT inner_q.*, ROWNUM AS rn
             FROM (
@@ -18,6 +18,7 @@
                        l.current_qty,
                        l.lot_date,
                        l.lot_status,
+                       i.type,
                        COUNT(*) OVER() AS total_count
                 FROM lot l
                 LEFT JOIN item i ON l.item_num = i.item_num
@@ -30,6 +31,9 @@
                     </if>
                     <if test="lot_status != null and lot_status != ''">
                         AND l.lot_status = #{lot_status}
+                    </if>
+                    <if test="item_type != null and item_type != ''">
+                        AND i.type = #{item_type}
                     </if>
                     <if test="item_num != 0">
                         AND l.item_num = #{item_num}
@@ -44,6 +48,14 @@
             WHERE ROWNUM &lt;= #{endRow}
         )
         WHERE rn &gt;= #{startRow}
+    </select>
+
+    <!-- 품목 드롭다운 옵션 (lot 관련 전체 타입) -->
+    <select id="getItemOptions" resultType="SelectOptionDTO">
+        SELECT item_num AS num, name AS name, type AS type
+        FROM item
+        WHERE type IN ('MATERIAL', 'SEMIPRODUCT', 'RAW', 'PRODUCT')
+        ORDER BY type, name
     </select>
 
     <!-- 단건 조회 -->

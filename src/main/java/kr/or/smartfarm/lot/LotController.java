@@ -6,6 +6,8 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import kr.or.smartfarm.prod.SelectOptionDTO;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -22,9 +24,11 @@ public class LotController {
 
     @RequestMapping
     public String list(@ModelAttribute LotPageDTO pageDTO, Model model) {
-        List<LotDTO> list = lotService.getList(pageDTO);
-        model.addAttribute("list", list);
-        model.addAttribute("page", pageDTO);
+        List<LotDTO>          list     = lotService.getList(pageDTO);
+        List<SelectOptionDTO> itemList = lotService.getItemOptions();
+        model.addAttribute("list",     list);
+        model.addAttribute("page",     pageDTO);
+        model.addAttribute("itemList", itemList);
         return "content/lot.tiles";
     }
 

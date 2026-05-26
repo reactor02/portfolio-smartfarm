@@ -6,4 +6,5 @@ import lombok.Data;
 public class SelectOptionDTO {
     private int num;
     private String name;
+    private String type;
 }
