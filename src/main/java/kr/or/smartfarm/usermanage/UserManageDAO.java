@@ -7,6 +7,7 @@ public interface UserManageDAO {
 	public List<UserManageDTO> getUserManage();
 	public List<UserManageDTO> selectd();
 	public List<UserManageDTO> selectl();
+	public List<UserManageDTO> selectm();
 	public UserManageDTO getUserDetail(String userId);
 	public UserManageDTO searchpw(UserManageDTO changepwDTO);
 
