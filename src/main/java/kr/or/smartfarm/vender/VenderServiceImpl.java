@@ -18,4 +18,11 @@ public class VenderServiceImpl implements VenderService {
 		return result;
 	}
 
+
+	@Override
+	public VenderDTO getVender(int vender_num) {
+		VenderDTO venderDTO = venderDAO.selectOneVender(vender_num);
+		return venderDTO;
+	}
+
 }

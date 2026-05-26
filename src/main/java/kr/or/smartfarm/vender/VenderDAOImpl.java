@@ -26,4 +26,13 @@ public class VenderDAOImpl implements VenderDAO{
 		return resultList;
 	}
 
+	@Override
+	public VenderDTO selectOneVender(int vender_num) {
+		VenderDTO venderDTO = null;
+		
+		venderDTO = sqlSession.selectOne("mapper.vender.selectOneVender", vender_num);
+		System.out.println("selectOneVender: VenderDTO: " + venderDTO);
+		return venderDTO;
+	}
+
 }

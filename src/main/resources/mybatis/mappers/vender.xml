@@ -4,8 +4,12 @@
 	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="mapper.vender">
 
-<select id="selectVender" resultType="kr.or.smartfarm.vender.VenderDTO">
+	<select id="selectVender" resultType="kr.or.smartfarm.vender.VenderDTO">
       select * from vender
+    </select>
+    
+    <select id="selectOneVender" resultType = "kr.or.smartfarm.vender.VenderDTO">
+    	select * from vender where vender_num = #{vender_num}
     </select>
 
 </mapper>
