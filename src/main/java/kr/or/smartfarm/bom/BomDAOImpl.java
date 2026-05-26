@@ -33,4 +33,5 @@ public class BomDAOImpl implements BomDAO{
 		result = sqlSession.selectList("kr.or.bom.searchBom", map);
 		return result;
 	}
+
 }
