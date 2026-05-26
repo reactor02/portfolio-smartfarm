@@ -96,33 +96,55 @@
     <!-- 2. 공정 이력 + 소모 자재 -->
     <div class="bottom-grid">
 
-        <!-- 공정 이력 -->
+        <!-- 공정 이력 (이 LOT이 어느 생산 LOT에 투입됐는지) -->
         <div class="section-box">
             <div class="section-title">■ 공정 이력</div>
             <ul class="lot-tree">
                 <li>▼ ${lotDTO.lot_code}
                     <ul>
-                        <li>등록된 공정 이력이 없습니다.</li>
+                        <c:choose>
+                            <c:when test="${not empty usedIn}">
+                                <c:forEach var="u" items="${usedIn}">
+                                    <li>→ ${u.child_lot_code} (${u.item_name})</li>
+                                </c:forEach>
+                            </c:when>
+                            <c:otherwise>
+                                <li>등록된 공정 이력이 없습니다.</li>
+                            </c:otherwise>
+                        </c:choose>
                     </ul>
                 </li>
             </ul>
         </div>
 
-        <!-- 소모 자재 -->
+        <!-- 소모 자재 (이 LOT 생산에 사용된 원재료 LOT) -->
         <div class="section-box">
             <div class="section-title">■ 소모 자재</div>
             <table class="data-table">
                 <thead>
                     <tr>
                         <th>번호</th>
+                        <th>LOT 번호</th>
                         <th>품목명</th>
-                        <th>수량</th>
-                        <th>소모일</th>
                         <th>상태</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr><td colspan="5" style="padding:20px; color:#aaa;">등록된 소모 자재가 없습니다.</td></tr>
+                    <c:choose>
+                        <c:when test="${not empty materials}">
+                            <c:forEach var="m" items="${materials}" varStatus="s">
+                                <tr>
+                                    <td>${s.index + 1}</td>
+                                    <td>${m.parent_lot_code}</td>
+                                    <td>${m.item_name}</td>
+                                    <td>${m.lot_status}</td>
+                                </tr>
+                            </c:forEach>
+                        </c:when>
+                        <c:otherwise>
+                            <tr><td colspan="4" style="padding:20px; color:#aaa;">등록된 소모 자재가 없습니다.</td></tr>
+                        </c:otherwise>
+                    </c:choose>
                 </tbody>
             </table>
         </div>

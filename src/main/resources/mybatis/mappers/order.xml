@@ -6,7 +6,7 @@
 
     <!-- 목록 조회 (페이징 + 필터) -->
     <select id="getList" parameterType="WorkPageDTO" resultType="WorkDTO">
-        SELECT order_num, work_order_id, plan_id, item_name,
+        SELECT order_num, work_order_id, plan_id, item_name, type,
                order_qty, ename, order_start, work_status, total_count
         FROM (
             SELECT inner_q.*, ROWNUM AS rn
@@ -19,6 +19,7 @@
                        e.ename,
                        wo.order_start,
                        wo.order_status AS work_status,
+                       i.type,
                        f.facility_name,
                        COUNT(*) OVER() AS total_count
                 FROM work_order wo
@@ -46,6 +47,12 @@
                     <if test="work_status != null and work_status != ''">
                         AND wo.order_status = #{work_status}
                     </if>
+                    <if test="item_type != null and item_type != ''">
+                        AND i.type = #{item_type}
+                    </if>
+                    <if test="item_num != 0">
+                        AND pp.item_num = #{item_num}
+                    </if>
                     <if test="keyword != null and keyword != ''">
                         AND (wo.order_id LIKE '%' || #{keyword} || '%'
                           OR i.name      LIKE '%' || #{keyword} || '%')
@@ -66,6 +73,14 @@
                wo.order_qty   AS order_qty,
                pp.plan_qty,
                pp.plan_id,
+               CASE
+                   WHEN pp.plan_status IN ('취소', '완료') THEN pp.plan_status
+                   WHEN pp.plan_status = '진행'            THEN '진행'
+                   WHEN SYSDATE >= pp.plan_start           THEN '진행'
+                   ELSE '대기'
+               END AS plan_status,
+               pp.plan_start,
+               pp.plan_end,
                pp.item_num,
                wo.order_status  AS work_status,
                wo.emp_num,
@@ -115,16 +130,24 @@
         </selectKey>
         INSERT INTO work_order
             (order_num, order_id, order_qty, order_status, emp_num,
-             plan_num, current_qty, content, created_at, order_start, order_end)
-        SELECT WO_SEQ.NEXTVAL, #{work_order_id}, #{order_qty}, 'WAIT', #{emp_num},
-               #{plan_num}, 0, #{content}, SYSDATE, #{order_start}, #{order_end}
+             plan_num, current_qty, content, created_at, order_start)
+        SELECT WO_SEQ.NEXTVAL, #{work_order_id}, #{order_qty}, '대기', #{emp_num},
+               #{plan_num}, 0, #{content}, SYSDATE, #{order_start}
         FROM DUAL
         WHERE NOT EXISTS (
             SELECT 1 FROM production_plan
             WHERE plan_num = #{plan_num}
-              AND (plan_status = '취소' OR SYSDATE > plan_end)
+              AND (plan_status IN ('취소', '완료') OR SYSDATE > plan_end)
         )
     </insert>
+
+    <!-- 품목 드롭다운 옵션 (PRODUCT + SEMIPRODUCT) -->
+    <select id="getItemOptions" resultType="SelectOptionDTO">
+        SELECT item_num AS num, name AS name, type AS type
+        FROM item
+        WHERE type IN ('PRODUCT', 'SEMIPRODUCT')
+        ORDER BY type, name
+    </select>
 
     <!-- 담당자 옵션 -->
     <select id="getEmpOptions" resultType="SelectOptionDTO">
@@ -142,9 +165,10 @@
     <!-- 상태 변경 (완료/취소 상태에서는 변경 차단) -->
     <update id="updateStatus" parameterType="WorkDTO">
         UPDATE work_order
-        SET order_status = #{work_status}
+        SET order_status = #{work_status},
+            order_end = CASE WHEN #{work_status} IN ('대기', '취소') THEN NULL ELSE order_end END
         WHERE order_id = #{work_order_id}
-          AND order_status NOT IN ('DONE', '취소')
+          AND order_status NOT IN ('완료', '취소')
     </update>
 
     <!-- 작업 등록: current_qty=order_qty, order_end=SYSDATE, status=DONE (DONE/취소면 무시) -->
@@ -152,10 +176,74 @@
         UPDATE work_order
         SET current_qty  = order_qty,
             order_end    = SYSDATE,
-            order_status = 'DONE'
+            order_status = '완료'
         WHERE order_id = #{work_order_id}
-          AND order_status != 'DONE'
+          AND order_status != '완료'
           AND order_status != '취소'
     </update>
+
+    <!-- 작업완료 시 생산계획 완료 처리: SUM(current_qty) >= plan_qty 이면 '완료' 저장 -->
+    <update id="completePlanIfDone" parameterType="String">
+        UPDATE production_plan pp
+        SET pp.plan_status = '완료'
+        WHERE pp.plan_num = (
+            SELECT plan_num FROM work_order WHERE order_id = #{value}
+        )
+        AND pp.plan_status NOT IN ('취소', '완료')
+        AND pp.plan_qty &lt;= (
+            SELECT NVL(SUM(wo.current_qty), 0)
+            FROM work_order wo
+            WHERE wo.plan_num = pp.plan_num
+        )
+    </update>
+
+    <!-- BOM 재료 목록 조회 (완성품 item_num 기준, 생산 시 소모 재료 산출용) -->
+    <select id="getMaterialsByItem" parameterType="int" resultType="BomDTO">
+        SELECT item_num2, required_qty
+        FROM bom
+        WHERE item_num   = #{item_num}
+          AND bom_status = 'Y'
+    </select>
+
+    <!-- 재료 출고 io 기록 -->
+    <insert id="insertIo" parameterType="map">
+        INSERT INTO io (io_num, io_type, io_count, io_date, lot_num, order_num, io_reason)
+        VALUES (IO_SEQ.NEXTVAL, #{ioType}, #{ioCount}, SYSDATE, #{lotNum}, #{orderNum}, #{ioReason})
+    </insert>
+
+    <!-- 생산계획 검색 (AJAX 모달용, 취소·완료 제외) -->
+    <select id="searchPlans" parameterType="map" resultType="ProdDTO">
+        SELECT plan_id, plan_num, plan_qty, item_name, plan_status,
+               plan_start, plan_end, ename, total_count
+        FROM (
+            SELECT inner_q.*, ROWNUM AS rn
+            FROM (
+                SELECT pp.plan_id,
+                       pp.plan_num,
+                       pp.plan_qty,
+                       i.name AS item_name,
+                       CASE
+                           WHEN SYSDATE > pp.plan_end    THEN '완료'
+                           WHEN SYSDATE >= pp.plan_start THEN '진행'
+                           ELSE '대기'
+                       END AS plan_status,
+                       pp.plan_start,
+                       pp.plan_end,
+                       e.ename,
+                       COUNT(*) OVER() AS total_count
+                FROM production_plan pp
+                LEFT JOIN item i ON pp.item_num = i.item_num
+                LEFT JOIN emp  e ON pp.emp_num  = e.emp_num
+                WHERE pp.plan_status NOT IN ('취소', '완료')
+                <if test="keyword != null and keyword != ''">
+                    AND (pp.plan_id LIKE '%' || #{keyword} || '%'
+                      OR i.name     LIKE '%' || #{keyword} || '%')
+                </if>
+                ORDER BY pp.plan_num DESC
+            ) inner_q
+            WHERE ROWNUM &lt;= #{endRow}
+        )
+        WHERE rn &gt;= #{startRow}
+    </select>
 
 </mapper>

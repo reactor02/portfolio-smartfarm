@@ -1,0 +1,168 @@
+@charset "UTF-8";
+
+/* ── 리셋 & 기본 ── */
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Malgun Gothic', sans-serif; }
+
+/* ── 레이아웃 골격 ── */
+.mat-all   { display: flex; flex-direction: column; min-height: 100vh; background-color: #f4f7f6; }
+.mat-body  { display: flex; flex: 1; }
+.main-cont { flex: 1; padding: 2rem 2.5rem; min-width: 0; }
+
+/* ── 페이지 콘텐츠 타이틀 헤더 (layout.jsp의 .hdr 네비바와 클래스 충돌 방지용 .page-hdr 사용) ── */
+.page-hdr {
+    display: flex; justify-content: space-between; align-items: center;
+    background-color: #2D6A4F; padding: 15px 25px; border-radius: 8px;
+    margin-bottom: 25px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+.page-hdr h1 { font-size: 1.8rem; color: #fff; font-weight: bold; letter-spacing: -1px; }
+.btn-reg {
+    background-color: #fff; color: #2D6A4F; padding: 10px 24px;
+    border-radius: 6px; border: 1px solid #2D6A4F; font-weight: bold;
+    font-size: 1.05rem; cursor: pointer; transition: background-color 0.2s;
+}
+.btn-reg:hover { background-color: #B7E4C7; }
+
+/* ── 검색 영역 ── */
+.sch-wrap {
+    background-color: #fff; border: 1px solid #bbb; border-radius: 10px;
+    padding: 20px 25px; margin-bottom: 25px; box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+}
+.sch-row  { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+.sch-row:last-child { margin-bottom: 0; }
+.sch-left, .sch-right { display: flex; align-items: center; gap: 12px; }
+.label { font-size: 0.95rem; font-weight: bold; color: #333; display: flex; align-items: center; }
+
+/* ── 폼 컨트롤 ── */
+.form-control {
+    height: 38px; border: 1px solid #aaa; border-radius: 4px;
+    padding: 0 10px; font-size: 0.95rem; outline: none; transition: border-color 0.2s;
+}
+.form-control:focus { border-color: #2D6A4F; }
+select.form-control { width: 140px; }
+
+/* ── 키워드 검색창 ── */
+.sch-input-box {
+    display: flex; align-items: center; border: 1px solid #aaa;
+    border-radius: 4px; height: 38px; background: #fff;
+    padding-left: 10px; width: 250px;
+}
+.sch-input-box input {
+    border: none; outline: none; height: 100%;
+    flex: 1; padding: 0 5px; font-size: 0.95rem;
+}
+
+/* ── 버튼 ── */
+.btn-sch {
+    height: 38px; padding: 0 20px; background-color: #fff; color: #2D6A4F;
+    border: 1px solid #2D6A4F; border-radius: 4px; font-size: 1rem;
+    font-weight: bold; cursor: pointer; transition: 0.2s;
+}
+.btn-sch:hover { background-color: #B7E4C7; }
+
+.select-reset {
+    height: 38px; padding: 0 20px; background-color: #fff; color: #2D6A4F;
+    border: 1px solid #2D6A4F; border-radius: 4px; font-size: 1rem;
+    font-weight: bold; cursor: pointer; transition: 0.2s;
+}
+.select-reset:hover { background-color: #FFB703; }
+
+/* ── 데이터 테이블 ── */
+.tbl-box { background: #fff; border-radius: 8px; padding: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.03); }
+.stk-tbl { width: 100%; border-collapse: collapse; border-top: 2px solid #555; border-bottom: 2px solid #555; }
+.stk-tbl th {
+    background-color: #e9ecef; color: #222; padding: 12px 10px;
+    border: 1px solid #ccc; border-top: none; font-weight: bold; font-size: 0.95rem;
+}
+.stk-tbl td { padding: 12px 10px; border: 1px solid #ccc; text-align: center; color: #333; font-size: 0.95rem; }
+.stk-tbl tbody tr:hover { background-color: #f1f8f5; }
+
+/* 번호 컬럼 / 빈 행 (인라인 style 대체) */
+.col-no    { width: 60px; }
+.num-cell  { font-weight: bold; color: #555; }
+.empty-cell { padding: 40px 10px !important; color: #aaa; }
+
+/* ── 링크 ── */
+.link-txt { color: #2D6A4F; text-decoration: none; font-weight: bold; }
+.link-txt:hover { text-decoration: underline; }
+
+/* ── 상태 배지 ── */
+.badge {
+    display: inline-block; padding: 3px 10px; border-radius: 12px;
+    font-size: 11px; font-weight: bold; background: #B7E4C7; color: #2D6A4F;
+}
+
+/* work / prod 상태 (DB 한글값 기준) */
+.badge-wait     { background: #E9ECEF; color: #6C757D; }   /* 대기 — 회색   */
+.badge-progress { background: #FFF3CD; color: #856404; }   /* 진행 — 노랑   */
+.badge-done     { background: #D1E7DD; color: #0A3622; }   /* 완료 — 진초록 */
+.badge-cancel   { background: #F8D7DA; color: #842029; }   /* 취소 — 빨강   */
+
+/* lot 상태 (DB 영문값 유지, 색상만 구별) */
+.badge-available { background: #D1E7DD; color: #0A3622; }  /* AVAILABLE — 초록 */
+.badge-used      { background: #E9ECEF; color: #6C757D; }  /* USED      — 회색 */
+.badge-expired   { background: #FFE5D0; color: #923D00; }  /* EXPIRED   — 주황 */
+
+/* ── 페이지네이션 ── */
+.pg-wrap { text-align: center; margin-top: 1.5rem; }
+.pg-btn {
+    display: inline-block; padding: 6px 12px; margin: 0 2px;
+    border: 1px solid #E9ECEF; border-radius: 4px; text-decoration: none;
+    color: #333; font-size: 13px; background: #fff;
+}
+.pg-btn:hover  { background-color: #B7E4C7; }
+.pg-active { background-color: #2D6A4F !important; color: #FFF !important; border-color: #2D6A4F; }
+
+/* ═══════════════════════════════════════════════════
+   반응형 — 태블릿 (≤ 768px)
+   ═══════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+    .main-cont { padding: 1.2rem 1rem; }
+
+    /* 필터 행: 가로 → 세로 쌓기 (.sch-left / .sch-right가 순서대로 내려감) */
+    .sch-row {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+    }
+
+    /* 각 섹션 내부: flex-wrap으로 자연스럽게 줄바꿈 허용 */
+    .sch-left, .sch-right {
+        flex-wrap: wrap;
+        gap: 8px 10px;
+    }
+    .sch-right { justify-content: flex-start; }
+
+    /* 날짜 입력·select: 고정폭 제거 → 신축 */
+    input[type="date"].form-control { flex: 1 1 130px; }
+    select.form-control             { flex: 1 1 120px; width: auto; }
+    .sch-input-box                  { flex: 1 1 180px; width: auto; }
+
+    /* 테이블: 가로 스크롤로 삐져나가기 방지 */
+    .tbl-box { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .stk-tbl { min-width: 600px; }
+}
+
+/* ═══════════════════════════════════════════════════
+   반응형 — 모바일 (≤ 480px)
+   ═══════════════════════════════════════════════════ */
+@media (max-width: 480px) {
+    .main-cont { padding: 0.8rem; }
+
+    .page-hdr    { padding: 12px 15px; flex-wrap: wrap; gap: 8px; }
+    .page-hdr h1 { font-size: 1.4rem; }
+
+    .sch-wrap { padding: 14px 12px; }
+
+    /* 필터 내부: 완전 세로 쌓기 — 각 항목이 한 줄씩 차지 */
+    .sch-left, .sch-right {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    input[type="date"].form-control { width: 100%; flex: none; }
+    select.form-control             { width: 100%; flex: none; }
+    .sch-input-box                  { width: 100%; flex: none; }
+    .btn-sch, .select-reset         { width: 100%; }
+
+    /* 페이지네이션 줄바꿈 */
+    .pg-wrap { flex-wrap: wrap; }
+}

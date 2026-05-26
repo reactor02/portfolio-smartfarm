@@ -10,6 +10,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,19 +26,27 @@ public class ProdController {
     @Autowired
     ProdService prodService;
 
+    @InitBinder
+    public void initBinder(WebDataBinder binder) {
+        binder.registerCustomEditor(java.sql.Date.class, new java.beans.PropertyEditorSupport() {
+            @Override
+            public void setAsText(String text) {
+                setValue(text == null || text.trim().isEmpty() ? null : java.sql.Date.valueOf(text.trim()));
+            }
+        });
+    }
+
     /* ── 목록 ───────────────────────────────────────── */
     @RequestMapping
     public String list(@ModelAttribute ProdPageDTO pageDTO, Model model) {
-        List<ProdDTO>         list         = prodService.getList(pageDTO);
-        List<SelectOptionDTO> facilityList = prodService.getFacilityOptions();
-        List<SelectOptionDTO> itemList     = prodService.getItemOptions();
-        List<SelectOptionDTO> empList      = prodService.getEmpList();
+        List<ProdDTO>         list     = prodService.getList(pageDTO);
+        List<SelectOptionDTO> itemList = prodService.getItemOptions();
+        List<SelectOptionDTO> empList  = prodService.getEmpList();
 
-        model.addAttribute("list",         list);
-        model.addAttribute("page",         pageDTO);
-        model.addAttribute("facilityList", facilityList);
-        model.addAttribute("itemList",     itemList);
-        model.addAttribute("empList",      empList);
+        model.addAttribute("list",     list);
+        model.addAttribute("page",     pageDTO);
+        model.addAttribute("itemList", itemList);
+        model.addAttribute("empList",  empList);
         return "content/prod.tiles";
     }
 

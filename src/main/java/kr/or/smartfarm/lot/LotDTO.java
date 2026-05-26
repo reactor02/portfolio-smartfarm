@@ -10,6 +10,7 @@ public class LotDTO {
     private String lot_code;      // LOT번호
     private Date   expiry_date;   // 만료일
     private int    item_num;
+    private int    order_num;     // 작업지시 FK
     private Date   lot_date;      // 생성일
     private int    init_qty;      // 초기수량
     private int    current_qty;   // 현재수량

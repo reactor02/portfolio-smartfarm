@@ -14,5 +14,6 @@ public interface ProdDAO {
     public ProdDTO               getSelectOne(String plan_id);
     public int                   create(ProdDTO prodDTO);
     public int                   updateStatus(ProdDTO prodDTO);
+    public int                   syncPlanStatus();
     public List<WorkDTO>         getWorkOrders(Map<String, Object> params);
 }

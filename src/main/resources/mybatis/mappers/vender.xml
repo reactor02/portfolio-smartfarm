@@ -4,9 +4,67 @@
 	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="mapper.vender">
 
-<select id="selectVender" resultType="kr.or.smartfarm.vender.VenderDTO">
-      select * from vender
-    </select>
+	<select id="selectVender"
+		resultType="kr.or.smartfarm.vender.VenderDTO">
+		SELECT v.*, e.ename
+		FROM vender v
+		JOIN emp e
+		ON v.emp_num =
+		e.emp_num
+	</select>
+
+	<select id="selectOneVender"
+		resultType="kr.or.smartfarm.vender.VenderDTO">
+		SELECT v.*, e.ename
+		FROM vender v
+		JOIN emp e
+		ON v.emp_num =
+		e.emp_num
+		WHERE v.vender_num = #{vender_num}
+	</select>
+
+	<insert id="insertVender">
+		INSERT INTO vender (
+		vender_num,
+		vender_name,
+		vender_type,
+		vender_phone,
+		vender_addr,
+		ven_ename,
+		biz_no,
+		emp_num
+		)
+		VALUES (
+		vender_seq.nextval,
+		#{vender_name},
+		#{vender_type},
+		#{vender_phone},
+		#{vender_addr},
+		#{ven_ename},
+		#{biz_no},
+		#{emp_num}
+		)
+	</insert>
+
+	<select id="getEmpList"
+		resultType="kr.or.smartfarm.vender.VenderDTO">
+		select emp_num, ename
+		from emp
+	</select>
+
+	<update id="updateVender"
+		parameterType="kr.or.smartfarm.vender.VenderDTO">
+		UPDATE vender
+		SET vender_name = #{vender_name},
+		vender_type = #{vender_type},
+		vender_phone = #{vender_phone},
+		vender_addr = #{vender_addr},
+		ven_ename = #{ven_ename},
+		biz_no =
+		#{biz_no},
+		emp_num = #{emp_num}
+		WHERE vender_num = #{vender_num}
+	</update>
 
 </mapper>
 

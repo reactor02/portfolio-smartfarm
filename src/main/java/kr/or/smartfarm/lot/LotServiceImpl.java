@@ -2,6 +2,8 @@ package kr.or.smartfarm.lot;
 
 import java.util.List;
 
+import kr.or.smartfarm.prod.SelectOptionDTO;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -10,6 +12,9 @@ public class LotServiceImpl implements LotService {
 
     @Autowired
     private LotDAO dao;
+
+    @Autowired
+    private LotRelationDAO relationDao;
 
     @Override
     public List<LotDTO> getList(LotPageDTO page) {
@@ -37,5 +42,20 @@ public class LotServiceImpl implements LotService {
     @Override
     public LotDTO selectOne(String lot_code) {
         return dao.getSelectOne(lot_code);
+    }
+
+    @Override
+    public List<SelectOptionDTO> getItemOptions() {
+        return dao.getItemOptions();
+    }
+
+    @Override
+    public List<LotRelationDTO> getMaterialsByChildLot(int lot_num) {
+        return relationDao.getMaterialsByChildLot(lot_num);
+    }
+
+    @Override
+    public List<LotRelationDTO> getParentsByLot(int lot_num) {
+        return relationDao.getParentsByLot(lot_num);
     }
 }

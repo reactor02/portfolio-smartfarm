@@ -51,6 +51,11 @@ public class ProdDAOImpl implements ProdDAO {
     }
 
     @Override
+    public int syncPlanStatus() {
+        return session.update("kr.or.smartfarm.prod.syncPlanStatus");
+    }
+
+    @Override
     public List<WorkDTO> getWorkOrders(Map<String, Object> params) {
         return session.selectList("kr.or.smartfarm.prod.getWorkOrders", params);
     }

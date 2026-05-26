@@ -5,7 +5,7 @@ import lombok.Data;
 @Data
 public class WorkPageDTO {
 	private int page      = 1;
-	private int size      = 10;
+	private int size      = 5;
 	private int blockSize = 10;
 
 	private int totalCount;
@@ -16,8 +16,10 @@ public class WorkPageDTO {
 	private int endPage;
 
 	// 필터
-	private String startDate  = "";
-	private String endDate    = "";
+	private String startDate   = "";
+	private String endDate     = "";
 	private String work_status = "";
-	private String keyword    = "";
+	private String item_type   = "";
+	private int    item_num    = 0;
+	private String keyword     = "";
 }
