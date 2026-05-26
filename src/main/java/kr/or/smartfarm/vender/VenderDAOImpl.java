@@ -35,4 +35,38 @@ public class VenderDAOImpl implements VenderDAO{
 		return venderDTO;
 	}
 
+	@Override
+	public void insertVender(VenderDTO venderDTO) {
+		sqlSession.insert("mapper.vender.insertVender", venderDTO);
+	}
+
+	@Override
+	public int updateVender(VenderDTO venderDTO) {
+		int result = -1; 
+		result = sqlSession.update("mapper.vender.updateVender", venderDTO);
+		return result;
+	}
+
+	@Override
+	public int deleteVender(VenderDTO venderDTO) {
+		int result = -1; 
+		result = sqlSession.delete("mapper.vender.deleteVender", venderDTO);
+		return result;
+	}
+
+	@Override
+	public List<VenderDTO> getEmpList() {
+		
+		return sqlSession.selectList("mapper.vender.getEmpList");
+	}
+
+	@Override
+	public VenderDTO findById(int vender_num) {
+		VenderDTO venderDTO = null ;
+		venderDTO = sqlSession.selectOne("mapper.vender.findById", vender_num);
+		return venderDTO;
+	}
+
+
+
 }

@@ -294,44 +294,82 @@ select.form-control {
 	border-color: #2D6A4F;
 	font-weight: bold;
 }
+
+/* 작업 등록 모달 */
+.modal-overlay {
+	display: none;
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background: rgba(0, 0, 0, 0.5);
+	z-index: 1000;
+	justify-content: center;
+	align-items: center;
+}
+
+.modal-box {
+	background: #fff;
+	border-radius: 10px;
+	padding: 30px;
+	width: 520px;
+	max-height: 90vh;
+	overflow-y: auto;
+	box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+}
+
+.modal-title {
+	font-size: 1.2rem;
+	font-weight: bold;
+	color: var(- -m-cl);
+	margin-bottom: 20px;
+}
+
+.modal-grid {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 16px;
+}
+
+.modal-field {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+}
+
+.modal-field label {
+	font-size: 12px;
+	color: #777;
+	font-weight: bold;
+}
+
+.modal-field input, .modal-field select, .modal-field textarea {
+	padding: 8px 10px;
+	border: 1px solid var(- -border-cl);
+	border-radius: 6px;
+	font-size: 13px;
+	font-family: inherit;
+}
+
+.modal-field-full {
+	grid-column: 1/-1;
+}
+
+.modal-btn-wrap {
+	display: flex;
+	justify-content: flex-end;
+	gap: 10px;
+	margin-top: 20px;
+}
+
+.modal-btn-wrap button {
+	padding: 9px 22px;
+	border
+}
 </style>
 
-<script>
-	window.addEventListener('load',()=>{
-		bind()
-	})
-	
-		let page=${param.page != null ? param.page : 1};
-	
-	function bind(){
-			
-			
-			fetch(`vender/list?page=`+ page,{
-				method:'get'
-			}).then(
-				resp => resp.json()		
-			).then(function(data){
-				console.log(data)
-				console.log('data.list',data.length)
-				
-				document.getElementById("tbody").innerHTML=``
-				for(let i = 0; i<data.length;i++){
-					document.getElementById("tbody").innerHTML+=`
-					<tr>
-						<td>\${data[i].vender_num}</td>
-						<td>\${data[i].vender_name}</td>
-						<td>\${data[i].emp_num}</td>
-						<td>\${data[i].vender_type}</td>
-						<td>\${data[i].vender_phone}</td>
-						<td>\${data[i].vender_addr}</td>
-					</tr>
-					`
-				}
-			})
-		}
-		
-	
-</script>
+
 </head>
 <body>
 	<div class="mat-all"> 
@@ -341,7 +379,7 @@ select.form-control {
 			<main class="main-cont">
 				<div class="hdr">
 					<h1>거래처 관리</h1>
-					<button type="button" class="btn-reg link-txt" >+ 등록하기</button>
+					<button type="button" class="btn-reg link-txt" id="btnOpenWorkModal" >+ 등록하기</button>
 				</div>
 				
 				<%-- 검색창 action --%>
@@ -379,10 +417,11 @@ select.form-control {
 						<tr>
 							<th>no.</th>
 							<th>거래처명</th>
-							<th>사원번호</th>
+							<th>거래처 담당자</th>
 							<th>거래 유형</th>
 							<th>거래처 연락처</th>
 							<th>거래처 주소</th>
+							<th>담당 사원</th>
 						</tr>
 					</thead>
 					<tbody id ="tbody"></tbody>
@@ -397,7 +436,122 @@ select.form-control {
 		</div>
 		<tiles:insertAttribute name="footer" ignore="true" />
 	</div>
+	
+	<!-- 거래처 수정 모달 -->
+		<div id="workModal" class="modal-overlay">
+			<div class="modal-box">
+				<h3 class="modal-title">거래처 등록</h3>
+				<form id="venRegForm" action = "/vender/insert" method="post">
+					<input type="hidden" name="vender_num" value="${venderDTO.vender_num}">
+					<div class="modal-grid"> 
+						<div class="modal-field">
+							<label>거래처명</label>
+							<select name="ven_name"> 
+								<option name="">선택</option>
+								<c:forEach var="v" items="${venderList}">
+									<option value="${v.vender_num}">${v.vender_name}</option>
+								</c:forEach>
+							</select>
+						</div>
+						<div class="modal-field"> 
+							<label>대표자명</label>
+							<input type="string" name="ven_ename" placeholder="대표자명">
+						</div>
+						<div class="modal-field"> 
+							<label>사업자등록번호</label>
+							<input type="string" name="biz_no" placeholder="사업자등록번호">
+						</div>
+						<div class="modal-field"> 
+							<label>거래처 타입</label>
+							<input type="string" name="vender_type" placeholder="타입">
+						</div>
+						<div class="modal-field"> 
+							<label>연락처</label>
+							<input type="string" name="vender_phone" placeholder="연락처">
+						</div>
+						<div class="modal-field"> 
+							<label>주소</label>
+							<input type="string" name="vender-addr" placeholder="주소">
+						</div>
+						<div class="modal-field"> 
+							<label>담당 사원</label>
+							<select name="emp_num">
+								<option value=""> 선택</option>
+								<c:forEach var="e" items="${empList}"> 
+									<option value="${e.emp_num}">
+										${e.ename}
+									</option>
+								</c:forEach>
+							</select>
+						</div>
+					</div>
+					<div class="modal-btn-wrap">
+						<button type="submit" class="btn-submit">등록</button>
+						<button type="button" class="btn-close" id="btnCloseWorkModal">닫기</button>
+					</div>
+				</form>
+			</div>
+		</div>
 
+
+<script>
+	window.addEventListener('load',()=>{
+		bind()
+	})
+	
+		let page=${param.page != null ? param.page : 1};
+	
+	function bind(){
+			
+			
+			fetch(`vender/list?page=`+ page,{
+				method:'get'
+			}).then(
+				resp => resp.json()		
+			).then(function(data){
+				console.log(data)
+				console.log('data.list',data.length)
+				
+				document.getElementById("tbody").innerHTML=``
+				for(let i = 0; i<data.length;i++){
+					document.getElementById("tbody").innerHTML+=`
+					<tr>
+						<td>\${data[i].vender_num}</td>
+						<td style="text-align:left; padding-left:20px">
+							<a href="/vender/one?vender_num=\${data[i].vender_num}"class="link-txt">\${data[i].vender_name}</a></td>
+						<td>\${data[i].ven_ename}</td>
+						<td>\${data[i].vender_type}</td>
+						<td>\${data[i].vender_phone}</td>
+						<td>\${data[i].vender_addr}</td>
+						<td>\${data[i].ename}</td>
+					</tr>
+					`
+				}
+			})
+			
+			
+			
+		
+			
+	/* 작업 등록 모달 */
+	var btnOpenWork = document.getElementById('btnOpenWorkModal');
+	if (btnOpenWork) btnOpenWork.addEventListener('click', function(){
+		document.getElementById('workModal').style.display = 'flex';
+	});
+	document.getElementById('btnCloseWorkModal').addEventListener('click', function(){
+		document.getElementById('workModal').style.display = 'none';
+	});
+	document.getElementById('workModal').addEventListener('click', function(e){
+		if(e.target == this) this.style.display='none';
+	});
+	
+		}
+	
+	
+	
+		
+	
+</script>
 
 </body>
 </html>
