@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.or.smartfarm.shipment">
+
+    <!-- 전체 조회 (PageHelper 페이징) -->
+    <select id="loadShipment" resultType="hashMap">
+        SELECT
+            S.shipment_num,
+            S.shipment_id,
+            TO_CHAR(S.shipment_date, 'YYYY-MM-DD') AS shipment_date,
+            S.shipment_status,
+            S.plan_qty,
+            E.ename,
+            I.name,
+            V.vender_name
+        FROM shipment S
+        JOIN emp             E  ON S.emp_num              = E.emp_num
+        JOIN shipment_request SR ON S.shipment_request_num = SR.shipment_request_num
+        JOIN vender          V  ON SR.vender_num           = V.vender_num
+        JOIN item            I  ON SR.item_num             = I.item_num
+        ORDER BY S.shipment_num DESC
+    </select>
+
+    <!-- 검색 조회 (PageHelper 페이징) -->
+    <select id="searchShipment" resultType="hashMap" parameterType="map">
+        SELECT
+            S.shipment_num,
+            S.shipment_id,
+            TO_CHAR(S.shipment_date, 'YYYY-MM-DD') AS shipment_date,
+            S.shipment_status,
+            S.plan_qty,
+            E.ename,
+            I.name,
+            V.vender_name
+        FROM shipment S
+        JOIN emp             E  ON S.emp_num              = E.emp_num
+        JOIN shipment_request SR ON S.shipment_request_num = SR.shipment_request_num
+        JOIN vender          V  ON SR.vender_num           = V.vender_num
+        JOIN item            I  ON SR.item_num             = I.item_num
+        WHERE 1 = 1
+        <if test="status != null and status != '' and status != 'all'">
+            AND S.shipment_status = #{status}
+        </if>
+        <if test="keyword != null and keyword != ''">
+            AND (
+                upper(V.vender_name) LIKE '%' || upper(#{keyword}) || '%'
+                OR upper(S.shipment_id) LIKE '%' || upper(#{keyword}) || '%'
+            )
+        </if>
+        <if test="sDate != null and sDate != ''">
+            AND S.shipment_date &gt;= TO_DATE(#{sDate}, 'YYYY-MM-DD')
+            <choose>
+                <when test="eDate != null and eDate != ''">
+                    AND S.shipment_date &lt; TO_DATE(#{eDate}, 'YYYY-MM-DD') + 1
+                </when>
+                <otherwise>
+                    AND S.shipment_date &lt; SYSDATE + 1
+                </otherwise>
+            </choose>
+        </if>
+        ORDER BY S.shipment_num DESC
+    </select>
+
+</mapper>
