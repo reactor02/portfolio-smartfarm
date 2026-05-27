@@ -25,9 +25,13 @@ public class RequestController {
 		List result = null;
 		 result = RequestService.selectAll(page);
 		 model.addAttribute("result" , result);
-		 
+
 		 PageInfo<Map<String, Object>> pageInfo = new PageInfo<Map<String, Object>>(result);
 		 model.addAttribute("pageInfo", pageInfo);
+
+		 // 등록 모달용 완제품 목록
+		 model.addAttribute("itemList", RequestService.loadProducts());
+
 		return "content/request.tiles";
 	}
 	
@@ -60,7 +64,7 @@ public class RequestController {
 	        searchMap.put("eDate", eDate );
 System.out.println(searchMap);
 	        
-	        List searchResult = RequestService.searchBom(searchMap);
+	        List searchResult = RequestService.searchRequest(searchMap);
 	        result.put("searchResult", searchResult);
 
 	        result.put("status", "good");
@@ -95,17 +99,19 @@ System.out.println(searchMap);
 		return RequestService.loadItems();
 	}
 
-	/* ── 출하 요청 등록 ── */
+	/* ── 주문 등록 ── */
 	@PostMapping("/insertRequest")
 	public String insertRequest(
-	        @RequestParam("vender_seq") int venderSeq,
-	        @RequestParam("item_num")   int itemNum,
-	        @RequestParam("due_date")   String dueDate) {
+	        @RequestParam("vender_seq")   int    venderSeq,
+	        @RequestParam("item_num")     int    itemNum,
+	        @RequestParam("request_date") String requestDate,
+	        @RequestParam("due_date")     String dueDate) {
 
 		Map insertMap = new HashMap();
-		insertMap.put("vender_num", venderSeq);
-		insertMap.put("item_num",   itemNum);
-		insertMap.put("due_date",   dueDate);
+		insertMap.put("vender_num",   venderSeq);
+		insertMap.put("item_num",     itemNum);
+		insertMap.put("request_date", requestDate);
+		insertMap.put("due_date",     dueDate);
 
 		RequestService.insertRequest(insertMap);
 		return "redirect:/request";

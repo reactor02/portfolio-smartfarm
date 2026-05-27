@@ -8,5 +8,6 @@ public interface RequestDAO {
 	public List searchRequest(Map map);
 	public List searchVender(String keyword);
 	public List loadItems();
+	public List loadProducts();
 	public int insertRequest(Map map);
 }
