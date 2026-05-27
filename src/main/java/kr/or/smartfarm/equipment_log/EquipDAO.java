@@ -1,0 +1,11 @@
+package kr.or.smartfarm.equipment_log;
+
+import java.util.List;
+import java.util.Map;
+
+
+public interface EquipDAO {
+	
+	public List selectAll(int pageNum); 
+	
+}

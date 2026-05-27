@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+	
+<mapper namespace="mapper.defective">
+
+<!-- modelConfig.xml 에서 세팅해서 별칭 만들었음 -->
+
+	<select id="selectAllDefective" resultType="DefectiveDTO">
+		SELECT
+			defect.defect_num,
+			defect.defect_reason,
+			defect.defect_action,
+			defect.defect_status,
+			io.io_num,
+			io.io_reason,
+			io.io_qty,
+			io.io_date,
+			item.item_num,
+			item.name,
+			item.code
+		FROM defective
+		JOIN io
+		    ON defective.io_num = io.io_num
+		JOIN lot
+			ON io.lot_num = lot.lot_num
+		JOIN item
+			ON lot.item_num = item.item_num
+		WHERE io.io_reason = '폐기'
+	</select>
+	
+	
+</mapper>
+
+
+
+
