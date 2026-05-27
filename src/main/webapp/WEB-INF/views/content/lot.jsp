@@ -3,6 +3,8 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <link rel="stylesheet" href="/resources/css/list-common.css">
 
+<div class="main-cont">
+
 <!-- 타이틀 헤더 -->
 <div class="page-hdr">
     <h1>LOT 관리</h1>
@@ -11,23 +13,16 @@
 <!-- 검색 필터 -->
 <form id="searchForm" method="get" action="/lot">
     <div class="sch-wrap">
-        <div class="sch-row">
-            <div class="sch-left">
-                <span class="label">▶ 기간</span>
-                <input type="date" name="startDate" value="${page.startDate}" class="form-control">
-                <span style="font-weight:bold;color:#666;">~</span>
-                <input type="date" name="endDate"   value="${page.endDate}"   class="form-control">
-                <span class="label" style="margin-left:10px;">▶ 상태</span>
-                <select name="lot_status" class="form-control">
-                    <option value="">상태 선택</option>
-                    <option value="사용가능" <c:if test="${page.lot_status == '사용가능'}">selected</c:if>>사용가능</option>
-                    <option value="소진"     <c:if test="${page.lot_status == '소진'}">selected</c:if>>소진</option>
-                    <option value="만료"     <c:if test="${page.lot_status == '만료'}">selected</c:if>>만료</option>
-                </select>
-            </div>
+        <!-- 1행: 기간 -->
+        <div class="sch-row-1">
+            <span class="label">▶ 기간</span>
+            <input type="date" name="startDate" value="${page.startDate}" class="form-control">
+            <span style="font-weight:bold;color:#666;">~</span>
+            <input type="date" name="endDate"   value="${page.endDate}"   class="form-control">
         </div>
-        <div class="sch-row">
-            <div class="sch-left">
+        <!-- 2행: 품목분류 | 품목명 (50:50) -->
+        <div class="sch-row-2">
+            <div>
                 <span class="label">▶ 품목분류</span>
                 <select name="item_type" id="lotItemType" class="form-control"
                         onchange="filterLotItems()">
@@ -37,8 +32,9 @@
                     <option value="RAW"         <c:if test="${page.item_type == 'RAW'}">selected</c:if>>원자재</option>
                     <option value="PRODUCT"     <c:if test="${page.item_type == 'PRODUCT'}">selected</c:if>>완제품</option>
                 </select>
-
-                <span class="label" style="margin-left:10px;">▶ 품목명</span>
+            </div>
+            <div>
+                <span class="label">▶ 품목명</span>
                 <select name="item_num" id="lotItemNum" class="form-control">
                     <option value="0">선택</option>
                     <c:forEach var="i" items="${itemList}">
@@ -47,14 +43,15 @@
                     </c:forEach>
                 </select>
             </div>
-            <div class="sch-right">
-                <div class="sch-input-box">
-                    <span style="color:#888;">&#128269;</span>
-                    <input type="text" name="keyword" value="${page.keyword}" placeholder="LOT번호 / 품목명">
-                </div>
-                <button type="submit" class="btn-sch">검색</button>
-                <button type="button" class="select-reset" onclick="location.href='/lot'">초기화</button>
+        </div>
+        <!-- 3행: 키워드 검색 (우측 정렬) -->
+        <div class="sch-row-3">
+            <div class="sch-input-box">
+                <span style="color:#888;">&#128269;</span>
+                <input type="text" name="keyword" value="${page.keyword}" placeholder="LOT번호 / 품목명">
             </div>
+            <button type="submit" class="btn-sch">검색</button>
+            <button type="button" class="select-reset" onclick="location.href='/lot'">검색 초기화</button>
         </div>
     </div>
     <input type="hidden" name="page" id="pageInput" value="1">
@@ -72,7 +69,7 @@
                 <th>품목코드</th>
                 <th>현재수량</th>
                 <th>생성일</th>
-                <th>상태</th>
+                
             </tr>
         </thead>
         <tbody>
@@ -94,9 +91,7 @@
                             <td>${l.code}</td>
                             <td>${l.current_qty}</td>
                             <td><fmt:formatDate value="${l.lot_date}" pattern="yyyy-MM-dd"/></td>
-                            <td>
-                                <span class="badge <c:choose><c:when test="${l.lot_status == 'available'}">badge-available</c:when><c:when test="${l.lot_status == 'used'}">badge-used</c:when><c:when test="${l.lot_status == 'expired'}">badge-expired</c:when></c:choose>">${l.lot_status}</span>
-                            </td>
+                           
                         </tr>
                     </c:forEach>
                 </c:when>
@@ -124,21 +119,6 @@
     </c:if>
 </div>
 
-<script>
-function movePage(p) {
-    document.getElementById('pageInput').value = p;
-    document.getElementById('searchForm').submit();
-}
+</div>
 
-/* 품목분류 → 품목명 연계 드롭다운 */
-function filterLotItems() {
-    var type = document.getElementById('lotItemType').value;
-    var sel  = document.getElementById('lotItemNum');
-    sel.value = '0';
-    Array.from(sel.options).forEach(function(opt) {
-        if (!opt.value || opt.value === '0') return;
-        opt.style.display = (!type || opt.dataset.type === type) ? '' : 'none';
-    });
-}
-window.addEventListener('load', function() { filterLotItems(); });
-</script>
+<script src="/resources/js/lot/lot.js"></script>
