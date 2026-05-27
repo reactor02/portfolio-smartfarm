@@ -3,6 +3,7 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <link rel="stylesheet" href="/resources/css/list-common.css">
 <link rel="stylesheet" href="/resources/css/modal.css">
+<link rel="stylesheet" href="/resources/css/work/work.css">
 
 <div class="main-cont">
 
@@ -19,7 +20,7 @@
         <div class="sch-row-1">
             <span class="label">▶ 기간</span>
             <input type="date" name="startDate" value="${page.startDate}" class="form-control">
-            <span style="font-weight:bold;color:#666;">~</span>
+            <span class="date-sep">~</span>
             <input type="date" name="endDate"   value="${page.endDate}"   class="form-control">
         </div>
         <!-- 2행: 상태 | 품목분류 | 품목명 (33:33:33) -->
@@ -57,7 +58,7 @@
         <!-- 3행: 키워드 검색 (우측 정렬) -->
         <div class="sch-row-3">
             <div class="sch-input-box">
-                <span style="color:#888;">&#128269;</span>
+                <span class="sch-icon">&#128269;</span>
                 <input type="text" name="keyword" value="${page.keyword}" placeholder="작업번호 / 품목명">
             </div>
             <button type="submit" class="btn-sch">검색</button>
@@ -138,12 +139,12 @@
             <div class="modal-grid">
                 <div class="modal-field">
                     <label>생산계획</label>
-                    <div style="display:flex;gap:6px;align-items:center;">
+                    <div class="plan-select-wrap">
                         <input type="text" id="planDisplay" readonly placeholder="계획 선택 후 표시"
-                               style="flex:1;background:#f5f5f5;cursor:default;">
+                               class="plan-display-input">
                         <input type="hidden" name="plan_num" id="planNumInput">
                         <button type="button" onclick="openPlanModal()"
-                                style="padding:6px 12px;background:#2D6A4F;color:#FFF;border:none;border-radius:4px;cursor:pointer;white-space:nowrap;">검색</button>
+                                class="btn-search-sm">검색</button>
                     </div>
                 </div>
                 <div class="modal-field">
@@ -178,20 +179,20 @@
 </div>
 
 <!-- ===== 생산계획 검색 모달 ===== -->
-<div id="planSearchModal" class="modal-overlay" style="display:none;z-index:10000;">
-    <div class="modal-box" style="width:700px;max-width:95vw;">
+<div id="planSearchModal" class="modal-overlay modal-overlay-top" style="display:none;">
+    <div class="modal-box modal-box-lg">
         <h3 class="modal-title">생산계획 검색</h3>
 
         <!-- 검색 입력 -->
-        <div style="display:flex;gap:8px;margin-bottom:14px;">
+        <div class="modal-search-bar">
             <input type="text" id="planKeyword" placeholder="계획번호 / 품목명"
-                   style="flex:1;padding:7px 10px;border:1px solid #CCC;border-radius:4px;">
+                   class="modal-search-input">
             <button type="button" onclick="searchPlans(1)"
-                    style="padding:7px 16px;background:#2D6A4F;color:#FFF;border:none;border-radius:4px;cursor:pointer;">검색</button>
+                    class="btn-modal-search">검색</button>
         </div>
 
         <!-- 결과 테이블 -->
-        <table class="stk-tbl" style="width:100%;font-size:13px;">
+        <table class="stk-tbl plan-tbl">
             <thead>
                 <tr>
                     <th>계획번호</th>
@@ -203,14 +204,14 @@
                 </tr>
             </thead>
             <tbody id="planSearchBody">
-                <tr><td colspan="6" style="text-align:center;padding:20px;color:#888;">검색어를 입력하거나 검색 버튼을 누르세요.</td></tr>
+                <tr><td colspan="6" class="empty-modal-cell">검색어를 입력하거나 검색 버튼을 누르세요.</td></tr>
             </tbody>
         </table>
 
         <!-- 페이지네이션 -->
-        <div class="pg-wrap" id="planPagination" style="margin-top:10px;"></div>
+        <div class="pg-wrap plan-pagination" id="planPagination"></div>
 
-        <div class="modal-btn-wrap" style="margin-top:14px;">
+        <div class="modal-btn-wrap modal-btn-wrap-mt">
             <button type="button" class="btn-cancel"
                     onclick="document.getElementById('planSearchModal').style.display='none'">닫기</button>
         </div>

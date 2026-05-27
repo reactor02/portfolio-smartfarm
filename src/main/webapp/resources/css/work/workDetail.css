@@ -44,7 +44,7 @@ body { font-family: 'Malgun Gothic', sans-serif; color: var(--txt); background-c
 .badge-done     { background: #D1E7DD; color: #0A3622; }
 .badge-cancel   { background: #F8D7DA; color: #842029; }
 
-.status-grid { display: grid; gap: 15px; margin-bottom: 1.5rem; text-align: center; }
+.status-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 1.5rem; text-align: center; }
 .status-card { background-color: #FFF; border: 1px solid var(--border-cl); padding: 16px; border-radius: 8px; }
 .status-num { font-size: 1.3rem; font-weight: bold; margin-top: 6px; }
 
@@ -64,3 +64,8 @@ body { font-family: 'Malgun Gothic', sans-serif; color: var(--txt); background-c
 
 .section-box { border: 1px solid var(--border-cl); border-radius: 8px; padding: 20px; background-color: #FFF; }
 .section-box .section-title { margin-top: 0; }
+
+.info-label-accent { color: var(--s-cl); }
+.status-num-accent { color: var(--s-cl); }
+.process-link-wrap { margin-bottom: 8px; }
+.info-label-block  { display: block; margin-bottom: 6px; }
