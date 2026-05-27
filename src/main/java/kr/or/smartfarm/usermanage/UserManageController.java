@@ -7,8 +7,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.github.pagehelper.PageInfo;
 
@@ -47,6 +49,64 @@ public class UserManageController {
 	    return "content/usermanage.tiles";
 	}
 	
+	
+	@PostMapping("/userinsert")
+	public String userinsert(
+			UserManageDTO userManageDTO, 
+			RedirectAttributes rttr) { 
+	    System.out.println("userinsertPost 실행");
+	    
+	    // 1. 서비스 실행 (정상 등록 시 1, 실패 시 0 또는 예외 반환)
+	    int resultCount = userManageService.userInsert(userManageDTO);
+	    
+	    // 2. 성패 로직 처리 및 결과 메시지 생성
+	    String msgType;
+	    String msgContent;
+	    
+	    if (resultCount > 0) {
+	        msgType = "success";
+	        msgContent = "사원이 정상적으로 등록되었습니다.";
+	    } else {
+	        msgType = "error";
+	        msgContent = "등록에 실패했습니다. 입력 데이터를 확인해주세요.";
+	    }
+	    
+	    // 3. 리다이렉트 화면까지 안전하게 메시지 배달 (Flash Attribute)
+	    rttr.addFlashAttribute("msg", msgContent);
+	    
+	    // 4. 타일즈 막힘 해결을 위해 GET 메서드로 리다이렉트
+	    return "redirect:/usermanage";
+	}
+	
+	@PostMapping("/userupdate")
+	public String userupdate(
+			UserManageDTO userManageDTO, 
+			RedirectAttributes rttr) { 
+		System.out.println("userupdatePost 실행");
+		
+		// 1. 서비스 실행 (정상 등록 시 1, 실패 시 0 또는 예외 반환)
+		int resultCount = userManageService.userUpdate(userManageDTO);
+		
+		// 2. 성패 로직 처리 및 결과 메시지 생성
+		String msgType;
+		String msgContent;
+		
+		if (resultCount > 0) {
+			msgType = "success";
+			msgContent = "사원이 정상적으로 등록되었습니다.";
+		} else {
+			msgType = "error";
+			msgContent = "등록에 실패했습니다. 입력 데이터를 확인해주세요.";
+		}
+		
+		// 3. 리다이렉트 화면까지 안전하게 메시지 배달 (Flash Attribute)
+		rttr.addFlashAttribute("msg", msgContent);
+		
+		// 4. 타일즈 막힘 해결을 위해 GET 메서드로 리다이렉트
+		return "redirect:/usermanage";
+	}
+	
+	
 	@GetMapping("/userdetail")
 	public String userdetailGet(
 			
@@ -66,6 +126,8 @@ public class UserManageController {
 	}
 	
 	
+	
+	
 	//paging
 	@RequestMapping("/ssssspaging")
 	public String goStock(@RequestParam(value = "page", defaultValue = "1")int page,@RequestParam(value="msg", required=false)String msg,Model model) {
@@ -76,6 +138,38 @@ public class UserManageController {
 		 PageInfo<Map<String, Object>> pageInfo = new PageInfo<Map<String, Object>>(result);
 		 model.addAttribute("pageInfo", pageInfo);
 		return "content/stockSelect";
+	}
+	
+	@GetMapping("/usersearch")
+	public String usermanageGet(
+			UserManageDTO searchDTO,
+			Model model
+			) { 
+	    System.out.println("usermanageGet 실행 - 검색 조건 진입");
+	    System.out.println("검색 부서: " + searchDTO.getDept_num());
+	    System.out.println("검색 권한: " + searchDTO.getE_level());
+	    System.out.println("검색 키워드: " + searchDTO.getKeyword());
+
+	    // 1. 서비스에 검색 조건 객체(DTO)를 넘겨 필터링된 결과 조회
+	    // 💡 (중요) 기존 getUserManage() 메서드에 searchDTO를 매개변수로 넘기도록 서비스 코드를 수정해야 합니다.
+	    List<UserManageDTO> userList = userManageService.getUserSearch(searchDTO);
+	    
+	    // 2. 셀렉트 박스(부서/권한 등)를 채우기 위한 고정 목록 조회
+	    List<UserManageDTO> selectd = userManageService.selectd();
+	    List<UserManageDTO> selectl = userManageService.selectl();
+	    List<UserManageDTO> selectm = userManageService.selectm();
+	    
+	    // 3. 화면에서 검색창에 선택했던 값이 그대로 유지되도록 검색 조건을 다시 뷰로 전달
+	    model.addAttribute("search", searchDTO);
+	    
+	    // 4. 조회된 데이터들을 가방(Model)에 적재
+	    model.addAttribute("userList", userList);
+	    model.addAttribute("selectd", selectd);
+	    model.addAttribute("selectl", selectl);
+	    model.addAttribute("selectm", selectm);
+	    
+	    // 5. 타일즈 뷰 리턴
+	    return "content/usermanage.tiles";
 	}
 	
 	

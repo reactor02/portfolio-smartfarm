@@ -24,6 +24,14 @@ public class UserManageDAOImpl implements UserManageDAO {
 		return result;
 	}
 	@Override
+	public List<UserManageDTO> getUserSearch(UserManageDTO searchDTO) {
+		// TODO Auto-generated method stub
+		
+		List<UserManageDTO> result = sqlSession.selectList(NAMESPACE + "userSearch", searchDTO);
+		
+		return result;
+	}
+	@Override
 	public List<UserManageDTO> selectd() {
 		// TODO Auto-generated method stub
 		
@@ -36,6 +44,22 @@ public class UserManageDAOImpl implements UserManageDAO {
 		// TODO Auto-generated method stub
 		
 		List<UserManageDTO> result = sqlSession.selectList(NAMESPACE + "selectm");
+		
+		return result;
+	}
+	@Override
+	public int userInsert(UserManageDTO userManageDTO) {
+		// TODO Auto-generated method stub
+		
+		int result = sqlSession.insert(NAMESPACE + "userInsert", userManageDTO);
+		
+		return result;
+	}
+	@Override
+	public int userUpdate(UserManageDTO userManageDTO) {
+		// TODO Auto-generated method stub
+		
+		int result = sqlSession.insert(NAMESPACE + "userUpdate", userManageDTO);
 		
 		return result;
 	}
