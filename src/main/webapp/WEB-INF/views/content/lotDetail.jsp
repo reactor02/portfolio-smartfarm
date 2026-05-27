@@ -6,41 +6,7 @@
 <head>
 <meta charset="UTF-8">
 <title>LOT 관리 상세</title>
-<style>
-    :root { --m-cl:#2D6A4F; --s-cl:#49A47A; --p-cl:#B7E4C7; --bg:#F8F9FA; --txt:#333; --border-cl:#E9ECEF; --danger-cl:#E63946; }
-    * { box-sizing:border-box; margin:0; padding:0; }
-    body { font-family:'Malgun Gothic',sans-serif; color:var(--txt); background:var(--bg); }
-    .cont { flex:1; padding:2rem; background:#FFF; }
-
-    .page-header { display:flex; flex-direction:column; margin-bottom:2rem; padding-bottom:1rem; border-bottom:2px solid var(--m-cl); }
-    .page-title  { font-size:1.5rem; font-weight:bold; color:var(--txt); }
-    .btn-row     { display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem; }
-    .btn-row button { padding:8px 18px; border-radius:6px; border:1px solid var(--border-cl); background:#FFF; cursor:pointer; font-weight:bold; font-size:13px; transition:background 0.2s; }
-    .btn-row .btn-back   { background:var(--m-cl); color:#FFF; border:none; }
-    .btn-row .btn-back:hover { background:var(--s-cl); }
-
-    .section-title { font-size:1.1rem; font-weight:bold; margin:2rem 0 1rem 0; color:var(--m-cl); }
-    .info-grid  { display:grid; grid-template-columns:repeat(3,1fr); gap:20px; background:var(--bg); padding:20px; border:1px solid var(--border-cl); border-radius:8px; }
-    .info-item  { display:flex; flex-direction:column; gap:6px; }
-    .info-label { font-size:12px; color:#777; font-weight:bold; }
-    .info-value { font-size:14px; font-weight:bold; }
-    .badge      { background:var(--p-cl); color:var(--m-cl); padding:3px 10px; border-radius:12px; font-size:11px; font-weight:bold; width:fit-content; }
-
-    /* 하단 2열 */
-    .bottom-grid { display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-top:0.5rem; }
-    .section-box { border:1px solid var(--border-cl); border-radius:8px; padding:20px; background:#FFF; }
-    .section-box .section-title { margin-top:0; }
-
-    /* 공정 이력 트리 */
-    .lot-tree { list-style:none; padding-left:0; }
-    .lot-tree li { padding:4px 0; font-size:13px; color:#555; }
-    .lot-tree ul { list-style:none; padding-left:20px; border-left:2px solid var(--border-cl); margin-left:8px; }
-
-    /* 소모 자재 테이블 */
-    .data-table { width:100%; border-collapse:collapse; margin-top:0.5rem; }
-    .data-table th { background:var(--bg); border-bottom:2px solid var(--s-cl); padding:10px; text-align:center; font-size:13px; font-weight:bold; }
-    .data-table td { padding:10px; border-bottom:1px solid var(--border-cl); text-align:center; font-size:13px; color:#555; }
-</style>
+<link rel="stylesheet" href="/resources/css/lot/lotDetail.css">
 </head>
 <body>
 <main class="cont">

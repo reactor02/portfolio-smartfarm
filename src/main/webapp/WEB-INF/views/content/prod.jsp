@@ -35,32 +35,29 @@ response.setContentType("text/html; charset=utf-8");
                 <form name="searchFrm" action="/prod" method="get">
                     <div class="sch-wrap">
 
-                        <!-- 기간 + 상태 -->
-                        <div class="sch-row">
-                            <div class="sch-left">
-                                <span class="label">▶ 기간</span>
-                                <input type="date" name="startDate" id="startDate"
-                                       value="${param.startDate}" class="form-control"
-                                       onchange="validateDate()">
-                                <span style="font-weight:bold;color:#666;">~</span>
-                                <input type="date" name="endDate" id="endDate"
-                                       value="${param.endDate}" class="form-control"
-                                       onchange="validateDate()">
-
-                                <span class="label" style="margin-left:15px;">▶ 상태</span>
-                                <select name="plan_status" class="form-control">
-                                    <option value="">선택</option>
-                                    <option value="대기" <c:if test="${param.plan_status == '대기'}">selected</c:if>>대기</option>
-                                    <option value="진행" <c:if test="${param.plan_status == '진행'}">selected</c:if>>진행</option>
-                                    <option value="취소" <c:if test="${param.plan_status == '취소'}">selected</c:if>>취소</option>
-                                    <option value="완료" <c:if test="${param.plan_status == '완료'}">selected</c:if>>완료</option>
-                                </select>
-                            </div>
+                        <!-- 1행: 기간 + 상태 -->
+                        <div class="sch-row-1">
+                            <span class="label">▶ 기간</span>
+                            <input type="date" name="startDate" id="startDate"
+                                   value="${param.startDate}" class="form-control"
+                                   onchange="validateDate()">
+                            <span style="font-weight:bold;color:#666;">~</span>
+                            <input type="date" name="endDate" id="endDate"
+                                   value="${param.endDate}" class="form-control"
+                                   onchange="validateDate()">
+                            <span class="label">▶ 상태</span>
+                            <select name="plan_status" class="form-control">
+                                <option value="">선택</option>
+                                <option value="대기" <c:if test="${param.plan_status == '대기'}">selected</c:if>>대기</option>
+                                <option value="진행" <c:if test="${param.plan_status == '진행'}">selected</c:if>>진행</option>
+                                <option value="취소" <c:if test="${param.plan_status == '취소'}">selected</c:if>>취소</option>
+                                <option value="완료" <c:if test="${param.plan_status == '완료'}">selected</c:if>>완료</option>
+                            </select>
                         </div>
 
-                        <!-- 품목분류 + 품목명 + 키워드 -->
-                        <div class="sch-row">
-                            <div class="sch-left">
+                        <!-- 2행: 품목분류 | 품목명 (50:50) -->
+                        <div class="sch-row-2">
+                            <div>
                                 <span class="label">▶ 품목분류</span>
                                 <select name="item_type" id="prodItemType" class="form-control"
                                         onchange="filterProdItems()">
@@ -68,8 +65,9 @@ response.setContentType("text/html; charset=utf-8");
                                     <option value="SEMIPRODUCT" ${param.item_type == 'SEMIPRODUCT' ? 'selected' : ''}>반제품</option>
                                     <option value="PRODUCT"     ${param.item_type == 'PRODUCT'     ? 'selected' : ''}>완제품</option>
                                 </select>
-
-                                <span class="label" style="margin-left:15px;">▶ 품목명</span>
+                            </div>
+                            <div>
+                                <span class="label">▶ 품목명</span>
                                 <select name="item_num" id="prodItemNum" class="form-control">
                                     <option value="0">선택</option>
                                     <c:forEach var="i" items="${itemList}">
@@ -78,17 +76,18 @@ response.setContentType("text/html; charset=utf-8");
                                     </c:forEach>
                                 </select>
                             </div>
+                        </div>
 
-                            <div class="sch-right">
-                                <div class="sch-input-box">
-                                    <span style="color:#888;">&#128269;</span>
-                                    <input type="text" name="keyword"
-                                           value="${param.keyword}" placeholder="계획번호 / 품목명">
-                                </div>
-                                <button type="submit" class="btn-sch">검색</button>
-                                <button type="button" class="select-reset"
-                                        onclick="location.href='/prod'">초기화</button>
+                        <!-- 3행: 키워드 검색 (우측 정렬) -->
+                        <div class="sch-row-3">
+                            <div class="sch-input-box">
+                                <span style="color:#888;">&#128269;</span>
+                                <input type="text" name="keyword"
+                                       value="${param.keyword}" placeholder="계획번호 / 품목명">
                             </div>
+                            <button type="submit" class="btn-sch">검색</button>
+                            <button type="button" class="select-reset"
+                                    onclick="location.href='/prod'">검색 초기화</button>
                         </div>
 
                     </div>
@@ -218,39 +217,7 @@ response.setContentType("text/html; charset=utf-8");
         </div>
     </div>
 
-    <script>
-        /* 품목분류 → 품목명 연계 드롭다운 */
-        function filterProdItems() {
-            var type = document.getElementById('prodItemType').value;
-            var sel  = document.getElementById('prodItemNum');
-            sel.value = '0';
-            Array.from(sel.options).forEach(function(opt) {
-                if (!opt.value || opt.value === '0') return;
-                opt.style.display = (!type || opt.dataset.type === type) ? '' : 'none';
-            });
-        }
-        window.addEventListener('load', function() { filterProdItems(); });
-
-        /* 날짜 유효성 */
-        function validateDate() {
-            var start = document.getElementById('startDate').value;
-            var end   = document.getElementById('endDate').value;
-            if (start && end && start > end) {
-                alert("시작 날짜는 종료 날짜보다 이후일 수 없습니다.");
-                document.getElementById('endDate').value = "";
-            }
-        }
-        /* 모달 열기/닫기 */
-        document.getElementById('btnOpenModal').addEventListener('click', function() {
-            document.getElementById('regModal').style.display = 'flex';
-        });
-        document.getElementById('btnCloseModal').addEventListener('click', function() {
-            document.getElementById('regModal').style.display = 'none';
-        });
-        document.getElementById('regModal').addEventListener('click', function(e) {
-            if (e.target === this) this.style.display = 'none';
-        });
-    </script>
+    <script src="/resources/js/prod/prod.js"></script>
 
 </body>
 </html>

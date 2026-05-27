@@ -8,7 +8,7 @@
 .mat-body  { display: flex; flex: 1; }
 .main-cont { flex: 1; padding: 2rem 2.5rem; min-width: 0; }
 
-/* ── 페이지 콘텐츠 타이틀 헤더 (layout.jsp의 .hdr 네비바와 클래스 충돌 방지용 .page-hdr 사용) ── */
+/* ── 페이지 콘텐츠 타이틀 헤더 ── */
 .page-hdr {
     display: flex; justify-content: space-between; align-items: center;
     background-color: #2D6A4F; padding: 15px 25px; border-radius: 8px;
@@ -26,11 +26,29 @@
 .sch-wrap {
     background-color: #fff; border: 1px solid #bbb; border-radius: 10px;
     padding: 20px 25px; margin-bottom: 25px; box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+    display: flex; flex-direction: column; gap: 15px;
 }
-.sch-row  { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-.sch-row:last-child { margin-bottom: 0; }
+
+/* 구형 호환 — sch-row / sch-left / sch-right */
+.sch-row  { display: flex; justify-content: space-between; align-items: center; }
 .sch-left, .sch-right { display: flex; align-items: center; gap: 12px; }
-.label { font-size: 0.95rem; font-weight: bold; color: #333; display: flex; align-items: center; }
+
+/* selectBom 3행 구조 */
+.sch-row-1, .sch-row-3 {
+    display: flex; align-items: center; width: 100%; gap: 15px;
+}
+.sch-row-2 {
+    display: flex; align-items: center; width: 100%; gap: 30px;
+}
+.sch-row-2 > div {
+    flex: 1; display: flex; align-items: center; gap: 15px;
+}
+.sch-row-3 { justify-content: flex-end; }
+
+/* sch-row-2 내 select는 남은 공간을 채움 */
+.sch-row-2 > div select.form-control { flex: 1; width: auto; }
+
+.label { font-size: 0.95rem; font-weight: bold; color: #333; display: flex; align-items: center; white-space: nowrap; min-width: 75px; }
 
 /* ── 폼 컨트롤 ── */
 .form-control {
@@ -44,7 +62,7 @@ select.form-control { width: 140px; }
 .sch-input-box {
     display: flex; align-items: center; border: 1px solid #aaa;
     border-radius: 4px; height: 38px; background: #fff;
-    padding-left: 10px; width: 250px;
+    padding-left: 10px; width: 250px; flex-shrink: 0;
 }
 .sch-input-box input {
     border: none; outline: none; height: 100%;
@@ -56,6 +74,7 @@ select.form-control { width: 140px; }
     height: 38px; padding: 0 20px; background-color: #fff; color: #2D6A4F;
     border: 1px solid #2D6A4F; border-radius: 4px; font-size: 1rem;
     font-weight: bold; cursor: pointer; transition: 0.2s;
+    white-space: nowrap; flex-shrink: 0;
 }
 .btn-sch:hover { background-color: #B7E4C7; }
 
@@ -63,6 +82,7 @@ select.form-control { width: 140px; }
     height: 38px; padding: 0 20px; background-color: #fff; color: #2D6A4F;
     border: 1px solid #2D6A4F; border-radius: 4px; font-size: 1rem;
     font-weight: bold; cursor: pointer; transition: 0.2s;
+    white-space: nowrap; flex-shrink: 0;
 }
 .select-reset:hover { background-color: #FFB703; }
 
@@ -76,7 +96,7 @@ select.form-control { width: 140px; }
 .stk-tbl td { padding: 12px 10px; border: 1px solid #ccc; text-align: center; color: #333; font-size: 0.95rem; }
 .stk-tbl tbody tr:hover { background-color: #f1f8f5; }
 
-/* 번호 컬럼 / 빈 행 (인라인 style 대체) */
+/* 번호 컬럼 / 빈 행 */
 .col-no    { width: 60px; }
 .num-cell  { font-weight: bold; color: #555; }
 .empty-cell { padding: 40px 10px !important; color: #aaa; }
@@ -90,17 +110,13 @@ select.form-control { width: 140px; }
     display: inline-block; padding: 3px 10px; border-radius: 12px;
     font-size: 11px; font-weight: bold; background: #B7E4C7; color: #2D6A4F;
 }
-
-/* work / prod 상태 (DB 한글값 기준) */
-.badge-wait     { background: #E9ECEF; color: #6C757D; }   /* 대기 — 회색   */
-.badge-progress { background: #FFF3CD; color: #856404; }   /* 진행 — 노랑   */
-.badge-done     { background: #D1E7DD; color: #0A3622; }   /* 완료 — 진초록 */
-.badge-cancel   { background: #F8D7DA; color: #842029; }   /* 취소 — 빨강   */
-
-/* lot 상태 (DB 영문값 유지, 색상만 구별) */
-.badge-available { background: #D1E7DD; color: #0A3622; }  /* AVAILABLE — 초록 */
-.badge-used      { background: #E9ECEF; color: #6C757D; }  /* USED      — 회색 */
-.badge-expired   { background: #FFE5D0; color: #923D00; }  /* EXPIRED   — 주황 */
+.badge-wait     { background: #E9ECEF; color: #6C757D; }
+.badge-progress { background: #FFF3CD; color: #856404; }
+.badge-done     { background: #D1E7DD; color: #0A3622; }
+.badge-cancel   { background: #F8D7DA; color: #842029; }
+.badge-available { background: #D1E7DD; color: #0A3622; }
+.badge-used      { background: #E9ECEF; color: #6C757D; }
+.badge-expired   { background: #FFE5D0; color: #923D00; }
 
 /* ── 페이지네이션 ── */
 .pg-wrap { text-align: center; margin-top: 1.5rem; }
@@ -118,26 +134,21 @@ select.form-control { width: 140px; }
 @media (max-width: 768px) {
     .main-cont { padding: 1.2rem 1rem; }
 
-    /* 필터 행: 가로 → 세로 쌓기 (.sch-left / .sch-right가 순서대로 내려감) */
-    .sch-row {
+    .sch-row, .sch-row-1, .sch-row-2, .sch-row-3 {
         flex-direction: column;
         align-items: stretch;
         gap: 10px;
     }
-
-    /* 각 섹션 내부: flex-wrap으로 자연스럽게 줄바꿈 허용 */
-    .sch-left, .sch-right {
-        flex-wrap: wrap;
-        gap: 8px 10px;
-    }
+    .sch-left, .sch-right { flex-wrap: wrap; gap: 8px 10px; }
     .sch-right { justify-content: flex-start; }
+    .sch-row-2 > div { flex-direction: column; align-items: stretch; }
+    .sch-row-3 { justify-content: flex-start; }
 
-    /* 날짜 입력·select: 고정폭 제거 → 신축 */
     input[type="date"].form-control { flex: 1 1 130px; }
     select.form-control             { flex: 1 1 120px; width: auto; }
+    .sch-row-2 > div select.form-control { flex: 1 1 120px; }
     .sch-input-box                  { flex: 1 1 180px; width: auto; }
 
-    /* 테이블: 가로 스크롤로 삐져나가기 방지 */
     .tbl-box { overflow-x: auto; -webkit-overflow-scrolling: touch; }
     .stk-tbl { min-width: 600px; }
 }
@@ -153,16 +164,12 @@ select.form-control { width: 140px; }
 
     .sch-wrap { padding: 14px 12px; }
 
-    /* 필터 내부: 완전 세로 쌓기 — 각 항목이 한 줄씩 차지 */
-    .sch-left, .sch-right {
-        flex-direction: column;
-        align-items: stretch;
-    }
+    .sch-left, .sch-right { flex-direction: column; align-items: stretch; }
     input[type="date"].form-control { width: 100%; flex: none; }
     select.form-control             { width: 100%; flex: none; }
+    .sch-row-2 > div select.form-control { width: 100%; flex: none; }
     .sch-input-box                  { width: 100%; flex: none; }
     .btn-sch, .select-reset         { width: 100%; }
 
-    /* 페이지네이션 줄바꿈 */
     .pg-wrap { flex-wrap: wrap; }
 }

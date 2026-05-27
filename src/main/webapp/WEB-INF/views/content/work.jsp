@@ -7,30 +7,30 @@
 <!-- 타이틀 헤더 -->
 <div class="page-hdr">
     <h1>작업지시 관리</h1>
-    <button class="btn-reg" onclick="document.getElementById('workRegModal').style.display='flex'">+ 등록</button>
+    <button class="btn-reg" onclick="document.getElementById('workRegModal').style.display='flex'">+ 등록하기</button>
 </div>
 
 <!-- 검색 필터 -->
 <form id="searchForm" method="get" action="/work">
     <div class="sch-wrap">
-        <div class="sch-row">
-            <div class="sch-left">
-                <span class="label">▶ 기간</span>
-                <input type="date" name="startDate" value="${page.startDate}" class="form-control">
-                <span style="font-weight:bold;color:#666;">~</span>
-                <input type="date" name="endDate"   value="${page.endDate}"   class="form-control">
-                <span class="label" style="margin-left:10px;">▶ 상태</span>
-                <select name="work_status" class="form-control">
-                    <option value="">상태 선택</option>
-                    <option value="대기"  <c:if test="${page.work_status == '대기'}">selected</c:if>>대기</option>
-                    <option value="진행"  <c:if test="${page.work_status == '진행'}">selected</c:if>>진행</option>
-                    <option value="완료"  <c:if test="${page.work_status == '완료'}">selected</c:if>>완료</option>
-                    <option value="취소"  <c:if test="${page.work_status == '취소'}">selected</c:if>>취소</option>
-                </select>
-            </div>
+        <!-- 1행: 기간 + 상태 -->
+        <div class="sch-row-1">
+            <span class="label">▶ 기간</span>
+            <input type="date" name="startDate" value="${page.startDate}" class="form-control">
+            <span style="font-weight:bold;color:#666;">~</span>
+            <input type="date" name="endDate"   value="${page.endDate}"   class="form-control">
+            <span class="label">▶ 상태</span>
+            <select name="work_status" class="form-control">
+                <option value="">상태 선택</option>
+                <option value="대기"  <c:if test="${page.work_status == '대기'}">selected</c:if>>대기</option>
+                <option value="진행"  <c:if test="${page.work_status == '진행'}">selected</c:if>>진행</option>
+                <option value="완료"  <c:if test="${page.work_status == '완료'}">selected</c:if>>완료</option>
+                <option value="취소"  <c:if test="${page.work_status == '취소'}">selected</c:if>>취소</option>
+            </select>
         </div>
-        <div class="sch-row">
-            <div class="sch-left">
+        <!-- 2행: 품목분류 | 품목명 (50:50) -->
+        <div class="sch-row-2">
+            <div>
                 <span class="label">▶ 품목분류</span>
                 <select name="item_type" id="workItemType" class="form-control"
                         onchange="filterWorkItems()">
@@ -38,8 +38,9 @@
                     <option value="SEMIPRODUCT" <c:if test="${page.item_type == 'SEMIPRODUCT'}">selected</c:if>>반제품</option>
                     <option value="PRODUCT"     <c:if test="${page.item_type == 'PRODUCT'}">selected</c:if>>완제품</option>
                 </select>
-
-                <span class="label" style="margin-left:10px;">▶ 품목명</span>
+            </div>
+            <div>
+                <span class="label">▶ 품목명</span>
                 <select name="item_num" id="workItemNum" class="form-control">
                     <option value="0">선택</option>
                     <c:forEach var="i" items="${itemList}">
@@ -48,14 +49,15 @@
                     </c:forEach>
                 </select>
             </div>
-            <div class="sch-right">
-                <div class="sch-input-box">
-                    <span style="color:#888;">&#128269;</span>
-                    <input type="text" name="keyword" value="${page.keyword}" placeholder="작업번호 / 품목명">
-                </div>
-                <button type="submit" class="btn-sch">검색</button>
-                <button type="button" class="select-reset" onclick="location.href='/work'">초기화</button>
+        </div>
+        <!-- 3행: 키워드 검색 (우측 정렬) -->
+        <div class="sch-row-3">
+            <div class="sch-input-box">
+                <span style="color:#888;">&#128269;</span>
+                <input type="text" name="keyword" value="${page.keyword}" placeholder="작업번호 / 품목명">
             </div>
+            <button type="submit" class="btn-sch">검색</button>
+            <button type="button" class="select-reset" onclick="location.href='/work'">검색 초기화</button>
         </div>
     </div>
     <input type="hidden" name="page" id="pageInput" value="1">
@@ -211,113 +213,4 @@
     </div>
 </div>
 
-<script>
-function movePage(p) {
-    document.getElementById('pageInput').value = p;
-    document.getElementById('searchForm').submit();
-}
-document.getElementById('workRegModal').addEventListener('click', function(e) {
-    if (e.target === this) this.style.display = 'none';
-});
-document.getElementById('planSearchModal').addEventListener('click', function(e) {
-    if (e.target === this) this.style.display = 'none';
-});
-
-/* 품목분류 → 품목명 연계 드롭다운 */
-function filterWorkItems() {
-    var type = document.getElementById('workItemType').value;
-    var sel  = document.getElementById('workItemNum');
-    sel.value = '0';
-    Array.from(sel.options).forEach(function(opt) {
-        if (!opt.value || opt.value === '0') return;
-        opt.style.display = (!type || opt.dataset.type === type) ? '' : 'none';
-    });
-}
-window.addEventListener('load', function() { filterWorkItems(); });
-
-/* ── 등록 submit 전 검증 ── */
-function validateReg() {
-    if (!document.getElementById('planNumInput').value) {
-        alert('생산계획을 선택해주세요.');
-        return false;
-    }
-    return true;
-}
-
-/* ── 생산계획 검색 모달 ── */
-function openPlanModal() {
-    document.getElementById('planSearchModal').style.display = 'flex';
-    document.getElementById('planKeyword').value = '';
-    searchPlans(1);
-}
-
-/* Enter 키로도 검색 */
-document.getElementById('planKeyword').addEventListener('keydown', function(e) {
-    if (e.key === 'Enter') searchPlans(1);
-});
-
-function searchPlans(page) {
-    var keyword = document.getElementById('planKeyword').value;
-    fetch('/work/plans?keyword=' + encodeURIComponent(keyword) + '&page=' + page)
-        .then(function(r) { return r.json(); })
-        .then(function(data) {
-            renderPlanTable(data.list);
-            renderPlanPaging(data.currentPage, data.totalPages);
-        })
-        .catch(function() { alert('검색 중 오류가 발생했습니다.'); });
-}
-
-function renderPlanTable(list) {
-    var tbody = document.getElementById('planSearchBody');
-    if (!list || list.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:20px;color:#888;">검색 결과가 없습니다.</td></tr>';
-        return;
-    }
-    var html = '';
-    list.forEach(function(p) {
-        html += '<tr style="cursor:pointer;" onclick="selectPlan(\'' + p.plan_id + '\',\'' + p.plan_num + '\')">'
-              + '<td style="text-align:center;">' + (p.plan_id || '') + '</td>'
-              + '<td style="text-align:center;">' + (p.item_name || '') + '</td>'
-              + '<td style="text-align:center;">' + (p.plan_qty || '') + '</td>'
-              + '<td style="text-align:center;">' + fmtDate(p.plan_start) + '</td>'
-              + '<td style="text-align:center;">' + fmtDate(p.plan_end) + '</td>'
-              + '<td style="text-align:center;">' + (p.plan_status || '') + '</td>'
-              + '</tr>';
-    });
-    tbody.innerHTML = html;
-}
-
-function fmtDate(ts) {
-    if (!ts) return '-';
-    var d = new Date(ts);
-    var y = d.getFullYear();
-    var m = String(d.getMonth() + 1).padStart(2, '0');
-    var day = String(d.getDate()).padStart(2, '0');
-    return y + '-' + m + '-' + day;
-}
-
-function renderPlanPaging(cur, total) {
-    var wrap = document.getElementById('planPagination');
-    var html = '';
-    if (cur > 1) {
-        html += '<a href="#" class="pg-btn" onclick="searchPlans(' + (cur - 1) + ');return false;">이전</a>';
-    }
-    for (var p = 1; p <= total; p++) {
-        if (p === cur) {
-            html += '<a href="#" class="pg-btn pg-active">' + p + '</a>';
-        } else {
-            html += '<a href="#" class="pg-btn" onclick="searchPlans(' + p + ');return false;">' + p + '</a>';
-        }
-    }
-    if (cur < total) {
-        html += '<a href="#" class="pg-btn" onclick="searchPlans(' + (cur + 1) + ');return false;">다음</a>';
-    }
-    wrap.innerHTML = html;
-}
-
-function selectPlan(planId, planNum) {
-    document.getElementById('planDisplay').value  = planId;
-    document.getElementById('planNumInput').value = planNum;
-    document.getElementById('planSearchModal').style.display = 'none';
-}
-</script>
+<script src="/resources/js/work/work.js"></script>
