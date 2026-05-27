@@ -27,9 +27,15 @@ public class EquipServiceImpl implements EquipService{
 	public List selectItemEquip() {
 		return equipDAO.selectItemEquip();
 	}
+	@Override
+	public List selectEmp() {
+		return equipDAO.selectEmp();
+	}
 	
 	public List searchEquip(Map map) {
 		return equipDAO.searchEquip(map);
 	}
+
+
 
 }

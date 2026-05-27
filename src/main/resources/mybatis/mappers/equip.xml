@@ -76,6 +76,13 @@
 		FROM item
 		WHERE "TYPE" = 'EQUIP'
 	</select>
+	<!-- Select Emp -->
+	<select id="selectEmp" resultType="EquipDTO">
+		SELECT 
+			emp_num,
+			ename
+		FROM emp
+	</select>
 
 <!-- 기계 누적 가동시간 UPDATE -->
 	<update id="total_runtime">

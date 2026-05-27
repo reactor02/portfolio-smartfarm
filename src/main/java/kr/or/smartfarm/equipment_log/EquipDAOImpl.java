@@ -29,12 +29,16 @@ public class EquipDAOImpl implements EquipDAO{
 	public List selectItemEquip() {
 		return sqlSession.selectList("mapper.equip.selectItemEquip");
 	}
+	@Override
+	public List selectEmp() {
+		return sqlSession.selectList("mapper.equip.selectEmp");
+	}
 
 	@Override
 	public List searchEquip(Map map) {
 		List result = null;
 		int pageNum = (Integer)map.get("page");
-		PageHelper.startPage(pageNum, 5);
+		PageHelper.startPage(pageNum, 10);
 		result = sqlSession.selectList("mapper.equip.searchEquip", map);
 		return result;
 	}

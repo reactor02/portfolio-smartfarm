@@ -37,6 +37,9 @@ public class EquipController {
 		List item = equipService.selectItemEquip();
 		model.addAttribute("item", item);
 		
+		List emp = equipService.selectEmp();
+		model.addAttribute("emp", emp);
+		
 		PageInfo<Map<String, Object>> pageInfo = new PageInfo<Map<String, Object>>(result);
 		model.addAttribute("pageInfo", pageInfo);
 		
@@ -66,9 +69,12 @@ public class EquipController {
 
 	        result.put("status", "good");
 	        if(searchResult != null) {
+	        	
 	        	PageInfo<Map<String, Object>> pageInfo = new PageInfo<Map<String, Object>>(searchResult);
+	        	System.out.println("pageInfo === " + pageInfo);
 	        	result.put("pageInfo", pageInfo);
 	        }else {
+	        	System.out.println("else 탔음!!!");
 	        	PageInfo pageInfo = new PageInfo();
 	        	result.put("pageInfo", pageInfo);
 	        }
