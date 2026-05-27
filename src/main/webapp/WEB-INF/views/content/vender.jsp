@@ -1,24 +1,25 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8"%>
-    
- <%
+	pageEncoding="UTF-8"%>
+
+<%
 request.setCharacterEncoding("utf-8");
 String vender_type = request.getParameter("vender_type");
 %>
-    
-    <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-    <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
-    <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
-    <%@ taglib prefix="tiles" uri="http://tiles.apache.org/tags-tiles"%>
-    
-    
+
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+<%@ taglib prefix="tiles" uri="http://tiles.apache.org/tags-tiles"%>
+
+
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>거래처 관리</title>
-<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/paging.css">
+<link rel="stylesheet"
+	href="${pageContext.request.contextPath}/resources/css/paging.css">
 <link rel="stylesheet" href="/resources/css/list-common.css">
 <link rel="stylesheet" href="/resources/css/modal.css">
 
@@ -380,123 +381,127 @@ select.form-control {
 
 </head>
 <body>
-	<div class="mat-all"> 
+	<div class="mat-all">
 		<tiles:insertAttribute name="header" ignore="true" />
-		
+
 		<div class="mat-body">
 			<main class="main-cont">
-			
+
 				<div class="hdr">
 					<h1>거래처 관리</h1>
-					<button type="button" class="btn-reg link-txt" id="btnOpenWorkModal" >+ 등록하기</button>
+					<button type="button" class="btn-reg link-txt"
+						id="btnOpenWorkModal">+ 등록하기</button>
 				</div>
-				
+
 				<%-- 검색창 action --%>
-				<form name="searchFrm" action="" method="get">
+				<form name="searchFrm" action="${pageContext.request.contextPath}/vender/search" method="get">
 					<div class="sch-wrap">
 						<div class="sch-row">
-						
+
 							<div class="sch-left">
-								<span class="label">▶ 거래처명</span>
-								<select class="form-control"> 
-									<option></option>
+								<span class="label">▶ 거래 유형</span> <select class="form-control" name="type">
+									<option value="">선택</option>
+									<option value="공급업체">공급업체</option>
+									<option value="고객사">고객사</option>
+									<option value="협력업체">협력업체</option>
+									<option value="유통업체">유통업체</option>
 								</select>
-						
-							
+
+
 							</div>
 							<div class="sch-right">
 								<div class="sch-input-box">
-									<span style="color: #888;">&#128269;</span>
-									<input type="text" id="keyword" value="" placeholder="거래처명 검색">
-								
+									<span style="color: #888;">&#128269;</span> <input type="text"
+										id="keyword" name="keyword" placeholder="거래처명 검색">
+
 								</div>
-								<button type="button" class="btn-sch" id="search">검색</button>
-								<button type="button" class="btn-sch" id="init">초기화</button>
+								<button type="submit" class="btn-sch" id="search">검색</button>
+								<button type="button" class="btn-sch" id="init">검색 초기화</button>
 							</div>
 						</div>
 					</div>
-				
+
 				</form>
-				
+
 				<%-- 테이블 리스트 --%>
-				
+
 				<div class="tbl-box">
-				<table class="ven-tbl">
-					<thead>
-						<tr>
-							<th>no.</th>
-							<th>거래처명</th>
-							<th>거래처 담당자</th>
-							<th>거래 유형</th>
-							<th>거래처 연락처</th>
-							<th>거래처 주소</th>
-							<th>담당 사원</th>
-						</tr>
-					</thead>
-					<tbody id ="tbody"></tbody>
-				</table>
+					<table class="ven-tbl">
+						<thead>
+							<tr>
+								<th>no.</th>
+								<th>거래처명</th>
+								<th>거래처 담당자</th>
+								<th>거래 유형</th>
+								<th>거래처 연락처</th>
+								<th>거래처 주소</th>
+								<th>담당 사원</th>
+							</tr>
+						</thead>
+						<tbody id="tbody"></tbody>
+					</table>
 				</div>
-				
+
 				<div class="table-responsive"></div>
-			
-			<jsp:include page="/WEB-INF/views/common/paging.jsp" />
+
+				<jsp:include page="/WEB-INF/views/common/paging.jsp" />
 			</main>
-		
+
 		</div>
 		<tiles:insertAttribute name="footer" ignore="true" />
 	</div>
-	
+
 	<!-- 거래처 등록 모달 -->
-		<div id="workModal" class="modal-overlay">
-			<div class="modal-box">
-				<h3 class="modal-title">거래처 등록</h3>
-				<form id="venRegForm" action = "/vender/insert" method="post" accept-charset="UTF-8">
-					<div class="modal-grid"> 
-						<div class="modal-field">
-							<label>거래처명</label> 
-								<input type="text" name="vender_name" placeholder="거래처명">
-						</div>
-						<div class="modal-field"> 
-							<label>대표자명</label>
-							<input type="text" name="ven_ename" placeholder="대표자명">
-						</div>
-						<div class="modal-field"> 
-							<label>사업자등록번호</label>
-							<input type="text" name="biz_no" placeholder="사업자등록번호">
-						</div>
-						<div class="modal-field"> 
-							<label>거래처 타입</label>
-							<select name="vender_type" >
-								<option value="">선택</option>
-								<option value="공급업체">공급업체</option>
-								<option value="고객사">고객사</option>
-								<option value="협력업체">협력업체</option>
-								<option value="유통업체">유통업체</option>
-							</select>
-						</div>
-						<div class="modal-field"> 
-							<label>연락처</label>
-							<input type="text" name="vender_phone" placeholder="연락처">
-						</div>
-						<div class="modal-field"> 
-							<label>주소</label>
-							<input type="text" name="vender_addr" placeholder="주소">
-						</div>
-						<div class="modal-field"> 
-							<label>담당 사원</label>
-							<input type="number" name="emp_num" placeholder="사원번호">
-						</div>
+	<div id="workModal" class="modal-overlay">
+		<div class="modal-box">
+			<h3 class="modal-title">거래처 등록</h3>
+			<form id="venRegForm" action="/vender/insert" method="post"
+				accept-charset="UTF-8">
+				<div class="modal-grid">
+					<div class="modal-field">
+						<label>거래처명</label> <input type="text" name="vender_name"
+							placeholder="거래처명">
 					</div>
-					<div class="modal-btn-wrap">
-						<button type="submit" class="btn-submit">등록</button>
-						<button type="button" class="btn-close" id="btnCloseWorkModal">닫기</button>
+					<div class="modal-field">
+						<label>대표자명</label> <input type="text" name="ven_ename"
+							placeholder="대표자명">
 					</div>
-				</form>
-			</div>
+					<div class="modal-field">
+						<label>사업자등록번호</label> <input type="text" name="biz_no"
+							placeholder="사업자등록번호">
+					</div>
+					<div class="modal-field">
+						<label>거래처 타입</label> <select name="vender_type">
+							<option value="">선택</option>
+							<option value="공급업체">공급업체</option>
+							<option value="고객사">고객사</option>
+							<option value="협력업체">협력업체</option>
+							<option value="유통업체">유통업체</option>
+						</select>
+					</div>
+					<div class="modal-field">
+						<label>연락처</label> <input type="text" name="vender_phone"
+							placeholder="연락처">
+					</div>
+					<div class="modal-field">
+						<label>주소</label> <input type="text" name="vender_addr"
+							placeholder="주소">
+					</div>
+					<div class="modal-field">
+						<label>담당 사원</label> <input type="number" name="emp_num"
+							placeholder="사원번호">
+					</div>
+				</div>
+				<div class="modal-btn-wrap">
+					<button type="submit" class="btn-submit">등록</button>
+					<button type="button" class="btn-close" id="btnCloseWorkModal">닫기</button>
+				</div>
+			</form>
 		</div>
+	</div>
 
 
-<script>
+	<script>
 	window.addEventListener('load',()=>{
 		bind()
 	})
@@ -506,7 +511,7 @@ select.form-control {
 	function bind(){
 			
 			
-			fetch(`vender/list?page=`+ page,{
+			fetch(`/vender/list?page=`+ page,{
 				method:'get'
 			}).then(
 				resp => resp.json()		

@@ -112,18 +112,18 @@
 <div class="pw-change-container">
 	<p class="section-title">아이디/비밀번호 찾기</p>
 
-	<form class="pw-change-form">
+	<form method="post" action="/searchpw" class="pw-change-form">
 		<div class="input-group-container">
 			<!-- 사원번호 입력 -->
 			<div class="input-group">
 				<label for="emp-no">사원번호 :</label> <input id="emp_no" type="text" name="emp_num"
 					placeholder="사원번호를 입력해주세요." class="input-field" required
-					pattern="\S+" title="사원번호를 입력해주세요.">
+					pattern="^[^\s]+$" title="사원번호를 입력해주세요.">
 			</div>
 			<!-- 현재 비밀번호 입력 -->
 			<div class="input-group">
 				<label for="current-pw">개인정보 :</label> <input type="password"
-					id="current-pw" required>
+					name="secret" id="current-pw" required pattern="^[^\s]+$">
 			</div>
 		</div>
 

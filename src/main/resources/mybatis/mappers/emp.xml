@@ -6,7 +6,7 @@
 
 	<select id="loginCheck"
 		resultType="kr.or.smartfarm.login.LoginDTO">
-		SELECT emp_num, pw
+		SELECT *
 		FROM emp
 		where emp_num = #{ emp_num }
 		and pw = #{ pw }
@@ -22,7 +22,7 @@
 
 	<select id="selectd"
 		resultType="kr.or.smartfarm.usermanage.UserManageDTO">
-		SELECT dept_name
+		SELECT dept_name, dept_num
 		FROM dept
 	</select>
 
@@ -33,6 +33,51 @@
 		ON e.dept_num = d.dept_num
 		WHERE e."E_LEVEL" > 2
 	</select>
+	
+<update id="userDUpdate" parameterType="UserManageDTO">
+    <!-- 인사관리자용: 오직 부서(dept_num)만 수정 가능하도록 제한 -->
+    UPDATE emp
+    SET dept_num = #{dept_num}
+    WHERE emp_num = #{emp_num}
+</update>
+
+<update id="userPUpdate" parameterType="UserManageDTO">
+    <!-- 사장님용: 부서, 권한을 선택적으로 모두 수정 가능 -->
+    UPDATE emp
+    <set>
+        <if test="dept_num != null and dept_num != ''">
+            dept_num = #{dept_num},
+        </if>
+        <if test="e_level != null and e_level != ''">
+            e_level = #{e_level},
+        </if>
+    </set>
+    WHERE emp_num = #{emp_num}
+</update>	
+
+	<insert id="userInsert" parameterType="kr.or.smartfarm.usermanage.UserManageDTO">
+    INSERT INTO emp (
+        EMP_NUM,          <!-- 사원번호 컬럼 -->
+        ENAME,            <!-- 이름 -->
+        PW,               <!-- 비밀번호 (암호화된 문자열) -->
+        E_LEVEL,          <!-- 권한 레벨 -->
+        TEL,              <!-- 연락처 -->
+        HIRE_DATE,        <!-- 입사일 (현재시간) -->
+        STATUS,           <!-- 재직상태 ('Y') -->
+        SECRET,           <!-- 개인정보 -->
+        DEPT_NUM          <!-- 부서번호 -->
+    ) VALUES (
+        EMP_SEQ.NEXTVAL,  <!-- 💡 확인하신 시퀀스로 자동 번호 생성! -->
+        #{ename},
+        #{pw},
+        #{e_level},
+        #{tel},
+        SYSDATE,          <!-- 오라클 현재 날짜 주입 -->
+        'Y',              <!-- 기본값 정상 재직('Y') 주입 -->
+        #{secret},
+        #{dept_num}
+    )
+</insert>
 
 	<select id="selectl"
 		resultType="kr.or.smartfarm.usermanage.UserManageDTO">
@@ -47,7 +92,47 @@
 		SELECT *
 		FROM emp e left outer join dept d
 		on e.dept_num = d.dept_num
+		order by emp_num desc
 	</select>
+	
+	<select id="userSearch" 
+        resultType="kr.or.smartfarm.usermanage.UserManageDTO">
+    SELECT 
+        e.emp_num,
+        e.ename,
+        e.pw,
+        e.e_level,
+        e.tel,
+        e.hire_date,
+        e.status,
+        e.termination_date,
+        e.secret,
+        e.dept_num,
+        d.dept_name
+    FROM emp e 
+    LEFT OUTER JOIN dept d ON e.dept_num = d.dept_num
+    <where>
+        <!-- 1. 부서 일치 조건 (부서번호가 담겨왔을 때만) -->
+        <if test="dept_num != null and dept_num != ''">
+            AND e.dept_num = #{dept_num}
+        </if>
+        
+        <!-- 2. 권한 일치 조건 (권한이 담겨왔을 때만) -->
+        <if test="e_level != null and e_level != ''">
+            AND e.e_level = #{e_level}
+        </if>
+        
+        <!-- 3. 사원번호 또는 이름 키워드 포함 조건 (LIKE 검색) -->
+        <if test="keyword != null and keyword != ''">
+            AND (
+                e.emp_num LIKE '%' || #{keyword} || '%'
+                OR e.ename LIKE '%' || #{keyword} || '%'
+            )
+        </if>
+    </where>
+    ORDER BY e.emp_num DESC
+</select>
+	
 
 	<select id="searchpw"
 		resultType="kr.or.smartfarm.changepw.ChangepwDTO">

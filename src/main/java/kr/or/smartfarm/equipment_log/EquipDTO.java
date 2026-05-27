@@ -16,6 +16,7 @@ public class EquipDTO {
 	private Date maintenance_date;
 	private Date start_date;
 	private Date end_date;
+	private int total_runtime;
 	
 	// item
 	private int item_num;

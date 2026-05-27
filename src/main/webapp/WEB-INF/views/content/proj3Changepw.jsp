@@ -36,7 +36,7 @@
 <div class="pw-change-container">
     <p class="section-title">비밀번호 변경</p>
 
-    <form class="pw-change-form">
+    <form method="post" action="/changepw" class="pw-change-form">
         <div class="input-group-container">
             <!-- 사원번호 입력 -->
             <!-- 현재 비밀번호 입력 -->
@@ -56,7 +56,7 @@
                 <label for="new-pw" style="font-size : 0.75em;">비밀번호확인 :</label>
                  <input type="password" 
                  id="new-pw"
-           name="pw" 
+           name="pw2" 
            placeholder="비밀번호를 입력해주세요." 
            class="input-field" 
            required

@@ -28,7 +28,7 @@ public class LoginDAOImpl implements LoginDAO{
 	public LoginDTO loginCheck(LoginDTO loginDTO) {
 		// TODO Auto-generated method stub
 		
-		LoginDTO result = sqlSession.selectOne(NAMESPACE + "loginCheck", loginDTO.getEmp_num());
+		LoginDTO result = sqlSession.selectOne(NAMESPACE + "loginCheck", loginDTO);
 		
 		return result;
 	}

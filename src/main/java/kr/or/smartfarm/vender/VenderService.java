@@ -16,6 +16,9 @@ public interface VenderService {
 	// 아이디로 찾기 
 	VenderDTO findById(int vender_num);
 	
+	// 검색
+	List<VenderDTO> search(VenderDTO venderDTO);
+	
 
 	
 }

@@ -19,10 +19,30 @@ public class EquipDAOImpl implements EquipDAO{
 	public List<EquipDTO> selectAll(int pageNum) {
 		
 		PageHelper.startPage(pageNum, 10);
-		
 		List<EquipDTO> result = sqlSession.selectList("mapper.equip.selectAllEquip");
 		
 		return result;
+//		int total_runtime = sqlSession.update("mapper.equip.total_runtime");
 	}
+
+	@Override
+	public List selectItemEquip() {
+		return sqlSession.selectList("mapper.equip.selectItemEquip");
+	}
+	@Override
+	public List selectEmp() {
+		return sqlSession.selectList("mapper.equip.selectEmp");
+	}
+
+	@Override
+	public List searchEquip(Map map) {
+		List result = null;
+		int pageNum = (Integer)map.get("page");
+		PageHelper.startPage(pageNum, 10);
+		result = sqlSession.selectList("mapper.equip.searchEquip", map);
+		return result;
+	}
+	
+	
 	
 }

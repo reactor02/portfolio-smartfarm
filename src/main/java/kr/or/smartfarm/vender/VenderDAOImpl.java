@@ -67,6 +67,15 @@ public class VenderDAOImpl implements VenderDAO{
 		return venderDTO;
 	}
 
+	@Override
+	public List<VenderDTO> search(VenderDTO venderDTO) {
+		List<VenderDTO> resultList = null; 
+		
+		resultList = sqlSession.selectList("mapper.vender.searchVender", venderDTO);
+		System.out.println("search : resultList : " + resultList);
+		return resultList;
+	}
+
 
 
 }
