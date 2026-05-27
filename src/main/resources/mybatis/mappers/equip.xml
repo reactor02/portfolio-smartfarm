@@ -7,6 +7,7 @@
 
 <!-- modelConfig.xml 에서 세팅해서 별칭 만들었음 -->
 
+<!-- SELECT ALL -->
 	<select id="selectAllEquip" resultType="EquipDTO">
 		SELECT
 			equipment_log.equip_num,
@@ -16,6 +17,7 @@
 		    equipment_log.maintenance_date,
 		    equipment_log.start_date,
 		    equipment_log.end_date,
+		    equipment_log.total_runtime,
 		    item.item_num,
 		    item.code,
 		    item.name,
@@ -29,7 +31,64 @@
 		ORDER BY equipment_log.maintenance_date DESC
 	</select>
 	
+	<!-- 검색 조건에 맞게 검색 -->
+	<select id="searchEquip" resultType="hashMap" parameterType="map">
+		SELECT
+			equipment_log.equip_num,
+		    equipment_log.equip_status,
+		    equipment_log.error_sign,
+		    equipment_log.equip_action,
+		    equipment_log.maintenance_date,
+		    equipment_log.start_date,
+		    equipment_log.end_date,
+		    equipment_log.total_runtime,
+		    item.item_num,
+		    item.code,
+		    item.name,
+		    emp.emp_num,
+		    emp.ename
+		FROM equipment_log
+		JOIN item
+		    ON equipment_log.item_num = item.item_num
+		JOIN emp
+		    ON equipment_log.emp_num = emp.emp_num
+
+	    <where>
+		<!-- item_num 검색 -->
+	        <if test="type != null and type != '' and type != 'all'">
+				AND equipment_log.item_num = #{type}
+			</if>
+	    <!-- 설비명 검색 --> 
+	        <if test="keyword != null and keyword != ''">
+	        	AND upper(item.name) LIKE ('%' || upper(#{keyword}) || '%')
+	   	 	</if>
+	    </where>
+	  ORDER BY equipment_log.maintenance_date DESC
+    </select>
+    
 	
+	<!-- Select Item WHERE Equip -->
+	<select id="selectItemEquip" resultType="EquipDTO">
+		SELECT 
+			item_num,
+			code,
+			name
+		FROM item
+		WHERE "TYPE" = 'EQUIP'
+	</select>
+
+<!-- 기계 누적 가동시간 UPDATE -->
+	<update id="total_runtime">
+		UPDATE equipment_log e
+		SET total_runtime = (
+		    SELECT SUM(
+		        ROUND((e2.end_date - e2.start_date) * 86400)
+		    )
+		    FROM equipment_log e2
+		    WHERE e2.item_num = e.item_num
+		)
+	</update>
+
 </mapper>
 
 

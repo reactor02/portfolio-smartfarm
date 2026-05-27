@@ -19,77 +19,119 @@ response.setContentType("text/html; charset=utf-8");
 <head>
 <meta charset="UTF-8">
 <title>설비관리 페이지</title>
+
+<style>
+
+select.form-control {
+	width: 200px;
+}
+
+</style>
 </head>
 <body>
+
+
 
 <div class="mat-all">
 	<!-- header -->
 	<tiles:insertAttribute name="header" ignore="true" />
 	
-	<!-- 타이틀 & 등록 버튼 -->
-	<div class="page-hdr">
-	    <h1>설비관리로그</h1>
-	    <button type="button" id="btnOpenModal" class="btn-reg">+ 등록하기</button>
-	</div>
-	                
-	<!-- table -->
-	<div class="tbl-box">
-		<table class="tbl">
-			<thead>
-				<tr>
-					<th style="width: 60px;">번호</th>
-					<th>설비코드</th>
-					<th>설비명</th>
-					<th>상태</th>
-					<th>이상여부</th>
-					<th>조치사항</th>
-					<th>점검날짜</th>
-					<th>가동시작</th>
-					<th>가동종료</th>
-					<th>확인자</th>
-				</tr>
-			</thead>	
+	<div class="mat-body">
+			<main class="main-cont">
 			
-			<tbody id="">
-				<c:choose>
-					<c:when test="${not empty result}">
-						<c:forEach var="item" items="${result}">
+				<!-- 타이틀 & 등록 버튼 -->
+				<div class="hdr">
+				    <h1>설비관리로그</h1>
+				    <button type="button" id="btnOpenModal" class="btn-reg">+ 등록하기</button>
+				</div>
+				
+				<!-- search form -->
+				<form name="searchFrm" action="" method="get">
+					<div class="sch-wrap">
+						<div class="sch-row">
+						
+							<div class="sch-left">
+								<span class="label">▶ 제품명</span> 
+								<select id="mType" class="form-control">
+									<option value="all">선택</option>
+									<c:forEach var="i" items="${item}">
+										<option value="${i.item_num}">${i.code} ${i.name}</option>
+									</c:forEach>
+								</select>
+							</div>
+			
+							<div class="sch-right">
+								<div class="sch-input-box">
+									<span style="color: #888;">&#128269;</span> 
+									<input type="text" id="keyword" value="" placeholder="설비 명 검색">
+								</div>
+								<button type="button" class="btn-sch">검색</button>
+								<button type="button" class="select-reset">검색 초기화</button>
+							</div>
+							
+						</div>
+					</div>
+				</form>
+				                
+				<!-- table -->
+				<div class="tbl-box">
+					<table class="tbl">
+						<thead>
 							<tr>
-								<td style="font-weight: bold; color: #555;">${item.equip_num}</td>
-								<td>${item.code}</td>
-								<td>${item.name}</td>
-								<td>${item.equip_status}</td>
-								<td>${item.error_sign}</td>
-								<td>${item.equip_action}</td>
-								<td>${item.maintenance_date}</td>
-								<td>${item.start_date}</td>
-								<td>${item.end_date}</td>
-								<td>${item.ename}</td>
+								<th style="width: 60px;">번호</th>
+								<th>설비코드</th>
+								<th>설비명</th>
+								<th>상태</th>
+								<th>이상여부</th>
+								<th>조치사항</th>
+								<th>점검날짜</th>
+								<th>가동시작</th>
+								<th>가동종료</th>
+								<th>확인자</th>
+								<th>누적시간</th>
 							</tr>
-						</c:forEach>
-					</c:when>
-					<c:otherwise>
-						<c:forEach var="i" begin="1" end="10">
-							<tr>
-								<td style="font-weight: bold; color: #888;">${i}</td>
-								<td></td>
-								<td></td>
-								<td></td>
-								<td></td>
-								<td></td>
-							</tr>
-						</c:forEach>
-					</c:otherwise>
-				</c:choose>
-			</tbody>
-		</table>
+						</thead>	
+						
+						<tbody id="equip-body">
+							<c:choose>
+								<c:when test="${not empty result}">
+									<c:forEach var="item" items="${result}">
+										<tr>
+											<td style="font-weight: bold; color: #555;">${item.equip_num}</td>
+											<td>${item.code}</td>
+											<td>${item.name}</td>
+											<td>${item.equip_status}</td>
+											<td>${item.error_sign}</td>
+											<td>${item.equip_action}</td>
+											<td>${item.maintenance_date}</td>
+											<td>${item.start_date}</td>
+											<td>${item.end_date}</td>
+											<td>${item.ename}</td>
+											<td>${item.total_runtime}</td>
+										</tr>
+									</c:forEach>
+								</c:when>
+								<c:otherwise>
+									<c:forEach var="i" begin="1" end="10">
+										<tr>
+											<h1>데이터 없음</h1>
+										</tr>
+									</c:forEach>
+								</c:otherwise>
+							</c:choose>
+						</tbody>
+					</table>
+				</div>
+								
+								
+				<!-- paging -->
+				<div id="paging-area">
+					<jsp:include page="/WEB-INF/views/common/paging.jsp" />
+				</div>
+				
+		</main>
 	</div>
-					
-					
-	<!-- paging -->
-	<div id="paging-area">
-		<jsp:include page="/WEB-INF/views/common/paging.jsp" />
-	</div>
+</div>
 	
 	<!-- footer -->
 	<tiles:insertAttribute name="footer" ignore="true" />
@@ -157,10 +199,79 @@ response.setContentType("text/html; charset=utf-8");
 	            </form>
 </div>   
 <script>
+
+// 검색 초기화 버튼 클릭시 새로고침
+const select_reset = document.querySelector(".select-reset");
+select_reset.addEventListener('click', () => {
+	location.reload();
+})
+
+// 검색 버튼 클릭시 아작스
+const btn_sch = document.querySelector(".btn-sch");
+btn_sch.addEventListener('click', ()=>{
+	movePage(1)
+})
+
+// 검색 아작스 로직 
+function movePage(pageNum) {
+    let type = document.querySelector("#mType").value;
+    let keyword = document.querySelector("#keyword").value;
+    
+    const params = new URLSearchParams();+
+	 // 누른 페이지 번호를 전달
+    params.append("page", pageNum); 
+    params.append("type", type);
+    params.append("keyword", keyword);
+    
+    fetch(`/searchEquip?\${params.toString()}`)
+    .then(response => response.json())
+    .then(data => {
+    	if(data.searchResult.length == 0){
+    		 let tbody = document.querySelector("#equip-body");
+    	    tbody.innerHTML = "<tr><td colspan='8'>조회된 결과가 없습니다.</td></tr>";
+    	    renderPagination(data.pageInfo); // 페이지 정보도 갱신하여 페이징 버튼도 사라지게 처리
+    	    return;
+    	}
+        if(data.status === "good"){
+            // 1. 테이블 데이터 갱신
+            let tbody = document.querySelector("#equip-body");
+            tbody.innerHTML = "";
+            
+            let html = "";
+            for(let i = 0; i < data.searchResult.length; i++) {
+                let item = data.searchResult[i];
+                html += `
+                    <tr>
+                		<td style="font-weight: bold; color: #555;">
+                			\${item.equip_num}
+                		</td>
+                        <td>\${item.CODE}</td>
+                        <td>\${item.NAME}</td>
+                        <td>\${item.EQUIP_STATUS}</td>
+                        <td>\${item.ERROR_SIGN}</td>
+                        <td>\${item.EQUIP_ACTION}</td>
+                        <td>\${item.MAINTENANCE_DATE}</td>
+                        <td>\${item.START_DATE}</td>
+                        <td>\${item.END_DATE}</td>
+                        <td>\${item.ENAME}</td>
+                        <td>\${item.TOTAL_RUNTIME}</td>
+                    </tr>
+                `;
+            }
+            tbody.innerHTML = html;
+            
+            // paging 갱신
+            renderPagination(data.pageInfo);
+
+         	// 주소 변경
+            const newUrl = window.location.pathname + `?page=\${pageNum}&type=\${type}&keyword=\${keyword}`;
+            window.history.pushState({path: newUrl}, '', newUrl);
+        }
+    });
+}
+
               
-/* 모달 열기/닫기 */
- 
- 
+/* 등록 모달 열기/닫기 */
 document.getElementById('btnOpenModal').addEventListener('click', function() {
     document.getElementById('regModal').style.display = 'flex';
 });
@@ -170,6 +281,19 @@ document.getElementById('btnCloseModal').addEventListener('click', function() {
 document.getElementById('regModal').addEventListener('click', function(e) {
     if (e.target === this) this.style.display = 'none';
 });
+
+/* 날짜 유효성 검사 로직 */
+function validateDate() {
+	const start = document.querySelector('#start_date').value;
+	const end = document.querySelector('#end_date').value;
+	//(start && end) start와 end가 존재할 때 start의 값이 end보다 크면
+	if (start && end && start > end) {
+		alert("시작 날짜는 종료 날짜보다 이후일 수 없습니다.");
+		document.querySelector('#end_date').value = ""; // 초기화
+	}
+}
+
+
 </script>
 </body>
 </html>
