@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.io">
+<!-- 기본 전체 조회 로직 -->
+<select id="loadIo" resultType="hashMap">
+        SELECT 
+        i.io_type, i.io_num,
+        ii.name,
+        l.lot_num,
+        ii.type,
+        f.facility_name,
+        TO_CHAR(i.io_date, 'YYYY-MM-DD') AS io_date,
+        i.io_reason
+        FROM io i
+        JOIN lot l ON l.lot_num = i.lot_num
+        JOIN item ii ON ii.item_num = l.item_num
+        JOIN facility f ON i.facility_num = f.facility_num
+        ORDER BY i.io_num DESC
+    </select>
+<select id="facility" resultType="hashMap">
+	SELECT * FROM facility
+</select>
+
+
+<!-- 검색 조건에 맞게 검색하는 로직 -->
+	<select id="searchIo" resultType="hashMap" parameterType="map">
+    SELECT
+        i.io_type, 
+        i.io_num,
+        ii.name,
+        l.lot_num,
+        ii.type,
+        f.facility_name,
+        TO_CHAR(i.io_date, 'YYYY-MM-DD') AS io_date,
+        i.io_reason
+    FROM io i
+    JOIN lot l ON l.lot_num = i.lot_num
+    JOIN item ii ON ii.item_num = l.item_num
+    JOIN facility f ON i.facility_num = f.facility_num
+    <where>
+<!-- where 1 = 1 -->
+        <if test="type != null and type != 'all'">
+            <choose>
+                <when test="type == 'product'">
+                    AND upper(ii.type) = 'PRODUCT'
+                </when>
+                <when test="type == 'semiproduct'">
+                    AND upper(ii.type) = 'SEMIPRODUCT'
+                </when>
+                <when test="type == 'equip'">
+                    AND upper(ii.type) = 'EQUIP'
+                </when>
+                <when test="type == 'raw'">
+                    AND upper(ii.type) IN ('RAW', 'MATERIAL')
+                </when>
+            </choose>
+        </if>
+        
+        <if test="keyword != null and keyword != ''">
+            AND (
+                upper(ii.name) LIKE '%' || upper(#{keyword}) || '%'
+                OR
+                upper(l.lot_num) LIKE '%' || upper(#{keyword}) || '%'
+            )
+        </if>
+        
+        <if test="io_type != null and io_type != 'all'">
+            <choose>
+                <when test='io_type == "in"'>
+                    AND i.io_type = '입고'
+                </when>
+                <when test='io_type == "out"'>
+                    AND i.io_type = '출고'
+                </when>
+            </choose>
+        </if>
+        
+        <if test="sDate != null and sDate !=''">
+            AND i.io_date &gt;= TO_DATE(#{sDate}, 'YYYY-MM-DD')
+            <choose>
+                <when test="eDate != null and eDate!=''">
+                    AND i.io_date &lt; TO_DATE(#{eDate}, 'YYYY-MM-DD') + 1
+                </when>
+                <otherwise>
+                    AND i.io_date &lt; SYSDATE + 1
+                </otherwise>
+            </choose>
+        </if>
+    </where>
+    ORDER BY i.io_num DESC
+</select>
+    
+    
+    
+    
+    
+<!--     모달에서 ajax로 input창에 부모 검색  -->
+<select id="bomModalSearch" resultType="hashMap" parameterType="string">
+SELECT i.CODE, i.NAME, i.TYPE, i.UNIT, i.iTEM_NUM
+FROM item i
+	LEFT OUTER JOIN (
+		SELECT ITEM_NUM FROM ITEM
+ 		MINUS
+ 		SELECT ITEM_NUM FROM BOM
+	) num ON i.item_num = num.item_num
+WHERE( UPPER(NAME) LIKE  '%' || UPPER(#{_parameter}) || '%'
+OR UPPER(i.CODE) LIKE '%' || UPPER(#{_parameter}) || '%')
+AND num.ITEM_NUM IS NOT NULL
+AND i.TYPE IN ('PRODUCT', 'SEMIPRODUCT')
+</select>
+
+
+<!--     모달에서 ajax로 input창에 자식 검색  -->
+<select id="childSearch" resultType="hashMap"  parameterType="string">
+	SELECT item_num, name, code, unit FROM item
+	WHERE type != 'PRODUCT'
+	AND item_num != #{_parameter}
+</select>
+
+
+
+<!-- insert -->
+<!-- <insert id="bomInsert" parameterType="map"> -->
+<!-- 	INSERT ALL  -->
+<!-- 	<foreach collection="childList" item="item" > -->
+<!-- 	INTO BOM (BOM_NUM, REQUIRED_QTY, BOM_STATUS, ITEM_NUM, ITEM_NUM2, BOM_CODE, CREATED_AT, CHILD_QTY) -->
+<!-- 	VALUES -->
+<!-- 	(BOM_SEQ.NEXTVAL, #{parent_qty}, 'Y', #{parent_item_num}, #{item.item_num}, 'BOM_CODE_' || BOM_SEQ.CURRVAL, SYSDATE, #{item.qty}) -->
+<!-- 	</foreach> -->
+<!-- 	 SELECT * FROM DUAL -->
+<!-- </insert> -->
+
+
+<insert id="bomInsert" parameterType="map">
+    <selectKey keyProperty="bom_code" resultType="string" order="BEFORE">
+        SELECT 'BOM_CODE_' || BOM_SEQ.NEXTVAL FROM DUAL
+    </selectKey>
+
+    BEGIN
+    <foreach collection="childList" item="item">
+        INSERT INTO BOM (
+            BOM_NUM, REQUIRED_QTY, BOM_STATUS, ITEM_NUM, ITEM_NUM2, BOM_CODE, CREATED_AT, CHILD_QTY
+        ) VALUES (
+            BOM_SEQ.NEXTVAL, #{parent_qty}, 'Y', #{parent_item_num}, #{item.item_num}, #{bom_code}, SYSDATE, #{item.qty}
+        );
+    </foreach>
+    END;
+</insert>
+
+<!-- 디테일셀렉트 -->
+<select id="detailSelect" resultType="hashMap" parameterType="string">
+    SELECT 
+        p.NAME, b.BOM_NUM, b.REQUIRED_QTY, b.BOM_CODE,p.ITEM_NUM, 
+        b.BOM_STATUS, b.CREATED_AT, b.CHILD_QTY, p.TYPE, p.UNIT,
+        i.NAME AS CNAME, i.CODE AS CCODE, i.UNIT AS CUNIT
+    FROM BOM b
+    JOIN ITEM p ON b.ITEM_NUM = p.ITEM_NUM
+    JOIN ITEM i ON b.ITEM_NUM2 = i.ITEM_NUM
+    WHERE b.BOM_NUM = #{bom_num}  ORDER BY b.BOM_NUM ASC
+</select>
+
+<update id="updateBomStatus" parameterType="kr.or.smartfarm.bom.BomDTO">
+    UPDATE BOM
+    SET BOM_STATUS = #{bom_status}
+    WHERE BOM_NUM = #{bom_num}
+</update>
+
+<!-- 모달에서 자재명 검색 -->
+<!-- <select id="ioModalSearch" resultType="hashMap" parameterType="map"> -->
+<!-- 	SELECT NAME, CODE, TYPE FROM item -->
+<!-- 	WHERE  -->
+<!-- </select> -->
+</mapper>

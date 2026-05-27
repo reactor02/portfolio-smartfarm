@@ -1,4 +1,4 @@
-package kr.or.smartfarm.Io;
+package kr.or.smartfarm.io;
 
 import java.sql.Date;
 
@@ -7,13 +7,11 @@ import lombok.Data;
 @Data
 public class IoDTO {
 	
-	private int ioNum; //시퀀스
-	private int ioCount; //자재량
-	private String ioType; //구분
-	private Date ioDate;  //입출고 날짜
+	private int io_num; //시퀀스
+	private String io_type; //구분
+	private Date io_date;  //입출고 날짜
+	private String type;
+	private String keyword;
 	
-	
-	private int qcNum;       //품질관리 시퀀스
-	private int lotNum;      //Lot 시퀀스
-	private int orderNum;    //작업지시 시퀀스
+
 }
