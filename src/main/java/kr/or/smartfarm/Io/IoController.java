@@ -5,9 +5,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
 public class IoController {
-	@RequestMapping("/test")
-	public String test() {
-		
-		return "sideBar";
+	
+	@RequestMapping("/io")
+	public String ioSelect() {
+		System.out.println("/io들어옴");
+		return "content/ioSelect.tiles";
 	}
 }
