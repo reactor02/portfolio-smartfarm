@@ -19,4 +19,7 @@ public interface VenderDAO {
 	
 	// 아이디로 가져오기 
 	public VenderDTO findById(int vender_num);
+	
+	// 검색용 
+	List<VenderDTO> search(VenderDTO venderDTO);
 }

@@ -18,4 +18,6 @@ public interface BoardDAO {
 	
 	public BoardDTO findById(int board_num);
 	
+	
+	
 }

@@ -17,4 +17,8 @@ public class VenderDTO {
 	// emp 테이블 조인용
 	private String ename;
 	
+	// 검색용 
+	private String type; 
+	private String keyword;
+	
 }

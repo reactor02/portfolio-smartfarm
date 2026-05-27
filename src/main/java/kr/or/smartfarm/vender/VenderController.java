@@ -105,4 +105,18 @@ public class VenderController {
 	}
 	
 	
+	@RequestMapping("/search")
+	public String search(Model model, VenderDTO venderDTO) {
+		System.out.println("/search 실행");
+		model.addAttribute("venderDTO", venderDTO);
+		
+		
+		List<VenderDTO> list = venderService.search(venderDTO);
+		System.out.println("/list: list: " + list);
+		
+		System.out.println("keyword = " + venderDTO.getKeyword());
+		model.addAttribute("list",list);
+		return "content/vender";
+	}
+	
 }
