@@ -34,14 +34,14 @@
 		WHERE e."E_LEVEL" > 2
 	</select>
 	
-<update id="userDUpdate" parameterType="UserManageDTO">
+<update id="userDUpdate" parameterType="kr.or.smartfarm.usermanage.UserManageDTO">
     <!-- 인사관리자용: 오직 부서(dept_num)만 수정 가능하도록 제한 -->
     UPDATE emp
     SET dept_num = #{dept_num}
     WHERE emp_num = #{emp_num}
 </update>
 
-<update id="userPUpdate" parameterType="UserManageDTO">
+<update id="userPUpdate" parameterType="kr.or.smartfarm.usermanage.UserManageDTO">
     <!-- 사장님용: 부서, 권한을 선택적으로 모두 수정 가능 -->
     UPDATE emp
     <set>

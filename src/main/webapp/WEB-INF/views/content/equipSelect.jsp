@@ -214,10 +214,11 @@ btn_sch.addEventListener('click', ()=>{
 
 // 검색 아작스 로직 
 function movePage(pageNum) {
+	console.log("pageNum===", pageNum);
     let type = document.querySelector("#mType").value;
     let keyword = document.querySelector("#keyword").value;
     
-    const params = new URLSearchParams();+
+    const params = new URLSearchParams();
 	 // 누른 페이지 번호를 전달
     params.append("page", pageNum); 
     params.append("type", type);
@@ -265,12 +266,25 @@ function movePage(pageNum) {
             renderPagination(data.pageInfo);
 
          	// 주소 변경
-            const newUrl = window.location.pathname + `?page=\${pageNum}&type=\${type}&keyword=\${keyword}`;
+            const newUrl = window.location.pathname + `?page=\${pageNum}&Type=\${type}&keyword=\${keyword}`;
             window.history.pushState({path: newUrl}, '', newUrl);
         }
     });
 }
 
+function renderPagination(pInfo) {
+	let pagingHtml = "";
+	if (!pInfo.isFirstPage) {
+		pagingHtml += `<a class="page-link prev-next" href="javascript:movePage(${pInfo.pageNum - 1})">이전</a>`;
+	}
+	pInfo.navigatepageNums.forEach(num => {
+		pagingHtml += `<a class="page-link prev-next \${num === pInfo.pageNum ? 'active' : ''}" href="javascript:movePage(\${num})">\${num}</a>`;
+	});
+	if (!pInfo.isLastPage) {
+		pagingHtml += `<a class="page-link prev-next" href="javascript:movePage(${pInfo.pageNum + 1})">다음</a>`;
+	}
+	document.querySelector(".pagination-container").innerHTML = pagingHtml;
+}
               
 /* 등록 모달 열기/닫기 */
 document.getElementById('btnOpenModal').addEventListener('click', function() {
