@@ -68,11 +68,13 @@
     </select>
 
     <!-- 거래처 검색 (등록 모달 AJAX용) -->
-    <select id="searchVender" resultType="hashMap" parameterType="string">
+    <select id="searchVender" resultType="VenderDTO" parameterType="string">
         SELECT
             V.vender_num,
             V.vender_name,
             V.vender_type,
+            V.vender_phone,
+            V.ven_ename,
             E.ename
         FROM vender V
         JOIN emp E ON V.emp_num = E.emp_num
@@ -92,13 +94,22 @@
         ORDER BY type, name
     </select>
 
+    <!-- 완제품(PRODUCT) 목록 (등록 모달 select용) -->
+    <select id="loadProducts" resultType="hashMap">
+        SELECT item_num, name
+        FROM item
+        WHERE UPPER(type) = 'PRODUCT'
+        ORDER BY name
+    </select>
+
     <!-- 출하 요청 등록 -->
     <insert id="insertRequest" parameterType="map">
-        <selectKey keyProperty="request_id" resultType="String" order="BEFORE">
-            SELECT 'REQ' || LPAD(REQUEST_SEQ.NEXTVAL, 4, '0') FROM DUAL
+        <selectKey keyProperty="shipment_request_num" resultType="String" order="BEFORE">
+            SELECT 'SREQ' || LPAD(REQUEST_SEQ.NEXTVAL, 4, '0') FROM DUAL
         </selectKey>
-        INSERT INTO shipment_request (request_id, request_date, vender_num, due_date, request_status, item_num)
-        VALUES (#{request_id}, SYSDATE, #{vender_num}, TO_DATE(#{due_date}, 'YYYY-MM-DD'), '대기', #{item_num})
+        INSERT INTO shipment_request (shipment_request_num, request_id, request_date, vender_num, due_date, request_status, item_num)
+        VALUES (#{shipment_request_num}, REPLACE(#{shipment_request_num}, 'SREQ', 'REQ'),
+                TO_DATE(#{request_date}, 'YYYY-MM-DD'), #{vender_num}, TO_DATE(#{due_date}, 'YYYY-MM-DD'), '대기', #{item_num})
     </insert>
 
 </mapper>

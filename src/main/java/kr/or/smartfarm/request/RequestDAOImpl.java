@@ -45,6 +45,11 @@ public class RequestDAOImpl implements RequestDAO {
 	}
 
 	@Override
+	public List loadProducts() {
+		return sqlSession.selectList("kr.or.smartfarm.request.loadProducts");
+	}
+
+	@Override
 	public int insertRequest(Map map) {
 		return sqlSession.insert("kr.or.smartfarm.request.insertRequest", map);
 	}

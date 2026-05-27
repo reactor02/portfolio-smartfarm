@@ -20,7 +20,7 @@ public class RequestSerivceImpl implements RequestService {
 	
 	//목록 검색
 	@Override
-	public List searchBom(Map map) {
+	public List searchRequest(Map map) {
 		List result = null;
 
 		 result = requestDAO.searchRequest(map);
@@ -35,6 +35,11 @@ public class RequestSerivceImpl implements RequestService {
 	@Override
 	public List loadItems() {
 		return requestDAO.loadItems();
+	}
+
+	@Override
+	public List loadProducts() {
+		return requestDAO.loadProducts();
 	}
 
 	@Override

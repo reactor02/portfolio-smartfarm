@@ -367,7 +367,7 @@ response.setContentType("text/html; charset=utf-8");
                                 <select id="type" class="form-control select-input">
                                     <option value="all" selected>전체</option>
                                     <option value="product">완제품</option>
-                                    <option value="semiproduct]">반제품</option>
+                                    <option value="semiproduct">반제품</option>
                                     <option value="equip">설비</option>
                                     <option value="raw">재료</option>
                                 </select>
@@ -446,8 +446,7 @@ response.setContentType("text/html; charset=utf-8");
 	<div id="regModal" class="modal-overlay" style="display: none;">
     <div class="modal-box" style="max-width: 650px;"> <h3 class="modal-title">입고/출고 등록</h3>
 
-        <form method="POST" action="/insertController" id="insert-form">
-            <input type="hidden" name="item_num" id="selectedItemNum">
+        <form method="POST" action="insertIo" accept-charset="UTF-8" onsubmit="document.charset='UTF-8'; id="insert-form">
 
             <div class="modal-grid">
                 <div class="modal-field">
@@ -469,7 +468,7 @@ response.setContentType("text/html; charset=utf-8");
 
                 <div class="modal-field">
                     <label for="itemSearch">자재 검색 (완제품 제외)</label>
-                    <input type="text" id="itemSearch" name="name" placeholder="자재명 또는 자재코드 입력">
+                    <input type="text" id="itemSearch"  placeholder="자재명 또는 자재코드 입력">
                 </div>
 
                 <div class="modal-field">
@@ -689,14 +688,14 @@ response.setContentType("text/html; charset=utf-8");
 					row.remove();
 				}
 			});
-			const itemList = data.result;
+			const itemList = data;
 			if(itemList && itemList.length > 0){
 				Message.style.display = 'none';
 				
 				let html = "";
 				itemList.forEach(item =>{
 					html += `<tr>
-						<td style="text-align:center;"><input type="radio" name="item_num" onchange="sendItemNum(this)" value="\${item.ITEM_NUM || ''}"></td>
+						<td style="text-align:center;"><input type="radio" name="item_num"  value="\${item.ITEM_NUM || ''}"></td>
 						<td>\${item.CODE || ''}</td>
 						<td>\${item.NAME || ''}</td>
 						<td>\${item.TYPE || ''}</td>
@@ -718,24 +717,28 @@ response.setContentType("text/html; charset=utf-8");
 		
 			
 		//등록 버튼 눌렀을 때
-		const btn_plus = document.querySelector(".btn-plus");
-		btn_plus.addEventListener('click', ()=>{
-			//여기서 submit 가로채고
-			
-			const parentRadio = document.querySelector('input[name="item_num"]:checked');
-			const parentQty = document.querySelector("#quantity").value;
-			
-			if (!parentRadio) {
-				alert("등록하실 품목(생산품)을 선택해주세요.");
-				return;
-			}
-			if (!parentQty || parentQty < 1) {
-				alert("기준 생산 수량을 1개 이상 입력해주세요.");
-				return;
-			}
-			
-			//submit 전송
-		});
+		const insertForm = document.querySelector("#insert-form");
+
+insertForm.addEventListener('submit', function(e) {
+    // 1. 선택된 자재 라디오 버튼이 있는지 검사
+    const checkedRadio = document.querySelector('input[name="item_num"]:checked');
+    
+    if (!checkedRadio) {
+        alert("등록하실 자재를 검색 후 선택해주세요.");
+        e.preventDefault(); // 서브밋 중단
+        return false;
+    }
+    
+    // 2. 수량 검사
+    const ioQty = document.querySelector("#ioQty").value;
+    if (!ioQty || ioQty < 1) {
+        alert("수량을 1개 이상 입력해주세요.");
+        e.preventDefault(); // 서브밋 중단
+        return false;
+    }
+    
+    // 모든 조건 만족 시 정상적으로 submit 진행됨
+});
 	</script>
 </body>
 </html>

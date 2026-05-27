@@ -81,9 +81,18 @@ public class IoController {
 		
 		//모달에서 자재명 검색 했을 때
 		@RequestMapping("/modalSearch2")
-		public Map searchModal(@RequestParam(value = "keyword") String keyword) {
-			Map result = null;
-			
+		@ResponseBody
+		public List searchModal(@RequestParam(value = "keyword") String keyword) {
+			List result = null;
+			result = ioService.modalSearch(keyword);
 			return result;
+		}
+		
+		@RequestMapping("insertIo")
+		public String insertIo(IoDTO ioDTO) {
+			System.out.println("컨트롤러에서 받은 값:  ===" + ioDTO.getIo_reason());
+			ioService.insertData(ioDTO);
+			
+			return "redirect:io";
 		}
 }

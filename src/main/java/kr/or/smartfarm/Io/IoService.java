@@ -8,4 +8,5 @@ public interface IoService {
 	public List searchIo(Map map);
 	public List facility();
 	public List modalSearch(String keyword);
+	public void insertData(IoDTO ioDTO);
 }

@@ -48,4 +48,10 @@ public class IoDAOImpl implements IoDAO{
 		return result;
 	}
 	
+	public void insertData2(IoDTO ioDTO) {
+		
+		sqlSession.insert("kr.or.io.insertLot22", ioDTO);
+	    sqlSession.insert("kr.or.io.insertIo", ioDTO);
+		return ;
+	}
 }

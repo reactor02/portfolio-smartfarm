@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.process">
+<!-- 기본 전체 조회 로직 -->
+<select id="loadProcess" resultType="hashMap">
+        SELECT 
+        i.name, i.type,
+        p.flow, p.head_count,
+        i.item_status,
+        TO_CHAR(p.created_at, 'YYYY-MM-DD') AS created_at,,process_status
+        FROM process p
+        JOIN item i ON p.item_num = i.item_num
+        WHERE i.TYPE IN ('PRODUCT', 'SEMIPRODUCT') 
+         ORDER BY i.item_num DESC
+    </select>
+
+
+
+<!-- 검색 조건에 맞게 검색하는 로직 -->
+	<select id="searchBom1" resultType="hashMap" parameterType="map">
+        SELECT 
+        b.bom_code,
+        i.name,
+        i.item_status,
+        i.code,
+        b.required_qty,
+        b.bom_status,
+        TO_CHAR(b.created_at, 'YYYY-MM-DD') AS created_at,
+        b.bom_num
+        FROM bom b
+        JOIN item i ON b.item_num = i.item_num
+<!--         <where> -->
+<!-- 	타입검토 -->
+where 1 = 1
+        <if test="type != null and type != 'all'">
+        <choose>
+        	<when test="type == 'product'">
+        		AND upper(i.type) = 'PRODUCT'
+        	</when>
+        	<when test="type == 'semiproduct'">
+        		AND upper(i.type) = 'SEMIPRODUCT'
+        	</when>
+        </choose>
+        </if>
+        
+        <if test="keyword != null and keyword != ''">
+        AND (
+        upper(i.name) LIKE ('%' || upper(#{keyword}) || '%')
+        OR
+        upper(b.bom_code) LIKE ('%' || upper(#{keyword}) || '%')
+        )
+   	 	</if>
+
+   	 	
+   	 	
+   	 	
+   	 	<!-- 	상태 -->
+        <if test="status != null and status != 'all'">
+        <choose>
+        	<when test='status == "Y"'>
+        		AND upper(b.bom_status) = 'Y'
+        	</when>
+        	<when test='status == "N"'>
+        		AND upper(b.bom_status) = 'N'
+        	</when>
+        </choose>
+        </if>
+   	 	
+   	 	
+<!--    	 	날짜검토 -->
+   	 	<if test="sDate != null and sDate !=''">
+   	 	AND b.created_at >= TO_DATE(#{sDate}, 'YYYY-MM-DD')
+   	 	<choose>
+   	 		<when test="eDate != null and eDate!=''">
+   	 			AND b.created_at &lt; TO_DATE(#{eDate}, 'YYYY-MM-DD') + 1
+   	 		</when>
+   	 		<otherwise>
+            AND b.created_at &lt; SYSDATE + 1
+        </otherwise>
+   	 	</choose>
+   	 	</if>
+   	 	
+<!--     </where> -->
+         ORDER BY b.bom_num DESC
+    </select>
+    
+    
+    
+    
+    
+<!--     모달에서 ajax로 input창에 부모 검색  -->
+<select id="bomModalSearch1" resultType="hashMap" parameterType="string">
+SELECT i.CODE, i.NAME, i.TYPE, i.UNIT, i.iTEM_NUM
+FROM item i
+	LEFT OUTER JOIN (
+		SELECT ITEM_NUM FROM ITEM
+ 		MINUS
+ 		SELECT ITEM_NUM FROM BOM
+	) num ON i.item_num = num.item_num
+WHERE( UPPER(NAME) LIKE  '%' || UPPER(#{_parameter}) || '%'
+OR UPPER(i.CODE) LIKE '%' || UPPER(#{_parameter}) || '%')
+AND num.ITEM_NUM IS NOT NULL
+AND i.TYPE IN ('PRODUCT', 'SEMIPRODUCT')
+</select>
+
+
+<!--     모달에서 ajax로 input창에 자식 검색  -->
+<select id="childSearch1" resultType="hashMap"  parameterType="string">
+	SELECT item_num, name, code, unit FROM item
+	WHERE type != 'PRODUCT'
+	AND item_num != #{_parameter}
+</select>
+
+
+
+<!-- insert -->
+<!-- <insert id="bomInsert" parameterType="map"> -->
+<!-- 	INSERT ALL  -->
+<!-- 	<foreach collection="childList" item="item" > -->
+<!-- 	INTO BOM (BOM_NUM, REQUIRED_QTY, BOM_STATUS, ITEM_NUM, ITEM_NUM2, BOM_CODE, CREATED_AT, CHILD_QTY) -->
+<!-- 	VALUES -->
+<!-- 	(BOM_SEQ.NEXTVAL, #{parent_qty}, 'Y', #{parent_item_num}, #{item.item_num}, 'BOM_CODE_' || BOM_SEQ.CURRVAL, SYSDATE, #{item.qty}) -->
+<!-- 	</foreach> -->
+<!-- 	 SELECT * FROM DUAL -->
+<!-- </insert> -->
+
+
+<insert id="bomInsert1" parameterType="map">
+    <selectKey keyProperty="bom_code" resultType="string" order="BEFORE">
+        SELECT 'BOM_CODE_' || BOM_SEQ.NEXTVAL FROM DUAL
+    </selectKey>
+
+    BEGIN
+    <foreach collection="childList" item="item">
+        INSERT INTO BOM (
+            BOM_NUM, REQUIRED_QTY, BOM_STATUS, ITEM_NUM, ITEM_NUM2, BOM_CODE, CREATED_AT, CHILD_QTY
+        ) VALUES (
+            BOM_SEQ.NEXTVAL, #{parent_qty}, 'Y', #{parent_item_num}, #{item.item_num}, #{bom_code}, SYSDATE, #{item.qty}
+        );
+    </foreach>
+    END;
+</insert>
+
+<!-- 디테일셀렉트 -->
+<select id="PdetailSelect" resultType="hashMap" parameterType="int">
+SELECT 
+		i.item_num,
+        i.code,
+        i.name,
+        i.type,
+        i.unit,
+        i.STATUS,
+        p.process_status,
+        p.flow,
+        p.image,
+        p.process_content,
+        p.process_num,
+        p.head_count
+        FROM process p
+        JOIN item i ON p.item_num = i.item_num
+        where i.item_num = #{itemNum}
+</select>
+
+<update id="updateBomStatus1" parameterType="kr.or.smartfarm.bom.BomDTO">
+    UPDATE BOM
+    SET BOM_STATUS = #{bom_status}
+    WHERE BOM_NUM = #{bom_num}
+</update>
+</mapper>

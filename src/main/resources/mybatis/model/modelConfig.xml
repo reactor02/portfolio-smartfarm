@@ -31,6 +31,10 @@
         <typeAlias type="kr.or.smartfarm.lot.LotRelationDTO"   alias="LotRelationDTO"/>
         <!-- bom -->
         <typeAlias type="kr.or.smartfarm.bom.BomDTO"           alias="BomDTO"/>
+        <!-- usermanage -->
+        <typeAlias type="kr.or.smartfarm.usermanage.UserManageDTO" alias="UserManageDTO"/>
+        <!-- vender -->
+        <typeAlias type="kr.or.smartfarm.vender.VenderDTO" alias="VenderDTO"/>
     </typeAliases>
     
       
