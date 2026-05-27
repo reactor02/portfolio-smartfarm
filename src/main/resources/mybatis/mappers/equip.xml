@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+	
+<mapper namespace="mapper.equip">
+
+<!-- modelConfig.xml 에서 세팅해서 별칭 만들었음 -->
+
+	<select id="selectAllEquip" resultType="EquipDTO">
+		SELECT
+			equipment_log.equip_num,
+		    equipment_log.equip_status,
+		    equipment_log.error_sign,
+		    equipment_log.equip_action,
+		    equipment_log.maintenance_date,
+		    equipment_log.start_date,
+		    equipment_log.end_date,
+		    item.item_num,
+		    item.code,
+		    item.name,
+		    emp.emp_num,
+		    emp.ename
+		FROM equipment_log
+		JOIN item
+		    ON equipment_log.item_num = item.item_num
+		JOIN emp
+		    ON equipment_log.emp_num = emp.emp_num
+		ORDER BY equipment_log.maintenance_date DESC
+	</select>
+	
+	
+</mapper>
+
+
+
+

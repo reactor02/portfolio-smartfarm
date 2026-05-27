@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+	
+<mapper namespace="mapper.qc">
+
+<!-- modelConfig.xml 에서 세팅해서 별칭 만들었음 -->
+
+	<select id="selectAllQc" resultType="QcDTO">
+		SELECT
+		    io.io_num,
+		    io.io_qty,
+		    io.io_date,
+		    qc.qc_type,
+		    qc.qc_pass,
+		    item.code,
+		    item.name,
+		    item.unit
+		FROM io
+		JOIN qc
+		    ON qc.qc_num = io.qc_num
+		JOIN lot
+		    ON io.lot_num = lot.lot_num
+		JOIN item
+		    ON lot.item_num = item.item_num
+		WHERE qc.qc_pass = 'PASS'
+	</select>
+	
+	
+</mapper>
+
+
+
+
