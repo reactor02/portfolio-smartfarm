@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 
 @Service
@@ -36,7 +37,15 @@ public class IoServiceImpl implements IoService{
 	
 	public List modalSearch(String keyword) {
 		List result = null;
-		
+		result = ioDAO.modalSearch2(keyword);
 		return result;
+	}
+	
+	
+	@Override
+	@Transactional
+	public void insertData(IoDTO ioDTO) {
+		 ioDAO.insertData2(ioDTO);
+		return;
 	}
 }

@@ -168,8 +168,60 @@ AND i.TYPE IN ('PRODUCT', 'SEMIPRODUCT')
 </update>
 
 <!-- 모달에서 자재명 검색 -->
-<!-- <select id="ioModalSearch" resultType="hashMap" parameterType="map"> -->
-<!-- 	SELECT NAME, CODE, TYPE FROM item -->
-<!-- 	WHERE  -->
-<!-- </select> -->
+<select id="ioModalSearch" resultType="hashMap" parameterType="string">
+	SELECT ITEM_NUM, NAME, CODE, TYPE FROM item
+	WHERE UPPER(NAME) LIKE '%' || UPPER(#{keyword}) || '%'
+	AND TYPE != 'PRODUCT'
+</select>
+
+<!-- insert -->
+<insert id="insertLot22" parameterType="kr.or.smartfarm.io.IoDTO">
+        <selectKey keyProperty="lot_num" resultType="int" order="BEFORE">
+            SELECT lot_seq.NEXTVAL FROM DUAL
+        </selectKey>
+        
+        INSERT INTO lot (
+            lot_num,
+            lot_code,
+            expiry_date,
+            item_num,
+            lot_date,
+            init_qty,
+            current_qty,
+            order_num
+        ) VALUES (
+            #{lot_num},                                  'LOT' || TO_CHAR(SYSDATE, 'YYYYMMDD'),       ADD_MONTHS(SYSDATE, 36),                     #{item_num},
+            SYSDATE,
+            #{io_qty},
+            #{io_qty},
+            NULL                                         )
+    </insert>
+
+
+    <insert id="insertIo" parameterType="kr.or.smartfarm.io.IoDTO">
+        INSERT INTO io (
+            io_num,
+            io_type,
+            io_qty,
+            io_date,
+            qc_num,
+            lot_num,
+            plan_num,
+            io_reason,
+            facility_num,
+            emp_num
+        ) VALUES (
+            io_seq.NEXTVAL,
+            #{io_type},
+            #{io_qty},
+            #{io_date},
+            (
+                SELECT MIN(qc_num) 
+                FROM qc 
+                WHERE qc_type = (SELECT type FROM item WHERE item_num = #{item_num})
+                  AND qc_pass = 'WAITING'
+            ),
+            #{lot_num},          1,                   #{io_reason},
+            3,                   NULL                 )
+    </insert>
 </mapper>
