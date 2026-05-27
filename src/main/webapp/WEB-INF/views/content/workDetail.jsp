@@ -18,23 +18,21 @@
     <main class="cont">
 
         <!-- 페이지 헤더 -->
-        <div class="page-header">
-            <div class="btn-row">
-                <button class="btn-back" onclick="location.href='/work'">목록으로</button>
-                <div>
-                    <c:if test="${workDTO.work_status == '대기'}">
-                        <button class="btn-start" onclick="startWork()">작업시작</button>
-                    </c:if>
-                    <c:if test="${workDTO.work_status == '진행'}">
-                        <button class="btn-complete" onclick="completeWork()">작업종료</button>
-                        <button class="btn-reg" style="margin-left:6px;" onclick="produceWork()">작업완료</button>
-                    </c:if>
-                    <c:if test="${workDTO.work_status != '완료' and workDTO.work_status != '취소'}">
-                        <button class="btn-cancel" style="margin-left:6px;" onclick="cancelWork()">취소</button>
-                    </c:if>
-                </div>
+        <div class="hdr">
+            <h1>작업지시 상세</h1>
+            <div class="hdr-right">
+                <c:if test="${workDTO.work_status == '대기'}">
+                    <button type="button" class="btn-action" onclick="startWork()">작업시작</button>
+                </c:if>
+                <c:if test="${workDTO.work_status == '진행'}">
+                    <button type="button" class="btn-action" onclick="completeWork()">작업종료</button>
+                    <button type="button" class="btn-action" onclick="produceWork()">작업완료</button>
+                </c:if>
+                <c:if test="${workDTO.work_status != '완료' and workDTO.work_status != '취소'}">
+                    <button type="button" class="btn-action btn-del" onclick="cancelWork()">취소</button>
+                </c:if>
+                <button type="button" class="btn-action" onclick="location.href='/work'">목록으로</button>
             </div>
-            <h1 class="page-title">작업지시 상세</h1>
         </div>
 
         <!-- 1. 기본 정보 -->

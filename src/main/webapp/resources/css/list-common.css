@@ -134,19 +134,12 @@ select.form-control { width: 140px; }
 @media (max-width: 768px) {
     .main-cont { padding: 1.2rem 1rem; }
 
-    .sch-row, .sch-row-1, .sch-row-2, .sch-row-3 {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 10px;
-    }
+    .sch-row { flex-direction: column; align-items: stretch; gap: 10px; }
     .sch-left, .sch-right { flex-wrap: wrap; gap: 8px 10px; }
     .sch-right { justify-content: flex-start; }
-    .sch-row-2 > div { flex-direction: column; align-items: stretch; }
-    .sch-row-3 { justify-content: flex-start; }
 
     input[type="date"].form-control { flex: 1 1 130px; }
     select.form-control             { flex: 1 1 120px; width: auto; }
-    .sch-row-2 > div select.form-control { flex: 1 1 120px; }
     .sch-input-box                  { flex: 1 1 180px; width: auto; }
 
     .tbl-box { overflow-x: auto; -webkit-overflow-scrolling: touch; }

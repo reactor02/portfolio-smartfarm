@@ -3,6 +3,8 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <link rel="stylesheet" href="/resources/css/list-common.css">
 
+<div class="main-cont">
+
 <!-- 타이틀 헤더 -->
 <div class="page-hdr">
     <h1>LOT 관리</h1>
@@ -115,6 +117,8 @@
     <c:if test="${page.page < page.totalPages}">
         <a href="#" onclick="movePage(${page.page+1})" class="pg-btn">다음</a>
     </c:if>
+</div>
+
 </div>
 
 <script src="/resources/js/lot/lot.js"></script>

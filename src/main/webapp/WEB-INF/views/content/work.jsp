@@ -4,6 +4,8 @@
 <link rel="stylesheet" href="/resources/css/list-common.css">
 <link rel="stylesheet" href="/resources/css/modal.css">
 
+<div class="main-cont">
+
 <!-- 타이틀 헤더 -->
 <div class="page-hdr">
     <h1>작업지시 관리</h1>
@@ -13,23 +15,25 @@
 <!-- 검색 필터 -->
 <form id="searchForm" method="get" action="/work">
     <div class="sch-wrap">
-        <!-- 1행: 기간 + 상태 -->
+        <!-- 1행: 기간 -->
         <div class="sch-row-1">
             <span class="label">▶ 기간</span>
             <input type="date" name="startDate" value="${page.startDate}" class="form-control">
             <span style="font-weight:bold;color:#666;">~</span>
             <input type="date" name="endDate"   value="${page.endDate}"   class="form-control">
-            <span class="label">▶ 상태</span>
-            <select name="work_status" class="form-control">
-                <option value="">상태 선택</option>
-                <option value="대기"  <c:if test="${page.work_status == '대기'}">selected</c:if>>대기</option>
-                <option value="진행"  <c:if test="${page.work_status == '진행'}">selected</c:if>>진행</option>
-                <option value="완료"  <c:if test="${page.work_status == '완료'}">selected</c:if>>완료</option>
-                <option value="취소"  <c:if test="${page.work_status == '취소'}">selected</c:if>>취소</option>
-            </select>
         </div>
-        <!-- 2행: 품목분류 | 품목명 (50:50) -->
+        <!-- 2행: 상태 | 품목분류 | 품목명 (33:33:33) -->
         <div class="sch-row-2">
+            <div>
+                <span class="label">▶ 상태</span>
+                <select name="work_status" class="form-control">
+                    <option value="">상태 선택</option>
+                    <option value="대기"  <c:if test="${page.work_status == '대기'}">selected</c:if>>대기</option>
+                    <option value="진행"  <c:if test="${page.work_status == '진행'}">selected</c:if>>진행</option>
+                    <option value="완료"  <c:if test="${page.work_status == '완료'}">selected</c:if>>완료</option>
+                    <option value="취소"  <c:if test="${page.work_status == '취소'}">selected</c:if>>취소</option>
+                </select>
+            </div>
             <div>
                 <span class="label">▶ 품목분류</span>
                 <select name="item_type" id="workItemType" class="form-control"
@@ -211,6 +215,8 @@
                     onclick="document.getElementById('planSearchModal').style.display='none'">닫기</button>
         </div>
     </div>
+</div>
+
 </div>
 
 <script src="/resources/js/work/work.js"></script>

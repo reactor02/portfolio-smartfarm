@@ -16,18 +16,14 @@
     <main class="cont">
 
         <!-- 페이지 헤더 -->
-        <div class="page-header">
-            <div class="btn-row">
-                <button class="btn-back" onclick="location.href='/prod'">목록으로</button>
-                <div>
-                    <c:if test="${prodDTO.plan_status != '취소' and prodDTO.plan_status != '완료'}">
-                      
-                        <button class="btn-cancel" style="margin-left:6px;"
-                                onclick="cancelPlan()">취소</button>
-                    </c:if>
-                </div>
+        <div class="hdr">
+            <h1>생산계획 상세</h1>
+            <div class="hdr-right">
+                <c:if test="${prodDTO.plan_status != '취소' and prodDTO.plan_status != '완료'}">
+                    <button type="button" class="btn-action btn-del" onclick="cancelPlan()">취소</button>
+                </c:if>
+                <button type="button" class="btn-action" onclick="location.href='/prod'">목록으로</button>
             </div>
-            <h1 class="page-title">생산계획 상세</h1>
         </div>
 
         <!-- 1. 기본 정보 -->

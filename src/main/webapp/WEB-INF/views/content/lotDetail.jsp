@@ -11,11 +11,11 @@
 <body>
 <main class="cont">
 
-    <div class="page-header">
-        <div class="btn-row">
-            <button class="btn-back" onclick="location.href='/lot'">목록으로</button>
+    <div class="hdr">
+        <h1>LOT 관리 상세</h1>
+        <div class="hdr-right">
+            <button type="button" class="btn-action" onclick="location.href='/lot'">목록으로</button>
         </div>
-        <h1 class="page-title">LOT 관리 상세</h1>
     </div>
 
     <!-- 1. 기본 정보 -->
@@ -25,10 +25,7 @@
             <span class="info-label">LOT 번호</span>
             <span class="info-value">${lotDTO.lot_code}</span>
         </div>
-        <div class="info-item">
-            <span class="info-label">상태</span>
-            <span class="badge">${lotDTO.lot_status}</span>
-        </div>
+        
         <div class="info-item">
             <span class="info-label">품목 유형</span>
             <span class="info-value">${lotDTO.type}</span>
@@ -92,7 +89,7 @@
                         <th>번호</th>
                         <th>LOT 번호</th>
                         <th>품목명</th>
-                        <th>상태</th>
+                        <th>소모자재 수량</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -103,7 +100,7 @@
                                     <td>${s.index + 1}</td>
                                     <td>${m.parent_lot_code}</td>
                                     <td>${m.item_name}</td>
-                                    <td>${m.lot_status}</td>
+                                    
                                 </tr>
                             </c:forEach>
                         </c:when>
