@@ -80,14 +80,14 @@
 
         <!-- 2. 작업 현황 -->
         <div class="section-title">■ 작업 현황</div>
-        <div class="status-grid" style="grid-template-columns: repeat(3, 1fr);">
+        <div class="status-grid">
             <div class="status-card">
                 <div class="info-label">지시 수량</div>
                 <div class="status-num">${workDTO.order_qty}</div>
             </div>
             <div class="status-card">
-                <div class="info-label" style="color: var(--s-cl);">생산 완료</div>
-                <div class="status-num" style="color: var(--s-cl);">${workDTO.current_qty}</div>
+                <div class="info-label info-label-accent">생산 완료</div>
+                <div class="status-num status-num-accent">${workDTO.current_qty}</div>
             </div>
             <div class="status-card">
                 <div class="info-label">잔여 수량</div>
@@ -131,12 +131,12 @@
 
         <!-- 4. 공정 정보 -->
         <div class="section-title">■ 공정 정보</div>
-        <div style="margin-bottom: 8px;">
+        <div class="process-link-wrap">
             <span class="info-label">공정 정보 링크:</span>
             <a href="/process/item/${workDTO.item_num}" class="link-text">${workDTO.item_name} 공정관리 링크</a>
         </div>
         <div class="instruction-box">
-            <span class="info-label" style="display:block; margin-bottom:6px;">상세 지시사항</span>
+            <span class="info-label info-label-block">상세 지시사항</span>
             <strong>${workDTO.content}</strong>
         </div>
 

@@ -66,6 +66,13 @@ public class VenderServiceImpl implements VenderService {
 	}
 
 
+	@Override
+	public List<VenderDTO> search(VenderDTO venderDTO) {
+		List<VenderDTO> result = venderDAO.search(venderDTO);
+		return result;
+	}
+
+
 
 
 }

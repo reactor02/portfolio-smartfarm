@@ -69,6 +69,17 @@
 	<delete id="deleteVender" parameterType="kr.or.smartfarm.vender.VenderDTO"> 
 		delete from vender where vender_num = #{vender_num}	
 	</delete>
+	
+	<select id="searchVender" parameterType = "kr.or.smartfarm.vender.VenderDTO"
+	resultType="kr.or.smartfarm.vender.VenderDTO">
+		select v.*,e.ename from vender v 
+		left join emp e on v.emp_num = e.emp_num
+		where 1=1 
+		and ( 
+			v.vender_name like ('%' || #{keyword} || '%')
+			or e.ename like ('%' || #{keyword} || '%')
+		)
+	</select>
 
 </mapper>
 

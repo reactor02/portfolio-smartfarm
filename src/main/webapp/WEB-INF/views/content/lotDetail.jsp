@@ -100,7 +100,7 @@
                                     <td>${s.index + 1}</td>
                                     <td>${m.parent_lot_code}</td>
                                     <td>${m.item_name}</td>
-                                    
+                                    <td> </td>
                                 </tr>
                             </c:forEach>
                         </c:when>

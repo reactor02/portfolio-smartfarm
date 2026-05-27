@@ -2,6 +2,7 @@
 <%@ taglib prefix="c"   uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <link rel="stylesheet" href="/resources/css/list-common.css">
+<link rel="stylesheet" href="/resources/css/lot/lot.css">
 
 <div class="main-cont">
 
@@ -17,7 +18,7 @@
         <div class="sch-row-1">
             <span class="label">▶ 기간</span>
             <input type="date" name="startDate" value="${page.startDate}" class="form-control">
-            <span style="font-weight:bold;color:#666;">~</span>
+            <span class="date-sep">~</span>
             <input type="date" name="endDate"   value="${page.endDate}"   class="form-control">
         </div>
         <!-- 2행: 품목분류 | 품목명 (50:50) -->
@@ -47,7 +48,7 @@
         <!-- 3행: 키워드 검색 (우측 정렬) -->
         <div class="sch-row-3">
             <div class="sch-input-box">
-                <span style="color:#888;">&#128269;</span>
+                <span class="sch-icon">&#128269;</span>
                 <input type="text" name="keyword" value="${page.keyword}" placeholder="LOT번호 / 품목명">
             </div>
             <button type="submit" class="btn-sch">검색</button>
