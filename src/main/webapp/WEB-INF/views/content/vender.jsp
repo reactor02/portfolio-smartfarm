@@ -1,6 +1,11 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
     
+ <%
+request.setCharacterEncoding("utf-8");
+String vender_type = request.getParameter("vender_type");
+%>
+    
     <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
     <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
     <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
@@ -11,8 +16,11 @@
 <html>
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>거래처 관리</title>
 <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/paging.css">
+<link rel="stylesheet" href="/resources/css/list-common.css">
+<link rel="stylesheet" href="/resources/css/modal.css">
 
 <style>
 /* 기본 초기화 */
@@ -294,44 +302,82 @@ select.form-control {
 	border-color: #2D6A4F;
 	font-weight: bold;
 }
+
+/* 작업 등록 모달 */
+.modal-overlay {
+	display: none;
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background: rgba(0, 0, 0, 0.5);
+	z-index: 1000;
+	justify-content: center;
+	align-items: center;
+}
+
+.modal-box {
+	background: #fff;
+	border-radius: 10px;
+	padding: 30px;
+	width: 520px;
+	max-height: 90vh;
+	overflow-y: auto;
+	box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+}
+
+.modal-title {
+	font-size: 1.2rem;
+	font-weight: bold;
+	color: var(- -m-cl);
+	margin-bottom: 20px;
+}
+
+.modal-grid {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 16px;
+}
+
+.modal-field {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+}
+
+.modal-field label {
+	font-size: 12px;
+	color: #777;
+	font-weight: bold;
+}
+
+.modal-field input, .modal-field select, .modal-field textarea {
+	padding: 8px 10px;
+	border: 1px solid var(- -border-cl);
+	border-radius: 6px;
+	font-size: 13px;
+	font-family: inherit;
+}
+
+.modal-field-full {
+	grid-column: 1/-1;
+}
+
+.modal-btn-wrap {
+	display: flex;
+	justify-content: flex-end;
+	gap: 10px;
+	margin-top: 20px;
+}
+
+.modal-btn-wrap button {
+	padding: 9px 22px;
+	border
+}
 </style>
 
-<script>
-	window.addEventListener('load',()=>{
-		bind()
-	})
-	
-		let page=${param.page != null ? param.page : 1};
-	
-	function bind(){
-			
-			
-			fetch(`vender/list?page=`+ page,{
-				method:'get'
-			}).then(
-				resp => resp.json()		
-			).then(function(data){
-				console.log(data)
-				console.log('data.list',data.length)
-				
-				document.getElementById("tbody").innerHTML=``
-				for(let i = 0; i<data.length;i++){
-					document.getElementById("tbody").innerHTML+=`
-					<tr>
-						<td>\${data[i].vender_num}</td>
-						<td>\${data[i].vender_name}</td>
-						<td>\${data[i].emp_num}</td>
-						<td>\${data[i].vender_type}</td>
-						<td>\${data[i].vender_phone}</td>
-						<td>\${data[i].vender_addr}</td>
-					</tr>
-					`
-				}
-			})
-		}
-		
-	
-</script>
+
 </head>
 <body>
 	<div class="mat-all"> 
@@ -339,9 +385,10 @@ select.form-control {
 		
 		<div class="mat-body">
 			<main class="main-cont">
+			
 				<div class="hdr">
 					<h1>거래처 관리</h1>
-					<button type="button" class="btn-reg link-txt" >+ 등록하기</button>
+					<button type="button" class="btn-reg link-txt" id="btnOpenWorkModal" >+ 등록하기</button>
 				</div>
 				
 				<%-- 검색창 action --%>
@@ -379,10 +426,11 @@ select.form-control {
 						<tr>
 							<th>no.</th>
 							<th>거래처명</th>
-							<th>사원번호</th>
+							<th>거래처 담당자</th>
 							<th>거래 유형</th>
 							<th>거래처 연락처</th>
 							<th>거래처 주소</th>
+							<th>담당 사원</th>
 						</tr>
 					</thead>
 					<tbody id ="tbody"></tbody>
@@ -397,7 +445,115 @@ select.form-control {
 		</div>
 		<tiles:insertAttribute name="footer" ignore="true" />
 	</div>
+	
+	<!-- 거래처 등록 모달 -->
+		<div id="workModal" class="modal-overlay">
+			<div class="modal-box">
+				<h3 class="modal-title">거래처 등록</h3>
+				<form id="venRegForm" action = "/vender/insert" method="post" accept-charset="UTF-8">
+					<div class="modal-grid"> 
+						<div class="modal-field">
+							<label>거래처명</label> 
+								<input type="text" name="vender_name" placeholder="거래처명">
+						</div>
+						<div class="modal-field"> 
+							<label>대표자명</label>
+							<input type="text" name="ven_ename" placeholder="대표자명">
+						</div>
+						<div class="modal-field"> 
+							<label>사업자등록번호</label>
+							<input type="text" name="biz_no" placeholder="사업자등록번호">
+						</div>
+						<div class="modal-field"> 
+							<label>거래처 타입</label>
+							<select name="vender_type" >
+								<option value="">선택</option>
+								<option value="공급업체">공급업체</option>
+								<option value="고객사">고객사</option>
+								<option value="협력업체">협력업체</option>
+								<option value="유통업체">유통업체</option>
+							</select>
+						</div>
+						<div class="modal-field"> 
+							<label>연락처</label>
+							<input type="text" name="vender_phone" placeholder="연락처">
+						</div>
+						<div class="modal-field"> 
+							<label>주소</label>
+							<input type="text" name="vender_addr" placeholder="주소">
+						</div>
+						<div class="modal-field"> 
+							<label>담당 사원</label>
+							<input type="number" name="emp_num" placeholder="사원번호">
+						</div>
+					</div>
+					<div class="modal-btn-wrap">
+						<button type="submit" class="btn-submit">등록</button>
+						<button type="button" class="btn-close" id="btnCloseWorkModal">닫기</button>
+					</div>
+				</form>
+			</div>
+		</div>
 
+
+<script>
+	window.addEventListener('load',()=>{
+		bind()
+	})
+	
+		let page=${param.page != null ? param.page : 1};
+	
+	function bind(){
+			
+			
+			fetch(`vender/list?page=`+ page,{
+				method:'get'
+			}).then(
+				resp => resp.json()		
+			).then(function(data){
+				console.log(data)
+				console.log('data.list',data.length)
+				
+				document.getElementById("tbody").innerHTML=``
+				for(let i = 0; i<data.length;i++){
+					document.getElementById("tbody").innerHTML+=`
+					<tr>
+						<td>\${data[i].vender_num}</td>
+						<td style="text-align:left; padding-left:20px">
+							<a href="/vender/one?vender_num=\${data[i].vender_num}"class="link-txt">\${data[i].vender_name}</a></td>
+						<td>\${data[i].ven_ename}</td>
+						<td>\${data[i].vender_type}</td>
+						<td>\${data[i].vender_phone}</td>
+						<td>\${data[i].vender_addr}</td>
+						<td>\${data[i].ename}</td>
+					</tr>
+					`
+				}
+			})
+			
+			
+			
+		
+			
+	/* 작업 등록 모달 */
+	var btnOpenWork = document.getElementById('btnOpenWorkModal');
+	if (btnOpenWork) btnOpenWork.addEventListener('click', function(){
+		document.getElementById('workModal').style.display = 'flex';
+	});
+	document.getElementById('btnCloseWorkModal').addEventListener('click', function(){
+		document.getElementById('workModal').style.display = 'none';
+	});
+	document.getElementById('workModal').addEventListener('click', function(e){
+		if(e.target == this) this.style.display='none';
+	});
+	
+		}
+	
+	
+	
+		
+	
+</script>
 
 </body>
 </html>

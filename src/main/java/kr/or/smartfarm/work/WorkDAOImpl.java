@@ -3,6 +3,7 @@ package kr.or.smartfarm.work;
 import java.util.List;
 import java.util.Map;
 
+import kr.or.smartfarm.bom.BomDTO;
 import kr.or.smartfarm.prod.ProdDTO;
 import kr.or.smartfarm.prod.SelectOptionDTO;
 
@@ -64,5 +65,15 @@ public class WorkDAOImpl implements WorkDAO {
     @Override
     public List<ProdDTO> searchPlans(Map<String, Object> params) {
         return session.selectList("kr.or.smartfarm.work.searchPlans", params);
+    }
+
+    @Override
+    public List<BomDTO> getMaterialsByItem(int item_num) {
+        return session.selectList("kr.or.smartfarm.work.getMaterialsByItem", item_num);
+    }
+
+    @Override
+    public void insertIo(Map<String, Object> params) {
+        session.insert("kr.or.smartfarm.work.insertIo", params);
     }
 }

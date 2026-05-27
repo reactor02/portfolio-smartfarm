@@ -111,3 +111,58 @@ select.form-control { width: 140px; }
 }
 .pg-btn:hover  { background-color: #B7E4C7; }
 .pg-active { background-color: #2D6A4F !important; color: #FFF !important; border-color: #2D6A4F; }
+
+/* ═══════════════════════════════════════════════════
+   반응형 — 태블릿 (≤ 768px)
+   ═══════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+    .main-cont { padding: 1.2rem 1rem; }
+
+    /* 필터 행: 가로 → 세로 쌓기 (.sch-left / .sch-right가 순서대로 내려감) */
+    .sch-row {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+    }
+
+    /* 각 섹션 내부: flex-wrap으로 자연스럽게 줄바꿈 허용 */
+    .sch-left, .sch-right {
+        flex-wrap: wrap;
+        gap: 8px 10px;
+    }
+    .sch-right { justify-content: flex-start; }
+
+    /* 날짜 입력·select: 고정폭 제거 → 신축 */
+    input[type="date"].form-control { flex: 1 1 130px; }
+    select.form-control             { flex: 1 1 120px; width: auto; }
+    .sch-input-box                  { flex: 1 1 180px; width: auto; }
+
+    /* 테이블: 가로 스크롤로 삐져나가기 방지 */
+    .tbl-box { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .stk-tbl { min-width: 600px; }
+}
+
+/* ═══════════════════════════════════════════════════
+   반응형 — 모바일 (≤ 480px)
+   ═══════════════════════════════════════════════════ */
+@media (max-width: 480px) {
+    .main-cont { padding: 0.8rem; }
+
+    .page-hdr    { padding: 12px 15px; flex-wrap: wrap; gap: 8px; }
+    .page-hdr h1 { font-size: 1.4rem; }
+
+    .sch-wrap { padding: 14px 12px; }
+
+    /* 필터 내부: 완전 세로 쌓기 — 각 항목이 한 줄씩 차지 */
+    .sch-left, .sch-right {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    input[type="date"].form-control { width: 100%; flex: none; }
+    select.form-control             { width: 100%; flex: none; }
+    .sch-input-box                  { width: 100%; flex: none; }
+    .btn-sch, .select-reset         { width: 100%; }
+
+    /* 페이지네이션 줄바꿈 */
+    .pg-wrap { flex-wrap: wrap; }
+}

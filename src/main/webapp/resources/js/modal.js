@@ -3,6 +3,9 @@ window.onload = function () {
 }
 
 function bind() {
+    // 이 페이지에 모달 트리거가 없으면 중단
+    if (!document.getElementById('btnOpenModal')) return;
+
     // 등록하기 버튼
     document.getElementById('btnOpenModal').addEventListener('click', function () {
         document.getElementById('regModal').style.display = 'flex';

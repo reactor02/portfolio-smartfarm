@@ -28,6 +28,9 @@
         <typeAlias type="kr.or.smartfarm.equipment_log.EquipDTO"       alias="EquipDTO"/>
         <!-- defective -->
         <typeAlias type="kr.or.smartfarm.defective.DefectiveDTO"       alias="DefectiveDTO"/>
+        <typeAlias type="kr.or.smartfarm.lot.LotRelationDTO"   alias="LotRelationDTO"/>
+        <!-- bom -->
+        <typeAlias type="kr.or.smartfarm.bom.BomDTO"           alias="BomDTO"/>
     </typeAliases>
     
       

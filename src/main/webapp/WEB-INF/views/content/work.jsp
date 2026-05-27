@@ -157,10 +157,6 @@
                     <label>작업시작일</label>
                     <input type="date" name="order_start" required>
                 </div>
-                <div class="modal-field">
-                    <label>작업종료일</label>
-                    <input type="date" name="order_end" required>
-                </div>
                 <div class="modal-field modal-field-full">
                     <label>지시사항</label>
                     <textarea name="content" placeholder="지시사항 입력"></textarea>

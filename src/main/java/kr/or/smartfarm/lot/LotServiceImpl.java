@@ -13,6 +13,9 @@ public class LotServiceImpl implements LotService {
     @Autowired
     private LotDAO dao;
 
+    @Autowired
+    private LotRelationDAO relationDao;
+
     @Override
     public List<LotDTO> getList(LotPageDTO page) {
         int startRow = (page.getPage() - 1) * page.getSize() + 1;
@@ -44,5 +47,15 @@ public class LotServiceImpl implements LotService {
     @Override
     public List<SelectOptionDTO> getItemOptions() {
         return dao.getItemOptions();
+    }
+
+    @Override
+    public List<LotRelationDTO> getMaterialsByChildLot(int lot_num) {
+        return relationDao.getMaterialsByChildLot(lot_num);
+    }
+
+    @Override
+    public List<LotRelationDTO> getParentsByLot(int lot_num) {
+        return relationDao.getParentsByLot(lot_num);
     }
 }

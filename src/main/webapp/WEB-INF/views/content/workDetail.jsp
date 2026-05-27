@@ -69,6 +69,10 @@
     .info-label { font-size: 12px; color: #777; font-weight: bold; }
     .info-value { font-size: 14px; font-weight: bold; }
     .badge { background-color: var(--p-cl); color: var(--m-cl); padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: bold; width: fit-content; }
+    .badge-wait     { background: #E9ECEF; color: #6C757D; }
+    .badge-progress { background: #FFF3CD; color: #856404; }
+    .badge-done     { background: #D1E7DD; color: #0A3622; }
+    .badge-cancel   { background: #F8D7DA; color: #842029; }
 
     .status-grid { display: grid; gap: 15px; margin-bottom: 1.5rem; text-align: center; }
     .status-card { background-color: #FFF; border: 1px solid var(--border-cl); padding: 16px; border-radius: 8px; }
@@ -125,7 +129,7 @@
             </div>
             <div class="info-item">
                 <span class="info-label">상태</span>
-                <span class="badge">${workDTO.work_status}</span>
+                <span class="badge <c:choose><c:when test="${workDTO.work_status == '대기'}">badge-wait</c:when><c:when test="${workDTO.work_status == '진행'}">badge-progress</c:when><c:when test="${workDTO.work_status == '완료'}">badge-done</c:when><c:when test="${workDTO.work_status == '취소'}">badge-cancel</c:when></c:choose>">${workDTO.work_status}</span>
             </div>
             <div class="info-item">
                 <span class="info-label">작업자</span>
@@ -194,7 +198,7 @@
             </div>
             <div class="info-item">
                 <span class="info-label">계획상태</span>
-                <span class="badge">${workDTO.plan_status}</span>
+                <span class="badge <c:choose><c:when test="${workDTO.plan_status == '대기'}">badge-wait</c:when><c:when test="${workDTO.plan_status == '진행'}">badge-progress</c:when><c:when test="${workDTO.plan_status == '완료'}">badge-done</c:when><c:when test="${workDTO.plan_status == '취소'}">badge-cancel</c:when></c:choose>">${workDTO.plan_status}</span>
             </div>
             <div class="info-item">
                 <span class="info-label">계획수량</span>
@@ -225,6 +229,7 @@
 
 <script>
     var WORK_ORDER_ID = '${workDTO.work_order_id}';
+    var ORDER_START   = '<fmt:formatDate value="${workDTO.order_start}" pattern="yyyy-MM-dd"/>';
 
     window.onload = function () {
         var orderQty   = parseInt('${workDTO.order_qty}')   || 0;
@@ -238,10 +243,28 @@
     };
 
     function startWork() {
+        var today = new Date();
+        var todayStr = today.getFullYear() + '-'
+            + String(today.getMonth() + 1).padStart(2, '0') + '-'
+            + String(today.getDate()).padStart(2, '0');
+        if (todayStr !== ORDER_START) {
+            alert('작업일이 아닙니다.\n작업시작일: ' + ORDER_START);
+            return;
+        }
         if (!confirm('작업을 시작하시겠습니까?')) return;
         fetch('/work/' + WORK_ORDER_ID + '/start', { method: 'POST' })
             .then(function(r) { return r.text(); })
-            .then(function() { location.reload(); })
+            .then(function(result) {
+                if (result === 'date_error') {
+                    alert('작업일이 아닙니다.');
+                    return;
+                }
+                if (result === 'error') {
+                    alert('처리할 수 없는 작업입니다.');
+                    return;
+                }
+                location.reload();
+            })
             .catch(function() { alert('처리 중 오류가 발생했습니다.'); });
     }
 
@@ -258,7 +281,17 @@
         if (!confirm('지시수량(' + qty + ')만큼 생산 완료 처리하시겠습니까?')) return;
         fetch('/work/' + WORK_ORDER_ID + '/produce', { method: 'POST' })
             .then(function(r) { return r.text(); })
-            .then(function() { location.reload(); })
+            .then(function(result) {
+                if (result === 'stock_error') {
+                    alert('원재료 재고가 부족합니다.\nBOM 기준 재고를 확인해주세요.');
+                    return;
+                }
+                if (result === 'error') {
+                    alert('처리 중 오류가 발생했습니다.');
+                    return;
+                }
+                location.reload();
+            })
             .catch(function() { alert('처리 중 오류가 발생했습니다.'); });
     }
 

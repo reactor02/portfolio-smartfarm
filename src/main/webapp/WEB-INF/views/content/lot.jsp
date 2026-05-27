@@ -95,7 +95,7 @@
                             <td>${l.current_qty}</td>
                             <td><fmt:formatDate value="${l.lot_date}" pattern="yyyy-MM-dd"/></td>
                             <td>
-                                <span class="badge <c:choose><c:when test="${l.lot_status == '사용가능'}">badge-available</c:when><c:when test="${l.lot_status == '소진'}">badge-used</c:when><c:when test="${l.lot_status == '만료'}">badge-expired</c:when></c:choose>">${l.lot_status}</span>
+                                <span class="badge <c:choose><c:when test="${l.lot_status == 'available'}">badge-available</c:when><c:when test="${l.lot_status == 'used'}">badge-used</c:when><c:when test="${l.lot_status == 'expired'}">badge-expired</c:when></c:choose>">${l.lot_status}</span>
                             </td>
                         </tr>
                     </c:forEach>

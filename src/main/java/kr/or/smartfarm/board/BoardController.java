@@ -34,7 +34,7 @@ public class BoardController {
 		PageInfo<Map<String, Object>> pageInfo = new PageInfo<Map<String, Object>> (result);
 		model.addAttribute("pageInfo", pageInfo);
 		
-		return "content/board";
+		return "content/board.tiles";
 	}
 
 	@RequestMapping(value = "/list", method = RequestMethod.GET)
@@ -60,14 +60,14 @@ public class BoardController {
 		// 조회수 증가 
 		boardService.updateViewCnt(board_num);
 		
-		return "content/boarddetail";
+		return "content/boarddetail.tiles";
 	}
 	
 	@GetMapping("/write")
 	public String writeForm() {
 		System.out.println("get /write 실행");
 	    
-		return "content/writeboard";
+		return "content/writeboard.tiles";
 	}
 	
 	@PostMapping("/write")

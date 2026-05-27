@@ -70,7 +70,7 @@
            pattern="(?=.*[a-zA-Z])(?=.*\d)(?=.*[!@#$%^&*()_+~`\-={}\[\]:;&quot;'<>,.?\/]).{8,20}"
            title="비밀번호는 영문, 숫자, 특수문자를 포함하여 8~20자로 입력해주세요.">
         <div class="find-account-section">
-            <a href="/changepw" class="find-link" >아이디/패스워드 찾기</a>
+            <a href="/searchpw" class="find-link" >아이디/패스워드 찾기</a>
         </div>
 
         <button type="submit" class="submit-btn">로그인하기</button>
