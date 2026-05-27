@@ -8,10 +8,10 @@ import javax.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -21,12 +21,10 @@ public class LoginController {
 	@Autowired
 	LoginService loginService;
 	
-	@RequestMapping(value = "/login", method = RequestMethod.GET)
+	@GetMapping("/login")
 	public ModelAndView loginGet( ) {
-		System.out.println("login 실행");
-		
-		
-		
+		System.out.println("login Get 실행");
+				
 		ModelAndView mav = new ModelAndView("proj3Login.nohead");
 		
 		return mav;
@@ -34,40 +32,34 @@ public class LoginController {
 	}
 	
 	@PostMapping("/login")
-	@ResponseBody
+	@ResponseBody // 💡 반드시 필요! 자바스크립트 fetch가 이 어노테이션 덕분에 JSON을 읽을 수 있습니다.
 	public LoginResponseDTO semiLogin(
-			@RequestBody LoginDTO loginDTO, 
-			HttpServletRequest request 
-			) {
-		
-        System.out.println("login POST 실행");
-		
-      
-        
-        LoginDTO login = loginService.loginCheck( loginDTO );
-				
-		LoginResponseDTO response = new LoginResponseDTO();
-		// 임시 로그인 검증 로직
+	        @RequestBody LoginDTO loginDTO, // 💡 JSON 요청을 받기 위해 유지
+	        HttpServletRequest request
+	        ) {
+	    
+	    System.out.println("login POST 실행");
+	    
+	    LoginDTO login = loginService.loginCheck(loginDTO);
+	    LoginResponseDTO response = new LoginResponseDTO();
+	            
 	    if (login != null) {
+	        // [세션 처리]
+	        HttpSession session = request.getSession();
+	        session.setAttribute("loginUser", login); 
+	        session.setMaxInactiveInterval(1800); 
+	        
+	        // 💡 자바스크립트 .then(data => { ... }) 쪽으로 성공 신호를 보냅니다.
 	        response.setSuccess(true);
 	        response.setMessage("로그인에 성공했습니다!");
 	        
-	        // 💡 2. [세션 처리] 로그인 성공 시 세션 객체를 가져와서 사원 정보를 저장합니다.
-	        HttpSession session = request.getSession();
-	        
-	        // 세션에 "loginUser"라는 이름으로 로그인한 사원의 DTO(또는 사원번호)를 통째로 저장합니다.
-	        session.setAttribute("loginUser", login); 
-	        
-	        // (선택) 세션 유지 시간 설정 - 예: 30분 동안 유지 (단위: 초)
-	        session.setMaxInactiveInterval(1800); 
-	        
 	    } else {
+	        // 💡 자바스크립트 쪽으로 실패 신호와 메시지를 보냅니다.
 	        response.setSuccess(false);
 	        response.setMessage("사원번호 또는 비밀번호가 틀렸습니다.");
 	    }
-		
-		return response;
-		
+	    
+	    return response; // 💡 문자열이 아닌 DTO 객체를 JSON 형태로 전송합니다.
 	}
 	
 //	@RequestMapping(value = "/login", method = RequestMethod.POST)

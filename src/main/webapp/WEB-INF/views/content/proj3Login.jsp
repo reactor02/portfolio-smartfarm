@@ -120,7 +120,7 @@
 	    
 	    if (data.success === true) {
 	        alert(data.message);         // "로그인에 성공했습니다."
-	        window.location.href = '/home'; // 메인 화면으로 리다이렉트(이동)
+	        window.location.href = '/usermanage'; // 메인 화면으로 리다이렉트(이동)
 	    } else {
 	        alert(data.message);         // "사원번호 또는 비밀번호가 틀렸습니다."
 	        // 화면 새로고침이 없으므로, 사용자는 입력했던 아이디/비번을 안 지우고 그대로 수정 가능!
@@ -137,6 +137,15 @@
 	
 		
 	})
+</script>
+<script type="text/javascript">
+    // 컨트롤러에서 model.addAttribute("message", "...")로 보낸 값이 여기에 주입됩니다.
+    var alertMessage = "${message}";
+    
+    // 값이 존재할 때만 알림창(alert)을 띄웁니다.
+    if (alertMessage && alertMessage.trim() !== "") {
+        alert(alertMessage);
+    }
 </script>
 
 </body>

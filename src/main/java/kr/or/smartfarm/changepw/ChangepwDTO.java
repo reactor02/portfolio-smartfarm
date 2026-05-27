@@ -5,9 +5,10 @@ import lombok.Data;
 @Data
 public class ChangepwDTO {
 	
-	String emp_num;
+	int emp_num;
 	String ename;
 	String pw;
+	String pw2;
 	String e_level;
 	String tel;
 	String hire_date;
