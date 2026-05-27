@@ -140,7 +140,7 @@ select.form-control {
 	<div id="regModal" class="modal-overlay" style="display:none;">
 	    <div class="modal-box">
 	        <h3 class="modal-title">설비관리 등록</h3>
-	        <form id="regForm" action="/prod/create" method="post">
+	        <form id="regForm" action="/equip/insertEquip" method="post">
 	            <div class="modal-grid">
 	                <div class="modal-field">
 	                    <label>설비코드(설비명)</label>
@@ -196,7 +196,7 @@ select.form-control {
 	                <button type="submit" class="btn-reg">등록</button>
 	                <button type="button" class="btn-cancel" id="btnCloseModal">취소</button>
 	            </div>
-	            </form>
+	       </form>
 </div>   
 <script>
 
@@ -241,19 +241,20 @@ function movePage(pageNum) {
             let html = "";
             for(let i = 0; i < data.searchResult.length; i++) {
                 let item = data.searchResult[i];
+                console.log(item);
                 html += `
                     <tr>
                 		<td style="font-weight: bold; color: #555;">
-                			\${item.equip_num}
+                			\${item.EQUIP_NUM}
                 		</td>
                         <td>\${item.CODE}</td>
                         <td>\${item.NAME}</td>
                         <td>\${item.EQUIP_STATUS}</td>
                         <td>\${item.ERROR_SIGN}</td>
                         <td>\${item.EQUIP_ACTION}</td>
-                        <td>\${item.MAINTENANCE_DATE}</td>
-                        <td>\${item.START_DATE}</td>
-                        <td>\${item.END_DATE}</td>
+                        <td>\${formatDate(item.MAINTENANCE_DATE)}</td>
+                        <td>\${formatDate(item.START_DATE)}</td>
+                        <td>\${formatDate(item.END_DATE)}</td>
                         <td>\${item.ENAME}</td>
                         <td>\${item.TOTAL_RUNTIME}</td>
                     </tr>
@@ -272,6 +273,7 @@ function movePage(pageNum) {
     });
 }
 
+// 검색 페이지네이션
 function renderPagination(pInfo) {
 	let pagingHtml = "";
 	if (!pInfo.isFirstPage) {
@@ -307,6 +309,130 @@ function validateDate() {
 		document.querySelector('#end_date').value = ""; // 초기화
 	}
 }
+
+function formatDate(timestamp) {
+
+    if (!timestamp) return "-- : --";
+
+    const date = new Date(Number(timestamp));
+
+    if (isNaN(date.getTime())) return "-- : --";
+
+    return date.toLocaleString('ko-KR', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit'
+    });
+}
+
+//모달//////////////////////////////////////////////
+
+//모달 검색창 인풋 ajax
+const itemSearch = document.querySelector("#itemSearch");
+	itemSearch.addEventListener('input', ()=>{
+		const query = itemSearch.value.trim();
+		
+		if(query === ""){
+			document.querySelector("#suggestList").innerHTML = "";
+			suggestList.innerHTML = `
+	            <tr id="emptyMessage">
+	                <td colspan="5" style="padding: 50px 10px; text-align: center; color: #999;">
+	                    품목명을 입력하면 조건에 맞는 기준관리 항목이 여기에 표시됩니다.
+	                </td>
+	            </tr>
+	        `;
+			return;
+		}
+		
+		fetch(`/modal?search=\${encodeURIComponent(query)}`)
+		.then(response => response.json())
+		.then(data=>{
+			//여기에 받은 데이터 화면 갱신 로직 넣기 메서드 만들어서 넣으면 될듯 전달인자로 data넣어서
+			uploadData(data);
+		})
+		.catch(error=>{
+			console.log("등록모달 검색 에러 났음", error);
+		});
+	})
+	
+	
+	
+	//받은 data를 들고 테이블 만드는 함수
+	function uploadData(data){
+		const suggestList = document.getElementById('suggestList');
+		const Message = document.getElementById('emptyMessage');
+		
+		
+		const rows = suggestList.querySelectorAll('tr');
+		rows.forEach(row=>{
+			//테이블에 있는 tr중에 id가 emptyMessage(메시지)인것 빼고 제거
+			if(row.id !== 'emptyMessage'){
+				row.remove();
+			}
+		});//rows.forEach
+		const itemList = data.result;
+		if(itemList && itemList.length> 0){
+			Message.style.display = 'none';
+			
+			let html = "";
+			itemList.forEach(item =>{
+				html += `<tr>
+					<td style="text-align:center;"><input type="radio" name="item_num" value="\${item.ITEM_NUM || ''}"></td>
+	                <td>\${item.CODE || ''}</td>
+	                <td>\${item.NAME || ''}</td>
+	                <td>\${item.TYPE || ''}</td>
+	                <td>\${item.UNIT || 0}</td>
+	            </tr>`;
+	        });//data.forEach
+			
+	        //insertAdjacentHTML: html문자열을 태그로 바꿔서 넣음
+	        //'beforeend': suggestList의 태그가 닫히기 직전에 넣음
+			suggestList.insertAdjacentHTML('beforeend', html);
+			}//if(data && data.length> 0)
+			else{
+				Message.querySelector('td').innerText = '검색한 조건에 맞는 항목이 없습니다.';
+				Message.style.display = 'table-row';
+			}
+		}	//메서드 끝	
+		
+		
+		
+		//등록버튼 누르면 insert
+		const btn_plus = document.querySelector(".btn-plus");
+		btn_plus.addEventListener('click',()=>{
+			
+			//개수 인풋 값
+			const quantity = document.querySelector("#quantity").value;
+			//체크된 라디오 
+			const radio = document.querySelector("input[type='radio']:checked");
+			if(radio == null){//방어로직 : 아무 것도 선택하지 않았다면 작동
+				alert("선택된 항목이 없습니다.");
+			return;
+			}
+			if(quantity < 0){
+				alert("개수를 제대로 확인해주세요");
+				return;
+			}
+			const insert_form = document.querySelector("#insert-form");
+			insert_form.submit();
+		});
+			const msgFlag = "${msg}";
+			console.log("msgFlag:  ",msgFlag);
+			if(msgFlag == "true"){
+				
+				alert("등록되었습니다.");
+				//알림창 뜬 후에 주소창 쿼리스트링 제거
+				window.history.replaceState({}, document.title, window.location.pathname);
+			}else if(msgFlag == "false"){
+				alert("등록에 실패했습니다.");
+			}
+			
+			const select_reset = document.querySelector(".select-reset");
+			select_reset.addEventListener('click', ()=>{
+				location.reload();
+			})
 
 
 </script>

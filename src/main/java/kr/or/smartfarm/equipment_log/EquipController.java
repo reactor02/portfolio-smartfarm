@@ -9,11 +9,15 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.github.pagehelper.PageInfo;
+
+import kr.or.smartfarm.prod.ProdDTO;
 
 @Controller
 public class EquipController {
@@ -47,6 +51,7 @@ public class EquipController {
 		return "content/equipSelect.tiles";
 	}
 	
+//search
 	@RequestMapping("/searchEquip")
 	@ResponseBody
 	public Map searchEquip(
@@ -86,4 +91,11 @@ public class EquipController {
 	    
 	    return result;
 	}
+	
+// insert 
+    @RequestMapping(value = "/insertEquip", method = RequestMethod.POST)
+    public String create(EquipDTO equipDTO, Model model) {
+        equipService.insertEquip(equipDTO);
+        return "redirect:content/equipSelect.tiles";
+    }
 }

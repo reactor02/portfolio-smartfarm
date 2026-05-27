@@ -9,12 +9,15 @@ import org.springframework.stereotype.Repository;
 
 import com.github.pagehelper.PageHelper;
 
+import kr.or.smartfarm.stock.StockDTO;
+
 @Repository
 public class EquipDAOImpl implements EquipDAO{
 	
 	@Autowired
 	SqlSession sqlSession;
 	
+	// LIST
 	@Override
 	public List<EquipDTO> selectAll(int pageNum) {
 		
@@ -24,16 +27,8 @@ public class EquipDAOImpl implements EquipDAO{
 		return result;
 //		int total_runtime = sqlSession.update("mapper.equip.total_runtime");
 	}
-
-	@Override
-	public List selectItemEquip() {
-		return sqlSession.selectList("mapper.equip.selectItemEquip");
-	}
-	@Override
-	public List selectEmp() {
-		return sqlSession.selectList("mapper.equip.selectEmp");
-	}
-
+	
+	// SEARCH > LIST
 	@Override
 	public List searchEquip(Map map) {
 		List result = null;
@@ -41,6 +36,24 @@ public class EquipDAOImpl implements EquipDAO{
 		PageHelper.startPage(pageNum, 10);
 		result = sqlSession.selectList("mapper.equip.searchEquip", map);
 		return result;
+	}
+
+	// SELECT ITEM CODE, NAME
+	@Override
+	public List selectItemEquip() {
+		return sqlSession.selectList("mapper.equip.selectItemEquip");
+	}
+	// SELECT EMP_NUM, ENAME
+	@Override
+	public List selectEmp() {
+		return sqlSession.selectList("mapper.equip.selectEmp");
+	}
+
+
+	
+	// INSERT
+	public int insertEquip(EquipDTO dto) {
+		return sqlSession.insert("mapper.equip.insertEquip", dto);
 	}
 	
 	
