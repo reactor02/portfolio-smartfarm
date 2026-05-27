@@ -6,7 +6,7 @@
 
 	<select id="loginCheck"
 		resultType="kr.or.smartfarm.login.LoginDTO">
-		SELECT emp_num, pw
+		SELECT *
 		FROM emp
 		where emp_num = #{ emp_num }
 		and pw = #{ pw }

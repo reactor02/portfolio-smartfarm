@@ -1,16 +1,12 @@
 package kr.or.smartfarm.changepw;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.ResponseBody;
-
-import kr.or.smartfarm.login.LoginResponseDTO;
 
 @Controller
 public class ChangepwController {
@@ -40,7 +36,7 @@ public class ChangepwController {
 	
 	@PostMapping("/searchpw")
 	public String searchPost( 
-			@RequestBody ChangepwDTO changepwDTO, 
+			 ChangepwDTO changepwDTO, 
 			 HttpSession session 
 			) {
 		
@@ -65,50 +61,53 @@ public class ChangepwController {
 			session.setAttribute("verifiedUser", searchpw); 
 			
 			// 2. 비밀번호 변경 페이지(JSP)를 보여주는 URL로 리다이렉트 이동
-			return "proj3Changepw.nohead"; 
+			return "proj3Searchpw.nohead"; 
 		}
 		
 	}
 	@PostMapping("/changepw")
-	@ResponseBody // 프론트에서 Ajax(fetch, axios)로 처리 중이라면 유지, Form 태그라면 제거 후 return "redirect:/login";
-	public LoginResponseDTO changepwPost( 
-	        @RequestBody ChangepwDTO changepwDTO, 
-	        HttpSession session // 1. HttpServletRequest 대신 HttpSession 직접 주입
+	public String changepwPost( 
+	        ChangepwDTO changepwDTO, 
+	        HttpSession session,
+	        Model model // 💡 리다이렉트가 아니므로 Model을 사용하여 데이터를 전달합니다.
 	        ) {
 	    
 	    System.out.println("changepwPost 실행");
 	    
-	    LoginResponseDTO response = new LoginResponseDTO();
-	    
-	    // 2. 세션에서 이전 단계(searchpw)에서 저장한 인증 유저 정보 꺼내기
-	    // (이전 단계에서 세션에 객체를 통째로 넣었는지, ID 문자열만 넣었는지에 따라 형변환 하세요)
+	    // 1. 세션에서 인증 유저 정보 꺼내기
 	    ChangepwDTO verifiedUser = (ChangepwDTO) session.getAttribute("verifiedUser");
 	    
-	    // 3. 보안 검증: 세션이 만료되었거나 비정상적인 접근인 경우 차단
+	    // 2. 보안 검증: 세션 만료 시 처리
 	    if (verifiedUser == null) {
-	        response.setSuccess(false);
-	        response.setMessage("인증 시간이 만료되었거나 잘못된 접근입니다.");
-	        return response;
+	        model.addAttribute("message", "인증 시간이 만료되었거나 잘못된 접근입니다.");
+	        model.addAttribute("success", false);
+	        // 필요 시 본인인증 화면의 Tiles 설정값을 리턴하세요.
+	        return "proj3Searchpw.nohead"; 
 	    }
 	    
-	    // 4. 세션에서 꺼낸 유저 ID를 DTO에 확실히 세팅 (프론트가 조작하지 못하도록 방어)
+	    // 3. 세션 ID 세팅 및 비밀번호 변경 실행
 	    changepwDTO.setEmp_num(verifiedUser.getEmp_num());
-	    
 	    int changepw = changepwService.changepw(changepwDTO);
 	    
+	    // 4. 결과에 따른 데이터 적재 및 Tiles 정의 이름(Definition Name) 리턴
 	    if (changepw != 0) {
-	        response.setSuccess(true);
-	        response.setMessage("비밀번호가 변경되었습니다.");
+	        // [조건 1] 결과 데이터 모델에 담기
+	        model.addAttribute("message", "비밀번호가 성공적으로 변경되었습니다.");
+	        model.addAttribute("success", true);
 	        
-	        // 5. 핵심: 비밀번호 변경이 끝났으므로 본인확인 세션 완전히 제거
-	        session.removeAttribute("verifiedUser");
+	        session.removeAttribute("verifiedUser"); // 세션 정리
+	        
+	        // [조건 2] 로그인 화면에 해당하는 Tiles 정의(Definition) 이름 리턴
+	        // 💡 프로젝트의 tiles.xml에 등록된 로그인 화면 이름으로 적어주세요 (예: "login.nohead" 등)
+	        return "login.nohead"; 
 	       
 	    } else {
-	        response.setSuccess(false);
-	        response.setMessage("비밀번호 변경에 실패했습니다.");
+	        model.addAttribute("message", "비밀번호 변경에 실패했습니다. 다시 시도해주세요.");
+	        model.addAttribute("success", false);
+	        
+	        // 실패 시 현재 비밀번호 변경 화면의 Tiles 정의 이름 리턴
+	        return "proj3Changepw.nohead"; 
 	    }
-	    
-	    return response;
 	}
 	
 

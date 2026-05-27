@@ -13,14 +13,11 @@ public class LoginServiceImpl implements LoginService{
 	@Autowired
 	LoginDAO loginDAO;
 	
-	public List<LoginDTO> login() {
-		
+	public List<LoginDTO> login() {		
 		
 		List<LoginDTO> result = loginDAO.login();
 			
-		
-		return result;
-		
+		return result;		
 		
 	}
 	
@@ -30,14 +27,14 @@ public class LoginServiceImpl implements LoginService{
 	public LoginDTO loginCheck( LoginDTO loginDTO ) {
 		// TODO Auto-generated method stub		
 		String pw = SHA256Util.encrypt(loginDTO.getPw());
+		
+		loginDTO.setPw(pw);
 				
 		LoginDTO result = loginDAO.loginCheck(loginDTO);		
 		
-		if(result != null && result.getPw().equals(pw)) {
-			return result;
-		}		
+			
 		
-		return null;
+		return result;
 	}
 
 }

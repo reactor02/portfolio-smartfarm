@@ -14,7 +14,7 @@ public class LotDTO {
     private Date   lot_date;      // 생성일
     private int    init_qty;      // 초기수량
     private int    current_qty;   // 현재수량
-    private String lot_status;    // 상태
+    
 
     // JOIN 컬럼
     private String item_name;

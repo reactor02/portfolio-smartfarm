@@ -2,6 +2,7 @@ package kr.or.smartfarm.equipment_log;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,6 +21,15 @@ public class EquipServiceImpl implements EquipService{
 		result = equipDAO.selectAll(pageNum);
 		
 		return result; 
+	}
+
+	@Override
+	public List selectItemEquip() {
+		return equipDAO.selectItemEquip();
+	}
+	
+	public List searchEquip(Map map) {
+		return equipDAO.searchEquip(map);
 	}
 
 }

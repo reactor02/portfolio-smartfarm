@@ -6,4 +6,6 @@ import java.util.Map;
 public interface EquipService {
 
 	public List selectAll(int pageNum);
+	public List selectItemEquip();
+	public List searchEquip(Map map);
 }
