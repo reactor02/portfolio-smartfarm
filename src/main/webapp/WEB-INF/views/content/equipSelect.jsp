@@ -23,7 +23,7 @@ response.setContentType("text/html; charset=utf-8");
 <style>
 
 select.form-control {
-	width: 200px;
+	width: auto;
 }
 
 </style>
@@ -51,7 +51,7 @@ select.form-control {
 						<div class="sch-row">
 						
 							<div class="sch-left">
-								<span class="label">▶ 제품명</span> 
+								<span class="label">▶ 설비코드(설비명)</span> 
 								<select id="mType" class="form-control">
 									<option value="all">선택</option>
 									<c:forEach var="i" items="${item}">
@@ -146,7 +146,7 @@ select.form-control {
 	                    <label>설비코드(설비명)</label>
 	                   	<select name="item_num">
 	                   		<option value="">선택</option>
-	                   		<c:forEach var="i" items="${itemList}">
+	                   		<c:forEach var="i" items="${item}">
 	                            <option value="${i.code}">${i.name}</option>
 	                        </c:forEach>
 	                   	</select>
@@ -186,8 +186,8 @@ select.form-control {
 	                    <label>확인자</label>
 	                    <select name="emp_num">
 	                        <option value="">선택</option>
-	                        <c:forEach var="e" items="${empList}">
-	                            <option value="${e.num}">${e.name}</option>
+	                        <c:forEach var="e" items="${emp}">
+	                            <option value="${e.emp_num}">${e.ename}</option>
 	                        </c:forEach>
 	                    </select>
 	                </div>
@@ -261,6 +261,7 @@ function movePage(pageNum) {
             tbody.innerHTML = html;
             
             // paging 갱신
+            console.log("data.pageInfo===" + data.pageInfo);
             renderPagination(data.pageInfo);
 
          	// 주소 변경
