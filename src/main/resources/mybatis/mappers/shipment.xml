@@ -21,7 +21,7 @@
         JOIN shipment_request SR ON S.shipment_request_num = SR.shipment_request_num
         JOIN vender          V  ON SR.vender_num           = V.vender_num
         JOIN item            I  ON SR.item_num             = I.item_num
-        ORDER BY S.shipment_num DESC
+        ORDER BY S.shipment_date DESC NULLS LAST
     </select>
 
     <!-- 검색 조회 (PageHelper 페이징) -->
@@ -44,6 +44,9 @@
         <if test="status != null and status != '' and status != 'all'">
             AND S.shipment_status = #{status}
         </if>
+        <if test="item_num != null and item_num != '' and item_num != '0' and item_num != 0">
+            AND SR.item_num = #{item_num}
+        </if>
         <if test="keyword != null and keyword != ''">
             AND (
                 upper(V.vender_name) LIKE '%' || upper(#{keyword}) || '%'
@@ -61,7 +64,7 @@
                 </otherwise>
             </choose>
         </if>
-        ORDER BY S.shipment_num DESC
+        ORDER BY S.shipment_date DESC NULLS LAST
     </select>
 
     <!-- 출하 단건 상세 조회 -->
@@ -121,7 +124,33 @@
         ORDER BY L.lot_date ASC
     </select>
 
-    <!-- 출하 등록 -->
+    <!-- 접수 상태 주문 목록 (출하지시 모달용) -->
+    <select id="loadPendingRequests" resultType="hashMap">
+        SELECT
+            SR.shipment_request_num,
+            SR.request_id,
+            TO_CHAR(SR.request_date, 'YYYY-MM-DD') AS request_date,
+            TO_CHAR(SR.due_date,     'YYYY-MM-DD') AS due_date,
+            SR.request_qty,
+            V.vender_name,
+            I.name,
+            I.item_num
+        FROM shipment_request SR
+        JOIN request_status RS ON SR.status_num = RS.status_num
+        JOIN vender V ON SR.vender_num = V.vender_num
+        JOIN item   I ON SR.item_num   = I.item_num
+        WHERE RS.status_name = '접수'
+        ORDER BY SR.shipment_request_num DESC
+    </select>
+
+    <!-- 담당자 목록 (출하지시 모달용) -->
+    <select id="loadEmpList" resultType="hashMap">
+        SELECT emp_num, ename
+        FROM emp
+        ORDER BY emp_num
+    </select>
+
+    <!-- 출하 등록 (shipment_date 파라미터 사용, 없으면 SYSDATE) -->
     <insert id="insertShipment" parameterType="map">
         <selectKey keyProperty="shipment_num" resultType="int" order="BEFORE">
             SELECT SHIPMENT_SEQ.NEXTVAL FROM DUAL
@@ -132,8 +161,8 @@
             (#{shipment_num},
              'SHIP' || LPAD(#{shipment_num}, 4, '0'),
              #{emp_num},
-             SYSDATE,
-             '대기',
+             NVL(TO_DATE(#{shipment_date}, 'YYYY-MM-DD'), SYSDATE),
+             '출하대기',
              #{plan_qty},
              #{shipment_request_num})
     </insert>
@@ -174,9 +203,9 @@
             (io_seq.NEXTVAL, '출고', #{qty}, SYSDATE, NULL, #{lot_num}, NULL, '출하', 3, #{emp_num})
     </insert>
 
-    <!-- 출하확정: 출하 상태 → 완료 -->
+    <!-- 출하확정: 출하 상태 → 출하완료 -->
     <update id="confirmShipmentStatus" parameterType="int">
-        UPDATE shipment SET shipment_status = '완료' WHERE shipment_num = #{_parameter}
+        UPDATE shipment SET shipment_status = '출하완료' WHERE shipment_num = #{_parameter}
     </update>
 
     <!-- 출하확정: request 상태 → 출하완료 -->
@@ -197,5 +226,27 @@
         SET status_num = (SELECT status_num FROM request_status WHERE status_name = '접수')
         WHERE shipment_request_num = #{_parameter}
     </update>
+
+    <!-- requestDetail: 주문서에 연계된 출하지시 목록 -->
+    <select id="loadShipmentsByRequest" resultType="hashMap" parameterType="string">
+        SELECT S.shipment_num,
+               S.shipment_id,
+               TO_CHAR(S.shipment_date, 'YYYY-MM-DD') AS shipment_date,
+               S.shipment_status,
+               S.plan_qty,
+               E.ename
+        FROM shipment S
+        JOIN emp E ON S.emp_num = E.emp_num
+        WHERE S.shipment_request_num = #{_parameter}
+        ORDER BY S.shipment_date DESC NULLS LAST
+    </select>
+
+    <!-- shipment.jsp 품목 select용 — PRODUCT 목록 -->
+    <select id="loadItems" resultType="hashMap">
+        SELECT item_num, name
+        FROM item
+        WHERE UPPER(type) = 'PRODUCT'
+        ORDER BY name
+    </select>
 
 </mapper>

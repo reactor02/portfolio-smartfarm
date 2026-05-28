@@ -40,8 +40,8 @@ body { font-family: 'Malgun Gothic', sans-serif; color: var(--txt); background-c
 .btn-action:hover { background-color: var(--p-cl); }
 .btn-primary { background-color:#fff ; color: var(--m-cl); }
 .btn-primary:hover { background-color: var(--s-cl); color: #fff; border-color: var(--s-cl); }
-.btn-del { color: #dc3545; border-color: #dc3545; }
-.btn-del:hover { background-color: #dc3545; color: #fff; }
+.btn-del { color: #fff; border-color: #dc3545; background-color: #dc3545;}
+.btn-del:hover { background-color: #ff4757; border-color: #ff4757; color: #fff; }
 
 .section-title {
     font-size: 1.05rem;
@@ -54,7 +54,7 @@ body { font-family: 'Malgun Gothic', sans-serif; color: var(--txt); background-c
 
 .section-box {
     background: #fff;
-    border: 1px solid var(--border-cl);
+    border: 1px solid #bbb;
     border-radius: 8px;
     padding: 20px;
     margin-bottom: 20px;

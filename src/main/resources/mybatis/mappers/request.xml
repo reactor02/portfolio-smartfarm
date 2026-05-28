@@ -24,7 +24,7 @@
         JOIN vender V ON SR.vender_num = V.vender_num
         JOIN emp    E ON V.emp_num     = E.emp_num
         JOIN item   I ON SR.item_num   = I.item_num
-        ORDER BY SR.shipment_request_num DESC
+        ORDER BY SR.due_date ASC NULLS LAST
     </select>
 
     <!-- 검색 조회 (PageHelper가 페이징 처리) -->
@@ -60,17 +60,17 @@
             )
         </if>
         <if test="sDate != null and sDate != ''">
-            AND SR.request_date >= TO_DATE(#{sDate}, 'YYYY-MM-DD')
+            AND SR.due_date >= TO_DATE(#{sDate}, 'YYYY-MM-DD')
             <choose>
                 <when test="eDate != null and eDate != ''">
-                    AND SR.request_date &lt; TO_DATE(#{eDate}, 'YYYY-MM-DD') + 1
+                    AND SR.due_date &lt; TO_DATE(#{eDate}, 'YYYY-MM-DD') + 1
                 </when>
                 <otherwise>
-                    AND SR.request_date &lt; SYSDATE + 1
+                    AND SR.due_date &lt; SYSDATE + 1
                 </otherwise>
             </choose>
         </if>
-        ORDER BY SR.shipment_request_num DESC
+        ORDER BY SR.due_date ASC NULLS LAST
     </select>
 
     <!-- 단건 상세 조회 -->

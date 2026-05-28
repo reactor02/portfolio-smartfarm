@@ -20,14 +20,12 @@ response.setContentType("text/html; charset=utf-8");
     <div class="hdr">
         <h1>주문 상세</h1>
         <div class="hdr-right">
-            <c:if test="${hasShipment == 0 and detail.REQUEST_STATUS == '접수'}">
-                <form method="POST" action="/dispatchRequest" style="display:inline;">
+            <c:if test="${detail.REQUEST_STATUS != '취소' and detail.REQUEST_STATUS != '출하완료'}">
+                <form method="POST" action="/cancelRequest" style="display:inline;">
                     <input type="hidden" name="shipmentRequestNum" value="${detail.SHIPMENT_REQUEST_NUM}">
-                    <input type="hidden" name="itemNum"    value="${detail.ITEM_NUM}">
-                    <input type="hidden" name="requestQty" value="${detail.REQUEST_QTY}">
-                    <input type="hidden" name="requestId"  value="${detail.REQUEST_ID}">
-                    <button type="submit" class="btn-action btn-primary"
-                            onclick="return confirm('출하지시를 진행하시겠습니까?')">출하지시</button>
+                    <input type="hidden" name="requestId"          value="${detail.REQUEST_ID}">
+                    <button type="submit" class="btn-action btn-del"
+                            onclick="return confirm('주문을 취소하시겠습니까?')">취소</button>
                 </form>
             </c:if>
             <a href="/request" class="btn-action">목록으로</a>
@@ -37,6 +35,7 @@ response.setContentType("text/html; charset=utf-8");
     <c:choose>
         <c:when test="${not empty detail}">
 
+            <!-- 기본 정보 -->
             <div class="section-box">
                 <div class="section-title">기본 정보</div>
                 <div class="info-grid">
@@ -45,7 +44,7 @@ response.setContentType("text/html; charset=utf-8");
                         <span class="info-value">${detail.REQUEST_ID}</span>
                     </div>
                     <div class="info-item">
-                        <span class="info-label">주문일</span>
+                        <span class="info-label">등록일</span>
                         <span class="info-value">${detail.REQUEST_DATE}</span>
                     </div>
                     <div class="info-item">
@@ -82,6 +81,49 @@ response.setContentType("text/html; charset=utf-8");
                         </span>
                     </div>
                 </div>
+            </div>
+
+            <!-- 연계된 출하지시 -->
+            <div class="section-box">
+                <div class="section-title">연계된 출하지시</div>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>출하ID</th>
+                            <th>출하일</th>
+                            <th>계획수량</th>
+                            <th>담당자</th>
+                            <th>상태</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <c:choose>
+                            <c:when test="${not empty linkedShipments}">
+                                <c:forEach var="s" items="${linkedShipments}">
+                                    <tr>
+                                        <td><a href="/shipmentDetail/${s.SHIPMENT_ID}" class="link-id">${s.SHIPMENT_ID}</a></td>
+                                        <td>${s.SHIPMENT_DATE}</td>
+                                        <td>${s.PLAN_QTY}</td>
+                                        <td>${s.ENAME}</td>
+                                        <td>
+                                            <span class="badge
+                                                <c:choose>
+                                                    <c:when test="${s.SHIPMENT_STATUS == '출하대기'}">badge-waiting</c:when>
+                                                    <c:when test="${s.SHIPMENT_STATUS == '진행'}">badge-progress</c:when>
+                                                    <c:when test="${s.SHIPMENT_STATUS == '출하완료'}">badge-done</c:when>
+                                                    <c:when test="${s.SHIPMENT_STATUS == '취소'}">badge-cancel</c:when>
+                                                </c:choose>
+                                            ">${s.SHIPMENT_STATUS}</span>
+                                        </td>
+                                    </tr>
+                                </c:forEach>
+                            </c:when>
+                            <c:otherwise>
+                                <tr><td colspan="5" class="empty-cell">출하지시 없음</td></tr>
+                            </c:otherwise>
+                        </c:choose>
+                    </tbody>
+                </table>
             </div>
 
         </c:when>

@@ -92,4 +92,24 @@ public class ShipmentDAOImpl implements ShipmentDAO {
     public int updateRequestStatusToRollback(String shipmentRequestNum) {
         return sqlSession.update("kr.or.smartfarm.shipment.updateRequestStatusToRollback", shipmentRequestNum);
     }
+
+    @Override
+    public List selectByRequestNum(String shipmentRequestNum) {
+        return sqlSession.selectList("kr.or.smartfarm.shipment.loadShipmentsByRequest", shipmentRequestNum);
+    }
+
+    @Override
+    public List loadItems() {
+        return sqlSession.selectList("kr.or.smartfarm.shipment.loadItems");
+    }
+
+    @Override
+    public List loadPendingRequests() {
+        return sqlSession.selectList("kr.or.smartfarm.shipment.loadPendingRequests");
+    }
+
+    @Override
+    public List loadEmpList() {
+        return sqlSession.selectList("kr.or.smartfarm.shipment.loadEmpList");
+    }
 }

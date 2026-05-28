@@ -254,3 +254,66 @@ select.form-control {
 .link-id:hover {
     text-decoration: underline;
 }
+
+/* ── 출하지시 등록 모달 ── */
+.modal-box-wide {
+    width: 900px;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.modal-section-label {
+    font-size: 13px;
+    font-weight: bold;
+    color: #555;
+    margin-bottom: 6px;
+}
+
+.required-mark { color: #dc3545; }
+
+.modal-tbl-wrap {
+    max-height: 220px;
+    overflow-y: auto;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin-bottom: 4px;
+}
+
+.modal-req-tbl {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.modal-req-tbl th {
+    position: sticky;
+    top: 0;
+    background-color: #e9ecef;
+    padding: 9px 10px;
+    font-size: 13px;
+    font-weight: bold;
+    border-bottom: 2px solid #aaa;
+    text-align: center;
+    z-index: 1;
+}
+
+.modal-req-tbl td {
+    padding: 9px 10px;
+    font-size: 13px;
+    border-bottom: 1px solid #eee;
+    text-align: center;
+    color: #333;
+}
+
+.req-row { cursor: pointer; }
+.req-row:hover { background-color: #f1f8f5; }
+.req-row-selected { background-color: #B7E4C7 !important; font-weight: bold; }
+
+.modal-select,
+.modal-input {
+    padding: 7px 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 13px;
+    width: 100%;
+    box-sizing: border-box;
+}

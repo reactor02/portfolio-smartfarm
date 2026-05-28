@@ -20,7 +20,7 @@ response.setContentType("text/html; charset=utf-8");
     <div class="hdr">
         <h1>출하 상세</h1>
         <div class="hdr-right">
-            <c:if test="${detail.SHIPMENT_STATUS == '대기'}">
+            <c:if test="${detail.SHIPMENT_STATUS == '출하대기'}">
                 <form method="POST" action="/confirmShipment" style="display:inline;">
                     <input type="hidden" name="shipmentNum"        value="${detail.SHIPMENT_NUM}">
                     <input type="hidden" name="shipmentId"         value="${detail.SHIPMENT_ID}">
@@ -29,7 +29,7 @@ response.setContentType("text/html; charset=utf-8");
                             onclick="return confirm('출하확정하시겠습니까? 재고가 차감됩니다.')">출하확정</button>
                 </form>
             </c:if>
-            <c:if test="${detail.SHIPMENT_STATUS == '대기' or detail.SHIPMENT_STATUS == '진행'}">
+            <c:if test="${detail.SHIPMENT_STATUS != '취소' and detail.SHIPMENT_STATUS != '출하완료'}">
                 <form method="POST" action="/cancelShipment" style="display:inline;">
                     <input type="hidden" name="shipmentNum"        value="${detail.SHIPMENT_NUM}">
                     <input type="hidden" name="shipmentId"         value="${detail.SHIPMENT_ID}">
@@ -73,13 +73,17 @@ response.setContentType("text/html; charset=utf-8");
                         <span class="info-value">${detail.ENAME}</span>
                     </div>
                     <div class="info-item">
+                        <span class="info-label">등록일</span>
+                        <span class="info-value">${detail.SHIPMENT_DATE}</span>
+                    </div>
+                    <div class="info-item">
                         <span class="info-label">상태</span>
                         <span class="info-value">
                             <span class="badge
                                 <c:choose>
-                                    <c:when test="${detail.SHIPMENT_STATUS == '대기'}">badge-waiting</c:when>
+                                    <c:when test="${detail.SHIPMENT_STATUS == '출하대기'}">badge-waiting</c:when>
                                     <c:when test="${detail.SHIPMENT_STATUS == '진행'}">badge-progress</c:when>
-                                    <c:when test="${detail.SHIPMENT_STATUS == '완료'}">badge-done</c:when>
+                                    <c:when test="${detail.SHIPMENT_STATUS == '출하완료'}">badge-done</c:when>
                                     <c:when test="${detail.SHIPMENT_STATUS == '취소'}">badge-cancel</c:when>
                                 </c:choose>
                             ">${detail.SHIPMENT_STATUS}</span>

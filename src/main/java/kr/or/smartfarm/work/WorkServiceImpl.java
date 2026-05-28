@@ -144,10 +144,10 @@ public class WorkServiceImpl implements WorkService {
                 ioMap.put("ioReason", "생산투입");
                 dao.insertIo(ioMap);
 
-                // ③ lot_relation 기록
+                // ③ lot_relation 기록 (lot_parent = 생산결과, lot_child = 소모재료)
                 LotRelationDTO rel = new LotRelationDTO();
-                rel.setParent_lot_num(lot.getLot_num());
-                rel.setChild_lot_num(newLotNum);
+                rel.setParent_lot_num(newLotNum);       // 생산결과 LOT = parent
+                rel.setChild_lot_num(lot.getLot_num()); // 소모재료 LOT = child
                 lotRelationDao.insert(rel);
 
                 totalNeeded -= deduct;

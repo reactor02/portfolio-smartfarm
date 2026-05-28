@@ -113,4 +113,24 @@ public class ShipmentServiceImpl implements ShipmentService {
         // 2. Request 상태 → 접수 (롤백)
         shipmentDAO.updateRequestStatusToRollback(shipmentRequestNum);
     }
+
+    @Override
+    public List selectByRequestNum(String shipmentRequestNum) {
+        return shipmentDAO.selectByRequestNum(shipmentRequestNum);
+    }
+
+    @Override
+    public List loadItems() {
+        return shipmentDAO.loadItems();
+    }
+
+    @Override
+    public List loadPendingRequests() {
+        return shipmentDAO.loadPendingRequests();
+    }
+
+    @Override
+    public List loadEmpList() {
+        return shipmentDAO.loadEmpList();
+    }
 }
