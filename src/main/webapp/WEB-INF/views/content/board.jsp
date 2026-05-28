@@ -6,6 +6,13 @@
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 <%@ taglib prefix="tiles" uri="http://tiles.apache.org/tags-tiles"%>
 
+<%
+if (session.getAttribute("loginUser") == null) {
+    response.sendRedirect("/login");
+    return;
+}
+%>
+
 
 
 
@@ -223,69 +230,69 @@ select.form-control {
 
 /* ========== 4. 데이터 테이블 (세련된 스타일) ========== */
 .tbl-box {
-    background: #fff;
-    border-radius: 8px;
-    padding: 15px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+	background: #fff;
+	border-radius: 8px;
+	padding: 15px;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
 }
 
 .board-tbl {
-    width: 100%;
-    border-collapse: collapse;
-    border-top: 2px solid #2D6A4F; /* 상단 헤더 강조 */
-    margin-bottom: 20px;
+	width: 100%;
+	border-collapse: collapse;
+	border-top: 2px solid #2D6A4F; /* 상단 헤더 강조 */
+	margin-bottom: 20px;
 }
 
 .board-tbl th {
-    background-color: #f8f9fa;
-    color: #222;
-    padding: 14px 10px;
-    border-bottom: 1px solid #ddd;
-    font-weight: 700;
-    font-size: 0.95rem;
+	background-color: #f8f9fa;
+	color: #222;
+	padding: 14px 10px;
+	border-bottom: 1px solid #ddd;
+	font-weight: 700;
+	font-size: 0.95rem;
 }
 
 .board-tbl td {
-    padding: 12px 10px;
-    border-bottom: 1px solid #eee;
-    text-align: center;
-    color: #444;
-    font-size: 0.95rem;
+	padding: 12px 10px;
+	border-bottom: 1px solid #eee;
+	text-align: center;
+	color: #444;
+	font-size: 0.95rem;
 }
 
 /* 행 호버 효과 */
 .board-tbl tbody tr:hover {
-    background-color: #f9fdfb;
+	background-color: #f9fdfb;
 }
 
 /* [핵심] 공지사항 스타일 */
 .board-tbl tr.notice {
-    background-color: #f1f8f5; /* 연한 초록 배경 */
-    font-weight: bold;
+	background-color: #f1f8f5; /* 연한 초록 배경 */
+	font-weight: bold;
 }
 
 .board-tbl tr.notice td {
-    color: #2D6A4F; /* 글자 색상 강조 */
+	color: #2D6A4F; /* 글자 색상 강조 */
 }
 
 /* 공지 라벨 디자인 */
 .notice-badge {
-    background-color: #2D6A4F;
-    color: #fff;
-    padding: 2px 6px;
-    border-radius: 4px;
-    font-size: 0.8rem;
-    margin-right: 5px;
+	background-color: #2D6A4F;
+	color: #fff;
+	padding: 2px 6px;
+	border-radius: 4px;
+	font-size: 0.8rem;
+	margin-right: 5px;
 }
 
 .link-txt {
-    color: #333;
-    text-decoration: none;
+	color: #333;
+	text-decoration: none;
 }
 
 .link-txt:hover {
-    color: #2D6A4F;
-    text-decoration: underline;
+	color: #2D6A4F;
+	text-decoration: underline;
 }
 /* ========== 5. 페이징 ========== */
 .pg-wrap {
@@ -382,73 +389,7 @@ select.form-control {
 </style>
 
 
-<script> 
-	window.addEventListener('load', ()=> {
-		bind()
-	})
-	
-		let page = ${param.page != null ? param.page : 1};
-		let contextPath = "${pageContext.request.contextPath}";
-		
-	function bind(){
-			fetch(`\${contextPath}/board/list?page=` + page, {
-				method: 'get'
-			}).then(
-				resp => resp.json()		
-			).then(function(data){
-				console.log(data)
-				console.log('data.list',data.length)
-				
-				document.getElementById("tbody").innerHTML=``
-					for(let i = 0; i < data.length; i++) {
-					    // 카테고리가 공지인지 체크
-					    let isNotice = data[i].category === '공지';
-					    let trClass = isNotice ? 'class="notice"' : '';
-					    let badge = isNotice ? '<span class="notice-badge">공지</span>' : '';
 
-					    document.getElementById("tbody").innerHTML += `
-					    <tr ${trClass}>
-					        <td>\${isNotice ? '!' : data[i].board_num}</td>
-					        <td>\${data[i].category}</td>
-					        <td style="text-align: left; padding-left: 20px;">
-					            \${badge}
-					            <a href="\${contextPath}/board/one?board_num=\${data[i].board_num}" class="link-txt">\${data[i].title}</a>
-					        </td>
-					        <td>\${data[i].ename}</td>
-					        <td>\${formatDate(data[i].created_at)}</td>
-					        <td>\${data[i].view_cnt}</td>
-					    </tr>
-					    `;
-					}
-			})
-		
-		
-	}
-	
-	
-
-	function formatDate(ts){
-	    return ts ? new Date(ts).toLocaleString('ko-KR', {
-	        year:'numeric',
-	        month:'2-digit',
-	        day:'2-digit',
-	        hour:'2-digit',
-	        minute:'2-digit'
-	    }) : "";
-	}
-	
-	function selectOption(text){
-		document.getElementById('selectedText').innerText = text;
-	}
-	
-	document.addEventListener('click', function(e){
-		const select = document.getElementById('selectOption');
-		if(!select.contains(e.target)){
-			select.classList.remove('on');
-		}
-	})
-	</script>
-</script>
 </head>
 <body>
 
@@ -473,26 +414,23 @@ select.form-control {
 						<div class="sch-row">
 							<div class="sch-left">
 								<!-- 드롭다운 컨테이너 -->
-								<div class="select_option" id="selectOption"
-									onclick="this.classList.toggle('on')">
-									<span class="option_text" id="selectedText">선택 ⩢</span>
-									<ul class="option_list">
-										<li class="item"><button type="button"
-												onclick="selectOption('제목만')">제목만</button></li>
-										<li class="item"><button type="button"
-												onclick="selectOption('글작성자')">글작성자</button></li>
-									</ul>
-								</div>
+								<span class="label">▶ 검색 조건</span> <select class="form-control"
+									name="type" id="mType">
+									<option value="">선택</option>
+									<option value="title">제목만</option>
+									<option value="ename">글작성자</option>
+								</select>
 							</div>
 
 
 							<div class="sch-right">
 								<div class="sch-input-box">
 									<span style="color: #888;">&#128269;</span> <input type="text"
-										id="keyword" value="" placeholder="제목 검색">
+										id="keyword" value="" placeholder="제목/작성자 검색">
 								</div>
 								<button type="button" class="btn-sch" id="search">검색</button>
-								<button type="button" class="btn-sch" id="init">초기화</button>
+								<button type="button" class="btn-sch select-reset" id="init">검색
+									초기화</button>
 							</div>
 						</div>
 					</div>
@@ -525,6 +463,189 @@ select.form-control {
 		</div>
 		<tiles:insertAttribute name="footer" ignore="true" />
 	</div>
+
+
+	<script> 
+	window.addEventListener('load', ()=> {
+		bind()
+	})
+	
+		let page = ${param.page != null ? param.page : 1};
+		let contextPath = "${pageContext.request.contextPath}";
+		
+	function bind(){
+		reset(); 
+		
+		// 최초 로딩
+		loadData(page);
+		
+		// 검색 버튼 
+		const btn_sch = document.querySelector(".btn-sch");
+		btn_sch.addEventListener('click', () => {
+			loadData(1);
+		});
+		
+		// Enter 검색 
+		const keywordInput = document.querySelector("#keyword"); 
+		keywordInput.addEventListener("keydown", (e) => {
+			if (e.key === "Enter"){
+				e.preventDefault(); // form submit 막기용
+				loadData(1);
+			}
+		});
+		
+		// select 변경 검색 
+		const typeSelect = document.querySelector("#mType");
+		typeSelect.addEventListener("change",() => {
+			loadData(1);
+		})
+	}
+	
+	// 초기화 버튼 
+	function reset() {
+		const select_reset = document.querySelector(".select-reset");
+		select_reset.addEventListener('click', () => {
+			location.reload(); 
+		})
+	}
+	
+	// 전체조회 + 검색 + 페이징 통합 
+	function loadData(pageNum = 1){
+		
+		let type = document.querySelector("#mType").value;
+		let keyword = document.querySelector("#keyword").value; 
+		
+		const params = new URLSearchParams(); 
+		params.append("page", pageNum);
+		params.append("type", type);
+		params.append("keyword", keyword);
+	
+		fetch(`/board/search?\${params.toString()}`)
+		.then(
+			resp => resp.json()		
+		).then(data => {
+			
+			let tbody = document.querySelector("#tbody");
+			tbody.innerHTML = "";
+			
+			// 안전 처리 
+			let list = data.searchResult ?? data.list ?? [];
+			
+			// 데이터 없음 
+			if (list.length === 0){
+				tbody.innerHTML = "<tr><td colspan = '8'>조회된 결과가 없습니다.</td></tr>";
+				renderPagination(data.pageInfo);
+				return;
+			}
+			
+			// 데이터 출력 
+			let html = "";
+			for (let item of list){
+				
+				// 공지 여부 체크 
+				let isNotice = item.category === '공지';
+				
+				// tr 클래스
+				let trClass= isNotice ? 'class="notice"' : '';
+				
+				// 뱃지
+				 let badge = isNotice ? '<span class="notice-badge">공지</span>': '';
+				        
+				html += `
+				 <tr>
+			        <td>\${item.board_num}</td>
+			        <td>\${item.category}</td>
+			        <td style="text-align: left; padding-left: 20px;">
+			            \${badge}
+			            <a href="/board/one?board_num=\${item.board_num}" class="link-txt">\${item.title}</a>
+			        </td>
+			        <td>\${item.ename}</td>
+			        <td>\${formatDate(item.created_at)}</td>
+			        <td>\${item.view_cnt}</td>
+			    </tr>
+				`;
+			}
+			
+			tbody.innerHTML = html;
+			
+			//페이징 
+			renderPagination(data.pageInfo);
+			
+			// URL 변경
+			const newUrl = `${window.location.pathname}?\${params.toString()}`;
+			window.history.pushState({ path: newUrl }, '', newUrl);
+		})
+		.catch(err => {
+			console.error("fetch 에러:", err);
+		});	
+	}
+	
+	
+
+	
+	
+
+	function formatDate(ts){
+	    return ts ? new Date(ts).toLocaleString('ko-KR', {
+	        year:'numeric',
+	        month:'2-digit',
+	        day:'2-digit',
+	        hour:'2-digit',
+	        minute:'2-digit'
+	    }) : "";
+	}
+	
+	function selectOption(text){
+		document.getElementById('selectedText').innerText = text;
+	}
+	
+	document.addEventListener('click', function(e){
+		const select = document.getElementById('selectOption');
+		if(!select.contains(e.target)){
+			select.classList.remove('on');
+		}
+	})
+	
+	// 페이지네이션 함수 
+	function renderPagination(pInfo){
+		let pagingHtml = "";
+		
+		// 이전
+		if(!pInfo.isFirstPage){
+			// pg-btn -> page-link
+			pagingHtml += `<a class="page-link prev-next" href="javascript:movePage(${pInfo.pageNum - 1})">이전</a>`;
+		}
+		
+		// 번호
+	    pInfo.navigatepageNums.forEach(num => {
+	        pagingHtml += `<a class="page-link prev-next \${num === pInfo.pageNum ? 'active' : ''}" href="javascript:movePage(\${num})">\${num}</a>`;
+	    });
+	    
+	    // 다음
+	    if (!pInfo.isLastPage) {
+	        pagingHtml += `<a class="page-link prev-next" href="javascript:movePage(${pInfo.pageNum + 1})">다음</a>`;
+	    }
+	    
+	    document.querySelector(".pagination-container").innerHTML = pagingHtml;
+	}
+	
+	window.movePage = function(pageNum){
+		loadData(pageNum);
+	};
+	
+	document.querySelector("#mType").addEventListener("change", (e) => {
+	    const keyword = document.querySelector("#keyword");
+	    
+	    if (e.target.value === "title") {
+	        keyword.placeholder = "제목 검색";
+	    } else if (e.target.value === "ename") {
+	        keyword.placeholder = "작성자 검색";
+	    } else {
+	        keyword.placeholder = "제목/작성자 검색";
+	    }
+	});
+	
+</script>
 
 </body>
 </html>

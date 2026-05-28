@@ -1,6 +1,7 @@
 package kr.or.smartfarm.vender;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -67,8 +68,8 @@ public class VenderServiceImpl implements VenderService {
 
 
 	@Override
-	public List<VenderDTO> search(VenderDTO venderDTO) {
-		List<VenderDTO> result = venderDAO.search(venderDTO);
+	public List<VenderDTO> search(Map map) {
+		List<VenderDTO> result = venderDAO.search(map);
 		return result;
 	}
 

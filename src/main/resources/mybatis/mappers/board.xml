@@ -8,7 +8,8 @@
 		resultType="kr.or.smartfarm.board.BoardDTO">
 		SELECT b.*, e.ename
 		FROM board b
-		LEFT JOIN emp e ON b.emp_num = e.emp_num
+		LEFT JOIN emp e ON b.emp_num
+		= e.emp_num
 		ORDER BY
 		CASE WHEN b.category = '공지' THEN 0 ELSE 1 END,
 		b.board_num DESC
@@ -16,7 +17,9 @@
 
 	<select id="selectOneBoard"
 		resultType="kr.or.smartfarm.board.BoardDTO">
-		select * from board where board_num = #{board_num}
+		select b.*, e.ename from board b 
+		left join emp e on b.emp_num = e.emp_num
+		where board_num = #{board_num}
 	</select>
 
 	<insert id="insertBoard">
@@ -36,35 +39,64 @@
 		update board set view_cnt = view_cnt + 1 where
 		board_num = #{board_num}
 	</update>
-	
-	<update id="updateBoard" parameterType="kr.or.smartfarm.board.BoardDTO">
-		update board set 
+
+	<update id="updateBoard"
+		parameterType="kr.or.smartfarm.board.BoardDTO">
+		update board set
 		title = #{title},
 		content = #{content},
-		updated_at = sysdate 
+		updated_at = sysdate
 		where board_num = #{board_num}
 	</update>
-	
-	<delete id="deleteBoard" parameterType="kr.or.smartfarm.board.BoardDTO"> 
+
+	<delete id="deleteBoard"
+		parameterType="kr.or.smartfarm.board.BoardDTO">
 		delete from board where board_num = #{board_num}
 	</delete>
-	
-	<delete id="deletefiles" parameterType="kr.or.smartfarm.board.BoardDTO"> 
-		delete from files where files_num = #{files_num} 
+
+	<delete id="deletefiles"
+		parameterType="kr.or.smartfarm.board.BoardDTO">
+		delete from files where files_num = #{files_num}
 	</delete>
-	
+
 	<!-- 검색용 -->
-	<select id="selectTitleBoard" resultType="kr.or.smartfarm.board.BoardDTO">
-		select * from board where title like ('%' || #{title} || '%')
+	<select id="searchBoard"
+		resultType="kr.or.smartfarm.board.BoardDTO">
+		select b.*, e.ename
+		from board b
+		left join emp e on b.emp_num = e.emp_num
+		where 1=1
+
+		<if test="keyword != null and keyword != ''">
+			<choose>
+				<!-- 제목 검색 -->
+				<when test="type == 'title'">
+					and b.title like '%' || #{keyword} || '%'
+				</when>
+
+				<!-- 작성자 검색 -->
+				<when test="type == 'ename'">
+					and e.ename like '%' || #{keyword} || '%'
+				</when>
+
+				<!-- 전체 검색 -->
+				<otherwise>
+					and (
+					b.title like '%' || #{keyword} || '%'
+					OR e.ename like '%' || #{keyword} || '%'
+					)
+				</otherwise>
+			</choose>
+		</if>
+
+		ORDER BY
+		CASE WHEN b.category = '공지' THEN 0 ELSE 1 END,
+		b.board_num DESC
 	</select>
-	
-	<select id="selectenameBoard" resultType="kr.or.smartfarm.board.BoardDTO">
-		SELECT b.*, e.ename
-		FROM board b
-		LEFT JOIN emp e ON b.emp_num = e.emp_num
-		where e.ename like ('%' || #{ename} || '%')
-	</select>
-	
+
+
+
+
 
 </mapper>
 

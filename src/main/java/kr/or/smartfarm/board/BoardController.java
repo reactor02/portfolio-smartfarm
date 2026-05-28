@@ -1,5 +1,6 @@
 package kr.or.smartfarm.board;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -113,10 +114,39 @@ public class BoardController {
 	}
 	
 
-	
-	
-	
-	
+	@RequestMapping("/search")
+	@ResponseBody
+	public Map search(
+			@RequestParam(value="page", defaultValue="1") int page, 
+			@RequestParam(value="type") String type, 
+			@RequestParam(value="keyword") String keyword
+			) {
+		Map result = new HashMap(); 
+		
+		try {
+			Map searchMap = new HashMap(); 
+			searchMap.put("page", page);
+			searchMap.put("type", type);
+			searchMap.put("keyword", keyword);
+			System.out.println(searchMap);
+			
+			List searchResult = boardService.search(searchMap);
+			result.put("searchResult", searchResult);
+			
+			result.put("status",  "good");
+			if(searchResult != null) {
+				PageInfo<Map<String, Object>> pageInfo = new PageInfo<Map<String, Object>>(searchResult);
+				result.put("pageInfo", pageInfo);
+			} else {
+				PageInfo pageInfo = new PageInfo(); 
+				result.put("pageInfo", pageInfo);
+			}
+		} catch(Exception e) {
+			e.printStackTrace(); 
+			result.put("status", "error");
+		}
+		return result;
+	}
 	
 
 	

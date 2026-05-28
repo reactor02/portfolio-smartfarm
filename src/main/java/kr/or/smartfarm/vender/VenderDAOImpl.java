@@ -1,6 +1,7 @@
 package kr.or.smartfarm.vender;
 
 import java.util.List;
+import java.util.Map;
 
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +18,7 @@ public class VenderDAOImpl implements VenderDAO{
 	@Override 
 	public List<VenderDTO> selectAllVender(int pageNum) {
 		
-		PageHelper.startPage(pageNum, 5);
+		PageHelper.startPage(pageNum, 10);
 		
 		List<VenderDTO> resultList = null;
 		resultList = sqlSession.selectList("mapper.vender.selectVender");
@@ -68,10 +69,12 @@ public class VenderDAOImpl implements VenderDAO{
 	}
 
 	@Override
-	public List<VenderDTO> search(VenderDTO venderDTO) {
-		List<VenderDTO> resultList = null; 
+	public List search(Map map) {
+		List resultList = null; 
 		
-		resultList = sqlSession.selectList("mapper.vender.searchVender", venderDTO);
+		int pageNum = (Integer)map.get("page");
+		PageHelper.startPage(pageNum, 10);
+		resultList = sqlSession.selectList("mapper.vender.searchVender", map);
 		System.out.println("search : resultList : " + resultList);
 		return resultList;
 	}
