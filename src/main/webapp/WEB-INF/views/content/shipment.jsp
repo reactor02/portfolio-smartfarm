@@ -1,4 +1,4 @@
-﻿<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%
 request.setCharacterEncoding("utf-8");
 response.setContentType("text/html; charset=utf-8");
@@ -16,225 +16,7 @@ response.setContentType("text/html; charset=utf-8");
 <title>출하 관리</title>
 <link rel="stylesheet" href="/resources/css/paging.css">
 <link rel="stylesheet" href="/resources/css/modal.css">
-<style>
-* {
-	box-sizing: border-box;
-	margin: 0;
-	padding: 0;
-	font-family: 'Malgun Gothic', sans-serif;
-}
-
-.mat-all {
-	display: flex;
-	flex-direction: column;
-	min-height: 100vh;
-	background-color: #f4f7f6;
-}
-
-.mat-body {
-	display: flex;
-	flex: 1;
-}
-
-.main-cont {
-	flex: 1;
-	padding: 2rem 2.5rem;
-	min-width: 0;
-}
-
-.hdr {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	background-color: #2D6A4F;
-	padding: 15px 25px;
-	border-radius: 8px;
-	margin-bottom: 25px;
-	box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-.hdr h1 {
-	font-size: 1.8rem;
-	color: #ffffff;
-	font-weight: bold;
-	letter-spacing: -1px;
-}
-
-.btn-reg {
-	background-color: #fff;
-	color: #2D6A4F;
-	padding: 10px 24px;
-	border-radius: 6px;
-	border: 1px solid #2D6A4F;
-	font-weight: bold;
-	font-size: 1.05rem;
-	cursor: pointer;
-	box-shadow: inset 0 1px 0 rgba(255,255,255,0.2), 0 2px 3px rgba(0,0,0,0.2);
-	transition: background-color 0.2s;
-}
-
-.btn-reg:hover {
-	background-color: #B7E4C7;
-}
-
-.sch-wrap {
-	background-color: #fff;
-	border: 1px solid #bbb;
-	border-radius: 10px;
-	padding: 20px 25px;
-	margin-bottom: 25px;
-	box-shadow: 0 2px 8px rgba(0,0,0,0.03);
-	display: flex;
-	flex-direction: column;
-	gap: 15px;
-}
-
-.sch-row-1, .sch-row-3 {
-	display: flex;
-	align-items: center;
-	width: 100%;
-	gap: 15px;
-}
-
-.sch-row-2 {
-	display: flex;
-	align-items: center;
-	width: 100%;
-	gap: 30px;
-}
-
-.sch-row-2 > div {
-	flex: 1;
-	display: flex;
-	align-items: center;
-	gap: 15px;
-}
-
-.sch-row-3 {
-	justify-content: flex-end;
-}
-
-.label {
-	font-size: 0.95rem;
-	font-weight: bold;
-	color: #333;
-	white-space: nowrap;
-	min-width: 75px;
-}
-
-.form-control {
-	height: 38px;
-	border: 1px solid #aaa;
-	border-radius: 4px;
-	padding: 0 10px;
-	font-size: 0.95rem;
-	outline: none;
-	transition: border-color 0.2s;
-	width: 325px;
-}
-
-.form-control:focus {
-	border-color: #2D6A4F;
-}
-
-select.form-control {
-	flex: 1;
-	width: 327px;
-}
-
-.sch-input-box {
-	display: flex;
-	align-items: center;
-	border: 1px solid #aaa;
-	border-radius: 4px;
-	height: 38px;
-	background: #fff;
-	padding-left: 10px;
-	width: 555px;
-	flex-shrink: 0;
-}
-
-.sch-input-box input {
-	border: none;
-	outline: none;
-	height: 100%;
-	flex: 1;
-	padding: 0 5px;
-	font-size: 0.95rem;
-}
-
-.btn-sch, .select-reset {
-	height: 38px;
-	padding: 0 20px;
-	background-color: #fff;
-	color: #2D6A4F;
-	border: 1px solid #2D6A4F;
-	border-radius: 4px;
-	font-size: 1rem;
-	font-weight: bold;
-	cursor: pointer;
-	transition: 0.2s;
-	white-space: nowrap;
-	flex-shrink: 0;
-}
-
-.btn-sch:hover {
-	background-color: #B7E4C7;
-}
-
-.select-reset:hover {
-	background-color: #FFB703;
-}
-
-.tbl-box {
-	background: #fff;
-	border-radius: 8px;
-	padding: 15px;
-	box-shadow: 0 2px 8px rgba(0,0,0,0.03);
-}
-
-.stk-tbl {
-	width: 100%;
-	border-collapse: collapse;
-	border-top: 2px solid #555;
-	border-bottom: 2px solid #555;
-}
-
-.stk-tbl th {
-	background-color: #e9ecef;
-	color: #222;
-	padding: 12px 10px;
-	border: 1px solid #ccc;
-	border-top: none;
-	font-weight: bold;
-	font-size: 0.95rem;
-}
-
-.stk-tbl td {
-	padding: 12px 10px;
-	border: 1px solid #ccc;
-	text-align: center;
-	color: #333;
-	font-size: 0.95rem;
-}
-
-.stk-tbl tbody tr:hover {
-	background-color: #f1f8f5;
-}
-
-.badge {
-	display: inline-block;
-	padding: 3px 10px;
-	border-radius: 12px;
-	font-size: 0.82rem;
-	font-weight: bold;
-}
-
-.badge-progress { background-color: #d0ebff; color: #1864ab; }
-.badge-done     { background-color: #d3f9d8; color: #1e7e34; }
-.badge-cancel   { background-color: #ffe3e3; color: #c92a2a; }
-.badge-waiting  { background-color: #fff3cd; color: #856404; }
-</style>
+<link rel="stylesheet" href="/resources/css/shipment/shipment.css">
 </head>
 <body>
 
@@ -245,14 +27,14 @@ select.form-control {
 		<main class="main-cont">
 			<div class="hdr">
 				<h1>출하 관리</h1>
-				<button type="button" class="btn-reg">+ 등록하기</button>
+				<button type="button" class="btn-reg" id="btnOpenShipModal">+ 등록하기</button>
 			</div>
 
 			<div class="sch-wrap">
 				<div class="sch-row-1">
 					<span class="label">&#9654; 출하일자</span>
 					<input type="date" id="sDate" class="form-control" onchange="validateDate()">
-					<span style="font-weight: bold; padding: 0 47px;">~</span>
+					<span class="date-sep">~</span>
 					<input type="date" id="eDate" class="form-control" onchange="validateDate()">
 				</div>
 
@@ -261,9 +43,9 @@ select.form-control {
 						<span class="label">&#9654; 상태</span>
 						<select id="status" class="form-control">
 							<option value="all" selected>전체</option>
-							<option value="대기">대기</option>
+							<option value="출하대기">출하대기</option>
 							<option value="진행">진행</option>
-							<option value="완료">완료</option>
+							<option value="출하완료">출하완료</option>
 							<option value="취소">취소</option>
 						</select>
 					</div>
@@ -272,7 +54,7 @@ select.form-control {
 
 				<div class="sch-row-3">
 					<div class="sch-input-box">
-						<span style="color: #888;">&#128269;</span>
+						<span class="sch-icon">&#128269;</span>
 						<input type="text" id="keyword" value="" placeholder="거래처명 혹은 출하ID 검색">
 					</div>
 					<button type="button" class="btn-sch">검색</button>
@@ -284,7 +66,7 @@ select.form-control {
 				<table class="stk-tbl">
 					<thead>
 						<tr>
-							<th style="width: 60px;">번호</th>
+							<th class="col-no">번호</th>
 							<th>출하ID</th>
 							<th>출하일</th>
 							<th>거래처명</th>
@@ -299,8 +81,8 @@ select.form-control {
 							<c:when test="${not empty result}">
 								<c:forEach var="item" items="${result}" varStatus="vs">
 									<tr>
-										<td style="font-weight: bold; color: #555;">${vs.count}</td>
-										<td>${item.SHIPMENT_ID}</td>
+										<td class="num-cell">${vs.count}</td>
+										<td><a href="/shipmentDetail/${item.SHIPMENT_ID}" class="link-id">${item.SHIPMENT_ID}</a></td>
 										<td>${item.SHIPMENT_DATE}</td>
 										<td>${item.VENDER_NAME}</td>
 										<td>${item.NAME}</td>
@@ -308,14 +90,14 @@ select.form-control {
 										<td>${item.ENAME}</td>
 										<td>
 											<c:choose>
-												<c:when test="${item.SHIPMENT_STATUS == '대기'}">
-											<span class="badge badge-waiting">대기</span>
-										</c:when>
-										<c:when test="${item.SHIPMENT_STATUS == '진행'}">
+												<c:when test="${item.SHIPMENT_STATUS == '출하대기'}">
+													<span class="badge badge-waiting">출하대기</span>
+												</c:when>
+												<c:when test="${item.SHIPMENT_STATUS == '진행'}">
 													<span class="badge badge-progress">진행</span>
 												</c:when>
-												<c:when test="${item.SHIPMENT_STATUS == '완료'}">
-													<span class="badge badge-done">완료</span>
+												<c:when test="${item.SHIPMENT_STATUS == '출하완료'}">
+													<span class="badge badge-done">출하완료</span>
 												</c:when>
 												<c:when test="${item.SHIPMENT_STATUS == '취소'}">
 													<span class="badge badge-cancel">취소</span>
@@ -330,7 +112,7 @@ select.form-control {
 							</c:when>
 							<c:otherwise>
 								<tr>
-									<td colspan="8" style="padding: 30px; color: #999;">조회된 결과가 없습니다.</td>
+									<td colspan="8" class="empty-cell">조회된 결과가 없습니다.</td>
 								</tr>
 							</c:otherwise>
 						</c:choose>
@@ -395,7 +177,7 @@ select.form-control {
 			var tbody = document.querySelector('#shipment-body');
 
 			if (!data.searchResult || data.searchResult.length == 0) {
-				tbody.innerHTML = '<tr><td colspan="8" style="padding:30px; color:#999;">조회된 결과가 없습니다.</td></tr>';
+				tbody.innerHTML = '<tr><td colspan="8" class="empty-cell">조회된 결과가 없습니다.</td></tr>';
 				renderPagination(data.pageInfo);
 				return;
 			}
@@ -407,14 +189,14 @@ select.form-control {
 					var item = data.searchResult[i];
 					var statusClass = '';
 					var statusLabel = item.SHIPMENT_STATUS || '';
-					if (statusLabel == '대기')      statusClass = 'badge-waiting';
-					else if (statusLabel == '진행') statusClass = 'badge-progress';
-					else if (statusLabel == '완료') statusClass = 'badge-done';
-					else if (statusLabel == '취소') statusClass = 'badge-cancel';
+					if (statusLabel == '출하대기')      statusClass = 'badge-waiting';
+					else if (statusLabel == '진행')    statusClass = 'badge-progress';
+					else if (statusLabel == '출하완료') statusClass = 'badge-done';
+					else if (statusLabel == '취소')    statusClass = 'badge-cancel';
 
 					html += '<tr>'
-					      + '<td style="font-weight:bold; color:#555;">' + (offset + i + 1) + '</td>'
-					      + '<td>' + (item.SHIPMENT_ID   || '') + '</td>'
+					      + '<td class="num-cell">' + (offset + i + 1) + '</td>'
+					      + '<td><a href="/shipmentDetail/' + (item.SHIPMENT_ID || '') + '" class="link-id">' + (item.SHIPMENT_ID || '') + '</a></td>'
 					      + '<td>' + (item.SHIPMENT_DATE || '') + '</td>'
 					      + '<td>' + (item.VENDER_NAME   || '') + '</td>'
 					      + '<td>' + (item.NAME          || '') + '</td>'
@@ -434,6 +216,147 @@ select.form-control {
 
 	document.querySelector('.select-reset').addEventListener('click', function() {
 		location.reload();
+	});
+</script>
+
+<!-- ===== 출하지시 등록 모달 ===== -->
+<div id="shipRegModal" class="modal-overlay" style="display:none;">
+	<div class="modal-box modal-box-wide">
+		<h3 class="modal-title">출하지시 등록</h3>
+
+		<form id="shipInsertForm" method="POST" action="/insertShipment">
+			<input type="hidden" id="selectedRequestNum" name="shipmentRequestNum">
+			<input type="hidden" id="selectedItemNum"    name="itemNum">
+
+			<!-- 주문 선택 테이블 -->
+			<div class="modal-section-label">주문 선택 <span class="required-mark">*</span></div>
+			<div class="modal-tbl-wrap">
+				<table class="modal-req-tbl">
+					<thead>
+						<tr>
+							<th>요청번호</th>
+							<th>주문일</th>
+							<th>납기일</th>
+							<th>거래처명</th>
+							<th>품목명</th>
+							<th>수량</th>
+						</tr>
+					</thead>
+					<tbody id="pendingRequestBody">
+						<tr><td colspan="6" class="empty-cell">불러오는 중...</td></tr>
+					</tbody>
+				</table>
+			</div>
+
+			<!-- 입력 필드 -->
+			<div class="modal-grid" style="margin-top:18px;">
+				<div class="modal-field">
+					<label>담당자 <span class="required-mark">*</span></label>
+					<select id="empNum" name="empNum" class="modal-select">
+						<option value="">-- 선택 --</option>
+						<c:forEach var="emp" items="${empList}">
+							<option value="${emp.EMP_NUM}">${emp.ENAME}</option>
+						</c:forEach>
+					</select>
+				</div>
+				<div class="modal-field">
+					<label>출하일 <span class="required-mark">*</span></label>
+					<input type="date" id="shipmentDate" name="shipmentDate" class="modal-input">
+				</div>
+				<div class="modal-field">
+					<label>계획수량 <span class="required-mark">*</span></label>
+					<input type="number" id="planQty" name="planQty" min="1" value="" class="modal-input">
+				</div>
+			</div>
+
+			<div class="modal-btn-wrap">
+				<button type="button" class="btn-reg" id="btnInsertShipment">등록</button>
+				<button type="button" class="btn-cancel" id="btnCloseShipModal">취소</button>
+			</div>
+		</form>
+	</div>
+</div>
+
+<script>
+	/* ── 모달 열기/닫기 ── */
+	document.getElementById('btnOpenShipModal').addEventListener('click', function() {
+		resetShipModal();
+		loadPendingRequests();
+		document.getElementById('shipRegModal').style.display = 'flex';
+	});
+	document.getElementById('btnCloseShipModal').addEventListener('click', closeShipModal);
+	document.getElementById('shipRegModal').addEventListener('click', function(e) {
+		if (e.target === this) closeShipModal();
+	});
+
+	function closeShipModal() {
+		document.getElementById('shipRegModal').style.display = 'none';
+		resetShipModal();
+	}
+
+	function resetShipModal() {
+		document.getElementById('selectedRequestNum').value = '';
+		document.getElementById('selectedItemNum').value    = '';
+		document.getElementById('empNum').selectedIndex     = 0;
+		document.getElementById('shipmentDate').value       = '';
+		document.getElementById('planQty').value            = '';
+		document.getElementById('pendingRequestBody').innerHTML =
+			'<tr><td colspan="6" class="empty-cell">불러오는 중...</td></tr>';
+	}
+
+	/* ── 접수 주문 목록 AJAX ── */
+	function loadPendingRequests() {
+		fetch('/loadPendingRequests')
+			.then(function(res) { return res.json(); })
+			.then(function(data) { renderPendingTable(data); })
+			.catch(function(err) { console.error('주문 목록 조회 오류:', err); });
+	}
+
+	function renderPendingTable(list) {
+		var tbody = document.getElementById('pendingRequestBody');
+		if (!list || list.length === 0) {
+			tbody.innerHTML = '<tr><td colspan="6" class="empty-cell">접수된 주문이 없습니다.</td></tr>';
+			return;
+		}
+		var html = '';
+		list.forEach(function(r) {
+			html += '<tr class="req-row" onclick="selectRequest(this,\''
+				+ (r.SHIPMENT_REQUEST_NUM || '') + '\',' + (r.ITEM_NUM || 0) + ',' + (r.REQUEST_QTY || 1) + ')">'
+				+ '<td>' + (r.REQUEST_ID   || '') + '</td>'
+				+ '<td>' + (r.REQUEST_DATE || '') + '</td>'
+				+ '<td>' + (r.DUE_DATE     || '') + '</td>'
+				+ '<td>' + (r.VENDER_NAME  || '') + '</td>'
+				+ '<td>' + (r.NAME         || '') + '</td>'
+				+ '<td>' + (r.REQUEST_QTY  || '') + '</td>'
+				+ '</tr>';
+		});
+		tbody.innerHTML = html;
+	}
+
+	/* ── 행 선택 ── */
+	function selectRequest(row, requestNum, itemNum, qty) {
+		document.querySelectorAll('.req-row').forEach(function(r) {
+			r.classList.remove('req-row-selected');
+		});
+		row.classList.add('req-row-selected');
+		document.getElementById('selectedRequestNum').value = requestNum;
+		document.getElementById('selectedItemNum').value    = itemNum;
+		document.getElementById('planQty').value            = qty;
+	}
+
+	/* ── 등록 버튼 ── */
+	document.getElementById('btnInsertShipment').addEventListener('click', function() {
+		var requestNum   = document.getElementById('selectedRequestNum').value;
+		var empNum       = document.getElementById('empNum').value;
+		var shipmentDate = document.getElementById('shipmentDate').value;
+		var planQty      = document.getElementById('planQty').value;
+
+		if (!requestNum)   { alert('주문을 선택해주세요.');     return; }
+		if (!empNum)       { alert('담당자를 선택해주세요.');   return; }
+		if (!shipmentDate) { alert('출하일을 입력해주세요.');   return; }
+		if (!planQty || planQty < 1) { alert('계획수량을 입력해주세요.'); return; }
+
+		document.getElementById('shipInsertForm').submit();
 	});
 </script>
 </body>

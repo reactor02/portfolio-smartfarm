@@ -1,6 +1,7 @@
 package kr.or.smartfarm.lot;
 
 import java.util.List;
+import java.util.Map;
 
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,5 +26,10 @@ public class LotRelationDAOImpl implements LotRelationDAO {
     @Override
     public List<LotRelationDTO> getParentsByLot(int lot_num) {
         return session.selectList("kr.or.smartfarm.lot.getParentsByLot", lot_num);
+    }
+
+    @Override
+    public List<Map<String, Object>> getRecursiveMaterials(int lot_num) {
+        return session.selectList("kr.or.smartfarm.lot.getRecursiveMaterials", lot_num);
     }
 }

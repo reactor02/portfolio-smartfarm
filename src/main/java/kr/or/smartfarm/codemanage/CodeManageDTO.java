@@ -1,0 +1,22 @@
+package kr.or.smartfarm.codemanage;
+
+import lombok.Data;
+
+@Data
+public class CodeManageDTO {
+	
+	String emp_num;
+	String ename;
+	String pw;
+	String e_level;
+	String tel;
+	String hire_date;
+	String status;
+	String Termination_date;
+	String secret;
+	
+	String keyword;
+	String dept_num;
+	String dept_name;
+
+}

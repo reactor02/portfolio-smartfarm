@@ -6,10 +6,10 @@
 <!-- 기본 전체 조회 로직 -->
 <select id="loadProcess" resultType="hashMap">
         SELECT 
-        i.name, i.type,
+        i.name, i.type, i.item_num,
         p.flow, p.head_count,
         i.item_status,
-        TO_CHAR(p.created_at, 'YYYY-MM-DD') AS created_at,,process_status
+        TO_CHAR(p.created_at, 'YYYY-MM-DD') AS created_at
         FROM process p
         JOIN item i ON p.item_num = i.item_num
         WHERE i.TYPE IN ('PRODUCT', 'SEMIPRODUCT') 
@@ -151,13 +151,14 @@ SELECT
         i.name,
         i.type,
         i.unit,
-        i.STATUS,
+        i.item_status,
         p.process_status,
         p.flow,
         p.image,
         p.process_content,
         p.process_num,
-        p.head_count
+        p.head_count,
+        TO_CHAR(p.created_at, 'YYYY-MM-DD') AS created_at
         FROM process p
         JOIN item i ON p.item_num = i.item_num
         where i.item_num = #{itemNum}

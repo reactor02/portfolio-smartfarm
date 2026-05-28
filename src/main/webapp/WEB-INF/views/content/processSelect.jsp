@@ -366,7 +366,7 @@ background-color: #FFB703;
 									<c:forEach var="item" items="${result}" varStatus="vs">
 										<tr>
 											<td style="font-weight: bold; color: #555;">${vs.count}</td>
-											<td><a href="/processDetail?item_num=${item.NAME}" class="link-txt">${item.NAME}</a></td>
+											<td><a href="/processDetail?item_num=${item.ITEM_NUM}" class="link-txt">${item.NAME}</a></td>
 											<td>${item.TYPE}</td>
 											<td>${item.FLOW}</td>
 											<td>${item.HEAD_COUNT}</td>
