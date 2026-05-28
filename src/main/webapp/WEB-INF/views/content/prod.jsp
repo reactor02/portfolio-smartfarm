@@ -8,6 +8,7 @@ response.setContentType("text/html; charset=utf-8");
 <%@ taglib prefix="fn"  uri="http://java.sun.com/jsp/jstl/functions"%>
 <link rel="stylesheet" href="/resources/css/list-common.css">
 <link rel="stylesheet" href="/resources/css/modal.css">
+<link rel="stylesheet" href="/resources/css/prod/prod.css">
 
 <div class="main-cont">
 
@@ -27,7 +28,7 @@ response.setContentType("text/html; charset=utf-8");
             <input type="date" name="startDate" id="startDate"
                    value="${param.startDate}" class="form-control"
                    onchange="validateDate()">
-            <span style="font-weight:bold;color:#666;">~</span>
+            <span class="date-sep">~</span>
             <input type="date" name="endDate" id="endDate"
                    value="${param.endDate}" class="form-control"
                    onchange="validateDate()">
@@ -69,7 +70,7 @@ response.setContentType("text/html; charset=utf-8");
         <!-- 3행: 키워드 검색 (우측 정렬) -->
         <div class="sch-row-3">
             <div class="sch-input-box">
-                <span style="color:#888;">&#128269;</span>
+                <span class="sch-icon">&#128269;</span>
                 <input type="text" name="keyword"
                        value="${param.keyword}" placeholder="계획번호 / 품목명">
             </div>

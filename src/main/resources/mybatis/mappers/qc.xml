@@ -12,6 +12,7 @@
 		    io.io_num,
 		    io.io_qty,
 		    io.io_date,
+		    emp.ename,
 		    qc.qc_type,
 		    qc.qc_pass,
 		    item.code,
@@ -20,13 +21,119 @@
 		FROM io
 		JOIN qc
 		    ON qc.qc_num = io.qc_num
+		JOIN emp
+		    ON io.emp_num = emp.emp_num
 		JOIN lot
 		    ON io.lot_num = lot.lot_num
 		JOIN item
 		    ON lot.item_num = item.item_num
-		WHERE qc.qc_pass = 'PASS'
+		ORDER BY io.io_date DESC
 	</select>
 	
+<!-- Select Item -->
+	<select id="selectItem" resultType="QcDTO">
+		SELECT 
+			item_num,
+			code,
+			name
+		FROM item
+	</select>
+	
+	<!-- 검색 조건에 맞게 검색 -->
+	<select id="searchQc" resultType="hashMap" parameterType="map">
+		SELECT
+		    io.io_num,
+		    io.io_qty,
+		    io.io_date,
+		    emp.ename,
+		    qc.qc_type,
+		    qc.qc_pass,
+		    item.code,
+		    item.name,
+		    item.unit
+		FROM io
+		JOIN qc
+		    ON qc.qc_num = io.qc_num
+		JOIN emp
+		    ON io.emp_num = emp.emp_num
+		JOIN lot
+		    ON io.lot_num = lot.lot_num
+		JOIN item
+		    ON lot.item_num = item.item_num
+		
+	    <where>
+	    
+		<!-- 날짜 조회 -->
+	     <if test="sDate != null and sDate != '' and eDate != null and eDate != ''">
+		    AND io.io_date >= TO_DATE(#{sDate}, 'YYYY-MM-DD')
+		    AND io.io_date &lt; TO_DATE(#{eDate}, 'YYYY-MM-DD') + 1
+		</if>
+		<!-- item_num 검색 -->
+	        <if test="type != null and type != '' and type != 'all'">
+				AND qc.qc_pass = #{type}
+			</if>
+	    <!-- 품목명 검색 --> 
+	        <if test="keyword != null and keyword != ''">
+	        	AND (
+		        	upper(item.name) LIKE ('%' || upper(#{keyword}) || '%')
+		         OR upper(item.code) LIKE ('%' || upper(#{keyword}) || '%')
+		         )
+	   	 	</if>
+	    </where>
+	    
+	  	ORDER BY io.io_date DESC
+    </select>
+    
+    <select id="selectWaiting" resultType="QcDTO">
+		SELECT
+		    io.io_num,
+		    io.io_qty,
+		    io.io_date,
+		    emp.ename,
+		    lot.lot_num,
+		    qc.qc_type,
+		    qc.qc_pass,
+		    item.code,
+		    item.name,
+		    item.unit
+		FROM io
+		JOIN qc
+		    ON qc.qc_num = io.qc_num
+		JOIN emp
+		    ON io.emp_num = emp.emp_num
+		JOIN lot
+		    ON io.lot_num = lot.lot_num
+		JOIN item
+		    ON lot.item_num = item.item_num
+		WHERE qc.qc_pass = 'WAITING'
+		ORDER BY io.io_date DESC
+	</select>
+	
+	 <select id="selectDetail" resultType="QcDTO" parameterType="int">
+		SELECT
+		    io.io_num,
+		    io.io_qty,
+		    io.io_date,
+		    emp.ename,
+		    lot.lot_num,
+		    qc.qc_type,
+		    qc.qc_pass,
+		    item.code,
+		    item.name,
+		    item.unit
+		FROM io
+		JOIN qc
+		    ON qc.qc_num = io.qc_num
+		JOIN emp
+		    ON io.emp_num = emp.emp_num
+		JOIN lot
+		    ON io.lot_num = lot.lot_num
+		JOIN item
+		    ON lot.item_num = item.item_num
+		WHERE io.io_num = #{io_num}
+		ORDER BY io.io_date DESC
+	</select>
+		
 	
 </mapper>
 

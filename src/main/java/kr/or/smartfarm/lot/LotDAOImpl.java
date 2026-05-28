@@ -18,7 +18,9 @@ public class LotDAOImpl implements LotDAO {
 
     @Override
     public List<LotDTO> getList(LotPageDTO page) {
-        return session.selectList("kr.or.smartfarm.lot.getList", page);
+    	List<LotDTO> a = session.selectList("kr.or.smartfarm.lot.getList", page);
+    	System.out.println("겟롯"+a.get(0).getLot_code());
+        return a;
     }
 
     @Override

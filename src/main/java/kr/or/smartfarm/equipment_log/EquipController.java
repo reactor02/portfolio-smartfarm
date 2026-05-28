@@ -9,11 +9,15 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.github.pagehelper.PageInfo;
+
+import kr.or.smartfarm.prod.ProdDTO;
 
 @Controller
 public class EquipController {
@@ -37,6 +41,9 @@ public class EquipController {
 		List item = equipService.selectItemEquip();
 		model.addAttribute("item", item);
 		
+		List emp = equipService.selectEmp();
+		model.addAttribute("emp", emp);
+		
 		PageInfo<Map<String, Object>> pageInfo = new PageInfo<Map<String, Object>>(result);
 		model.addAttribute("pageInfo", pageInfo);
 		
@@ -44,6 +51,7 @@ public class EquipController {
 		return "content/equipSelect.tiles";
 	}
 	
+//search
 	@RequestMapping("/searchEquip")
 	@ResponseBody
 	public Map searchEquip(
@@ -66,9 +74,12 @@ public class EquipController {
 
 	        result.put("status", "good");
 	        if(searchResult != null) {
+	        	
 	        	PageInfo<Map<String, Object>> pageInfo = new PageInfo<Map<String, Object>>(searchResult);
+	        	System.out.println("pageInfo === " + pageInfo);
 	        	result.put("pageInfo", pageInfo);
 	        }else {
+	        	System.out.println("else 탔음!!!");
 	        	PageInfo pageInfo = new PageInfo();
 	        	result.put("pageInfo", pageInfo);
 	        }
@@ -80,4 +91,12 @@ public class EquipController {
 	    
 	    return result;
 	}
+	
+// insert 
+	@RequestMapping("/insertEquip")
+    public String insertEquip(EquipDTO equipDTO, Model model) {
+    	System.out.println("/INSERT DTO CHECK : " + equipDTO);
+        equipService.insertEquip(equipDTO);
+        return "redirect:equip";
+    }
 }

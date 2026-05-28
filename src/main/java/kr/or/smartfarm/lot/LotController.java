@@ -2,6 +2,7 @@ package kr.or.smartfarm.lot;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -37,6 +38,7 @@ public class LotController {
                          HttpServletRequest request, HttpServletResponse response) throws IOException {
         LotDTO lotDTO = lotService.selectOne(lot_code);
         if (lotDTO == null) {
+        	System.out.println("롯 패스배리어블 접속");
             String url = request.getContextPath() + "/lot";
             response.setContentType("text/html; charset=UTF-8");
             response.getWriter().write(
@@ -47,9 +49,10 @@ public class LotController {
             );
             return null;
         }
-        model.addAttribute("lotDTO",     lotDTO);
-        model.addAttribute("materials",  lotService.getMaterialsByChildLot(lotDTO.getLot_num()));
-        model.addAttribute("usedIn",     lotService.getParentsByLot(lotDTO.getLot_num()));
+        model.addAttribute("lotDTO",             lotDTO);
+        model.addAttribute("materials",          lotService.getMaterialsByChildLot(lotDTO.getLot_num()));
+        model.addAttribute("usedIn",             lotService.getParentsByLot(lotDTO.getLot_num()));
+        model.addAttribute("recursiveMaterials", lotService.getRecursiveMaterials(lotDTO.getLot_num()));
         return "content/lotDetail.tiles";
     }
 }

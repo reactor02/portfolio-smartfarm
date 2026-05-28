@@ -15,6 +15,7 @@ public class UserManageDTO {
 	String Termination_date;
 	String secret;
 	
+	String keyword;
 	String dept_num;
 	String dept_name;
 

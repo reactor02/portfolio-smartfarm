@@ -7,6 +7,7 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+
 @Service
 public class EquipServiceImpl implements EquipService{
 
@@ -27,9 +28,18 @@ public class EquipServiceImpl implements EquipService{
 	public List selectItemEquip() {
 		return equipDAO.selectItemEquip();
 	}
+	@Override
+	public List selectEmp() {
+		return equipDAO.selectEmp();
+	}
 	
 	public List searchEquip(Map map) {
 		return equipDAO.searchEquip(map);
 	}
+	
+	public int insertEquip(EquipDTO dto) {
+		return equipDAO.insertEquip(dto);
+	}
+
 
 }

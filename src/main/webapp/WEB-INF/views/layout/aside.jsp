@@ -45,6 +45,13 @@
             </ul>
         </li>
         <li class="nav-item"><a href="/" class="nav-btn">입고/출고 관리</a></li>
+        <li class="nav-item">
+            <div class="nav-btn toggle-btn">출하 관리</div>
+            <ul class="sub-nav">
+                <li><a href="/request">주문 관리</a></li>
+                <li><a href="/shipment">출하 관리</a></li>
+            </ul>
+        </li>
         <li class="nav-item"><a href="/board" class="nav-btn">게시판</a></li>
         <li class="nav-item"><a href="/report" class="nav-btn">리포트</a></li>
     </ul>

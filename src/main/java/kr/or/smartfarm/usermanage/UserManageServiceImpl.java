@@ -24,6 +24,15 @@ public class UserManageServiceImpl implements UserManageService {
 
 	}
 	@Override
+	public List<UserManageDTO> getUserSearch(UserManageDTO searchDTO) {
+		// TODO Auto-generated method stub
+		
+		List<UserManageDTO> result = userManageDAO.getUserSearch(searchDTO);
+		
+		return result;
+		
+	}
+	@Override
 	public List<UserManageDTO> selectd() {
 		// TODO Auto-generated method stub
 		
@@ -37,6 +46,46 @@ public class UserManageServiceImpl implements UserManageService {
 		// TODO Auto-generated method stub
 		
 		List<UserManageDTO> result = userManageDAO.selectm();
+		
+		return result;
+		
+	}
+	@Override
+	public int userInsert(UserManageDTO userManageDTO) {
+		// TODO Auto-generated method stub
+		
+        String pw = SHA256Util.encrypt(userManageDTO.getPw());
+		
+        userManageDTO.setPw(pw);
+		
+		int result = userManageDAO.userInsert(userManageDTO);
+		
+		return result;
+		
+	}
+	@Override
+	public int userUpdate(UserManageDTO userManageDTO) {
+		// TODO Auto-generated method stub
+		
+		int result = userManageDAO.userUpdate(userManageDTO);
+		
+		return result;
+		
+	}
+	@Override
+	public int userRetire(UserManageDTO userManageDTO) {
+		// TODO Auto-generated method stub
+		
+		int result = userManageDAO.userRetire(userManageDTO);
+		
+		return result;
+		
+	}
+	@Override
+	public int userLevelUpdate(UserManageDTO userManageDTO) {
+		// TODO Auto-generated method stub
+		
+		int result = userManageDAO.userLevelUpdate(userManageDTO);
 		
 		return result;
 		

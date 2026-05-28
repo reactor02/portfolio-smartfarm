@@ -58,7 +58,7 @@
                           OR i.name      LIKE '%' || #{keyword} || '%')
                     </if>
                 </where>
-                ORDER BY wo.order_num DESC
+                ORDER BY wo.order_start DESC NULLS LAST
             ) inner_q
             WHERE ROWNUM &lt;= #{endRow}
         )

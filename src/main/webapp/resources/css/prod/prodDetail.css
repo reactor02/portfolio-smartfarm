@@ -63,6 +63,13 @@ body { font-family: 'Malgun Gothic', sans-serif; color: var(--txt); background-c
 .instruction-box { background-color: var(--bg); padding: 18px; border-left: 4px solid var(--s-cl); margin-top: 15px; border-top: 1px solid var(--border-cl); border-right: 1px solid var(--border-cl); border-bottom: 1px solid var(--border-cl); border-radius: 0 8px 8px 0; }
 
 .wo-paging { text-align: center; margin-top: 1rem; }
+
+.info-label-accent { color: var(--s-cl); }
+.status-num-accent { color: var(--s-cl); }
+.col-no-sm         { width: 8%; }
+.empty-cell        { padding: 20px; color: #aaa; }
+.process-link-wrap { margin-bottom: 8px; }
+.info-label-block  { display: block; margin-bottom: 6px; }
 .wo-paging a { display: inline-block; padding: 5px 11px; margin: 0 2px; border: 1px solid var(--border-cl); border-radius: 4px; text-decoration: none; color: var(--txt); font-size: 13px; cursor: pointer; }
 .wo-paging a:hover { background: var(--p-cl); }
 .wo-paging .current { background: var(--m-cl); color: #FFF; border-color: var(--m-cl); }

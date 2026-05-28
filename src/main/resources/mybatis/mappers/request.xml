@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.or.smartfarm.request">
+
+    <!-- 전체 조회 (PageHelper가 페이징 처리) -->
+    <select id="loadRequest" resultType="hashMap">
+        SELECT
+            SR.shipment_request_num,
+            SR.request_id,
+            TO_CHAR(SR.request_date, 'YYYY-MM-DD') AS request_date,
+            TO_CHAR(SR.due_date,     'YYYY-MM-DD') AS due_date,
+            RS.status_name AS request_status,
+            SR.request_qty,
+            V.vender_name,
+            V.vender_type,
+            E.ename,
+            I.name,
+            I.type
+        FROM shipment_request SR
+        JOIN request_status RS ON SR.status_num = RS.status_num
+        JOIN vender V ON SR.vender_num = V.vender_num
+        JOIN emp    E ON V.emp_num     = E.emp_num
+        JOIN item   I ON SR.item_num   = I.item_num
+        ORDER BY SR.due_date ASC NULLS LAST
+    </select>
+
+    <!-- 검색 조회 (PageHelper가 페이징 처리) -->
+    <select id="searchRequest" resultType="hashMap" parameterType="map">
+        SELECT
+            SR.shipment_request_num,
+            SR.request_id,
+            TO_CHAR(SR.request_date, 'YYYY-MM-DD') AS request_date,
+            TO_CHAR(SR.due_date,     'YYYY-MM-DD') AS due_date,
+            RS.status_name AS request_status,
+            SR.request_qty,
+            V.vender_name,
+            V.vender_type,
+            E.ename,
+            I.name,
+            I.type
+        FROM shipment_request SR
+        JOIN request_status RS ON SR.status_num = RS.status_num
+        JOIN vender V ON SR.vender_num = V.vender_num
+        JOIN emp    E ON V.emp_num     = E.emp_num
+        JOIN item   I ON SR.item_num   = I.item_num
+        WHERE 1 = 1
+        <if test="status != null and status != '' and status != 'all'">
+            AND RS.status_name = #{status}
+        </if>
+        <if test="type != null and type != '' and type != 'all'">
+            AND upper(I.type) = upper(#{type})
+        </if>
+        <if test="keyword != null and keyword != ''">
+            AND (
+                upper(V.vender_name) LIKE ('%' || upper(#{keyword}) || '%')
+                OR upper(SR.request_id) LIKE ('%' || upper(#{keyword}) || '%')
+            )
+        </if>
+        <if test="sDate != null and sDate != ''">
+            AND SR.due_date >= TO_DATE(#{sDate}, 'YYYY-MM-DD')
+            <choose>
+                <when test="eDate != null and eDate != ''">
+                    AND SR.due_date &lt; TO_DATE(#{eDate}, 'YYYY-MM-DD') + 1
+                </when>
+                <otherwise>
+                    AND SR.due_date &lt; SYSDATE + 1
+                </otherwise>
+            </choose>
+        </if>
+        ORDER BY SR.due_date ASC NULLS LAST
+    </select>
+
+    <!-- 단건 상세 조회 -->
+    <select id="loadRequestDetail" resultType="hashMap" parameterType="string">
+        SELECT
+            SR.shipment_request_num,
+            SR.request_id,
+            TO_CHAR(SR.request_date, 'YYYY-MM-DD') AS request_date,
+            TO_CHAR(SR.due_date,     'YYYY-MM-DD') AS due_date,
+            RS.status_name AS request_status,
+            SR.request_qty,
+            V.vender_name,
+            V.vender_type,
+            V.vender_num,
+            E.ename,
+            E.emp_num,
+            I.name,
+            I.item_num,
+            I.type,
+            I.unit
+        FROM shipment_request SR
+        JOIN request_status RS ON SR.status_num = RS.status_num
+        JOIN vender V ON SR.vender_num = V.vender_num
+        JOIN emp    E ON V.emp_num     = E.emp_num
+        JOIN item   I ON SR.item_num   = I.item_num
+        WHERE SR.request_id = #{_parameter}
+    </select>
+
+    <!-- 출하 존재 여부 확인 (출하지시 버튼 표시 제어) -->
+    <select id="hasShipment" resultType="int" parameterType="string">
+        SELECT COUNT(*)
+        FROM shipment
+        WHERE shipment_request_num = #{_parameter}
+          AND shipment_status != '취소'
+    </select>
+
+    <!-- 요청 상태 변경 -->
+    <update id="updateRequestStatus" parameterType="map">
+        UPDATE shipment_request
+        SET status_num = (SELECT status_num FROM request_status WHERE status_name = #{status_name})
+        WHERE shipment_request_num = #{shipment_request_num}
+    </update>
+
+    <!-- 거래처 검색 (등록 모달 AJAX용) -->
+    <select id="searchVender" resultType="VenderDTO" parameterType="string">
+        SELECT
+            V.vender_num,
+            V.vender_name,
+            V.vender_type,
+            V.vender_phone,
+            V.ven_ename,
+            E.ename
+        FROM vender V
+        JOIN emp E ON V.emp_num = E.emp_num
+        WHERE upper(V.vender_name) LIKE '%' || upper(#{_parameter}) || '%'
+        ORDER BY V.vender_name
+    </select>
+
+    <!-- 완제품(PRODUCT) 목록 (등록 모달 select용) -->
+    <select id="loadProducts" resultType="hashMap">
+        SELECT item_num, name
+        FROM item
+        WHERE UPPER(type) = 'PRODUCT'
+        ORDER BY name
+    </select>
+
+    <!-- 출하 요청 등록 -->
+    <insert id="insertRequest" parameterType="map">
+        <selectKey keyProperty="shipment_request_num" resultType="String" order="BEFORE">
+            SELECT 'SREQ' || LPAD(REQUEST_SEQ.NEXTVAL, 4, '0') FROM DUAL
+        </selectKey>
+        INSERT INTO shipment_request
+            (shipment_request_num, request_id, request_date, vender_num, due_date, status_num, item_num, request_qty)
+        VALUES
+            (#{shipment_request_num},
+             REPLACE(#{shipment_request_num}, 'SREQ', 'REQ'),
+             TO_DATE(#{request_date}, 'YYYY-MM-DD'),
+             #{vender_num},
+             TO_DATE(#{due_date}, 'YYYY-MM-DD'),
+             (SELECT status_num FROM request_status WHERE status_name = '접수'),
+             #{item_num},
+             #{request_qty})
+    </insert>
+
+</mapper>

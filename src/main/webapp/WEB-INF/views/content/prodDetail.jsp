@@ -48,8 +48,8 @@
                 <div class="status-num">${prodDTO.plan_qty} EA</div>
             </div>
             <div class="status-card">
-                <div class="info-label" style="color:var(--s-cl);">생산 완료</div>
-                <div class="status-num" style="color:var(--s-cl);">${prodDTO.currentqty} EA</div>
+                <div class="info-label info-label-accent">생산 완료</div>
+                <div class="status-num status-num-accent">${prodDTO.currentqty} EA</div>
             </div>
             <div class="status-card">
                 <div class="info-label">잔여 수량</div>
@@ -72,7 +72,7 @@
             <table class="data-table">
                 <thead>
                     <tr>
-                        <th style="width:8%;">번호</th>
+                        <th class="col-no-sm">번호</th>
                         <th>작업번호</th>
                         <th>담당자</th>
                         <th>지시수량</th>
@@ -83,7 +83,7 @@
                     </tr>
                 </thead>
                 <tbody id="workOrderTbody">
-                    <tr><td colspan="8" style="padding:20px;color:#aaa;">불러오는 중...</td></tr>
+                    <tr><td colspan="8" class="empty-cell">불러오는 중...</td></tr>
                 </tbody>
             </table>
             <div class="wo-paging" id="workOrderPaging"></div>
@@ -91,12 +91,12 @@
 
         <!-- 4. 공정 정보 -->
         <div class="section-title">■ 공정 정보</div>
-        <div style="margin-bottom:8px;">
+        <div class="process-link-wrap">
             <span class="info-label">공정 정보 링크:</span>
             <a href="/process/item/${prodDTO.item_num}" class="link-text">${prodDTO.item_name} 공정관리 링크</a>
         </div>
         <div class="instruction-box">
-            <span class="info-label" style="display:block;margin-bottom:6px;">상세 지시사항</span>
+            <span class="info-label info-label-block">상세 지시사항</span>
             <strong>${prodDTO.content}</strong>
         </div>
 

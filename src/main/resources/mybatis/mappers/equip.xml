@@ -76,8 +76,54 @@
 		FROM item
 		WHERE "TYPE" = 'EQUIP'
 	</select>
+	<!-- Select Emp -->
+	<select id="selectEmp" resultType="EquipDTO">
+		SELECT 
+			emp_num,
+			ename
+		FROM emp
+	</select>
+	
+	<insert id="insertEquip"  parameterType="EquipDTO">
+		INSERT INTO 
+		equipment_log(
+		EQUIP_NUM, 
+		EQUIP_STATUS, 
+		error_sign, 
+		equip_action, 
+		start_date,
+		end_date,
+		total_runtime,
+		item_num,
+		emp_num
+		)
+	VALUES (
+		EQUIP_SEQ.NEXTVAL,
+		#{equip_status},
+		#{error_sign},
+		#{equip_action},
+		#{start_date},
+		#{end_date},
+		
+		<!--  total_date -->
+		(
+		    SELECT NVL(MAX(TOTAL_RUNTIME), 0)
+		    FROM equipment_log
+		    WHERE ITEM_NUM = #{item_num}
+		)
+		+
+		(
+		    CAST(#{end_date} AS DATE)
+		    -
+		    CAST(#{start_date} AS DATE)
+		) * 86400,
+    	
+		#{item_num},
+		#{emp_num}
+		 )
+	</insert>
 
-<!-- 기계 누적 가동시간 UPDATE -->
+	<!-- 기계 누적 가동시간 UPDATE -->
 	<update id="total_runtime">
 		UPDATE equipment_log e
 		SET total_runtime = (
