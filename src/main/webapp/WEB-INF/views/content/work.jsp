@@ -143,6 +143,8 @@
                         <input type="text" id="planDisplay" readonly placeholder="계획 선택 후 표시"
                                class="plan-display-input">
                         <input type="hidden" name="plan_num" id="planNumInput">
+                        <input type="hidden" id="planStartInput">
+                        <input type="hidden" id="planEndInput">
                         <button type="button" onclick="openPlanModal()"
                                 class="btn-search-sm">검색</button>
                     </div>
@@ -162,7 +164,7 @@
                 </div>
                 <div class="modal-field">
                     <label>작업시작일</label>
-                    <input type="date" name="order_start" required>
+                    <input type="date" name="order_start" id="orderStartInput" required>
                 </div>
                 <div class="modal-field modal-field-full">
                     <label>지시사항</label>

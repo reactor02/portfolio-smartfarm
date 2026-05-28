@@ -24,7 +24,7 @@
         JOIN vender V ON SR.vender_num = V.vender_num
         JOIN emp    E ON V.emp_num     = E.emp_num
         JOIN item   I ON SR.item_num   = I.item_num
-        ORDER BY SR.due_date ASC NULLS LAST
+        ORDER BY SR.shipment_request_num DESC
     </select>
 
     <!-- 검색 조회 (PageHelper가 페이징 처리) -->
@@ -70,7 +70,7 @@
                 </otherwise>
             </choose>
         </if>
-        ORDER BY SR.due_date ASC NULLS LAST
+        ORDER BY SR.shipment_request_num DESC
     </select>
 
     <!-- 단건 상세 조회 -->

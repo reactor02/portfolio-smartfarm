@@ -1,0 +1,131 @@
+@charset "UTF-8";
+
+/* ═══════════════════════════════════════════════════
+   detail-common.css
+   work / lot / prod / request / shipment 상세 페이지 공통
+   ═══════════════════════════════════════════════════ */
+
+/* ── CSS 변수 ── */
+:root {
+    --m-cl: #2D6A4F;
+    --s-cl: #49A47A;
+    --p-cl: #B7E4C7;
+    --bg:   #F8F9FA;
+    --txt:  #333;
+    --border-cl: #E9ECEF;
+    --warning-cl: #FFB703;
+    --danger-cl:  #E63946;
+}
+
+/* ── 리셋 ── */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Malgun Gothic', sans-serif; color: var(--txt); background-color: #f4f7f6; }
+.mat-all { display: flex; flex-direction: column; min-height: 100vh; background-color: #f4f7f6; }
+
+/* ── 메인 콘텐츠 영역 — bomSelect의 .main-cont와 동일 (#f4f7f6 상속) ── */
+.cont {
+    flex: 1;
+    padding: 2rem 2.5rem;
+    background-color: #f4f7f6;
+}
+
+/* ── 페이지 헤더 (.hdr: 상세, .page-hdr: 목록 — 동일 규격) ── */
+.hdr, .page-hdr {
+    display: flex; justify-content: space-between; align-items: center;
+    background-color: #2D6A4F; padding: 15px 25px;
+    border-radius: 8px; margin-bottom: 25px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+.hdr h1, .page-hdr h1 {
+    font-size: 1.8rem; color: #fff; font-weight: bold;
+    letter-spacing: -1px; line-height: 1.2;
+}
+.hdr-right { flex: 1; display: flex; justify-content: flex-end; gap: 10px; }
+
+/* ── 액션 버튼 ── */
+.btn-action {
+    background-color: #fff; color: var(--m-cl);
+    padding: 10px 24px; border-radius: 6px; border: 1px solid var(--m-cl);
+    font-weight: bold; font-size: 1.05rem; cursor: pointer;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.2), 0 2px 3px rgba(0,0,0,0.2);
+    transition: all 0.2s ease-in-out; text-decoration: none; display: inline-block;
+}
+.btn-action:hover { background-color: var(--p-cl); color: #1b4332; border-color: var(--p-cl); }
+.btn-del { color: #dc3545; border-color: #dc3545; }
+.btn-del:hover { background-color: #dc3545; color: #fff; border-color: #dc3545; }
+
+/* ── 섹션 제목 ── */
+.section-title {
+    font-size: 1.1rem; font-weight: bold;
+    margin: 2rem 0 1rem 0; color: var(--m-cl);
+}
+
+/* ── 정보 그리드 ── */
+.info-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;
+    background-color: var(--bg); padding: 20px;
+    border: 1px solid var(--border-cl); border-radius: 8px;
+}
+.info-item  { display: flex; flex-direction: column; gap: 6px; }
+.info-label { font-size: 12px; color: #777; font-weight: bold; }
+.info-value { font-size: 14px; font-weight: bold; }
+.info-label-accent { color: var(--s-cl); }
+
+/* ── 상태 배지 ── */
+.badge {
+    display: inline-block; padding: 3px 10px; border-radius: 12px;
+    font-size: 11px; font-weight: bold;
+    background: var(--p-cl); color: var(--m-cl); width: fit-content;
+}
+.badge-wait     { background: #E9ECEF; color: #6C757D; }
+.badge-progress { background: #FFF3CD; color: #856404; }
+.badge-done     { background: #D1E7DD; color: #0A3622; }
+.badge-cancel   { background: #F8D7DA; color: #842029; }
+.badge-waiting  { background: #FFF3CD; color: #856404; }
+
+/* ── 수량 카드 ── */
+.status-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 1.5rem; text-align: center; }
+.status-card { background-color: #FFF; border: 1px solid var(--border-cl); padding: 16px; border-radius: 8px; }
+.status-num  { font-size: 1.3rem; font-weight: bold; margin-top: 6px; }
+.status-num-accent { color: var(--s-cl); }
+
+/* ── 진행률 바 ── */
+.progress-box      { background-color: var(--bg); border: 1px solid var(--border-cl); padding: 20px; border-radius: 8px; margin-bottom: 1.5rem; }
+.progress-bar-bg   { background-color: #E9ECEF; height: 12px; border-radius: 6px; overflow: hidden; margin-top: 8px; }
+.progress-bar-fill { background-color: var(--s-cl); height: 100%; width: 0%; transition: width 0.3s ease; }
+.progress-text     { display: flex; justify-content: flex-end; font-size: 13px; font-weight: bold; color: var(--s-cl); margin-top: 6px; }
+
+/* ── 데이터 테이블 ── */
+.data-table { width: 100%; border-collapse: collapse; margin-top: 0.5rem; }
+.data-table th {
+    background-color: var(--bg); border-bottom: 2px solid var(--s-cl);
+    color: var(--txt); font-weight: bold; padding: 12px;
+    text-align: center; font-size: 13px;
+}
+.data-table td { padding: 12px; border-bottom: 1px solid var(--border-cl); text-align: center; color: #555; }
+.data-table tbody tr:hover { background-color: rgba(183, 228, 199, 0.15); }
+
+/* ── 링크 ── */
+.link-text { color: var(--s-cl); font-weight: bold; text-decoration: none; }
+.link-text:hover { text-decoration: underline; }
+.link-id { color: var(--s-cl); font-weight: bold; text-decoration: none; }
+.link-id:hover { text-decoration: underline; }
+
+/* ── 빈 셀 ── */
+.empty-cell { padding: 30px !important; color: #aaa; }
+
+/* ── 섹션 박스 ── */
+.section-box { border: 1px solid var(--border-cl); border-radius: 8px; padding: 20px; background-color: #FFF; }
+.section-box .section-title { margin-top: 0; }
+
+/* ── 지시사항 박스 ── */
+.instruction-box {
+    background-color: var(--bg); padding: 18px;
+    border-left: 4px solid var(--s-cl); margin-top: 15px;
+    border-top: 1px solid var(--border-cl); border-right: 1px solid var(--border-cl);
+    border-bottom: 1px solid var(--border-cl); border-radius: 0 8px 8px 0;
+}
+
+/* ── 기타 ── */
+.process-link-wrap { margin-bottom: 8px; }
+.info-label-block  { display: block; margin-bottom: 6px; }

@@ -112,4 +112,19 @@ public class ShipmentDAOImpl implements ShipmentDAO {
     public List loadEmpList() {
         return sqlSession.selectList("kr.or.smartfarm.shipment.loadEmpList");
     }
+
+    @Override
+    public int insertSplitLot(Map map) {
+        return sqlSession.insert("kr.or.smartfarm.shipment.insertSplitLot", map);
+    }
+
+    @Override
+    public int insertLotRelationForShipment(Map map) {
+        return sqlSession.insert("kr.or.smartfarm.shipment.insertLotRelationForShipment", map);
+    }
+
+    @Override
+    public int updateShipmentLotRef(Map map) {
+        return sqlSession.update("kr.or.smartfarm.shipment.updateShipmentLotRef", map);
+    }
 }
