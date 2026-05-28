@@ -64,4 +64,138 @@
         ORDER BY S.shipment_num DESC
     </select>
 
+    <!-- 출하 단건 상세 조회 -->
+    <select id="loadShipmentDetail" resultType="hashMap" parameterType="string">
+        SELECT
+            S.shipment_num,
+            S.shipment_id,
+            TO_CHAR(S.shipment_date, 'YYYY-MM-DD') AS shipment_date,
+            S.shipment_status,
+            S.plan_qty,
+            S.shipment_request_num,
+            E.ename,
+            E.emp_num,
+            I.name,
+            I.item_num,
+            V.vender_name,
+            SR.request_id,
+            TO_CHAR(SR.request_date, 'YYYY-MM-DD') AS request_date,
+            TO_CHAR(SR.due_date,     'YYYY-MM-DD') AS due_date
+        FROM shipment S
+        JOIN emp             E  ON S.emp_num              = E.emp_num
+        JOIN shipment_request SR ON S.shipment_request_num = SR.shipment_request_num
+        JOIN vender          V  ON SR.vender_num           = V.vender_num
+        JOIN item            I  ON SR.item_num             = I.item_num
+        WHERE S.shipment_id = #{_parameter}
+    </select>
+
+    <!-- 출하에 배정된 LOT 목록 조회 -->
+    <select id="loadShipmentLots" resultType="hashMap" parameterType="int">
+        SELECT
+            SL.shipment_lot_num,
+            SL.lot_num,
+            SL.qty,
+            L.lot_code,
+            TO_CHAR(L.lot_date, 'YYYY-MM-DD') AS lot_date,
+            I.name AS item_name
+        FROM shipment_lot SL
+        JOIN lot  L ON SL.lot_num  = L.lot_num
+        JOIN item I ON L.item_num  = I.item_num
+        WHERE SL.shipment_num = #{_parameter}
+        ORDER BY L.lot_date ASC
+    </select>
+
+    <!-- FIFO 가용 LOT 조회 (출하지시용) -->
+    <select id="getAvailableLotsForShipment" resultType="hashMap" parameterType="int">
+        SELECT L.lot_num, L.current_qty, TO_CHAR(L.lot_date, 'YYYY-MM-DD') AS lot_date
+        FROM lot L
+        WHERE L.item_num = #{_parameter}
+          AND L.current_qty > 0
+          AND L.expiry_date >= SYSDATE
+          AND NOT EXISTS (
+              SELECT 1 FROM shipment_lot SL
+              JOIN shipment S ON SL.shipment_num = S.shipment_num
+              WHERE SL.lot_num = L.lot_num
+                AND S.shipment_status != '취소'
+          )
+        ORDER BY L.lot_date ASC
+    </select>
+
+    <!-- 출하 등록 -->
+    <insert id="insertShipment" parameterType="map">
+        <selectKey keyProperty="shipment_num" resultType="int" order="BEFORE">
+            SELECT SHIPMENT_SEQ.NEXTVAL FROM DUAL
+        </selectKey>
+        INSERT INTO shipment
+            (shipment_num, shipment_id, emp_num, shipment_date, shipment_status, plan_qty, shipment_request_num)
+        VALUES
+            (#{shipment_num},
+             'SHIP' || LPAD(#{shipment_num}, 4, '0'),
+             #{emp_num},
+             SYSDATE,
+             '대기',
+             #{plan_qty},
+             #{shipment_request_num})
+    </insert>
+
+    <!-- 출하-LOT 배정 등록 -->
+    <insert id="insertShipmentLot" parameterType="map">
+        INSERT INTO shipment_lot (shipment_lot_num, shipment_num, lot_num, qty)
+        VALUES (SHIPMENT_LOT_SEQ.NEXTVAL, #{shipment_num}, #{lot_num}, #{qty})
+    </insert>
+
+    <!-- 출하지시: request 상태 → 출하대기 -->
+    <update id="updateRequestStatusToDispatch" parameterType="string">
+        UPDATE shipment_request
+        SET status_num = (SELECT status_num FROM request_status WHERE status_name = '출하대기')
+        WHERE shipment_request_num = #{_parameter}
+    </update>
+
+    <!-- 출하확정용 LOT 목록 조회 -->
+    <select id="getShipmentLots" resultType="hashMap" parameterType="int">
+        SELECT SL.lot_num, SL.qty, L.item_num
+        FROM shipment_lot SL
+        JOIN lot L ON SL.lot_num = L.lot_num
+        WHERE SL.shipment_num = #{_parameter}
+    </select>
+
+    <!-- 출하확정: LOT 수량 차감 -->
+    <update id="deductLotQty" parameterType="map">
+        UPDATE lot
+        SET current_qty = current_qty - #{qty}
+        WHERE lot_num = #{lot_num}
+    </update>
+
+    <!-- 출하확정: IO 출고 이력 등록 -->
+    <insert id="insertShipmentIo" parameterType="map">
+        INSERT INTO io
+            (io_num, io_type, io_qty, io_date, qc_num, lot_num, plan_num, io_reason, facility_num, emp_num)
+        VALUES
+            (io_seq.NEXTVAL, '출고', #{qty}, SYSDATE, NULL, #{lot_num}, NULL, '출하', 3, #{emp_num})
+    </insert>
+
+    <!-- 출하확정: 출하 상태 → 완료 -->
+    <update id="confirmShipmentStatus" parameterType="int">
+        UPDATE shipment SET shipment_status = '완료' WHERE shipment_num = #{_parameter}
+    </update>
+
+    <!-- 출하확정: request 상태 → 출하완료 -->
+    <update id="updateRequestStatusToComplete" parameterType="string">
+        UPDATE shipment_request
+        SET status_num = (SELECT status_num FROM request_status WHERE status_name = '출하완료')
+        WHERE shipment_request_num = #{_parameter}
+    </update>
+
+    <!-- 취소: 출하 상태 → 취소 -->
+    <update id="cancelShipmentStatus" parameterType="int">
+        UPDATE shipment SET shipment_status = '취소' WHERE shipment_num = #{_parameter}
+    </update>
+
+    <!-- 취소: request 상태 → 접수 (롤백) -->
+    <update id="updateRequestStatusToRollback" parameterType="string">
+        UPDATE shipment_request
+        SET status_num = (SELECT status_num FROM request_status WHERE status_name = '접수')
+        WHERE shipment_request_num = #{_parameter}
+    </update>
+
 </mapper>
