@@ -51,9 +51,23 @@ public class QcDAOImpl implements QcDAO{
 		return sqlSession.selectOne("mapper.qc.selectDetail", io_num);
 	}
 
-//	// INSERT
-//	public int insertQc(QcDTO dto) {
-//		return sqlSession.insert("mapper.qc.insertQc", dto);
-//	}
+	@Override
+	public List selectLog(int io_num) {
+		return sqlSession.selectList("mapper.qc.selectLog", io_num);
+	}
+	@Override
+	public List selectAllQc() {
+		return sqlSession.selectList("mapper.qc.qcList");
+	}
+
+	// INSERT
+	public int insertQc1(QcDTO dto) {
+		return sqlSession.insert("mapper.qc.insertQc", dto);
+	}
+
+	@Override
+	public QcDTO qcChk(int qc_num) {
+		return  sqlSession.selectOne("mapper.qc.qcChk", qc_num);
+	}
 	
 }

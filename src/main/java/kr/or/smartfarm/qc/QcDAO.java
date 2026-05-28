@@ -10,7 +10,10 @@ public interface QcDAO {
 	public List selectAll(int pageNum); 
 	public List selectItem(); 
 	public List selectWaiting(); 
+	public List selectAllQc(); 
 	public List searchQc(Map map);
 	public QcDTO selectDetail(int io_num);
-//	public int insertQc(QcDTO dto);
+	public List selectLog(int io_num); 
+	public int insertQc1(QcDTO dto);
+	public QcDTO qcChk(int qc_num); 
 }

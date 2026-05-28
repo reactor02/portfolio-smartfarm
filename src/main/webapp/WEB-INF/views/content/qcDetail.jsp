@@ -212,89 +212,101 @@ response.setContentType("text/html; charset=utf-8");
 </head>
 <body>
 
-	<div class="mat-all">
-		<tiles:insertAttribute name="header" ignore="true" />
+<div class="mat-all">
+	<tiles:insertAttribute name="header" ignore="true" />
 
-		<div class="mat-body">
-			<main class="main-cont">
-				
-				<div class="hdr">
-					<h1>품질검사 완료/수정</h1>
-					<a href="/qc" class="btn-list">목록으로</a>
-				</div>
+	<div class="mat-body">
+		<main class="main-cont">
+			
+			<div class="hdr">
+				<h1>품질검사 상세</h1>
+				<a href="/qc" class="btn-list">목록으로</a>
+			</div>
 
-				<div class="detail-section">
-				    <div class="info-grid-top">
-				        <div class="info-item">
-				            <span class="info-label">품목 코드</span>
-				            <span class="info-value">${result.code}</span>
-				        </div>
-				        <div class="info-item">
-				            <span class="info-label">자재명</span>
-				            <span class="info-value">${result.name}</span>
-				        </div>
-				        <div class="info-item">
-				            <span class="info-label">총 수량</span>
-				            <span class="info-value">${result.io_qty}${result.unit}</span>
-				        </div>
-				        <div class="info-item">
-				            <span class="info-label">검사일</span>
-				            <span class="info-value">${result.io_date}</span>
-				        </div>
-				      
-				    </div>
-    
-				    <div class="info-grid-sub">
-				        <div class="info-item">
-				            <span class="info-label">검사 수량</span>
-				            <span class="info-value"></span>
-				        </div>
-				        <div class="info-item">
-				            <span class="info-label">검사 상태</span>
-				            <span class="info-value">${result.qc_pass}</span>
-				        </div>
-				        <div class="info-item">
-				            <span class="info-label">담당자</span>
-				            <span class="info-value">${result.ename}</span>
-				        </div>
-				    </div>
-				</div>
+			<div class="detail-section">
+			    <div class="info-grid-top">
+			        <div class="info-item">
+			            <span class="info-label">품목 코드</span>
+			            <span class="info-value">${result.code}</span>
+			        </div>
+			        <div class="info-item">
+			            <span class="info-label">자재명</span>
+			            <span class="info-value">${result.name}</span>
+			        </div>
+			        <div class="info-item">
+			            <span class="info-label">총 수량</span>
+			            <span class="info-value">${result.io_qty}${result.unit}</span>
+			        </div>
+			        <div class="info-item">
+			            <span class="info-label">검사일</span>
+			            <span class="info-value">${result.io_date}</span>
+			        </div>
+			      
+			    </div>
+   
+			    <div class="info-grid-sub">
+			        <div class="info-item">
+			            <span class="info-label">검사 수량</span>
+			            <span class="info-value">${result.io_qty}</span>
+			        </div>
+			        <div class="info-item">
+			            <span class="info-label">검사 상태</span>
+			            <span class="info-value">${result.qc_pass}</span>
+			        </div>
+			        <div class="info-item">
+			            <span class="info-label">담당자</span>
+			            <span class="info-value">${result.ename}</span>
+			        </div>
+			    </div>
+			</div>
 
-				<div class="detail-section">
-					<div class="section-title">상세 내용</div>
-					<div class="tbl-box">
-						<table class="stk-tbl">
-							<thead>
-								<tr>
-									<th style="width: 60px;">번호</th>
-									<th>LOT 코드</th>
-									<th>수량</th>
-									<th>입고일</th>
-									<th>유통기한</th>
-									<th>담당자</th>
-								</tr>
-							</thead>
-							<tbody>
-								<c:choose>
-									<c:when test="${not empty result}">
-								
-									</c:when>
-									<c:otherwise>
+			<div class="detail-section">
+				<div class="section-title">상세 내역</div>
+				<div class="tbl-box">
+					<table class="stk-tbl">
+						<thead>
+							<tr>
+								<th style="width: 60px;">LOT 코드</th>
+								<th>품목명</th>
+								<th>검사 수량</th>
+								<th>검사일</th>
+								<th>검사상태</th>
+								<th>담당자</th>
+							</tr>
+						</thead>
+						<tbody>
+							<c:choose>
+								<c:when test="${not empty list}">
+									<c:forEach var="i" items="${list}">
 										<tr>
-											<td colspan="6" style="padding: 30px; color: #888;">조회된 이력 데이터가 없습니다.</td>
+											<td style="font-weight: bold; color: #555;">${i.lot_code}</td>
+											<td>${i.name}</td>
+											<td>${i.io_qty}${i.unit}</td>
+											<td><fmt:formatDate value="${i.io_date}" pattern="yyyy-MM-dd" /></td>
+											<td>${i.qc_pass}</td>
+											<td>${i.ename}</td>
 										</tr>
-									</c:otherwise>
-								</c:choose>
-							</tbody>
-						</table>
-					</div>
+									</c:forEach>
+								</c:when>
+								<c:otherwise>
+									<tr>
+										<td colspan="6" style="padding: 30px; color: #888;">조회된 이력 데이터가 없습니다.</td>
+									</tr>
+								</c:otherwise>
+							</c:choose>
+						</tbody>
+					</table>
 				</div>
+			</div>
 
-			</main>
-		</div>
-
-		<tiles:insertAttribute name="footer" ignore="true" />
+		</main>
 	</div>
+
+	<tiles:insertAttribute name="footer" ignore="true" />
+	
+			
+     
+</div>
 
 </body>
 </html>

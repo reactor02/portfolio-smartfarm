@@ -82,6 +82,7 @@
 			emp_num,
 			ename
 		FROM emp
+		WHERE status = 'Y'
 	</select>
 	
 	<insert id="insertEquip"  parameterType="EquipDTO">
