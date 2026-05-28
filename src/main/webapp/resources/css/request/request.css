@@ -1,14 +1,32 @@
-.required-mark {
-    color: #e03131;
-}
+/* ─────────────────────────────────────────
+   request.css
+   공통: list-common.css + modal.css 위임
+   여기엔 주문 페이지 고유 스타일만 작성
+   ───────────────────────────────────────── */
 
-.vender-search-wrap {
-    position: relative;
-}
+/* 링크 */
+.link-id       { color: #2D6A4F; font-weight: bold; text-decoration: none; }
+.link-id:hover { text-decoration: underline; }
 
-#venderSearch {
-    width: 100%;
-}
+/* 날짜 구분자 / 검색 아이콘 */
+.date-sep { font-weight: bold; padding: 0 10px; }
+.sch-icon { color: #888; }
+
+/* 배지 — list-common 에 없는 '출하대기' 전용 */
+.badge-waiting { background-color: #fff3cd; color: #856404; }
+
+/* 필수 표시 */
+.required-mark { color: #e03131; }
+
+/* 등록 모달 초기 숨김 (style="display:none" 대신 CSS로) */
+#regModal { display: none; }
+
+/* ══════════════════════════════════════════
+   거래처 검색 드롭다운
+   ══════════════════════════════════════════ */
+.vender-search-wrap { position: relative; }
+
+#venderSearch { width: 100%; }
 
 #venderDropdown {
     display: none;
@@ -32,52 +50,13 @@
     font-size: 13px;
     table-layout: fixed;
 }
-
 .vender-tbl col:nth-child(1) { width: 40%; }
 .vender-tbl col:nth-child(2) { width: 25%; }
 .vender-tbl col:nth-child(3) { width: 35%; }
 
-.vender-list-row {
-    cursor: pointer;
-    border-bottom: 1px solid #eee;
-}
+.vender-list-row       { cursor: pointer; border-bottom: 1px solid #eee; }
+.vender-list-row:hover { background: #f0faf5; }
 
-.vender-list-row:hover {
-    background: #f0f7ff;
-}
-
-.vender-list-cell {
-    padding: 8px 12px;
-}
-
-.vender-list-cell-muted {
-    padding: 8px 12px;
-    color: #555;
-}
-
-.vender-list-empty {
-    padding: 20px;
-    text-align: center;
-    color: #999;
-}
-
-.modal-btn-wrap {
-    margin-top: 20px;
-}
-
-#regModal {
-    display: none;
-}
-
-.badge-waiting { background-color: #fff3cd; color: #856404; }
-
-.date-sep { font-weight: bold; padding: 0 10px; }
-
-.link-id {
-    color: #2D6A4F;
-    font-weight: bold;
-    text-decoration: none;
-}
-.link-id:hover {
-    text-decoration: underline;
-}
+.vender-list-cell       { padding: 8px 12px; }
+.vender-list-cell-muted { padding: 8px 12px; color: #555; }
+.vender-list-empty      { padding: 20px; text-align: center; color: #999; }

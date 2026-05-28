@@ -75,10 +75,15 @@
 		select v.*,e.ename from vender v 
 		left join emp e on v.emp_num = e.emp_num
 		where 1=1 
-		and ( 
-			v.vender_name like ('%' || #{keyword} || '%')
-			or e.ename like ('%' || #{keyword} || '%')
-		)
+		<if test="type != null and type != ''">
+			and v.vender_type= #{type}
+		</if>
+		<if test="keyword != null and keyword != ''">
+			and ( 
+				v.vender_name like ('%' || #{keyword} || '%')
+				or e.ename like ('%' || #{keyword} || '%')
+			)
+		</if>
 	</select>
 
 </mapper>

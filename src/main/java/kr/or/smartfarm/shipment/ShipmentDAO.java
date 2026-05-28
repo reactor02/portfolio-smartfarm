@@ -23,4 +23,9 @@ public interface ShipmentDAO {
     public List loadItems();
     public List loadPendingRequests();
     public List loadEmpList();
+
+    // 출하확정 분할
+    public int insertSplitLot(Map map);
+    public int insertLotRelationForShipment(Map map);
+    public int updateShipmentLotRef(Map map);
 }

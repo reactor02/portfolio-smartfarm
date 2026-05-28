@@ -92,6 +92,7 @@ response.setContentType("text/html; charset=utf-8");
                 <th>품목</th>
                 <th>품목분류</th>
                 <th>계획수량</th>
+                <th>생산수량</th>
                 <th>생산일자</th>
                 <th>생산마감</th>
                 <th>진행률</th>
@@ -105,7 +106,7 @@ response.setContentType("text/html; charset=utf-8");
                     <c:forEach var="prod" items="${list}" varStatus="vs">
                         <tr>
                             <td class="num-cell">
-                                ${page.totalCount - (page.page-1)*page.size - vs.count + 1}
+                                ${(page.page - 1) * page.size + vs.count}
                             </td>
                             <td><a href="/prod/${prod.plan_id}" class="link-txt">${prod.plan_id}</a></td>
                             <td>${prod.item_name}</td>
@@ -115,6 +116,7 @@ response.setContentType("text/html; charset=utf-8");
                                 <c:otherwise>${prod.type}</c:otherwise>
                             </c:choose></td>
                             <td>${prod.plan_qty}</td>
+                            <td>${prod.order_qty_sum > 0 ? prod.order_qty_sum : '-'}</td>
                             <td><fmt:formatDate value="${prod.plan_start}" pattern="yyyy-MM-dd"/></td>
                             <td><fmt:formatDate value="${prod.plan_end}"   pattern="yyyy-MM-dd"/></td>
                             <td><fmt:formatNumber
@@ -128,7 +130,7 @@ response.setContentType("text/html; charset=utf-8");
                     </c:forEach>
                 </c:when>
                 <c:otherwise>
-                    <tr><td colspan="10" class="empty-cell">등록된 생산계획이 없습니다.</td></tr>
+                    <tr><td colspan="11" class="empty-cell">등록된 생산계획이 없습니다.</td></tr>
                 </c:otherwise>
             </c:choose>
         </tbody>

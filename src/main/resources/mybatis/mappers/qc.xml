@@ -12,6 +12,7 @@
 		    io.io_num,
 		    io.io_qty,
 		    io.io_date,
+		    lot.lot_code,
 		    emp.ename,
 		    qc.qc_type,
 		    qc.qc_pass,
@@ -46,6 +47,7 @@
 		    io.io_qty,
 		    io.io_date,
 		    emp.ename,
+		    lot.lot_code,
 		    qc.qc_type,
 		    qc.qc_pass,
 		    item.code,
@@ -91,6 +93,7 @@
 		    io.io_date,
 		    emp.ename,
 		    lot.lot_num,
+		    lot.lot_code,
 		    qc.qc_type,
 		    qc.qc_pass,
 		    item.code,
@@ -116,6 +119,7 @@
 		    io.io_date,
 		    emp.ename,
 		    lot.lot_num,
+		    lot.lot_code,
 		    qc.qc_type,
 		    qc.qc_pass,
 		    item.code,
@@ -133,6 +137,43 @@
 		WHERE io.io_num = #{io_num}
 		ORDER BY io.io_date DESC
 	</select>
+		
+	<select id="selectLog" resultType="QcDTO" parameterType="int">
+		SELECT
+		    io.io_num,
+		    lot.lot_code,
+		    item.name,
+		    io.io_qty,
+		    item.unit,
+		    io.io_date,
+		    qc.qc_pass,
+		    emp.ename
+		FROM io
+		JOIN qc
+		    ON qc.qc_num = io.qc_num
+		JOIN emp
+		    ON io.emp_num = emp.emp_num
+		JOIN lot
+		    ON io.lot_num = lot.lot_num
+		JOIN item
+		    ON lot.item_num = item.item_num
+		WHERE lot.lot_num = 
+		(
+			SELECT lot_num FROM io
+			WHERE io_num = #{io_num}
+		)
+		ORDER BY io.io_date DESC
+	</select>
+	
+	<select id="qcList" resultType="QcDTO">
+		SELECT * from qc
+	</select>
+	
+	<select id="qcChk" resultType="QcDTO" parameterType="int">
+		SELECT qc_pass from qc
+		WHERE qc_num = #{qc_num}
+	</select>
+	
 		
 	
 </mapper>

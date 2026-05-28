@@ -31,6 +31,7 @@ public class ProdDTO {
 
     // work_order SUM
     private int    currentqty;
+    private int    order_qty_sum;   // 연관 작업지시 수량 합계
 
     private int    total_count;
 }

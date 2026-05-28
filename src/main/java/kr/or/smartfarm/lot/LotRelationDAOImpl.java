@@ -32,4 +32,9 @@ public class LotRelationDAOImpl implements LotRelationDAO {
     public List<Map<String, Object>> getRecursiveMaterials(int lot_num) {
         return session.selectList("kr.or.smartfarm.lot.getRecursiveMaterials", lot_num);
     }
+
+    @Override
+    public List<Map<String, Object>> getLotHistory(int lot_num) {
+        return session.selectList("kr.or.smartfarm.lot.getLotHistory", lot_num);
+    }
 }

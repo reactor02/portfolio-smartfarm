@@ -188,44 +188,6 @@ select.form-control {
 	background-color: #B7E4C7;
 }
 
-/* ========== 3. 커스텀 라디오 버튼 ========== */
-.radio-label {
-	display: flex;
-	align-items: center;
-	gap: 6px;
-	cursor: pointer;
-	font-size: 0.95rem;
-	color: #333;
-	font-weight: bold;
-}
-
-.radio-label input[type="radio"] {
-	appearance: none;
-	-webkit-appearance: none;
-	width: 18px;
-	height: 18px;
-	border: 2px solid #aaa;
-	border-radius: 50%;
-	position: relative;
-	outline: none;
-	cursor: pointer;
-}
-
-.radio-label input[type="radio"]:checked {
-	border-color: #4A90E2;
-}
-
-.radio-label input[type="radio"]:checked::after {
-	content: "";
-	position: absolute;
-	top: 50%;
-	left: 50%;
-	transform: translate(-50%, -50%);
-	width: 10px;
-	height: 10px;
-	border-radius: 50%;
-	background-color: #4A90E2; /* 선택 시 파란색 원 */
-}
 
 /* ========== 4. 데이터 테이블 ========== */
 .tbl-box {
@@ -399,7 +361,8 @@ select.form-control {
 						<div class="sch-row">
 
 							<div class="sch-left">
-								<span class="label">▶ 거래 유형</span> <select class="form-control" name="type">
+								<span class="label">▶ 거래 유형</span> 
+								<select class="form-control" name="type" id="mType">
 									<option value="">선택</option>
 									<option value="공급업체">공급업체</option>
 									<option value="고객사">고객사</option>
@@ -415,8 +378,8 @@ select.form-control {
 										id="keyword" name="keyword" placeholder="거래처명 검색">
 
 								</div>
-								<button type="submit" class="btn-sch" id="search">검색</button>
-								<button type="button" class="btn-sch" id="init">검색 초기화</button>
+								<button type="button" class="btn-sch" id="search">검색</button>
+								<button type="button" class="select-reset" id="init">검색 초기화</button>
 							</div>
 						</div>
 					</div>
@@ -431,7 +394,7 @@ select.form-control {
 							<tr>
 								<th>no.</th>
 								<th>거래처명</th>
-								<th>거래처 담당자</th>
+								<th>대표자명</th>
 								<th>거래 유형</th>
 								<th>거래처 연락처</th>
 								<th>거래처 주소</th>
@@ -501,62 +464,166 @@ select.form-control {
 	</div>
 
 
+	<div id="pagination"></div>
+
 	<script>
-	window.addEventListener('load',()=>{
-		bind()
-	})
-	
-		let page=${param.page != null ? param.page : 1};
-	
-	function bind(){
-			
-			
-			fetch(`/vender/list?page=`+ page,{
-				method:'get'
-			}).then(
-				resp => resp.json()		
-			).then(function(data){
-				console.log(data)
-				console.log('data.list',data.length)
-				
-				document.getElementById("tbody").innerHTML=``
-				for(let i = 0; i<data.length;i++){
-					document.getElementById("tbody").innerHTML+=`
-					<tr>
-						<td>\${data[i].vender_num}</td>
-						<td style="text-align:left; padding-left:20px">
-							<a href="/vender/one?vender_num=\${data[i].vender_num}"class="link-txt">\${data[i].vender_name}</a></td>
-						<td>\${data[i].ven_ename}</td>
-						<td>\${data[i].vender_type}</td>
-						<td>\${data[i].vender_phone}</td>
-						<td>\${data[i].vender_addr}</td>
-						<td>\${data[i].ename}</td>
-					</tr>
-					`
-				}
-			})
-			
-			
-			
-		
-			
-	/* 작업 등록 모달 */
-	var btnOpenWork = document.getElementById('btnOpenWorkModal');
-	if (btnOpenWork) btnOpenWork.addEventListener('click', function(){
-		document.getElementById('workModal').style.display = 'flex';
+
+	window.addEventListener('load', () => {
+	    bind();
 	});
-	document.getElementById('btnCloseWorkModal').addEventListener('click', function(){
-		document.getElementById('workModal').style.display = 'none';
-	});
-	document.getElementById('workModal').addEventListener('click', function(e){
-		if(e.target == this) this.style.display='none';
-	});
+
+	// 서버에서 넘어온 page 값
+	let page = ${param.page != null ? param.page : 1};
+
+	function bind() {
+	    reset();
+	    modal();
+
+	    // 최초 로딩
+	    loadData(page);
+
+	    // 검색 버튼
+	    const btn_sch = document.querySelector(".btn-sch");
+	    btn_sch.addEventListener('click', () => {
+	        loadData(1);
+	    });
+	    
+	    // Enter 검색 
+	    const keywordInput = document.querySelector("#keyword");
+	    keywordInput.addEventListener("keydown", (e) => {
+	        if (e.key === "Enter") {
+	            e.preventDefault(); // form submit 막기
+	            loadData(1);
+	        }
+	    });
+	    
+	    // select 변경 검색 
+	    const typeSelect = document.querySelector("#mType");
+	    typeSelect.addEventListener("change", () => {
+	        loadData(1);
+	    });
+	    
+	}
 	
-		}
 	
+
+	// 초기화 버튼
+	function reset() {
+	    const select_reset = document.querySelector(".select-reset");
+	    select_reset.addEventListener('click', () => {
+	        location.reload();
+	    });
+	}
+
+	//  전체조회 + 검색 + 페이징 통합
+	function loadData(pageNum = 1) {
+
+	    let type = document.querySelector("#mType").value;
+	    let keyword = document.querySelector("#keyword").value;
+
+	    const params = new URLSearchParams();
+	    params.append("page", pageNum);
+	    params.append("type", type);
+	    params.append("keyword", keyword);
+
+	    fetch(`/vender/search?\${params.toString()}`)
+	    .then(res => res.json())
+	    .then(data => {
+
+	        let tbody = document.querySelector("#tbody");
+	        tbody.innerHTML = "";
+
+	        // 안전 처리
+	        let list = data.searchResult ?? data.list ?? [];
+
+	        // 데이터 없음
+	        if (list.length === 0) {
+	            tbody.innerHTML = "<tr><td colspan='8'>조회된 결과가 없습니다.</td></tr>";
+	            renderPagination(data.pageInfo);
+	            return;
+	        }
+
+	        // 데이터 출력
+	        let html = "";
+	        for (let item of list) {
+	            html += `
+	                <tr>
+	                    <td>\${item.vender_num}</td>
+	                    <td style="text-align:left; padding-left:20px">
+	                        <a href="/vender/one?vender_num=\${item.vender_num}" class="link-txt">
+	                            \${item.vender_name}
+	                        </a>
+	                    </td>
+	                    <td>\${item.ven_ename}</td>
+	                    <td>\${item.vender_type}</td>
+	                    <td>\${item.vender_phone}</td>
+	                    <td>\${item.vender_addr}</td>
+	                    <td>\${item.ename}</td>
+	                </tr>
+	            `;
+	        }
+
+	        tbody.innerHTML = html;
+
+	        // 페이징
+	        renderPagination(data.pageInfo);
+
+	        // URL 변경
+	        const newUrl = `${window.location.pathname}?\${params.toString()}`;
+	        window.history.pushState({ path: newUrl }, '', newUrl);
+	    })
+	    .catch(err => {
+	        console.error("fetch 에러:", err);
+	    });
+	}
+
+	// 모달
+	function modal() {
+	    var btnOpenWork = document.getElementById('btnOpenWorkModal');
+
+	    if (btnOpenWork) {
+	        btnOpenWork.addEventListener('click', function () {
+	            document.getElementById('workModal').style.display = 'flex';
+	        });
+	    }
+
+	    document.getElementById('btnCloseWorkModal').addEventListener('click', function () {
+	        document.getElementById('workModal').style.display = 'none';
+	    });
+
+	    document.getElementById('workModal').addEventListener('click', function (e) {
+	        if (e.target == this) this.style.display = 'none';
+	    });
+	}
+
+	// 페이지네이션 함수
+	function renderPagination(pInfo) {
+	    let pagingHtml = "";
+	    
+	    // 이전
+	    if (!pInfo.isFirstPage) {
+	        // pg-btn -> page-link
+	        pagingHtml += `<a class="page-link prev-next" href="javascript:movePage(${pInfo.pageNum - 1})">이전</a>`;
+	    }
+	    
+	    // 번호
+	    pInfo.navigatepageNums.forEach(num => {
+	        // pg-btn -> page-link, pg-active -> active (원하시는 명칭으로)
+	        pagingHtml += `<a class="page-link prev-next \${num === pInfo.pageNum ? 'active' : ''}" href="javascript:movePage(\${num})">\${num}</a>`;
+	    });
+	    
+	    // 다음
+	    if (!pInfo.isLastPage) {
+	        // pg-btn -> page-link
+	        pagingHtml += `<a class="page-link prev-next" href="javascript:movePage(${pInfo.pageNum + 1})">다음</a>`;
+	    }
+	    
+	    document.querySelector(".pagination-container").innerHTML = pagingHtml;
+	}
 	
-	
-		
+	window.movePage = function(pageNum) {
+	    loadData(pageNum);
+	};
 	
 </script>
 

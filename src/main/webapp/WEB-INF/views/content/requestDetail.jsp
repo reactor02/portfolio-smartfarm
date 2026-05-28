@@ -11,6 +11,7 @@ response.setContentType("text/html; charset=utf-8");
 <head>
 <meta charset="UTF-8">
 <title>주문 상세</title>
+<link rel="stylesheet" href="/resources/css/detail-common.css">
 <link rel="stylesheet" href="/resources/css/request/requestDetail.css">
 </head>
 <body>

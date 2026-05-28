@@ -1,289 +1,93 @@
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-    font-family: 'Malgun Gothic', sans-serif;
-}
+/* ─────────────────────────────────────────
+   shipment.css
+   공통: list-common.css + modal.css 위임
+   여기엔 출하 페이지 고유 스타일만 작성
+   ───────────────────────────────────────── */
 
-.mat-all {
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-    background-color: #f4f7f6;
-}
+/* 링크 (list-common 의 .link-txt 대응) */
+.link-id       { color: #2D6A4F; font-weight: bold; text-decoration: none; }
+.link-id:hover { text-decoration: underline; }
 
-.mat-body {
-    display: flex;
-    flex: 1;
-}
+/* 날짜 구분자 / 검색 아이콘 */
+.date-sep { font-weight: bold; padding: 0 10px; }
+.sch-icon { color: #888; }
 
-.main-cont {
-    flex: 1;
-    padding: 2rem 2.5rem;
-    min-width: 0;
-}
+/* 배지 — list-common 에 없는 '출하대기' 전용 */
+.badge-waiting { background-color: #fff3cd; color: #856404; }
 
-.hdr {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background-color: #2D6A4F;
-    padding: 15px 25px;
-    border-radius: 8px;
-    margin-bottom: 25px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
+/* ══════════════════════════════════════════
+   출하지시 등록 — 메인 모달 보완
+   (modal-overlay / modal-box / modal-grid 는 modal.css)
+   ══════════════════════════════════════════ */
+.required-mark       { color: #dc3545; }
+.modal-section-label { font-size: 13px; font-weight: bold; color: #555; margin-bottom: 6px; }
 
-.hdr h1 {
-    font-size: 1.8rem;
-    color: #ffffff;
-    font-weight: bold;
-    letter-spacing: -1px;
-}
-
-.btn-reg {
-    background-color: #fff;
-    color: #2D6A4F;
-    padding: 10px 24px;
+/* 선택된 주문 카드 */
+.selected-order-card {
+    border: 1px dashed #ccc;
     border-radius: 6px;
-    border: 1px solid #2D6A4F;
-    font-weight: bold;
-    font-size: 1.05rem;
-    cursor: pointer;
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 2px 3px rgba(0, 0, 0, 0.2);
-    transition: background-color 0.2s;
-}
-
-.btn-reg:hover {
-    background-color: #B7E4C7;
-}
-
-.sch-wrap {
-    background-color: #fff;
-    border: 1px solid #bbb;
-    border-radius: 10px;
-    padding: 20px 25px;
-    margin-bottom: 25px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-}
-
-.sch-row-1,
-.sch-row-3 {
+    padding: 12px 16px;
+    background: #fafafa;
+    font-size: 13px;
+    min-height: 52px;
     display: flex;
     align-items: center;
-    width: 100%;
-    gap: 15px;
+    margin-bottom: 8px;
 }
+.selected-order-card.has-order { background: #f0faf5; border: 1px solid #49A47A; }
+.empty-order-msg  { color: #bbb; }
+.order-info-row   { display: flex; flex-wrap: wrap; gap: 20px; }
+.order-info-item  { display: flex; flex-direction: column; gap: 2px; }
+.order-info-label { font-size: 11px; color: #777; font-weight: bold; }
+.order-info-val   { font-size: 13px; font-weight: bold; color: #1b4332; }
 
-.sch-row-2 {
-    display: flex;
-    align-items: center;
-    width: 100%;
-    gap: 30px;
-}
-
-.sch-row-2 > div {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    gap: 15px;
-}
-
-.sch-row-3 {
-    justify-content: flex-end;
-}
-
-.label {
-    font-size: 0.95rem;
-    font-weight: bold;
-    color: #333;
-    white-space: nowrap;
-    min-width: 75px;
-}
-
-.form-control {
-    height: 38px;
-    border: 1px solid #aaa;
-    border-radius: 4px;
-    padding: 0 10px;
-    font-size: 0.95rem;
-    outline: none;
-    transition: border-color 0.2s;
-    width: 325px;
-}
-
-.form-control:focus {
-    border-color: #2D6A4F;
-}
-
-select.form-control {
-    flex: 1;
-    width: 327px;
-}
-
-.sch-input-box {
-    display: flex;
-    align-items: center;
-    border: 1px solid #aaa;
-    border-radius: 4px;
-    height: 38px;
+/* 주문 검색 버튼 */
+.btn-pick-order {
+    padding: 7px 16px;
     background: #fff;
-    padding-left: 10px;
-    width: 555px;
-    flex-shrink: 0;
-}
-
-.sch-input-box input {
-    border: none;
-    outline: none;
-    height: 100%;
-    flex: 1;
-    padding: 0 5px;
-    font-size: 0.95rem;
-}
-
-.btn-sch,
-.select-reset {
-    height: 38px;
-    padding: 0 20px;
-    background-color: #fff;
-    color: #2D6A4F;
-    border: 1px solid #2D6A4F;
-    border-radius: 4px;
-    font-size: 1rem;
-    font-weight: bold;
-    cursor: pointer;
-    transition: 0.2s;
-    white-space: nowrap;
-    flex-shrink: 0;
-}
-
-.btn-sch:hover {
-    background-color: #B7E4C7;
-}
-
-.select-reset:hover {
-    background-color: #FFB703;
-}
-
-.tbl-box {
-    background: #fff;
-    border-radius: 8px;
-    padding: 15px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
-}
-
-.stk-tbl {
-    width: 100%;
-    border-collapse: collapse;
-    border-top: 2px solid #555;
-    border-bottom: 2px solid #555;
-}
-
-.stk-tbl th {
-    background-color: #e9ecef;
-    color: #222;
-    padding: 12px 10px;
-    border: 1px solid #ccc;
-    border-top: none;
-    font-weight: bold;
-    font-size: 0.95rem;
-}
-
-.stk-tbl td {
-    padding: 12px 10px;
-    border: 1px solid #ccc;
-    text-align: center;
-    color: #333;
-    font-size: 0.95rem;
-}
-
-.stk-tbl tbody tr:hover {
-    background-color: #f1f8f5;
-}
-
-.badge {
-    display: inline-block;
-    padding: 3px 10px;
-    border-radius: 12px;
-    font-size: 0.82rem;
-    font-weight: bold;
-}
-
-.badge-progress { background-color: #d0ebff; color: #1864ab; }
-.badge-done     { background-color: #d3f9d8; color: #1e7e34; }
-.badge-cancel   { background-color: #ffe3e3; color: #c92a2a; }
-.badge-waiting  { background-color: #fff3cd; color: #856404; }
-
-/* 날짜 구분자 (~) */
-.date-sep {
-    font-weight: bold;
-    padding: 0 47px;
-}
-
-/* 검색 아이콘 */
-.sch-icon {
-    color: #888;
-}
-
-/* 번호 컬럼 너비 */
-.col-no {
-    width: 60px;
-}
-
-/* 번호 셀 */
-.num-cell {
-    font-weight: bold;
-    color: #555;
-}
-
-/* 데이터 없음 셀 */
-.empty-cell {
-    padding: 30px;
-    color: #999;
-}
-
-.link-id {
     color: #49A47A;
-    font-weight: bold;
-    text-decoration: none;
-}
-.link-id:hover {
-    text-decoration: underline;
-}
-
-/* ── 출하지시 등록 모달 ── */
-.modal-box-wide {
-    width: 900px;
-    max-height: 90vh;
-    overflow-y: auto;
-}
-
-.modal-section-label {
+    border: 1px solid #49A47A;
+    border-radius: 4px;
     font-size: 13px;
     font-weight: bold;
-    color: #555;
-    margin-bottom: 6px;
+    cursor: pointer;
+    margin-bottom: 16px;
 }
+.btn-pick-order:hover { background: #f0faf5; }
 
-.required-mark { color: #dc3545; }
-
-.modal-tbl-wrap {
-    max-height: 220px;
-    overflow-y: auto;
+/* modal 내부 input/select */
+.modal-select,
+.modal-input {
+    padding: 7px 10px;
     border: 1px solid #ccc;
     border-radius: 4px;
-    margin-bottom: 4px;
-}
-
-.modal-req-tbl {
+    font-size: 13px;
     width: 100%;
-    border-collapse: collapse;
+    box-sizing: border-box;
 }
 
+/* ══════════════════════════════════════════
+   주문 검색 서브모달
+   ══════════════════════════════════════════ */
+.modal-sub-overlay { z-index: 10000; background: rgba(0, 0, 0, 0.25); }
+.modal-box-wide    { width: 860px; max-height: 90vh; overflow-y: auto; }
+
+/* 서브모달 내 검색창 */
+.order-search-row   { margin-bottom: 10px; }
+.order-search-input {
+    width: 100%;
+    height: 36px;
+    padding: 0 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 13px;
+    outline: none;
+}
+.order-search-input:focus { border-color: #49A47A; }
+
+/* 서브모달 테이블 */
+.modal-tbl-wrap { max-height: 320px; overflow-y: auto; border: 1px solid #ccc; border-radius: 4px; }
+.modal-req-tbl  { width: 100%; border-collapse: collapse; }
 .modal-req-tbl th {
     position: sticky;
     top: 0;
@@ -295,7 +99,6 @@ select.form-control {
     text-align: center;
     z-index: 1;
 }
-
 .modal-req-tbl td {
     padding: 9px 10px;
     font-size: 13px;
@@ -303,17 +106,5 @@ select.form-control {
     text-align: center;
     color: #333;
 }
-
-.req-row { cursor: pointer; }
+.req-row       { cursor: pointer; }
 .req-row:hover { background-color: #f1f8f5; }
-.req-row-selected { background-color: #B7E4C7 !important; font-weight: bold; }
-
-.modal-select,
-.modal-input {
-    padding: 7px 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 13px;
-    width: 100%;
-    box-sizing: border-box;
-}

@@ -1,6 +1,7 @@
 package kr.or.smartfarm.vender;
 
 import java.util.List;
+import java.util.Map;
 
 public interface VenderDAO {
 
@@ -21,5 +22,5 @@ public interface VenderDAO {
 	public VenderDTO findById(int vender_num);
 	
 	// 검색용 
-	List<VenderDTO> search(VenderDTO venderDTO);
+	List<VenderDTO> search(Map map);
 }

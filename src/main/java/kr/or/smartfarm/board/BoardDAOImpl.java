@@ -1,6 +1,7 @@
 package kr.or.smartfarm.board;
 
 import java.util.List;
+import java.util.Map;
 
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -71,6 +72,17 @@ public class BoardDAOImpl implements BoardDAO {
 		BoardDTO boardDTO = null;
 		boardDTO = sqlSession.selectOne("mapper.board.findById", board_num);
 		return boardDTO;
+	}
+
+	@Override
+	public List<BoardDTO> search(Map map) {
+		List resultList = null; 
+		
+		int pageNum = (Integer)map.get("page");
+		PageHelper.startPage(pageNum, 10);
+		resultList = sqlSession.selectList("mapper.board.searchBoard", map);
+		System.out.println("search : resultList : " + resultList);
+		return resultList;
 	}
 	
 }

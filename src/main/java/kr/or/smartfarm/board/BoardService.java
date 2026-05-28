@@ -1,6 +1,7 @@
 package kr.or.smartfarm.board;
 
 import java.util.List;
+import java.util.Map;
 
 public interface BoardService {
 
@@ -18,5 +19,8 @@ public interface BoardService {
 	
 	int updateBoard(BoardDTO boardDTO);
 	int deleteBoard(BoardDTO boardDTO);
+	
+	// 검색용
+	List<BoardDTO> search(Map map);
 	
 }

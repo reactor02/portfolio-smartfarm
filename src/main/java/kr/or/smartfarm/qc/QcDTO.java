@@ -9,6 +9,7 @@ import lombok.Data;
 public class QcDTO {
 	
 	// qc
+	private int qc_num;
 	private String qc_type;
 	private String qc_pass;
 	
@@ -30,6 +31,7 @@ public class QcDTO {
 	
 	// lot 
 	private int lot_num;
+	private String lot_code;
 	
 
 }

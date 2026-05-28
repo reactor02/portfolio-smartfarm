@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="mapper.comment">
+
+	<select id="selectComment"
+		resultType="kr.or.smartfarm.comment.CommentDTO">
+		SELECT
+		c.comment_num,
+		c.parent_cmt,
+		c.board_num,
+		c.emp_num,
+		LPAD(' ', 4 * LEVEL) || c.cmt_content AS cmt_content,
+		LEVEL,
+		e.ename
+		FROM cmt c
+		JOIN emp e ON c.emp_num = e.emp_num
+		WHERE c.board_num =
+		#{board_num}
+
+		START WITH c.parent_cmt IS NULL
+		CONNECT BY PRIOR
+		c.comment_num = c.parent_cmt
+		ORDER SIBLINGS BY c.comment_num
+	</select>
+
+	<insert id="insertComment">
+		INSERT INTO cmt (
+		comment_num,
+		parent_cmt,
+		cmt_content,
+		writed_at,
+		comment_status,
+		board_num,
+		emp_num
+		)
+		VALUES (
+		cmt_seq.NEXTVAL,
+		#{parent_cmt},
+		#{cmt_content},
+		SYSDATE,
+		'N',
+		#{board_num},
+		#{emp_num}
+		)
+	</insert>
+
+	<delete id="deleteComment"
+		parameterType="kr.or.smartfarm.comment.CommentDTO">
+		UPDATE cmt
+		SET comment_status = 'D'
+		WHERE comment_num = #{comment_num}
+		OR parent_cmt = #{comment_num}
+	</delete>
+
+
+
+
+
+</mapper>

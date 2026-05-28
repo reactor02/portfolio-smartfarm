@@ -5,20 +5,25 @@ window.onload = function () {
     document.getElementById('progressText').innerText  = pct.toFixed(1) + '%';
 };
 
+function showDateErr() {
+    document.getElementById('dateErrDate').innerText = ORDER_START;
+    document.getElementById('dateErrModal').style.display = 'flex';
+}
+
 function startWork() {
     var today    = new Date();
     var todayStr = today.getFullYear() + '-'
         + String(today.getMonth() + 1).padStart(2, '0') + '-'
         + String(today.getDate()).padStart(2, '0');
     if (todayStr !== ORDER_START) {
-        alert('작업일이 아닙니다.\n작업시작일: ' + ORDER_START);
+        showDateErr();
         return;
     }
     if (!confirm('작업을 시작하시겠습니까?')) return;
     fetch('/work/' + WORK_ORDER_ID + '/start', { method: 'POST' })
         .then(function(r) { return r.text(); })
         .then(function(result) {
-            if (result === 'date_error') { alert('작업일이 아닙니다.'); return; }
+            if (result === 'date_error') { showDateErr(); return; }
             if (result === 'error')      { alert('처리할 수 없는 작업입니다.'); return; }
             location.reload();
         })

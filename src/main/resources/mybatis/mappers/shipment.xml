@@ -21,7 +21,7 @@
         JOIN shipment_request SR ON S.shipment_request_num = SR.shipment_request_num
         JOIN vender          V  ON SR.vender_num           = V.vender_num
         JOIN item            I  ON SR.item_num             = I.item_num
-        ORDER BY S.shipment_date DESC NULLS LAST
+        ORDER BY S.shipment_num DESC
     </select>
 
     <!-- 검색 조회 (PageHelper 페이징) -->
@@ -64,7 +64,7 @@
                 </otherwise>
             </choose>
         </if>
-        ORDER BY S.shipment_date DESC NULLS LAST
+        ORDER BY S.shipment_num DESC
     </select>
 
     <!-- 출하 단건 상세 조회 -->
@@ -82,6 +82,7 @@
             I.item_num,
             V.vender_name,
             SR.request_id,
+            SR.request_qty,
             TO_CHAR(SR.request_date, 'YYYY-MM-DD') AS request_date,
             TO_CHAR(SR.due_date,     'YYYY-MM-DD') AS due_date
         FROM shipment S
@@ -180,9 +181,10 @@
         WHERE shipment_request_num = #{_parameter}
     </update>
 
-    <!-- 출하확정용 LOT 목록 조회 -->
+    <!-- 출하확정용 LOT 목록 조회 (분할 판단용 current_qty, expiry_date 포함) -->
     <select id="getShipmentLots" resultType="hashMap" parameterType="int">
-        SELECT SL.lot_num, SL.qty, L.item_num
+        SELECT SL.lot_num, SL.qty, L.item_num,
+               L.current_qty, L.expiry_date
         FROM shipment_lot SL
         JOIN lot L ON SL.lot_num = L.lot_num
         WHERE SL.shipment_num = #{_parameter}
@@ -195,12 +197,12 @@
         WHERE lot_num = #{lot_num}
     </update>
 
-    <!-- 출하확정: IO 출고 이력 등록 -->
+    <!-- 출하확정: IO 출고 이력 등록 (io_reason: '출하' or '분할') -->
     <insert id="insertShipmentIo" parameterType="map">
         INSERT INTO io
             (io_num, io_type, io_qty, io_date, qc_num, lot_num, plan_num, io_reason, facility_num, emp_num)
         VALUES
-            (io_seq.NEXTVAL, '출고', #{qty}, SYSDATE, NULL, #{lot_num}, NULL, '출하', 3, #{emp_num})
+            (io_seq.NEXTVAL, '출고', #{qty}, SYSDATE, NULL, #{lot_num}, NULL, #{io_reason}, 3, #{emp_num})
     </insert>
 
     <!-- 출하확정: 출하 상태 → 출하완료 -->
@@ -238,7 +240,7 @@
         FROM shipment S
         JOIN emp E ON S.emp_num = E.emp_num
         WHERE S.shipment_request_num = #{_parameter}
-        ORDER BY S.shipment_date DESC NULLS LAST
+        ORDER BY S.shipment_num DESC
     </select>
 
     <!-- shipment.jsp 품목 select용 — PRODUCT 목록 -->
@@ -248,5 +250,35 @@
         WHERE UPPER(type) = 'PRODUCT'
         ORDER BY name
     </select>
+
+    <!-- 출하확정 분할: 자식 LOT 생성 (부모 expiry_date 상속) -->
+    <insert id="insertSplitLot" parameterType="map">
+        <selectKey keyProperty="lot_num" resultType="int" order="BEFORE">
+            SELECT LOT_SEQ.NEXTVAL FROM DUAL
+        </selectKey>
+        INSERT INTO lot (lot_num, lot_code, item_num, order_num, init_qty, current_qty, lot_date, expiry_date)
+        VALUES (#{lot_num},
+                'LOT-' || TO_CHAR(SYSDATE, 'YYYYMMDD') || '-' || #{lot_num},
+                #{item_num},
+                NULL,
+                #{qty},
+                #{qty},
+                SYSDATE,
+                #{expiry_date,jdbcType=DATE})
+    </insert>
+
+    <!-- 출하확정 분할: lot_relation 등록 (parent → child) -->
+    <insert id="insertLotRelationForShipment" parameterType="map">
+        INSERT INTO lot_relation (lot_relation_num, lot_parent, lot_child)
+        VALUES (LOT_RELATION_SEQ.NEXTVAL, #{parent_lot_num}, #{child_lot_num})
+    </insert>
+
+    <!-- 출하확정 분할: shipment_lot.lot_num → 자식 LOT으로 교체 -->
+    <update id="updateShipmentLotRef" parameterType="map">
+        UPDATE shipment_lot
+        SET lot_num = #{child_lot_num}
+        WHERE shipment_num = #{shipment_num}
+          AND lot_num      = #{parent_lot_num}
+    </update>
 
 </mapper>

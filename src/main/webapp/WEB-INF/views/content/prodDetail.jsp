@@ -9,6 +9,7 @@
 <head>
 <meta charset="UTF-8">
 <title>생산계획 상세</title>
+<link rel="stylesheet" href="/resources/css/detail-common.css">
 <link rel="stylesheet" href="/resources/css/prod/prodDetail.css">
 </head>
 <body>

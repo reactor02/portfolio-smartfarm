@@ -8,4 +8,5 @@ public interface LotRelationDAO {
     List<LotRelationDTO>         getMaterialsByChildLot(int lot_num);
     List<LotRelationDTO>         getParentsByLot(int lot_num);
     List<Map<String, Object>>    getRecursiveMaterials(int lot_num);
+    List<Map<String, Object>>    getLotHistory(int lot_num);
 }

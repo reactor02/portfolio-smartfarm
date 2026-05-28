@@ -1,7 +1,6 @@
 package kr.or.smartfarm.vender;
 
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.request;
-
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -106,17 +105,40 @@ public class VenderController {
 	
 	
 	@RequestMapping("/search")
-	public String search(Model model, VenderDTO venderDTO) {
-		System.out.println("/search 실행");
-		model.addAttribute("venderDTO", venderDTO);
+	@ResponseBody
+	public Map search(
+			@RequestParam(value = "page", defaultValue="1") int page, 
+			@RequestParam(value = "type") String type,
+			@RequestParam(value = "keyword") String keyword
+			) {
+		Map result = new HashMap();
 		
+		try {
+			Map searchMap = new HashMap();
+			searchMap.put("page",  page);
+			searchMap.put("type",type);
+			searchMap.put("keyword",keyword);
+			System.out.println(searchMap);
+			
+			List searchResult = venderService.search(searchMap);
+			result.put("searchResult", searchResult);
+			
+			result.put("status",  "good");
+			if(searchResult != null) {
+				PageInfo<Map<String, Object>> pageInfo = new PageInfo<Map<String, Object>>(searchResult);
+				result.put("pageInfo", pageInfo);
+			} else {
+				PageInfo pageInfo = new PageInfo();
+				result.put("pageInfo", pageInfo);
+			}
+			
+		} catch(Exception e) {
+			e.printStackTrace();
+			result.put("status", "error");
+		}
 		
-		List<VenderDTO> list = venderService.search(venderDTO);
-		System.out.println("/list: list: " + list);
+		return result;
 		
-		System.out.println("keyword = " + venderDTO.getKeyword());
-		model.addAttribute("list",list);
-		return "content/vender";
 	}
 	
 }

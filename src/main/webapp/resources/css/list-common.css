@@ -8,17 +8,21 @@
 .mat-body  { display: flex; flex: 1; }
 .main-cont { flex: 1; padding: 2rem 2.5rem; min-width: 0; }
 
-/* ── 페이지 콘텐츠 타이틀 헤더 ── */
-.page-hdr {
+/* ── 페이지 콘텐츠 타이틀 헤더 (.page-hdr: 목록, .hdr: 상세 — 동일 규격) ── */
+.page-hdr, .hdr {
     display: flex; justify-content: space-between; align-items: center;
     background-color: #2D6A4F; padding: 15px 25px; border-radius: 8px;
     margin-bottom: 25px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
-.page-hdr h1 { font-size: 1.8rem; color: #fff; font-weight: bold; letter-spacing: -1px; }
+.page-hdr h1, .hdr h1 {
+    font-size: 1.8rem; color: #fff; font-weight: bold;
+    letter-spacing: -1px; line-height: 1.2;
+}
 .btn-reg {
     background-color: #fff; color: #2D6A4F; padding: 10px 24px;
     border-radius: 6px; border: 1px solid #2D6A4F; font-weight: bold;
     font-size: 1.05rem; cursor: pointer; transition: background-color 0.2s;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.2), 0 2px 3px rgba(0,0,0,0.2);
 }
 .btn-reg:hover { background-color: #B7E4C7; }
 
@@ -45,8 +49,8 @@
 }
 .sch-row-3 { justify-content: flex-end; }
 
-/* sch-row-2 내 select는 남은 공간을 채움 */
-.sch-row-2 > div select.form-control { flex: 1; width: auto; }
+/* sch-row-2 내 select — 위 select.form-control 규칙으로 이미 처리됨 (명시적 선언 유지) */
+.sch-row-2 > div select.form-control { flex: 1 !important; width: auto !important; }
 
 .label { font-size: 0.95rem; font-weight: bold; color: #333; display: flex; align-items: center; white-space: nowrap; min-width: 75px; }
 
@@ -54,15 +58,17 @@
 .form-control {
     height: 38px; border: 1px solid #aaa; border-radius: 4px;
     padding: 0 10px; font-size: 0.95rem; outline: none; transition: border-color 0.2s;
+    width: 325px !important;
 }
 .form-control:focus { border-color: #2D6A4F; }
-select.form-control { width: 140px; }
+/* select는 flex 컨테이너 안에서 남은 공간을 채움 — 개별 CSS가 이를 덮지 못함 */
+select.form-control { flex: 1 !important; width: auto !important; }
 
 /* ── 키워드 검색창 ── */
 .sch-input-box {
     display: flex; align-items: center; border: 1px solid #aaa;
     border-radius: 4px; height: 38px; background: #fff;
-    padding-left: 10px; width: 250px; flex-shrink: 0;
+    padding-left: 10px; width: 555px !important; flex-shrink: 0;
 }
 .sch-input-box input {
     border: none; outline: none; height: 100%;

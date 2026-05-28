@@ -50,6 +50,34 @@ public class UserManageController {
 	    return "content/usermanage.tiles";
 	}
 	
+	@GetMapping("/mypage")
+	public String mypageGet(
+			Model model
+			) { // 💡 데이터를 담을 가방(Model) 주입
+		System.out.println("mypageGet 실행");
+		
+		// 1. 서비스에서 전체 회원 목록(List) 조회
+		List<UserManageDTO> userList = userManageService.getUserManage();
+		
+		// 1-2. 서비스에서 부서명 조회
+		List<UserManageDTO> selectd = userManageService.selectd();
+		
+		// 1-3. 서비스에서 권한 목록 조회
+		List<UserManageDTO> selectl = userManageService.selectl();
+		
+		// 1-3. 서비스에서 전체 회원 목록(List) 조회
+		List<UserManageDTO> selectm = userManageService.selectm();
+		
+		// 2. 가져온 회원 목록 데이터를 "userList"라는 이름으로 가방에 넣음
+		model.addAttribute("userList", userList);
+		model.addAttribute("selectd", selectd);
+		model.addAttribute("selectl", selectl);
+		model.addAttribute("selectm", selectm);
+		
+		// 3. 타일즈 뷰 리턴 (화면이 그려지면서 데이터가 함께 배달됩니다)
+		return "content/mypage.tiles";
+	}
+	
 	
 	@PostMapping("/userinsert")
 	public String userinsert(
