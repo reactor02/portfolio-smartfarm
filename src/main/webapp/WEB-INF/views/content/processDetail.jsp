@@ -100,7 +100,6 @@ response.setContentType("text/html; charset=utf-8");
 	display: inline-block;
 }
 
-/* 수정된 그리드 레이아웃: 한 줄에 3개씩, 균등한 간격으로 배치 */
 .info-grid {
 	display: grid;
 	grid-template-columns: repeat(3, 1fr);
@@ -161,7 +160,6 @@ response.setContentType("text/html; charset=utf-8");
 	color: #333;
 }
 
-/* ================= 5. 모달 ================= */
 .modal-overlay {
 	display: none;
 	position: fixed;
@@ -335,12 +333,11 @@ response.setContentType("text/html; charset=utf-8");
 	color: #fff;
 	border-color: #dc3545;
 }
-/* 공정 설명 텍스트 에어리어 ID 스타일 */
+
 #processDesc {
 	max-height: 200px;
 }
 
-/* 공정 설명 텍스트 에어리어 클래스 스타일 */
 .textarea-desc {
 	width: 100%;
 	border: 1px solid #aaa;
@@ -424,7 +421,7 @@ response.setContentType("text/html; charset=utf-8");
 		<div class="modal-content">
 			<h2>BOM 수정</h2>
 
-			<form id="editForm" accept-charset="UTF-8" 
+			<form id="editForm" accept-charset="UTF-8"
 			enctype="multipart/form-data" action="/PupdateStatus" method="post">
 
 				<input type="hidden" name="process_num"
@@ -464,20 +461,21 @@ response.setContentType("text/html; charset=utf-8");
 						<div>
 							<label for="processImage">공정 이미지 첨부</label> <input type="file"
 								name="image" id="processImage" accept="image/*"
-								style="width: 100%; border: 1px solid #aaa; border-radius: 4px; padding: 6px; background: #fff; cursor: pointer; margin-top: 5px;">
+								style="width: 100%; border: 1px solid #aaa; border-radius: 4px; padding: 6px; background: #fff; cursor: pointer; margin-top: 5px;"
+								onchange="previewModalImage(this)">
 						</div>
 						<div id="imagePreviewContainer"
 							style="width: 100%; min-height: 150px; border: 1px solid #ddd; border-radius: 4px; display: flex; align-items: center; justify-content: center; background-color: #f9f9f9; overflow: hidden; flex: 1;">
 							<c:choose>
 								<c:when test="${not empty resultList[0].base64Image}">
+									<span id="noImageText" style="display: none; color: #999; font-size: 14px;">첨부 된 이미지가 없습니다.</span>
 									<img id="previewImage"
 										src="data:image/png;base64,${resultList[0].base64Image}"
 										alt="미리보기"
 										style="max-width: 100%; max-height: 200px; object-fit: contain;">
 								</c:when>
 								<c:otherwise>
-									<span id="noImageText" style="color: #999; font-size: 14px;">첨부
-										된 이미지가 없습니다.</span>
+									<span id="noImageText" style="color: #999; font-size: 14px;">첨부 된 이미지가 없습니다.</span>
 									<img id="previewImage" src="#" alt="미리보기"
 										style="display: none; max-width: 100%; max-height: 200px; object-fit: contain;">
 								</c:otherwise>
@@ -513,6 +511,24 @@ response.setContentType("text/html; charset=utf-8");
 		function submitEdit() {
 			if (confirm("수정된 내용을 저장하시겠습니까?")) {
 				document.getElementById('editForm').submit();
+			}
+		}
+
+		function previewModalImage(input) {
+			const previewImg = document.getElementById('previewImage');
+			const noImgText = document.getElementById('noImageText');
+			
+			if (input.files && input.files[0]) {
+				const reader = new FileReader();
+				reader.onload = function(e) {
+					previewImg.src = e.target.result;
+					previewImg.style.display = 'block';
+					if(noImgText) noImgText.style.display = 'none';
+				}
+				reader.readAsDataURL(input.files[0]);
+			} else {
+				// 파일 선택을 취소했을 때 기존 이미지가 있다면 유지, 없다면 초기화 로직 구현 가능
+				// 현재는 파일이 없을 경우 변경하지 않음.
 			}
 		}
 	</script>
