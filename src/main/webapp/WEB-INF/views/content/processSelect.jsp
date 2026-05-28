@@ -88,6 +88,7 @@ response.setContentType("text/html; charset=utf-8");
 .btn-plus:hover {
 	background-color: #B7E4C7;
 }
+
 .btn-plus {
 	background-color: #fff;
 	color: #2D6A4F; /* 텍스트가 아닌 명확한 버튼 디자인 */
@@ -199,7 +200,8 @@ select.form-control {
 .btn-sch:hover {
 	background-color: #B7E4C7;
 }
-.select-reset{
+
+.select-reset {
 	height: 38px;
 	padding: 0 20px;
 	background-color: #fff;
@@ -211,8 +213,9 @@ select.form-control {
 	cursor: pointer;
 	transition: 0.2s;
 }
-.select-reset:hover{
-background-color: #FFB703;
+
+.select-reset:hover {
+	background-color: #FFB703;
 }
 
 /* ========== 3. 커스텀 라디오 버튼 ========== */
@@ -300,6 +303,26 @@ background-color: #FFB703;
 .link-txt:hover {
 	text-decoration: underline;
 }
+#processDesc{
+	max-height: 200px;
+}
+/* 추가된 텍스트 에어리어 스타일 */
+.textarea-desc {
+	width: 100%;
+	border: 1px solid #aaa;
+	border-radius: 4px;
+	padding: 10px;
+	font-size: 0.95rem;
+	font-family: 'Malgun Gothic', sans-serif;
+	outline: none;
+	resize: vertical; /* 세로 크기 조절만 허용 */
+
+	
+}
+
+.textarea-desc:focus {
+	border-color: #2D6A4F;
+}
 </style>
 </head>
 <body>
@@ -314,20 +337,17 @@ background-color: #FFB703;
 					<button type="button" class="btn-reg">+ 등록하기</button>
 				</div>
 
-				<form name="searchFrm"  method="get">
+				<form name="searchFrm" method="get">
 					<div class="sch-wrap">
 
 						<div class="sch-row">
 							<div class="sch-left">
-								<span class="label">▶ 생산제품 타입</span>
-								 <select id="type"
+								<span class="label">▶ 생산제품 타입</span> <select id="type"
 									class="form-control">
 									<option value="all">선택</option>
 									<option value="product">완제품</option>
 									<option value="semiproduct">반제품</option>
-								</select>
-								<span class="label">▶ 사용 여부</span>
-								 <select id="process_status"
+								</select> <span class="label">▶ 사용 여부</span> <select id="process_status"
 									class="form-control">
 									<option value="all">전체</option>
 									<option value="사용중">사용중</option>
@@ -369,7 +389,8 @@ background-color: #FFB703;
 									<c:forEach var="item" items="${result}" varStatus="vs">
 										<tr>
 											<td style="font-weight: bold; color: #555;">${vs.count}</td>
-											<td><a href="/processDetail?item_num=${item.ITEM_NUM}" class="link-txt">${item.NAME}</a></td>
+											<td><a href="/processDetail?process_num=${item.PROCESS_NUM}"
+												class="link-txt">${item.NAME}</a></td>
 											<td>${item.TYPE}</td>
 											<td>${item.FLOW}</td>
 											<td>${item.HEAD_COUNT}</td>
@@ -406,32 +427,38 @@ background-color: #FFB703;
 
 		<tiles:insertAttribute name="footer" ignore="true" />
 	</div>
+
 	<div id="regModal" class="modal-overlay" style="display: none;">
-		<div class="modal-box">
+		<div class="modal-box" style="width: 600px;">
 			<h3 class="modal-title">공정 등록</h3>
 
-			<form method="POST" action="/insertController" id="insert-form">
+			<form method="POST" accept-charset="UTF-8" action="/PinsertController" id="insert-form"
+				enctype="multipart/form-data">
 				<div class="modal-grid">
 					<div class="modal-field">
-						<label for="itemSearch">품목명 검색</label> 
-						<input type="text" id="itemSearch" placeholder="품목명 검색"> 
-					</div>
-					
-					<div class="modal-field">
-						<label for="quantity">개수</label> 
-						<input type="number" name="stock_qty" id="quantity" min="1" placeholder="수량 입력">
-					</div>
-					<div class="modal-field">
-						<label for="quantity">작업 인원</label> 
-						<input type="number" name="stock_qty" id="quantity" min="1" placeholder="필요 작업인원 입력">
-					</div>
-					<div class="modal-field">
-						<label for="quantity">작업 순서</label> 
-						<input type="number" name="stock_qty" id="quantity" min="1" placeholder="해당 작업 순서 입력">
+						<label for="itemSearch">품목명 검색</label> <input type="text"
+							id="itemSearch" class="searchgo" placeholder="품목명 검색">
 					</div>
 
-					<div class="modal-field modal-field-full" id="selectedItemContainer" style="display: none; margin-top: 10px;">
-						<span style="display: inline-block; padding: 6px 12px; background-color: #e6f7ff; color: #1890ff; border: 1px solid #91d5ff; border-radius: 4px; font-weight: bold; font-size: 14px;">
+<!-- 					<div class="modal-field"> -->
+<!-- 						<label for="stockQty">개수</label> <input type="number" -->
+<!-- 							name="stock_qty" id="stockQty" min="1" placeholder="수량 입력"> -->
+<!-- 					</div> -->
+					<div class="modal-field">
+						<label for="headCount">작업 인원</label> <input type="number"
+							name="head_count" id="head_count" min="1" placeholder="필요 작업인원 입력">
+					</div>
+					<div class="modal-field">
+						<label for="flowOrder">작업 순서</label> <input type="number"
+							name="flow" id="flow" min="1"
+							placeholder="해당 작업 순서 입력">
+					</div>
+
+					<div class="modal-field modal-field-full"
+						id="selectedItemContainer"
+						style="display: none; margin-top: 10px;">
+						<span
+							style="display: inline-block; padding: 6px 12px; background-color: #e6f7ff; color: #1890ff; border: 1px solid #91d5ff; border-radius: 4px; font-weight: bold; font-size: 14px;">
 							📌 선택된 품목: <span id="selectedItemName" style="color: #0050b3;">-</span>
 						</span>
 					</div>
@@ -439,8 +466,10 @@ background-color: #FFB703;
 					<div class="modal-field modal-field-full" style="margin-top: 15px;">
 						<label>선택 가능한 품목 리스트 (아래 행을 클릭하여 선택하세요)</label>
 
-						<div id="searchResultArea" style="width: 100%; height: 200px; border: 1px solid #ccc; background: #fff; overflow-y: scroll; border-radius: 4px;">
-							<table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 14px; table-layout: fixed;">
+						<div id="searchResultArea"
+							style="width: 100%; height: 200px; border: 1px solid #ccc; background: #fff; overflow-y: scroll; border-radius: 4px;">
+							<table
+								style="width: 100%; border-collapse: collapse; text-align: left; font-size: 14px; table-layout: fixed;">
 								<colgroup>
 									<col style="width: 10%;">
 									<col style="width: 25%;">
@@ -448,7 +477,8 @@ background-color: #FFB703;
 									<col style="width: 15%;">
 									<col style="width: 15%;">
 								</colgroup>
-								<thead style="background: #f5f5f5; position: sticky; top: 0; border-bottom: 1px solid #ddd; z-index: 10;">
+								<thead
+									style="background: #f5f5f5; position: sticky; top: 0; border-bottom: 1px solid #ddd; z-index: 10;">
 									<tr>
 										<th style="padding: 10px; text-align: center;">선택</th>
 										<th style="padding: 10px;">품목코드</th>
@@ -459,17 +489,37 @@ background-color: #FFB703;
 								</thead>
 								<tbody id="suggestList">
 									<tr id="emptyMessage">
-										<td colspan="5" style="padding: 50px 10px; text-align: center; color: #999;">
-											품목명을 입력하면 조건에 맞는 기준관리 항목이 여기에 표시됩니다.
-										</td>
+										<td colspan="5"
+											style="padding: 50px 10px; text-align: center; color: #999;">
+											품목명을 입력하면 조건에 맞는 기준관리 항목이 여기에 표시됩니다.</td>
 									</tr>
 								</tbody>
 							</table>
 						</div>
 					</div>
-				</div>
 
-				<div class="modal-btn-wrap" style="margin-top: 20px;">
+					<div class="modal-field modal-field-full" style="display: flex; flex-direction: row; gap: 20px; margin-top: 20px;">
+						<div style="flex: 1; display: flex; flex-direction: column; gap: 10px;">
+							<div>
+								<label for="processImage">공정 이미지 첨부</label>
+								<input type="file" name="image" id="processImage" accept="image/*"
+									style="width: 100%; border: 1px solid #aaa; border-radius: 4px; padding: 6px; background: #fff; cursor: pointer; margin-top: 5px;">
+							</div>
+							<div id="imagePreviewContainer" style="width: 100%; min-height: 150px; border: 1px solid #ddd; border-radius: 4px; display: flex; align-items: center; justify-content: center; background-color: #f9f9f9; overflow: hidden; flex: 1;">
+								<span id="noImageText" style="color: #999; font-size: 14px;">첨부 된 이미지가 없습니다.</span>
+								<img id="previewImage" src="#" alt="미리보기" style="display: none; max-width: 100%; max-height: 200px; object-fit: contain;">
+							</div>
+						</div>
+						
+						<div style="flex: 1; display: flex; flex-direction: column;">
+							<label for="processDesc">공정 설명</label>
+							<textarea name="process_content" id="processDesc" class="textarea-desc"
+								placeholder="해당 공정에 대한 상세 설명을 작성해주세요." style="margin-top: 5px; flex: 1; resize: none;"></textarea>
+						</div>
+					</div>
+
+				</div>
+				<div class="modal-btn-wrap" style="margin-top: 30px;">
 					<button type="button" class="btn-plus">등록</button>
 					<button type="button" class="btn-cancel">취소</button>
 				</div>
@@ -477,229 +527,205 @@ background-color: #FFB703;
 		</div>
 	</div>
 
-
-
 	<script>
-		/* 날짜 유효성 검사 로직 */
 		function validateDate() {
 			const start = document.getElementById('sDate').value;
 			const end = document.getElementById('eDate').value;
-			//(start && end) start와 end가 존재할 때 start의 값이 end보다 크면
 			if (start && end && start > end) {
 				alert("시작 날짜는 종료 날짜보다 이후일 수 없습니다.");
 				document.getElementById('eDate').value = "";
 			}
 		}
 		
-		
-		
-		
 		function renderPagination(pInfo) {
 			let pagingHtml = "";
-		    
-		    // 이전
-    if (!pInfo.isFirstPage) {
-		        // pg-btn -> page-link
-		        pagingHtml += `<a class="page-link prev-next" href="javascript:movePage(${pInfo.pageNum - 1})">이전</a>`;
-		    }
-		    
-		    // 번호
-		    pInfo.navigatepageNums.forEach(num => {
-		        // pg-btn -> page-link, pg-active -> active (원하시는 명칭으로)
-		        pagingHtml += `<a class="page-link prev-next \${num === pInfo.pageNum ? 'active' : ''}" href="javascript:movePage(\${num})">\${num}</a>`;
-		    });
-		    
-		    // 다음
-		    if (!pInfo.isLastPage) {
-		        // pg-btn -> page-link
-		        pagingHtml += `<a class="page-link prev-next" href="javascript:movePage(${pInfo.pageNum + 1})">다음</a>`;
-		    }
-		    
-		    document.querySelector(".pagination-container").innerHTML = pagingHtml;
+		
+			if (!pInfo.isFirstPage) {
+				pagingHtml += `<a class="page-link prev-next" href="javascript:movePage(${pInfo.pageNum - 1})">이전</a>`;
+			}
+			
+			pInfo.navigatepageNums.forEach(num => {
+				pagingHtml += `<a class="page-link prev-next \${num === pInfo.pageNum ? 'active' : ''}" href="javascript:movePage(\${num})">\${num}</a>`;
+			});
+			
+			if (!pInfo.isLastPage) {
+				pagingHtml += `<a class="page-link prev-next" href="javascript:movePage(${pInfo.pageNum + 1})">다음</a>`;
+			}
+			
+			document.querySelector(".pagination-container").innerHTML = pagingHtml;
 		}
 		
-		
-		
-		
-// 		검색 버튼 클릭시 아작스
 		const btn_sch = document.querySelector(".btn-sch");
 		btn_sch.addEventListener('click', ()=>{
 			movePage(1)
 		})
 		
 		
-	function movePage(pageNum) {
-    let type = document.querySelector("#type").value;
-    let process_status = document.querySelector("#process_status").value;
-    let keyword = document.querySelector("#keyword").value;
-    
-    const params = new URLSearchParams();
-    params.append("page", pageNum); // 누른 페이지 번호를 전달
-    params.append("type", type);
-    params.append("process_status", process_status);
-    params.append("keyword", keyword);
-    
-    fetch(`/searchProcess?\${params.toString()}`)
-    .then(response => response.json())
-    .then(data => {
-    	if(data.searchResult.length == 0){
-    		 let tbody = document.querySelector("#stock-body");
-    	    tbody.innerHTML = "<tr><td colspan='8'>조회된 결과가 없습니다.</td></tr>";
-    	    renderPagination(data.pageInfo); // 페이지 정보도 갱신하여 페이징 버튼도 사라지게 처리
-    	    return;
-    	}
-        if(data.status === "good"){
-            // 1. 테이블 데이터 갱신
-            let tbody = document.querySelector("#stock-body");
-            tbody.innerHTML = "";
-            
-            let html = "";
-            for(let i = 0; i < data.searchResult.length; i++) {
-                let item = data.searchResult[i];
-                html += `<tr>
-                    <td style='font-weight: bold; color: #555;'>\${i + 1 + (data.pageInfo.pageNum - 1) * 5}</td>
-                    <td><a href="/processDetail?item_num=\${item.ITEM_NUM}" class="link-txt">\${item.NAME}</a></td>
-                    <td>\${item.TYPE}</td>
-                    <td>\${item.FLOW}</td>
-                    <td>\${item.HEAD_COUNT}</td>
-                    <td>\${item.CREATED_AT}</td>
-                    <td>\${item.PROCESS_STATUS}</td>
-                </tr>`;
-            }
-            tbody.innerHTML = html;
-            
-            renderPagination(data.pageInfo);
+		function movePage(pageNum) {
+			let type = document.querySelector("#type").value;
+			let process_status = document.querySelector("#process_status").value;
+			let keyword = document.querySelector("#keyword").value;
+			
+			const params = new URLSearchParams();
+			params.append("page", pageNum);
+			params.append("type", type);
+			params.append("process_status", process_status);
+			params.append("keyword", keyword);
+			
+			fetch(`/searchProcess?\${params.toString()}`)
+			.then(response => response.json())
+			.then(data => {
+				if(data.searchResult.length == 0){
+					let tbody = document.querySelector("#stock-body");
+					tbody.innerHTML = "<tr><td colspan='7'>조회된 결과가 없습니다.</td></tr>";
+					renderPagination(data.pageInfo);
+					return;
+				}
+				if(data.status === "good"){
+					let tbody = document.querySelector("#stock-body");
+					tbody.innerHTML = "";
+					
+					let html = "";
+					for(let i = 0; i < data.searchResult.length; i++) {
+						let item = data.searchResult[i];
+						html += `<tr>
+							<td style='font-weight: bold; color: #555;'>\${i + 1 + (data.pageInfo.pageNum - 1) * 5}</td>
+							<td><a href="/processDetail?process_num=\${item.PROCESS_NUM}" class="link-txt">\${item.NAME}</a></td>
+							<td>\${item.TYPE}</td>
+							<td>\${item.FLOW}</td>
+							<td>\${item.HEAD_COUNT}</td>
+							<td>\${item.CREATED_AT}</td>
+							<td>\${item.PROCESS_STATUS}</td>
+						</tr>`;
+					}
+					tbody.innerHTML = html;
+					
+					renderPagination(data.pageInfo);
 
-            const newUrl = window.location.pathname + `?page=\${pageNum}&type=\${type}&keyword=\${keyword}`;
-            window.history.pushState({path: newUrl}, '', newUrl);
-        }
-    });
-}
+					const newUrl = window.location.pathname + `?page=\${pageNum}&type=\${type}&keyword=\${keyword}`;
+					window.history.pushState({path: newUrl}, '', newUrl);
+				}
+			});
+		}
 		
-		
-		
-		////////모달 영역
 		const plus_btn = document.querySelector(".btn-reg");
-			const modal =  document.querySelector(".modal-overlay");
+		const modal = document.querySelector(".modal-overlay");
 		plus_btn.addEventListener('click', ()=>{
 			modal.style.display = "block";
 		})
-			//취소 버튼 클릭
-			const cancel = document.querySelector(".btn-cancel");
-			cancel.addEventListener('click',()=>{
-				modal.style.display = "none";
-			})
+		const cancel = document.querySelector(".btn-cancel");
+		cancel.addEventListener('click',()=>{
+			modal.style.display = "none";
+		})
 			
-			
-			
-		//모달///////////////////////////////////////////////
-		
-		//모달 검색창 인풋 ajax
 		const itemSearch = document.querySelector("#itemSearch");
-			itemSearch.addEventListener('input', ()=>{
-				const query = itemSearch.value.trim();
-				
-				if(query === ""){
-					document.querySelector("#suggestList").innerHTML = "";
-					suggestList.innerHTML = `
-			            <tr id="emptyMessage">
-			                <td colspan="5" style="padding: 50px 10px; text-align: center; color: #999;">
-			                    품목명을 입력하면 조건에 맞는 기준관리 항목이 여기에 표시됩니다.
-			                </td>
-			            </tr>
-			        `;
-					return;
-				}
-				
-				fetch(`/processModal?search=\${encodeURIComponent(query)}`)
-				.then(response => response.json())
-				.then(data=>{
-					//여기에 받은 데이터 화면 갱신 로직 넣기 메서드 만들어서 넣으면 될듯 전달인자로 data넣어서
-					uploadData(data);
-				})
-				.catch(error=>{
-					console.log("등록모달 검색 에러 났음", error);
-				});
+		itemSearch.addEventListener('input', ()=>{
+			const query = itemSearch.value.trim();
+			
+			if(query === ""){
+				document.querySelector("#suggestList").innerHTML = "";
+				suggestList.innerHTML = `
+					<tr id="emptyMessage">
+						<td colspan="5" style="padding: 50px 10px; text-align: center; color: #999;">
+							품목명을 입력하면 조건에 맞는 기준관리 항목이 여기에 표시됩니다.
+						</td>
+					</tr>
+				`;
+				return;
+			}
+			
+			fetch(`/processModal?search=\${encodeURIComponent(query)}`)
+			.then(response => response.json())
+			.then(data=>{
+				uploadData(data);
 			})
+			.catch(error=>{
+				console.log("등록모달 검색 에러 났음", error);
+			});
+		})
 			
+		function uploadData(data){
+			const suggestList = document.getElementById('suggestList');
+			const Message = document.getElementById('emptyMessage');
 			
+			const rows = suggestList.querySelectorAll('tr');
+			rows.forEach(row=>{
+				if(row.id !== 'emptyMessage'){
+					row.remove();
+				}
+			});
 			
-			//받은 data를 들고 테이블 만드는 함수
-			function uploadData(data){
-				const suggestList = document.getElementById('suggestList');
-				const Message = document.getElementById('emptyMessage');
+			const itemList = data.result;
+			if(itemList && itemList.length> 0){
+				Message.style.display = 'none';
 				
-				
-				const rows = suggestList.querySelectorAll('tr');
-				rows.forEach(row=>{
-					//테이블에 있는 tr중에 id가 emptyMessage(메시지)인것 빼고 제거
-					if(row.id !== 'emptyMessage'){
-						row.remove();
-					}
-				});//rows.forEach
-				const itemList = data.result;
-				if(itemList && itemList.length> 0){
-					Message.style.display = 'none';
-					
-					let html = "";
-					itemList.forEach(item =>{
-						html += `<tr>
-							<td style="text-align:center;"><input type="radio" name="item_num" value="\${item.ITEM_NUM || ''}"></td>
-			                <td>\${item.CODE || ''}</td>
-			                <td>\${item.NAME || ''}</td>
-			                <td>\${item.TYPE || ''}</td>
-			                <td>\${item.UNIT || 0}</td>
-			            </tr>`;
-			        });//data.forEach
-					
-			        //insertAdjacentHTML: html문자열을 태그로 바꿔서 넣음
-			        //'beforeend': suggestList의 태그가 닫히기 직전에 넣음
-					suggestList.insertAdjacentHTML('beforeend', html);
-					}//if(data && data.length> 0)
-					else{
-						Message.querySelector('td').innerText = '검색한 조건에 맞는 항목이 없습니다.';
-						Message.style.display = 'table-row';
-					}
-				}	//메서드 끝	
-				
-				
-				
-				//등록버튼 누르면 insert
-				const btn_plus = document.querySelector(".btn-plus");
-				btn_plus.addEventListener('click',()=>{
-					
-					//개수 인풋 값
-					const quantity = document.querySelector("#quantity").value;
-					//체크된 라디오 
-					const radio = document.querySelector("input[type='radio']:checked");
-					if(radio == null){//방어로직 : 아무 것도 선택하지 않았다면 작동
-						alert("선택된 항목이 없습니다.");
-					return;
-					}
-					if(quantity < 0){
-						alert("개수를 제대로 확인해주세요");
-						return;
-					}
-					const insert_form = document.querySelector("#insert-form");
-					insert_form.submit();
+				let html = "";
+				itemList.forEach(item =>{
+					html += `<tr>
+						<td style="text-align:center;"><input type="radio" name="item_num" value="\${item.ITEM_NUM || ''}"></td>
+						<td>\${item.CODE || ''}</td>
+						<td>\${item.NAME || ''}</td>
+						<td>\${item.TYPE || ''}</td>
+						<td>\${item.UNIT || 0}</td>
+					</tr>`;
 				});
-					const msgFlag = "${msg}";
-					console.log("msgFlag:  ",msgFlag);
-					if(msgFlag == "true"){
-						
-						alert("등록되었습니다.");
-						//알림창 뜬 후에 주소창 쿼리스트링 제거
-						window.history.replaceState({}, document.title, window.location.pathname);
-					}else if(msgFlag == "false"){
-						alert("등록에 실패했습니다.");
-					}
-					
-					const select_reset = document.querySelector(".select-reset");
-					select_reset.addEventListener('click', ()=>{
-						location.reload();
-					})
-
 				
+				suggestList.insertAdjacentHTML('beforeend', html);
+			}
+			else{
+				Message.querySelector('td').innerText = '검색한 조건에 맞는 항목이 없습니다.';
+				Message.style.display = 'table-row';
+			}
+		}	
+			
+		const btn_plus = document.querySelector(".btn-plus");
+		btn_plus.addEventListener('click',()=>{
+			
+			const radio = document.querySelector("input[type='radio']:checked");
+			
+			if(radio == null){
+				alert("선택된 항목이 없습니다.");
+				return;
+			}
+			
+			const insert_form = document.querySelector("#insert-form");
+			insert_form.submit();
+		});
+		
+		const msgFlag = "${msg}";
+		console.log("msgFlag: ", msgFlag);
+		if(msgFlag == "true"){
+			alert("등록되었습니다.");
+			window.history.replaceState({}, document.title, window.location.pathname);
+		}else if(msgFlag == "false"){
+			alert("등록에 실패했습니다.");
+		}
+		
+		const select_reset = document.querySelector(".select-reset");
+		select_reset.addEventListener('click', ()=>{
+			location.reload();
+		})
+				
+		const fileInput = document.querySelector("#processImage");
+		const preview = document.querySelector("#previewImage");
+		const noImageText = document.querySelector("#noImageText");
+
+		fileInput.addEventListener('change', function() {
+			const file = this.files[0];
+			if (file) {
+				const reader = new FileReader();
+				reader.onload = (e) => {
+					preview.src = e.target.result;
+					preview.style.display = "block";
+					noImageText.style.display = "none";
+				}
+				reader.readAsDataURL(file);
+			} else {
+				preview.style.display = "none";
+				preview.src = "#";
+				noImageText.style.display = "block";
+			}
+		});
 	</script>
 
 </body>

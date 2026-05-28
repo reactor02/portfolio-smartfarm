@@ -7,6 +7,8 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import kr.or.smartfarm.stock.StockDTO;
+
 
 @Service
 public class ProcessServiceImpl implements ProcessService{
@@ -43,6 +45,16 @@ public class ProcessServiceImpl implements ProcessService{
 		result.put("result", result2);
 		return result;
 	}
+	@Override
+	public int insertProcess(ProcessDTO dto) {
+		int result = 0;
+		result = DAO.insertProcess2(dto);
+	return result;
+	}
 	
-	
+	@Override
+	 public void updateStatus(ProcessDTO dto) {
+		DAO. updateStatus2(dto);
+		return;
+	}
 }
