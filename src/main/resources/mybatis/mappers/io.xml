@@ -6,7 +6,7 @@
 <!-- 기본 전체 조회 로직 -->
 <select id="loadIo" resultType="hashMap">
         SELECT 
-        i.io_type, i.io_num,
+        i.io_type, i.io_num, i.io_qty,
         ii.name,
         l.lot_num,
         ii.type,

@@ -392,6 +392,7 @@ response.setContentType("text/html; charset=utf-8");
                                 <th style="width: 60px;">번호</th>
                                 <th>입고/출고 여부</th>
                                 <th>자재명</th>
+                                <th>수량</th>
                                 <th>LOT번호</th>
                                 <th>자재유형</th>
                                 <th>입고/출고 날짜</th>
@@ -407,6 +408,7 @@ response.setContentType("text/html; charset=utf-8");
                                             <td style="font-weight: bold; color: #555;">${vs.count}</td>
                                             <td>${item.IO_TYPE}</td>
                                             <td>${item.NAME}</td>
+                                            <td>${item.IO_QTY}</td>
                                             <td>${item.LOT_NUM}</td>
                                             <td>${item.TYPE}</td>
                                             <td>${item.IO_DATE}</td>
@@ -602,6 +604,7 @@ response.setContentType("text/html; charset=utf-8");
 							<td style='font-weight: bold; color: #555;'>\${i + 1 + (data.pageInfo.pageNum - 1) * data.pageInfo.pageSize}</td>
 							<td>\${item.IO_TYPE}</td>
 							<td>\${item.NAME}</td>
+							<td>\${item.IO_QTY}</td>
 							<td>\${item.LOT_NUM}</td>
 							<td>\${item.TYPE}</td>
 							<td>\${item.IO_DATE}</td>
