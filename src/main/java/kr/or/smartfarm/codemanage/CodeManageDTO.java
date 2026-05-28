@@ -5,18 +5,18 @@ import lombok.Data;
 @Data
 public class CodeManageDTO {
 	
+	int item_num;
+	String code;
+	String name;
+	String type;
+	String unit;
+	String price;
+	String item_status;
 	String emp_num;
-	String ename;
-	String pw;
-	String e_level;
-	String tel;
-	String hire_date;
-	String status;
-	String Termination_date;
-	String secret;
-	
+	String facility_num;
+	String safe;
 	String keyword;
-	String dept_num;
-	String dept_name;
+	
+	String ename;
 
 }

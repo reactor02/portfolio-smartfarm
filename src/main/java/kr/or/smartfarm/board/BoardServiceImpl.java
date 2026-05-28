@@ -1,6 +1,7 @@
 package kr.or.smartfarm.board;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -56,6 +57,12 @@ public class BoardServiceImpl implements BoardService {
 		BoardDTO boardDTO = null;
 		boardDTO = boardDAO.findById(board_num);
 		return boardDTO;
+	}
+
+	@Override
+	public List<BoardDTO> search(Map map) {
+		List<BoardDTO> result = boardDAO.search(map);
+		return result;
 	}
 	
 	

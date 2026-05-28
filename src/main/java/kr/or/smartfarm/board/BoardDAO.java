@@ -1,6 +1,7 @@
 package kr.or.smartfarm.board;
 
 import java.util.List;
+import java.util.Map;
 
 public interface BoardDAO {
 
@@ -18,6 +19,6 @@ public interface BoardDAO {
 	
 	public BoardDTO findById(int board_num);
 	
-	
+	List<BoardDTO> search(Map map);
 	
 }

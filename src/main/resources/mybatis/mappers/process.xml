@@ -7,7 +7,7 @@
 <select id="loadProcess" resultType="hashMap">
         SELECT 
         i.name, i.type, i.item_num,
-        p.flow, p.head_count,
+        p.flow, p.head_count, p.process_status,
         i.item_status,
         TO_CHAR(p.created_at, 'YYYY-MM-DD') AS created_at
         FROM process p
@@ -19,21 +19,16 @@
 
 
 <!-- 검색 조건에 맞게 검색하는 로직 -->
-	<select id="searchBom1" resultType="hashMap" parameterType="map">
+	<select id="searchProcess" resultType="hashMap" parameterType="map">
         SELECT 
-        b.bom_code,
-        i.name,
+        i.name, i.type, i.item_num,
+        p.flow, p.head_count, p.process_status,
         i.item_status,
-        i.code,
-        b.required_qty,
-        b.bom_status,
-        TO_CHAR(b.created_at, 'YYYY-MM-DD') AS created_at,
-        b.bom_num
-        FROM bom b
-        JOIN item i ON b.item_num = i.item_num
-<!--         <where> -->
+        TO_CHAR(p.created_at, 'YYYY-MM-DD') AS created_at
+        FROM process p
+        JOIN item i ON p.item_num = i.item_num
+        <where>
 <!-- 	타입검토 -->
-where 1 = 1
         <if test="type != null and type != 'all'">
         <choose>
         	<when test="type == 'product'">
@@ -46,44 +41,26 @@ where 1 = 1
         </if>
         
         <if test="keyword != null and keyword != ''">
-        AND (
-        upper(i.name) LIKE ('%' || upper(#{keyword}) || '%')
-        OR
-        upper(b.bom_code) LIKE ('%' || upper(#{keyword}) || '%')
-        )
+        AND upper(i.name) LIKE ('%' || upper(#{keyword}) || '%')
    	 	</if>
 
    	 	
    	 	
    	 	
    	 	<!-- 	상태 -->
-        <if test="status != null and status != 'all'">
+        <if test="process_status != null and process_status != 'all'">
         <choose>
-        	<when test='status == "Y"'>
-        		AND upper(b.bom_status) = 'Y'
+        	<when test='process_status == "사용중"'>
+        		AND upper(p.process_status) = '사용중'
         	</when>
-        	<when test='status == "N"'>
-        		AND upper(b.bom_status) = 'N'
+        	<when test='process_status == "미사용"'>
+        		AND upper(p.process_status) = '미사용'
         	</when>
         </choose>
         </if>
-   	 	
-   	 	
-<!--    	 	날짜검토 -->
-   	 	<if test="sDate != null and sDate !=''">
-   	 	AND b.created_at >= TO_DATE(#{sDate}, 'YYYY-MM-DD')
-   	 	<choose>
-   	 		<when test="eDate != null and eDate!=''">
-   	 			AND b.created_at &lt; TO_DATE(#{eDate}, 'YYYY-MM-DD') + 1
-   	 		</when>
-   	 		<otherwise>
-            AND b.created_at &lt; SYSDATE + 1
-        </otherwise>
-   	 	</choose>
-   	 	</if>
-   	 	
-<!--     </where> -->
-         ORDER BY b.bom_num DESC
+
+    </where>
+         ORDER BY i.item_num DESC
     </select>
     
     
@@ -91,27 +68,15 @@ where 1 = 1
     
     
 <!--     모달에서 ajax로 input창에 부모 검색  -->
-<select id="bomModalSearch1" resultType="hashMap" parameterType="string">
-SELECT i.CODE, i.NAME, i.TYPE, i.UNIT, i.iTEM_NUM
+<select id="processModalSearch" resultType="hashMap" parameterType="string">
+SELECT i.CODE, i.NAME, i.TYPE, i.UNIT, i.ITEM_NUM
 FROM item i
-	LEFT OUTER JOIN (
-		SELECT ITEM_NUM FROM ITEM
- 		MINUS
- 		SELECT ITEM_NUM FROM BOM
-	) num ON i.item_num = num.item_num
-WHERE( UPPER(NAME) LIKE  '%' || UPPER(#{_parameter}) || '%'
-OR UPPER(i.CODE) LIKE '%' || UPPER(#{_parameter}) || '%')
-AND num.ITEM_NUM IS NOT NULL
+WHERE UPPER(NAME) LIKE  '%' || UPPER(#{_parameter}) || '%'
 AND i.TYPE IN ('PRODUCT', 'SEMIPRODUCT')
 </select>
 
 
-<!--     모달에서 ajax로 input창에 자식 검색  -->
-<select id="childSearch1" resultType="hashMap"  parameterType="string">
-	SELECT item_num, name, code, unit FROM item
-	WHERE type != 'PRODUCT'
-	AND item_num != #{_parameter}
-</select>
+
 
 
 

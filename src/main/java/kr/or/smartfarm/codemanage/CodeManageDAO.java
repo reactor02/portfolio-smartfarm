@@ -11,7 +11,7 @@ public interface CodeManageDAO {
 	public List<CodeManageDTO> selectm();
 	public int CodeInsert(CodeManageDTO CodeManageDTO);
 	public int CodeUpdate(CodeManageDTO CodeManageDTO);
-	public int CodeRetire(CodeManageDTO CodeManageDTO);
+	public int CodeRetire(int itemNum);
 	public int CodeLevelUpdate(CodeManageDTO CodeManageDTO);
 	public CodeManageDTO getCodeDetail(String CodeId);
 	public CodeManageDTO searchpw(CodeManageDTO changepwDTO);

@@ -17,24 +17,23 @@ String vender_type = request.getParameter("vender_type");
 <title>Insert title here</title>
 
 <style>
-
 * {
-	box-sizing : border-box;
-	margin: 0; 
-	padding : 0; 
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
 	font-family: 'Malgun Gothic', sans-serif;
 }
 
 .mat-all {
 	display: flex;
-	flex-direction : column; 
-	min-height: 100vh; 
-	background-color : #f4f7f6;
+	flex-direction: column;
+	min-height: 100vh;
+	background-color: #f4f7f6;
 }
 
 .mat-body {
-	display :flex; 
-	flex : 1; 
+	display: flex;
+	flex: 1;
 }
 
 /* ========== 1. 상단 타이틀 & 등록 버튼 ========== */
@@ -75,134 +74,153 @@ String vender_type = request.getParameter("vender_type");
 }
 
 body {
-  background: #f8fafc;
-  font-family: 'Segoe UI', sans-serif;
-  color: #333;
+	background: #f8fafc;
+	font-family: 'Segoe UI', sans-serif;
+	color: #333;
 }
 
 /* 컨테이너 */
 .report-container {
-  padding: 30px;
+	padding: 30px;
 }
 
 /* 상단 */
 .report-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 25px;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 25px;
 }
 
 .report-header h2 {
-  font-size: 22px;
-  font-weight: 600;
+	font-size: 22px;
+	font-weight: 600;
 }
 
 /* 검색 */
 .search-box {
-  display: flex;
-  gap: 8px;
+	display: flex;
+	gap: 8px;
 }
 
 .search-box input {
-  padding: 8px 10px;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  background: white;
+	padding: 8px 10px;
+	border: 1px solid #e2e8f0;
+	border-radius: 8px;
+	background: white;
 }
 
 .search-box button {
-  padding: 8px 14px;
-  border-radius: 8px;
-  border: none;
-  cursor: pointer;
-  font-weight: 500;
+	padding: 8px 14px;
+	border-radius: 8px;
+	border: none;
+	cursor: pointer;
+	font-weight: 500;
 }
 
 .search-box button:first-of-type {
-  background: #22c55e;
-  color: white;
+	background: #22c55e;
+	color: white;
 }
 
 .search-box button:last-of-type {
-  background: #e2e8f0;
+	background: #e2e8f0;
 }
 
 /* 그리드 */
 .grid-2 {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 18px;
-  margin-bottom: 18px;
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 18px;
+	margin-bottom: 18px;
 }
 
 .grid-3 {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 18px;
-  margin-bottom: 18px;
+	display: grid;
+	grid-template-columns: 1fr 1fr 1fr;
+	gap: 18px;
+	margin-bottom: 18px;
 }
 
 /* 카드 */
 .card {
-  background: white;
-  border-radius: 14px;
-  padding: 18px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.04);
-  transition: 0.2s;
+	background: white;
+	border-radius: 14px;
+	padding: 18px;
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+	transition: 0.2s;
 }
 
 .card:hover {
-  transform: translateY(-2px);
+	transform: translateY(-2px);
 }
 
 /* 카드 제목 */
 .card h3 {
-  font-size: 15px;
-  margin-bottom: 12px;
-  font-weight: 600;
+	font-size: 15px;
+	margin-bottom: 12px;
+	font-weight: 600;
 }
 
 /* 테이블 */
 table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 13px;
+	width: 100%;
+	border-collapse: collapse;
+	font-size: 13px;
 }
 
 th {
-  text-align: left;
-  padding: 10px;
-  background: #f1f5f9;
-  border-radius: 6px;
+	text-align: left;
+	padding: 10px;
+	background: #f1f5f9;
+	border-radius: 6px;
 }
 
 td {
-  padding: 10px;
-  border-bottom: 1px solid #f1f5f9;
+	padding: 10px;
+	border-bottom: 1px solid #f1f5f9;
 }
 
 /* 상태 */
 .ok {
-  color: #22c55e;
-  font-weight: 600;
+	color: #22c55e;
+	font-weight: 600;
 }
 
 .warn {
-  color: #f59e0b;
-  font-weight: 600;
+	color: #f59e0b;
+	font-weight: 600;
 }
 
 .bad {
-  color: #ef4444;
-  font-weight: 600;
+	color: #ef4444;
+	font-weight: 600;
 }
+
 .title {
-  font-size: 15px;
-  font-weight: 600;
-  margin-bottom: 12px;
-  padding-left: 10px;
-  border-left: 4px solid #22c55e;
+	font-size: 15px;
+	font-weight: 600;
+	margin-bottom: 12px;
+	padding-left: 10px;
+	border-left: 4px solid #22c55e;
+}
+/* 리포트 페이지용 css */
+.card-header-wrapper {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 12px;
+}
+
+.more-link {
+	font-size: 12px;
+	color: #2D6A4F;
+	text-decoration: none;
+	font-weight: bold;
+}
+
+.more-link:hover {
+	text-decoration: underline;
 }
 </style>
 </head>
@@ -219,9 +237,9 @@ td {
 
 					<!-- 상단 검색 -->
 					<div class="hdr">
-						<h1> 리포트</h1>
+						<h1>리포트</h1>
 					</div>
-					
+
 					<div class="report-header">
 						<div class="search-box">
 							<input type="date" id="startDate"> <span>~</span> <input
@@ -234,7 +252,10 @@ td {
 					<!-- 1줄 -->
 					<div class="grid-3">
 						<div class="card">
-							<h3 class="title">시설 현황</h3>
+							<div class="card-header-wrapper">
+								<h3 class="title">시설 현황</h3>
+								<a href="/equip" class="more-link">더보기 +</a>
+							</div>
 							<table>
 								<tr>
 									<th>시설명</th>
@@ -252,7 +273,10 @@ td {
 						</div>
 
 						<div class="card">
-							<h3 class="title">설비 가동</h3>
+							<div class="card-header-wrapper">
+								<h3 class="title">설비 가동</h3>
+								<a href="/equip" class="more-link">더보기 +</a>
+							</div>
 							<table>
 								<tr>
 									<th>설비</th>
@@ -270,7 +294,10 @@ td {
 						</div>
 
 						<div class="card">
-							<h3 class="title">생산 계획</h3>
+							<div class="card-header-wrapper">
+								<h3 class="title">생산 계획</h3>
+								<a href="/plan" class="more-link">더보기 +</a>
+							</div>
 							<table>
 								<tr>
 									<th>제품</th>
@@ -291,7 +318,10 @@ td {
 					<!-- 2줄 -->
 					<div class="grid-2">
 						<div class="card">
+							<div class="card-header-wrapper">
 							<h3 class="title">작업 진행 상황</h3>
+							<a href="/work" class="more-link">더보기 +</a>
+							</div>
 							<table id="workTable">
 								<tr>
 									<th>날짜</th>
@@ -312,7 +342,10 @@ td {
 						</div>
 
 						<div class="card">
+							<div class="card-header-wrapper">
 							<h3 class="title">불량 현황</h3>
+							<a href="/defect" class="more-link">더보기 +</a>
+							</div>
 							<table>
 								<tr>
 									<th>유형</th>
@@ -333,7 +366,10 @@ td {
 					<!-- 3줄 -->
 					<div class="grid-3">
 						<div class="card">
+							<div class="card-header-wrapper">
 							<h3 class="title">출하</h3>
+							<a href="/shipment" class="more-link">더보기 +</a>
+							</div>
 							<table>
 								<tr>
 									<th>제품</th>
@@ -347,7 +383,10 @@ td {
 						</div>
 
 						<div class="card">
+							<div class="card-header-wrapper">
 							<h3 class="title">재고</h3>
+							<a href="/stock" class="more-link">더보기 +</a>
+							</div>
 							<table>
 								<tr>
 									<th>자재</th>
@@ -361,7 +400,10 @@ td {
 						</div>
 
 						<div class="card">
+							<div class="card-header-wrapper">
 							<h3 class="title">설비 다운타임</h3>
+							<a href="/runtime" class="more-link">더보기 +</a>
+							</div>
 							<table>
 								<tr>
 									<th>설비</th>

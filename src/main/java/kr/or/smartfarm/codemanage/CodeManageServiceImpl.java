@@ -33,6 +33,70 @@ public class CodeManageServiceImpl implements CodeManageService {
 		
 	}
 	@Override
+	public int CodeInsert(CodeManageDTO CodeManageDTO) {
+		// TODO Auto-generated method stub
+		
+		int result = CodeManageDAO.CodeInsert(CodeManageDTO);
+		
+		return result;
+		
+	}
+	@Override
+	public int CodeUpdate(CodeManageDTO CodeManageDTO) {
+		// TODO Auto-generated method stub
+		
+		int result = CodeManageDAO.CodeUpdate(CodeManageDTO);
+		
+		return result;
+		
+	}
+	@Override
+	public int CodeRetire(int itemNum) {
+		// TODO Auto-generated method stub
+		
+		int result = CodeManageDAO.CodeRetire(itemNum);
+		
+		return result;
+		
+	}
+	@Override
+	public int CodeLevelUpdate(CodeManageDTO CodeManageDTO) {
+		// TODO Auto-generated method stub
+		
+		int result = CodeManageDAO.CodeLevelUpdate(CodeManageDTO);
+		
+		return result;
+		
+	}
+	@Override
+	public CodeManageDTO getCodeDetail(String CodeId) {
+		// TODO Auto-generated method stub
+		
+		CodeManageDTO result = CodeManageDAO.getCodeDetail(CodeId);
+		
+		return result;
+		
+	}
+	@Override
+	public CodeManageDTO searchpw(CodeManageDTO changepwDTO) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	
+	
+	
+
+	@Override
+	public List<CodeManageDTO> selectl() {
+		// TODO Auto-generated method stub
+		
+		List<CodeManageDTO> result = CodeManageDAO.selectl();
+		
+		return result;
+		
+	}
+	@Override
 	public List<CodeManageDTO> selectd() {
 		// TODO Auto-generated method stub
 		
@@ -50,75 +114,4 @@ public class CodeManageServiceImpl implements CodeManageService {
 		return result;
 		
 	}
-	@Override
-	public int CodeInsert(CodeManageDTO CodeManageDTO) {
-		// TODO Auto-generated method stub
-		
-        String pw = SHA256Util.encrypt(CodeManageDTO.getPw());
-		
-        CodeManageDTO.setPw(pw);
-		
-		int result = CodeManageDAO.CodeInsert(CodeManageDTO);
-		
-		return result;
-		
-	}
-	@Override
-	public int CodeUpdate(CodeManageDTO CodeManageDTO) {
-		// TODO Auto-generated method stub
-		
-		int result = CodeManageDAO.CodeUpdate(CodeManageDTO);
-		
-		return result;
-		
-	}
-	@Override
-	public int CodeRetire(CodeManageDTO CodeManageDTO) {
-		// TODO Auto-generated method stub
-		
-		int result = CodeManageDAO.CodeRetire(CodeManageDTO);
-		
-		return result;
-		
-	}
-	@Override
-	public int CodeLevelUpdate(CodeManageDTO CodeManageDTO) {
-		// TODO Auto-generated method stub
-		
-		int result = CodeManageDAO.CodeLevelUpdate(CodeManageDTO);
-		
-		return result;
-		
-	}
-	@Override
-	public List<CodeManageDTO> selectl() {
-		// TODO Auto-generated method stub
-		
-		List<CodeManageDTO> result = CodeManageDAO.selectl();
-		
-		return result;
-		
-	}
-	@Override
-	public CodeManageDTO getCodeDetail(String CodeId) {
-		// TODO Auto-generated method stub
-		
-		CodeManageDTO result = CodeManageDAO.getCodeDetail(CodeId);
-		
-		return result;
-		
-	}
-
-	@Override
-	public CodeManageDTO searchpw(CodeManageDTO changepwDTO) {
-		
-		CodeManageDTO result = CodeManageDAO.searchpw(changepwDTO);		
-		
-		if(result != null && result.getSecret().equals(changepwDTO.getSecret())) {
-			return result;
-		}		
-		
-		return null;
-	}
-
 }

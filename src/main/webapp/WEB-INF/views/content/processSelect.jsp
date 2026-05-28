@@ -139,6 +139,7 @@ response.setContentType("text/html; charset=utf-8");
 	color: #333;
 	display: flex;
 	align-items: center;
+	white-space: nowrap;
 }
 
 /* 폼 요소 공통 규격 (높이 강제 일치) */
@@ -313,37 +314,39 @@ background-color: #FFB703;
 					<button type="button" class="btn-reg">+ 등록하기</button>
 				</div>
 
-				<form name="searchFrm" action="stockList.do" method="get">
+				<form name="searchFrm"  method="get">
 					<div class="sch-wrap">
-
 
 						<div class="sch-row">
 							<div class="sch-left">
-								<span class="label">▶ 공정 분류</span>
-								 <select id="mType"
+								<span class="label">▶ 생산제품 타입</span>
+								 <select id="type"
 									class="form-control">
 									<option value="all">선택</option>
 									<option value="product">완제품</option>
 									<option value="semiproduct">반제품</option>
 								</select>
 								<span class="label">▶ 사용 여부</span>
-								 <select id="mType"
+								 <select id="process_status"
 									class="form-control">
 									<option value="all">전체</option>
 									<option value="사용중">사용중</option>
 									<option value="미사용">미사용</option>
 								</select>
 							</div>
+						</div>
 
+						<div class="sch-row">
 							<div class="sch-right">
 								<div class="sch-input-box">
 									<span style="color: #888;">&#128269;</span> <input type="text"
-										id="keyword" value="" placeholder="자재 명 검색">
+										id="keyword" value="" placeholder="공정 품목 검색">
 								</div>
 								<button type="button" class="btn-sch">검색</button>
 								<button type="button" class="select-reset">검색 초기화</button>
 							</div>
 						</div>
+
 					</div>
 				</form>
 
@@ -403,10 +406,9 @@ background-color: #FFB703;
 
 		<tiles:insertAttribute name="footer" ignore="true" />
 	</div>
-	<!-- 재고 등록 -->
 	<div id="regModal" class="modal-overlay" style="display: none;">
 		<div class="modal-box">
-			<h3 class="modal-title">재고 등록</h3>
+			<h3 class="modal-title">공정 등록</h3>
 
 			<form method="POST" action="/insertController" id="insert-form">
 				<div class="modal-grid">
@@ -418,6 +420,14 @@ background-color: #FFB703;
 					<div class="modal-field">
 						<label for="quantity">개수</label> 
 						<input type="number" name="stock_qty" id="quantity" min="1" placeholder="수량 입력">
+					</div>
+					<div class="modal-field">
+						<label for="quantity">작업 인원</label> 
+						<input type="number" name="stock_qty" id="quantity" min="1" placeholder="필요 작업인원 입력">
+					</div>
+					<div class="modal-field">
+						<label for="quantity">작업 순서</label> 
+						<input type="number" name="stock_qty" id="quantity" min="1" placeholder="해당 작업 순서 입력">
 					</div>
 
 					<div class="modal-field modal-field-full" id="selectedItemContainer" style="display: none; margin-top: 10px;">
@@ -469,7 +479,6 @@ background-color: #FFB703;
 
 
 
-	<!-- 스크립트 -->
 	<script>
 		/* 날짜 유효성 검사 로직 */
 		function validateDate() {
@@ -486,10 +495,10 @@ background-color: #FFB703;
 		
 		
 		function renderPagination(pInfo) {
-		    let pagingHtml = "";
+			let pagingHtml = "";
 		    
 		    // 이전
-		    if (!pInfo.isFirstPage) {
+    if (!pInfo.isFirstPage) {
 		        // pg-btn -> page-link
 		        pagingHtml += `<a class="page-link prev-next" href="javascript:movePage(${pInfo.pageNum - 1})">이전</a>`;
 		    }
@@ -519,17 +528,18 @@ background-color: #FFB703;
 		})
 		
 		
-		//페이징 관련 함수
 	function movePage(pageNum) {
-    let type = document.querySelector("#mType").value;
+    let type = document.querySelector("#type").value;
+    let process_status = document.querySelector("#process_status").value;
     let keyword = document.querySelector("#keyword").value;
     
     const params = new URLSearchParams();
     params.append("page", pageNum); // 누른 페이지 번호를 전달
     params.append("type", type);
+    params.append("process_status", process_status);
     params.append("keyword", keyword);
     
-    fetch(`/searchStock?\${params.toString()}`)
+    fetch(`/searchProcess?\${params.toString()}`)
     .then(response => response.json())
     .then(data => {
     	if(data.searchResult.length == 0){
@@ -548,13 +558,12 @@ background-color: #FFB703;
                 let item = data.searchResult[i];
                 html += `<tr>
                     <td style='font-weight: bold; color: #555;'>\${i + 1 + (data.pageInfo.pageNum - 1) * 5}</td>
-                    <td>\${item.CODE}</td>
-                    <td><a href='/stockDetail?stock_id=\${item.STOCK_ID}' class='link-txt'>\${item.NAME}</a></td>
+                    <td><a href="/processDetail?item_num=\${item.ITEM_NUM}" class="link-txt">\${item.NAME}</a></td>
                     <td>\${item.TYPE}</td>
-                    <td>\${item.STOCK_QTY}</td>
-                    <td>\${item.SAFE}</td>
-                    <td>\${item.UNIT}</td>
-                    <td>\${item.FACILITY_NAME}</td>
+                    <td>\${item.FLOW}</td>
+                    <td>\${item.HEAD_COUNT}</td>
+                    <td>\${item.CREATED_AT}</td>
+                    <td>\${item.PROCESS_STATUS}</td>
                 </tr>`;
             }
             tbody.innerHTML = html;
@@ -602,7 +611,7 @@ background-color: #FFB703;
 					return;
 				}
 				
-				fetch(`/modal?search=\${encodeURIComponent(query)}`)
+				fetch(`/processModal?search=\${encodeURIComponent(query)}`)
 				.then(response => response.json())
 				.then(data=>{
 					//여기에 받은 데이터 화면 갱신 로직 넣기 메서드 만들어서 넣으면 될듯 전달인자로 data넣어서
