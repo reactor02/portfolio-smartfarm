@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.github.pagehelper.PageInfo;
@@ -30,10 +31,10 @@ public class UserManageController {
 	    // 1. 서비스에서 전체 회원 목록(List) 조회
 	    List<UserManageDTO> userList = userManageService.getUserManage();
 	    
-	    // 1-2. 서비스에서 전체 회원 목록(List) 조회
+	    // 1-2. 서비스에서 부서명 조회
 	    List<UserManageDTO> selectd = userManageService.selectd();
 	    
-	    // 1-3. 서비스에서 전체 회원 목록(List) 조회
+	    // 1-3. 서비스에서 권한 목록 조회
 	    List<UserManageDTO> selectl = userManageService.selectl();
 	    
 	    // 1-3. 서비스에서 전체 회원 목록(List) 조회
@@ -93,10 +94,54 @@ public class UserManageController {
 		
 		if (resultCount > 0) {
 			msgType = "success";
-			msgContent = "사원이 정상적으로 등록되었습니다.";
+			msgContent = "정보가 정상적으로 수정되었습니다.";
 		} else {
 			msgType = "error";
-			msgContent = "등록에 실패했습니다. 입력 데이터를 확인해주세요.";
+			msgContent = "수정에 실패했습니다. 입력 데이터를 확인해주세요.";
+		}
+		
+		// 3. 리다이렉트 화면까지 안전하게 메시지 배달 (Flash Attribute)
+		rttr.addFlashAttribute("msg", msgContent);
+		
+		// 4. 타일즈 막힘 해결을 위해 GET 메서드로 리다이렉트
+		return "redirect:/usermanage";
+	}
+	
+	@PostMapping("/userRetire")
+	@ResponseBody // 💡 중요: 페이지 이동을 막고 "success" 글자 데이터만 그대로 브라우저에 던지겠다는 선언!
+	public String userretire(UserManageDTO userManageDTO) { 
+	    System.out.println("userretirePost 실행 - 넘어온 사원번호: " + userManageDTO.getEmp_num());
+	    
+	    // 1. 서비스 실행 (정상 등록 시 1, 실패 시 0)
+	    int resultCount = userManageService.userRetire(userManageDTO);
+	    
+	    // 2. 자바스크립트 fetch가 기다리고 있는 "success" 또는 "fail" 문자열을 반환
+	    if (resultCount > 0) {
+	        return "success"; // 💡 JS의 if (data === "success") 구문과 매칭됨
+	    } else {
+	        return "fail";
+	    }
+	}
+	
+	@PostMapping("/userlevelupdate")
+	public String userlevelupdate(
+			UserManageDTO userManageDTO, 
+			RedirectAttributes rttr) { 
+		System.out.println("userlevelupdatePost 실행");
+		
+		// 1. 서비스 실행 (정상 등록 시 1, 실패 시 0 또는 예외 반환)
+		int resultCount = userManageService.userLevelUpdate(userManageDTO);
+		
+		// 2. 성패 로직 처리 및 결과 메시지 생성
+		String msgType;
+		String msgContent;
+		
+		if (resultCount > 0) {
+			msgType = "success";
+			msgContent = "권한이 정상적으로 변경되었습니다.";
+		} else {
+			msgType = "error";
+			msgContent = "변경에 실패했습니다. 입력 데이터를 확인해주세요.";
 		}
 		
 		// 3. 리다이렉트 화면까지 안전하게 메시지 배달 (Flash Attribute)
@@ -118,8 +163,16 @@ public class UserManageController {
 		    // 서비스에 파라미터로 받은 userId를 넘겨서 해당 유저의 상세 정보 조회
 		    UserManageDTO userDetail = userManageService.getUserDetail(emp_num);
 		    
+		    //1-2. 서비스에서 부서명 조회
+		    List<UserManageDTO> selectd = userManageService.selectd();
+		    
+		    // 1-3. 서비스에서 권한 목록 조회
+		    List<UserManageDTO> selectl = userManageService.selectl();
+		    
 		    // 가져온 데이터를 "user"라는 이름으로 가방(Model)에 넣음
 		    model.addAttribute("list", userDetail);
+		    model.addAttribute("selectd", selectd);
+		    model.addAttribute("selectl", selectl);
 		    
 		    return "content/userdetail.tiles";
 		

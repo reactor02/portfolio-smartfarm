@@ -14,270 +14,72 @@ response.setContentType("text/html; charset=utf-8");
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>재고 관리 시스템 - 재고관리 상세</title>
+<title>사용자 상세</title>
 <link rel="stylesheet" href="/resources/css/paging.css">
 <link rel="stylesheet" href="/resources/css/modal.css">
 <style>
 
 /* 공통 및 메인 레이아웃 스타일 */
-* {
-	box-sizing: border-box;
-	margin: 0;
-	padding: 0;
-	font-family: 'Malgun Gothic', sans-serif
-}
-
-.mat-all {
-	display: flex;
-	flex-direction: column;
-	min-height: 100vh;
-	background-color: #f4f7f6
-}
-
-.mat-body {
-	display: flex;
-	flex: 1
-}
-
-.main-cont {
-	flex: 1;
-	padding: 2rem 2.5rem;
-	min-width: 0
-}
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Malgun Gothic', sans-serif; }
+.mat-all { display: flex; flex-direction: column; min-height: 100vh; background-color: #f4f7f6; }
+.mat-body { display: flex; flex: 1; }
+.main-cont { flex: 1; padding: 2rem 2.5rem; min-width: 0; }
 
 /* 상단 타이틀 헤더 스타일 */
-.hdr {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	background-color: #2D6A4F;
-	padding: 15px 25px;
-	border-radius: 8px;
-	margin-bottom: 25px;
-	box-shadow: 0 4px 6px rgba(0, 0, 0, .1)
-}
-
-.hdr h1 {
-	font-size: 1.8rem;
-	color: #fff;
-	font-weight: 700;
-	letter-spacing: -1px
-}
+.hdr { display: flex; justify-content: space-between; align-items: center; background-color: #2D6A4F; padding: 15px 25px; border-radius: 8px; margin-bottom: 25px; box-shadow: 0 4px 6px rgba(0, 0, 0, .1); }
+.hdr h1 { font-size: 1.8rem; color: #fff; font-weight: 700; letter-spacing: -1px; }
 
 /* 버튼 컴포넌트 스타일 (목록, 등록, 플러스) */
-.btn-list {
-	display: inline-block;
-	background-color: #fff;
-	color: #2D6A4F;
-	padding: 10px 24px;
-	border: 1px solid #2D6A4F;
-	border-radius: 6px;
-	font-size: 1.05rem;
-	font-weight: 700;
-	text-decoration: none;
-	cursor: pointer;
-	box-shadow: inset 0 1px 0 rgba(255, 255, 255, .2), 0 2px 3px
-		rgba(0, 0, 0, .2);
-	transition: background-color .2s
-}
-
-.btn-list:hover {
-	background-color: #B7E4C7
-}
-
-.btn-plus {
-	display: inline-block;
-	background-color: #fff;
-	color: #2D6A4F;
-	padding: 10px 24px;
-	border: 1px solid #2D6A4F;
-	border-radius: 6px;
-	font-size: 1.05rem;
-	font-weight: 700;
-	text-decoration: none;
-	cursor: pointer;
-	box-shadow: inset 0 1px 0 rgba(255, 255, 255, .2), 0 2px 3px
-		rgba(0, 0, 0, .2);
-	transition: background-color .2s
-}
-
-.btn-plus:hover {
-	background-color: #B7E4C7
-}
+.btn-list, .btn-plus { display: inline-block; background-color: #fff; color: #2D6A4F; padding: 10px 24px; border: 1px solid #2D6A4F; border-radius: 6px; font-size: 1.05rem; font-weight: 700; text-decoration: none; cursor: pointer; box-shadow: inset 0 1px 0 rgba(255, 255, 255, .2), 0 2px 3px rgba(0, 0, 0, .2); transition: background-color .2s; }
+.btn-list:hover, .btn-plus:hover { background-color: #B7E4C7; }
 
 /* 상세 페이지 전용 섹션 및 콘텐츠 타이틀 스타일 */
-.detail-section {
-	background-color: #fff;
-	border: 1px solid #bbb;
-	border-radius: 10px;
-	padding: 25px;
-	margin-bottom: 25px;
-	box-shadow: 0 2px 8px rgba(0, 0, 0, .03)
-}
-
-.section-title {
-	display: inline-block;
-	font-size: 1.15rem;
-	font-weight: 700;
-	color: #333;
-	margin-bottom: 15px;
-	padding-bottom: 10px;
-	border-bottom: 2px solid #2D6A4F
-}
+.detail-section { background-color: #fff; border: 1px solid #bbb; border-radius: 10px; padding: 25px; margin-bottom: 25px; box-shadow: 0 2px 8px rgba(0, 0, 0, .03); }
+.section-title { display: inline-block; font-size: 1.15rem; font-weight: 700; color: #333; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 2px solid #2D6A4F; }
 
 /* 상세 정보 그리드: 정보창 레이아웃 및 3칸/4칸 구조 */
-.info-grid-top {
-	display: grid;
-	grid-template-columns: repeat(3, 1fr);
-	gap: 15px;
-	margin-bottom: 20px;
-	padding-bottom: 20px;
-	border-bottom: 1px solid #eee
-}
-
-.info-grid-sub {
-	display: grid;
-	grid-template-columns: repeat(4, 1fr);
-	gap: 20px
-}
+.info-grid-top { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #eee; }
+.info-grid-sub { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
 
 /* 그리드 내 항목: 라벨 및 데이터 텍스트 스타일 */
-.info-item {
-	display: flex;
-	flex-direction: column;
-	gap: 8px
-}
-
-.info-label {
-	font-size: .9rem;
-	color: #777;
-	font-weight: 700
-}
-
-.info-value {
-	font-size: 1.1rem;
-	color: #222;
-	font-weight: 700
-}
+.info-item { display: flex; flex-direction: column; gap: 8px; }
+.info-label { font-size: .9rem; color: #777; font-weight: 700; }
+.info-value { font-size: 1.1rem; color: #222; font-weight: 700; }
 
 /* 데이터 테이블: 테이블 외곽 스크롤 박스 */
-.tbl-box {
-	height: 350px;
-	overflow-y: auto;
-	background: #fff;
-	border-radius: 8px;
-	box-shadow: 0 2px 8px rgba(0, 0, 0, .03)
-}
+.tbl-box { height: 350px; overflow-y: auto; background: #fff; border-radius: 8px; box-shadow: 0 2px 8px rgba(0, 0, 0, .03); }
 
 /* 테이블 본체: 헤더 고정 및 테두리 스타일 */
-.stk-tbl {
-	width: 100%;
-	border-collapse: collapse;
-	border-top: 2px solid #555;
-	border-bottom: 2px solid #555
-}
-
-.stk-tbl th {
-	position: sticky;
-	top: 0;
-	z-index: 10;
-	background-color: #e9ecef;
-	color: #222;
-	padding: 12px 10px;
-	border: 1px solid #ccc;
-	border-top: none;
-	font-weight: 700
-}
-
-.stk-tbl td {
-	padding: 12px 10px;
-	border: 1px solid #ccc;
-	text-align: center;
-	color: #333
-}
+.stk-tbl { width: 100%; border-collapse: collapse; border-top: 2px solid #555; border-bottom: 2px solid #555; }
+.stk-tbl th { position: sticky; top: 0; z-index: 10; background-color: #e9ecef; color: #222; padding: 12px 10px; border: 1px solid #ccc; border-top: none; font-weight: 700; }
+.stk-tbl td { padding: 12px 10px; border: 1px solid #ccc; text-align: center; color: #333; }
 
 /* 테이블 공통 규격: 텍스트 크기 및 마우스 호버 효과 */
-.stk-tbl th {
-	font-size: .95rem
-}
-
-.stk-tbl td {
-	font-size: .95rem
-}
-
-.stk-tbl tbody tr:hover {
-	background-color: #f1f8f5
-}
+.stk-tbl th, .stk-tbl td { font-size: .95rem; }
+.stk-tbl tbody tr:hover { background-color: #f1f8f5; }
 
 /* 폼 요소 공통 규격: 인풋 및 셀렉트 박스 기본 스타일 */
-.form-control {
-	height: 38px;
-	padding: 0 10px;
-	border: 1px solid #aaa;
-	border-radius: 4px;
-	font-size: .95rem;
-	outline: none;
-	transition: border-color .2s
-}
-
-.form-control:focus {
-	border-color: #2D6A4F
-}
+.form-control { height: 38px; padding: 0 10px; border: 1px solid #aaa; border-radius: 4px; font-size: .95rem; outline: none; transition: border-color .2s; }
+.form-control:focus { border-color: #2D6A4F; }
 
 /* 모달창 기본 골격: 배경 암전 처리 스타일 */
-.modal-overlay {
-	position: fixed;
-	top: 0;
-	left: 0;
-	width: 100vw;
-	height: 100vh;
-	background-color: rgba(0, 0, 0, .5);
-	z-index: 1000
-}
+.modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(0, 0, 0, .5); z-index: 1000; }
 
 /* 모달 컨텐츠 박스: 화면 정중앙 배치 스타일 */
-.modal-box {
-	position: absolute;
-	top: 50%;
-	left: 50%;
-	transform: translate(-50%, -50%);
-	width: 100%;
-	max-width: 600px;
-	padding: 30px;
-	background-color: #fff;
-	border-radius: 10px;
-	box-shadow: 0 4px 15px rgba(0, 0, 0, .15);
-	box-sizing: border-box
-}
+.modal-box { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 100%; max-width: 600px; padding: 30px; background-color: #fff; border-radius: 10px; box-shadow: 0 4px 15px rgba(0, 0, 0, .15); box-sizing: border-box; }
 
 /* 모달 내부 레이아웃: 그리드 정렬 구조 */
-.modal-grid {
-	display: flex;
-	flex-wrap: wrap;
-	gap: 15px 20px;
-	margin-bottom: 20px;
-	width: 100%;
-	box-sizing: border-box
-}
+.modal-grid { display: flex; flex-wrap: wrap; gap: 15px 20px; margin-bottom: 20px; width: 100%; box-sizing: border-box; }
 
 /* 모달 필드 규격: 기본 기본 반 칸(50%) 구조 */
-.modal-field {
-	display: flex;
-	flex-direction: column;
-	gap: 6px;
-	width: calc(50% - 10px);
-	box-sizing: border-box
-}
+.modal-field { display: flex; flex-direction: column; gap: 6px; width: calc(50% - 10px); box-sizing: border-box; }
 
 /* 모달 필드 확장: 쿼터 칸(25%) 배치 구조 */
-.modal-field.quarter {
-	width: calc(25% - 15px)
-}
+.modal-field.quarter { width: calc(25% - 15px); }
 
 /* 모달 필드 확장: 전체 한 칸(100%) 배치 구조 */
-.modal-field.full {
-	width: 100%
-}
+.modal-field.full { width: 100%; }
+
 </style>
 </head>
 <body>
@@ -291,9 +93,14 @@ response.setContentType("text/html; charset=utf-8");
 				<div class="hdr">
 					<h1>사용자 상세</h1>
 					<div>
-						<button type="button" class="btn-list" id="level">권한</button>
 						<button type="button" class="btn-list" id="edit">수정</button>
+					    
+					    <c:if test="${ loginUser.e_level == 3 }">
+						<button type="button" class="btn-list" id="level">권한</button>
+					
 						<button type="button" class="btn-list" id="retire">퇴사</button>
+						</c:if>
+						
 						<a href="/usermanage" class="btn-list" id>목록으로</a>
 
 					</div>
@@ -346,7 +153,7 @@ response.setContentType("text/html; charset=utf-8");
 			<form method="POST" action="/userupdate" id="insert-form">
 
 				<!-- 💡 중요: DB 업데이트를 위해 사원번호(emp_num)를 hidden 필드로 숨겨서 전송 -->
-				<input type="hidden" name="emp_num" value="${userDetail.emp_num}">
+				<input type="hidden" name="emp_num" value="${list.emp_num}">
 
 				<div class="modal-grid">
 					<div class="modal-field">
@@ -395,7 +202,7 @@ response.setContentType("text/html; charset=utf-8");
 								<c:forEach var="b" items="${ selectl }">
 									<!-- 💡 기존 사원의 권한 등급과 일치하면 자동으로 선택(selected) 상태로 만듦 -->
 									<option value="${b.e_level}"
-										${b.e_level == userDetail.e_level ? 'selected' : ''}>${ b.e_level }</option>
+										${b.e_level == requestScope.list.e_level ? 'selected' : ''}>${ b.e_level }</option>
 								</c:forEach>
 							</select>
 						</div>
@@ -428,8 +235,9 @@ response.setContentType("text/html; charset=utf-8");
 				<div class="modal-grid">
 					<!-- 💡 이름은 정보 수정창이 아니므로 disabled 처리하여 수정을 방지 -->
 					<div class="modal-field">
+					<input type="hidden" name="emp_num" value="${list.emp_num}">
 						<label for="ename">이름</label> <input type="text" name="ename"
-							id="ename" placeholder="이름" value="${userDetail.ename}" disabled>
+							id="ename" placeholder="이름" value="${list.ename}" disabled>
 					</div>
 
 					<!-- 권한 영역 -->
@@ -442,7 +250,7 @@ response.setContentType("text/html; charset=utf-8");
 							<c:forEach var="b" items="${ selectl }">
 								<!-- 💡 기존 사원의 현재 권한을 기본 선택(selected) 상태로 래핑 -->
 								<option value="${b.e_level}"
-									${b.e_level == userDetail.e_level ? 'selected' : ''}>${ b.e_level }</option>
+									${b.e_level == requestScope.list.e_level ? 'selected' : ''}>${ b.e_level }</option>
 							</c:forEach>
 						</select>
 					</div>
@@ -483,34 +291,32 @@ response.setContentType("text/html; charset=utf-8");
 	    btnSubmit.addEventListener('click', () => {
 	        
 	        // 폼 필드 객체 및 값 확보
-	        const ename = document.querySelector("input[name='ename']");
-	        const pw = document.querySelector("input[name='pw']");
-	        const pw2 = document.querySelector("input[name='pw2']");
+
 	        const dType = document.querySelector("#dType-e").value; // 부서 선택값
-	        const lType = document.querySelector("#lType-e").value; // 권한 선택값
+	      //  const lType = document.querySelector("#lType-e").value; // 권한 선택값
 
 	        // HTML5 기본 제약조건(required, pattern) 검증 실행
-	        if (!ename.checkValidity() || !pw.checkValidity() || !pw2.checkValidity()) {
-	            ename.reportValidity() || pw.reportValidity() || pw2.reportValidity();
-	            return;
-	        }
+	       // if (!ename.checkValidity() || !pw.checkValidity() || !pw2.checkValidity()) {
+	       //     ename.reportValidity() || pw.reportValidity() || pw2.reportValidity();
+	       //     return;
+	       // }
 
 	        // 새 비밀번호 일치 여부 확인
-	        if (pw.value !== pw2.value) {
-	            alert("비밀번호와 비밀번호 확인이 일치하지 않습니다.");
-	            pw2.focus();
-	            return;
-	        }
+	      //  if (pw.value !== pw2.value) {
+	      //      alert("비밀번호와 비밀번호 확인이 일치하지 않습니다.");
+	      //      pw2.focus();
+	      //      return;
+	      //  }
 
 	        // 부서 및 권한 선택 여부 검증 (value="" 또는 "all" 방어)
 	        if (dType === "" || dType === "all") {
 	            alert("부서를 선택해주세요.");
 	            return;
 	        }
-	        if (lType === "" || lType === "all") {
-	            alert("권한을 center 선택해주세요.");
-	            return;
-	        }
+	       // if (lType === "" || lType === "all") {
+	       //     alert("권한을 center 선택해주세요.");
+	       //     return;
+	       // }
 
 	        // 모든 검증 완료 시 폼 제출 (/userupdate 로 POST 전송)
 	        const updateForm = document.querySelector("#insert-form");
@@ -529,7 +335,7 @@ response.setContentType("text/html; charset=utf-8");
 	// 1. 객체 확보 (수정 모달 등 타 컴포넌트와 클래스/ID 충돌 방지)
 	const levelBtn = document.querySelector("#level");            // 상단 헤더의 권한 버튼
 	const pModal = document.querySelector("#pModal");              // 권한 모달창 오버레이
-	const levelCancelBtn = document.querySelector(".btn-level-cancel"); // 권한 모달 내부 취소 버튼
+
 	const btnLevelSubmit = document.querySelector(".btn-level-submit"); // 권한 모달 내부 변경 완료 버튼
 
 	// 2. 권한 버튼 클릭 시 모달창 열기
@@ -576,6 +382,39 @@ response.setContentType("text/html; charset=utf-8");
 	        });
 	    });
 	}
+	
+	// 1. 코스트(const)로 버튼 요소 찾기
+	const retireBtn = document.querySelector('#retire');
+
+	// 2. 버튼에 바로 클릭 이벤트리스너 걸기
+	retireBtn.addEventListener('click', function() {
+	    
+	    // 사원번호 수집
+	    const empNum = "${list.emp_num}"; 
+	    
+	    // 확인창 띄우기
+	    if (confirm("정말 이 사원을 퇴사 처리하시겠습니까?")) {
+	        
+	        // 서버로 사원번호 전송 (기본 fetch)
+	        fetch('/userRetire', {
+	            method: 'POST',
+	            headers: {
+	                'Content-Type': 'application/x-www-form-urlencoded'
+	            },
+	            body: 'emp_num=' + encodeURIComponent(empNum)
+	        })
+	        .then(response => response.text())
+	        .then(data => {
+	            if (data === "success") {
+	                alert("퇴사 처리가 완료되었습니다.");
+	                location.href = '/usermanage'; // 목록 이동
+	            } else {
+	                alert("처리에 실패했습니다.");
+	            }
+	        });
+	        
+	    }
+	});
 	
 	// ==========================================
 // 1. 모달창 열기/닫기 제어
