@@ -76,7 +76,7 @@
                           OR i.name     LIKE '%' || #{keyword} || '%')
                     </if>
                 </where>
-                ORDER BY pp.plan_num DESC
+                ORDER BY pp.plan_start DESC NULLS LAST
             ) inner_q
             WHERE ROWNUM &lt;= #{endRow}
         )
