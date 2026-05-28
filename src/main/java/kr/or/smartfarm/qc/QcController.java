@@ -1,6 +1,5 @@
 package kr.or.smartfarm.qc;
 
-import java.sql.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,6 +15,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.github.pagehelper.PageInfo;
 
+import kr.or.smartfarm.equipment_log.EquipService;
+
 
 @Controller
 public class QcController {
@@ -27,6 +28,9 @@ public class QcController {
 //	find service
 	@Autowired
 	QcService qcService;
+	
+	@Autowired
+	EquipService equipService;
 
 //	list
 	@RequestMapping("/qc")
@@ -42,6 +46,13 @@ public class QcController {
 		
 		List item = qcService.selectItem();
 		model.addAttribute("item", item);
+		
+		List qc = qcService.selectAllQc();
+		model.addAttribute("qc", qc);
+		
+		List emp = equipService.selectEmp();
+		model.addAttribute("emp", emp);
+		
 		
 		PageInfo<Map<String, Object>> pageInfo = new PageInfo<Map<String, Object>>(result);
 		model.addAttribute("pageInfo", pageInfo);
@@ -96,14 +107,43 @@ public class QcController {
 	    return result;
 	}
 	
-@RequestMapping("/qcDetail")
-//상세페이지 들어가는 로직
-public String Detail(@RequestParam(value="io_num", required=false)Integer io_num, Model model) {
+	@RequestMapping("/qcDetail")
+	//상세페이지 들어가는 로직
+	public String Detail(@RequestParam(value="io_num", required=false)Integer io_num, Model model) {
+		
+		System.out.println("io_num : " + io_num );
+		QcDTO result = qcService.selectDetail(io_num);
+		model.addAttribute("result", result);
+		List list = qcService.selectLog(io_num);
+		model.addAttribute("list", list);
+		return "content/qcDetail.tiles";
+	}
 	
-	System.out.println("io_num : " + io_num );
-	QcDTO result = qcService.selectDetail(io_num);
-	model.addAttribute("result", result);
-	return "content/qcDetail.tiles";
-}
+	@RequestMapping("/insertQc")
+	//상세페이지 들어가는 로직
+	public String insertQc(Integer qc_num, QcDTO qcDTO, Model model) {
+		
+		System.out.println("qcDTO : " + qcDTO );
+		System.out.println("qc_num : " + qc_num );
+		
+		// qc 출고
+		// io_num > 시퀀스
+		// io_type > '출고'
+		// io_qty = dto
+		// io_date > sysdate
+		// qc_num > dto
+		// lot_num > dto
+		// io_reason > 품질검사
+		// facility_num > 7
+		// emp_num > dto
+		// qc_chked > 'N'
+		
+		QcDTO qcChk = qcService.qcChk(qc_num);
+		System.out.println("qc_num : " + qcChk.getQc_pass());
+		
+//		qcService.insertQc1(qcDTO);
+		
+		return "redirect:qc";
+	}
 
 }

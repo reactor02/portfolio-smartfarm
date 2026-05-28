@@ -74,7 +74,7 @@ response.setContentType("text/html; charset=utf-8");
 						<thead>
 							<tr>
 								<th style="width: 60px;">번호</th>
-								<th>품목코드</th>
+								<th>lot코드</th>
 								<th>품목명</th>
 								<th>검사일</th>
 								<th>검사구분</th>
@@ -92,7 +92,7 @@ response.setContentType("text/html; charset=utf-8");
 											<td style="font-weight: bold; color: #555;">${item.io_num}</td>
 											<td>
 												<a href="/qcDetail?io_num=${item.io_num}">
-													${item.code}
+													${item.lot_code}
 												</a>
 											</td>
 											<td>${item.name}</td>
@@ -134,43 +134,28 @@ response.setContentType("text/html; charset=utf-8");
 	            <div class="modal-grid">
 	                <div class="modal-field">
 	                    <label>검사한 품목</label>
-	                   	<select name="item_num">
-	                   		<option value="">품목코드 / 품목명 / 입고날짜 / 담당자 </option>
+	                   	<select name="lot_num">
+	                   		<option value="">lot코드 / 품목명 / 입고날짜 / 총량 / 담당자 </option>
 	                   		<c:forEach var="i" items="${waiting}">
-	                            <option value="${i.lot_num}">${i.code} / ${i.name} / ${i.io_date} / ${i.ename}</option>
+	                            <option value="${i.lot_num}">${i.lot_code} / ${i.name} / ${i.io_date} / ${i.io_qty}${i.unit} / ${i.ename} / </option>
 	                        </c:forEach>
 	                   	</select>
+	                   	<input type="hidden" name="" value="">
+	                </div>
+	                
+	                <div class="modal-field">
+	                    <label>검사 완료 개수</label>
+	                   	<input type="number" name="io_qty">
+	                   	<span>SELECT 값보다 적거나 같은 값을 입력해주세요. </span>
 	                </div>
 	                <div class="modal-field">
-	                    <label>상태</label>
-	                   	<select name="equip_status">
-	                   		<option value="RUNNING">RUNNING</option>
-	                   		<option value="ERROR">ERROR</option>
-	                   		<option value="MAINTENANCE">MAINTENANCE</option>
-	                   	</select>
-	                </div>
-	                <div class="modal-field">
-	                    <label>에러여부</label>
-	                   	<select name="error_sign">
-	                   		<option value="Y">Y</option>
-	                   		<option value="N">N</option>
-	                   	</select>
-	                </div>
-	                <div class="modal-field">
-	                    <label>조치사항</label>
-	                   	<select name="equip_action">
-	                   		<option value="NONE">NONE</option>
-	                   		<option value="REPAIR">REPAIR</option>
-	                   		<option value="CHECK">CHECK</option>
-	                   	</select>
-	                </div>
-	                <div class="modal-field">
-	                    <label>가동시작일자</label>
-	                   	<input type="date" name="start_date">
-	                </div>
-	                <div class="modal-field">
-	                    <label>가동종료일자</label>
-	                   	<input type="date" name="end_date">
+	                    <label>검사 구분</label>
+	                   	<select name="qc_num">
+	                        <option value="">선택</option>
+	                        <c:forEach var="qc" items="${qc}">
+	                            <option value="${qc.qc_num}">${qc.qc_type} ${qc.qc_pass}</option>
+	                        </c:forEach>
+	                    </select>
 	                </div>
 	                <div class="modal-field">
 	                    <label>확인자</label>
@@ -187,9 +172,8 @@ response.setContentType("text/html; charset=utf-8");
 	                <button type="button" class="btn-cancel" id="btnCloseModal">취소</button>
 	            </div>
 	        </div>
-       </form>
+       	</form>
      </div>
-</div>   
 </body>
 <script>
 
@@ -245,21 +229,23 @@ function movePage(pageNum) {
                         <td style="font-weight: bold; color: #555;">
                             \${item.IO_NUM}
                         </td>
-                        <td>\${item.CODE}</td>
+                        <td>
+	                        <a href="/qcDetail?io_num=\${item.IO_NUM}">
+	                        	\${item.LOT_CODE}
+							</a>
+                        </td>
                         <td>\${item.NAME}</td>
                         <td>\${formatDate(item.IO_DATE)}</td>
                         <td>\${item.QC_TYPE}</td>
                         <td>\${item.QC_PASS}</td>
+                        <td>\${item.IO_QTY}\${item.UNIT}</td>
                         <td>\${item.ENAME}</td>
-                        <td>\${item.IO_QTY} \${item.UNIT}</td>
                     </tr>
                 `;
-            console.log("TEST START DATE : " + item.START_DATE);
             }
             tbody.innerHTML = html;
             
             // paging 갱신
-            console.log("data.pageInfo===" + data.pageInfo);
             renderPagination(data.pageInfo);
 
          	// 주소 변경

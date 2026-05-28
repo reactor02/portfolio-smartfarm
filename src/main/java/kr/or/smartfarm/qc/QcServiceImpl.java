@@ -43,4 +43,23 @@ public class QcServiceImpl implements QcService{
 		return qcDAO.selectDetail(io_num);
 	}
 
+	@Override
+	public List selectLog(int io_num) {
+		return qcDAO.selectLog(io_num);
+	}
+	@Override
+	public List selectAllQc() {
+		return qcDAO.selectAllQc();
+	}
+
+	@Override
+	public int insertQc1(QcDTO qcDTO) {
+		return qcDAO.insertQc1(qcDTO);
+	}
+
+	@Override
+	public QcDTO qcChk(int qc_num) {
+		return qcDAO.qcChk(qc_num);
+	}
+
 }
