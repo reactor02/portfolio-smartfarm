@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 
 import com.github.pagehelper.PageHelper;
 
+
 @Repository
 public class QcDAOImpl implements QcDAO{
 	
@@ -18,11 +19,41 @@ public class QcDAOImpl implements QcDAO{
 	@Override
 	public List<QcDTO> selectAll(int pageNum) {
 		
-		PageHelper.startPage(pageNum, 5);
+		PageHelper.startPage(pageNum, 10);
 		
 		List<QcDTO> result = sqlSession.selectList("mapper.qc.selectAllQc");
 		
 		return result;
 	}
+
+	@Override
+	public List selectItem() {
+		return sqlSession.selectList("mapper.qc.selectItem");
+	}
+
+	// SEARCH > LIST
+	@Override
+	public List searchQc(Map map) {
+		List result = null;
+		int pageNum = (Integer)map.get("page");
+		PageHelper.startPage(pageNum, 10);
+		result = sqlSession.selectList("mapper.qc.searchQc", map);
+		return result;
+	}
+
+	@Override
+	public List selectWaiting() {
+		return sqlSession.selectList("mapper.qc.selectWaiting");
+	}
+
+	@Override
+	public QcDTO selectDetail(int io_num) {
+		return sqlSession.selectOne("mapper.qc.selectDetail", io_num);
+	}
+
+//	// INSERT
+//	public int insertQc(QcDTO dto) {
+//		return sqlSession.insert("mapper.qc.insertQc", dto);
+//	}
 	
 }

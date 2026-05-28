@@ -91,7 +91,6 @@
 		EQUIP_STATUS, 
 		error_sign, 
 		equip_action, 
-		maintenance_date,
 		start_date,
 		end_date,
 		total_runtime,
@@ -103,17 +102,21 @@
 		#{equip_status},
 		#{error_sign},
 		#{equip_action},
-		#{maintenance_date},
 		#{start_date},
 		#{end_date},
 		
 		<!--  total_date -->
 		(
-	        SELECT NVL(MAX(TOTAL_RUNTIME), 0)
-	        FROM equipment_log
-	        WHERE ITEM_NUM = #{item_num}
-	    ) +
-    	((#{end_date} - #{start_date}) * 86400),
+		    SELECT NVL(MAX(TOTAL_RUNTIME), 0)
+		    FROM equipment_log
+		    WHERE ITEM_NUM = #{item_num}
+		)
+		+
+		(
+		    CAST(#{end_date} AS DATE)
+		    -
+		    CAST(#{start_date} AS DATE)
+		) * 86400,
     	
 		#{item_num},
 		#{emp_num}

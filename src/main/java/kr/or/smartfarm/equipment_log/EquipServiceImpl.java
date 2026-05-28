@@ -7,7 +7,6 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import kr.or.smartfarm.stock.StockDTO;
 
 @Service
 public class EquipServiceImpl implements EquipService{

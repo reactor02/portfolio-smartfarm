@@ -88,7 +88,7 @@ select.form-control {
 								<th>가동시작</th>
 								<th>가동종료</th>
 								<th>확인자</th>
-								<th>누적시간</th>
+								<th>누적시간(초)</th>
 							</tr>
 						</thead>	
 						
@@ -103,9 +103,22 @@ select.form-control {
 											<td>${item.equip_status}</td>
 											<td>${item.error_sign}</td>
 											<td>${item.equip_action}</td>
-											<td>${item.maintenance_date}</td>
-											<td>${item.start_date}</td>
-											<td>${item.end_date}</td>
+											<td>
+												<fmt:formatDate 
+											        value="${item.maintenance_date}" 
+											    pattern="yyyy-MM-dd"/>
+											</td>
+											<td>
+											    <fmt:formatDate 
+											        value="${item.start_date}" 
+											    pattern="yyyy-MM-dd"/>
+											</td>
+											
+											<td>
+											    <fmt:formatDate 
+											        value="${item.end_date}" 
+											    pattern="yyyy-MM-dd"/>
+											</td>
 											<td>${item.ename}</td>
 											<td>${item.total_runtime}</td>
 										</tr>
@@ -140,14 +153,14 @@ select.form-control {
 	<div id="regModal" class="modal-overlay" style="display:none;">
 	    <div class="modal-box">
 	        <h3 class="modal-title">설비관리 등록</h3>
-	        <form id="regForm" action="/equip/insertEquip" method="post">
+	        <form id="regForm" action="${pageContext.request.contextPath}/insertEquip" method="post">
 	            <div class="modal-grid">
 	                <div class="modal-field">
 	                    <label>설비코드(설비명)</label>
 	                   	<select name="item_num">
 	                   		<option value="">선택</option>
 	                   		<c:forEach var="i" items="${item}">
-	                            <option value="${i.code}">${i.name}</option>
+	                            <option value="${i.item_num}">${i.code} ${i.name}</option>
 	                        </c:forEach>
 	                   	</select>
 	                </div>
@@ -161,7 +174,7 @@ select.form-control {
 	                </div>
 	                <div class="modal-field">
 	                    <label>에러여부</label>
-	                   	<select name="equip_sign">
+	                   	<select name="error_sign">
 	                   		<option value="Y">Y</option>
 	                   		<option value="N">N</option>
 	                   	</select>
@@ -196,7 +209,9 @@ select.form-control {
 	                <button type="submit" class="btn-reg">등록</button>
 	                <button type="button" class="btn-cancel" id="btnCloseModal">취소</button>
 	            </div>
-	       </form>
+	        </div>
+       </form>
+     </div>
 </div>   
 <script>
 
@@ -244,9 +259,9 @@ function movePage(pageNum) {
                 console.log(item);
                 html += `
                     <tr>
-                		<td style="font-weight: bold; color: #555;">
-                			\${item.EQUIP_NUM}
-                		</td>
+                        <td style="font-weight: bold; color: #555;">
+                            \${item.EQUIP_NUM}
+                        </td>
                         <td>\${item.CODE}</td>
                         <td>\${item.NAME}</td>
                         <td>\${item.EQUIP_STATUS}</td>
@@ -259,6 +274,7 @@ function movePage(pageNum) {
                         <td>\${item.TOTAL_RUNTIME}</td>
                     </tr>
                 `;
+            console.log("TEST START DATE : " + item.START_DATE);
             }
             tbody.innerHTML = html;
             
@@ -301,30 +317,31 @@ document.getElementById('regModal').addEventListener('click', function(e) {
 
 /* 날짜 유효성 검사 로직 */
 function validateDate() {
-	const start = document.querySelector('#start_date').value;
-	const end = document.querySelector('#end_date').value;
-	//(start && end) start와 end가 존재할 때 start의 값이 end보다 크면
-	if (start && end && start > end) {
-		alert("시작 날짜는 종료 날짜보다 이후일 수 없습니다.");
-		document.querySelector('#end_date').value = ""; // 초기화
-	}
+    const start = document.querySelector('input[name="start_date"]').value;
+    const end = document.querySelector('input[name="end_date"]').value;
+    
+    if (start && end && start > end) {
+        alert("시작 날짜는 종료 날짜보다 이후일 수 없습니다.");
+        document.querySelector('input[name="end_date"]').value = ""; // 초기화
+    }
 }
 
-function formatDate(timestamp) {
+// date format
+// date format
+function formatDate(value) {
+    if (!value) return "--";
 
-    if (!timestamp) return "-- : --";
+    // 서버에서 넘어오는 값이 타임스탬프(숫자)인지 날짜 문자열인지 판별
+    const date = new Date(isNaN(Number(value)) ? value : Number(value));
 
-    const date = new Date(Number(timestamp));
+    if (isNaN(date.getTime())) return "--";
 
-    if (isNaN(date.getTime())) return "-- : --";
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
 
-    return date.toLocaleString('ko-KR', {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit'
-    });
+    // JSP 파일 내부이므로 $ 앞에 반드시 백슬래시(\)를 붙여야 에러가 나지 않습니다.
+    return `\${year}-\${month}-\${day}`;
 }
 
 //모달//////////////////////////////////////////////
@@ -429,11 +446,6 @@ const itemSearch = document.querySelector("#itemSearch");
 				alert("등록에 실패했습니다.");
 			}
 			
-			const select_reset = document.querySelector(".select-reset");
-			select_reset.addEventListener('click', ()=>{
-				location.reload();
-			})
-
 
 </script>
 </body>
