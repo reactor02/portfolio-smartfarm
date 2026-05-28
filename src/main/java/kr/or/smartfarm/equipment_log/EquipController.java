@@ -93,9 +93,10 @@ public class EquipController {
 	}
 	
 // insert 
-    @RequestMapping(value = "/insertEquip", method = RequestMethod.POST)
-    public String create(EquipDTO equipDTO, Model model) {
+	@RequestMapping("/insertEquip")
+    public String insertEquip(EquipDTO equipDTO, Model model) {
+    	System.out.println("/INSERT DTO CHECK : " + equipDTO);
         equipService.insertEquip(equipDTO);
-        return "redirect:content/equipSelect.tiles";
+        return "redirect:equip";
     }
 }

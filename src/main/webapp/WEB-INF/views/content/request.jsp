@@ -29,7 +29,7 @@ response.setContentType("text/html; charset=utf-8");
 				<div class="sch-wrap">
 					<!-- 1행: 기간 -->
 					<div class="sch-row-1">
-						<span class="label">▶ 주문일자</span>
+						<span class="label">▶ 납기일자</span>
 						<input type="date" id="sDate" class="form-control" onchange="validateDate()">
 						<span class="date-sep">~</span>
 						<input type="date" id="eDate" class="form-control" onchange="validateDate()">
@@ -66,7 +66,6 @@ response.setContentType("text/html; charset=utf-8");
 							<tr>
 								<th class="col-no">번호</th>
 								<th>요청번호</th>
-								<th>주문일</th>
 								<th>납기일</th>
 								<th>거래처명</th>
 								<th>품목명</th>
@@ -82,7 +81,6 @@ response.setContentType("text/html; charset=utf-8");
 										<tr>
 											<td class="num-cell">${vs.count}</td>
 											<td><a href="/requestDetail/${item.REQUEST_ID}" class="link-id">${item.REQUEST_ID}</a></td>
-											<td>${item.REQUEST_DATE}</td>
 											<td>${item.DUE_DATE}</td>
 											<td>${item.VENDER_NAME}</td>
 											<td>${item.NAME}</td>
@@ -102,7 +100,7 @@ response.setContentType("text/html; charset=utf-8");
 									</c:forEach>
 								</c:when>
 								<c:otherwise>
-									<tr><td colspan="9" class="empty-cell">등록된 출하 요청이 없습니다.</td></tr>
+									<tr><td colspan="8" class="empty-cell">등록된 출하 요청이 없습니다.</td></tr>
 								</c:otherwise>
 							</c:choose>
 						</tbody>
@@ -225,7 +223,7 @@ response.setContentType("text/html; charset=utf-8");
 				.then(data => {
 					const tbody = document.getElementById('request-body');
 					if (!data.searchResult || data.searchResult.length === 0) {
-						tbody.innerHTML = "<tr><td colspan='9' class='empty-cell'>조회된 결과가 없습니다.</td></tr>";
+						tbody.innerHTML = "<tr><td colspan='8' class='empty-cell'>조회된 결과가 없습니다.</td></tr>";
 						renderPagination(data.pageInfo);
 						return;
 					}
@@ -241,7 +239,6 @@ response.setContentType("text/html; charset=utf-8");
 							html += '<tr>'
 								+ '<td class="num-cell">' + (i + 1 + (data.pageInfo.pageNum - 1) * data.pageInfo.pageSize) + '</td>'
 								+ '<td><a href="/requestDetail/' + (item.REQUEST_ID || '') + '" class="link-id">' + (item.REQUEST_ID || '') + '</a></td>'
-								+ '<td>' + (item.REQUEST_DATE  || '') + '</td>'
 								+ '<td>' + (item.DUE_DATE      || '') + '</td>'
 								+ '<td>' + (item.VENDER_NAME   || '') + '</td>'
 								+ '<td>' + (item.NAME          || '') + '</td>'

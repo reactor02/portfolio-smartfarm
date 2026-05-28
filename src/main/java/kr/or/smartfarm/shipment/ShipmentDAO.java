@@ -19,4 +19,8 @@ public interface ShipmentDAO {
     public int updateRequestStatusToComplete(String shipmentRequestNum);
     public int cancelShipmentStatus(int shipmentNum);
     public int updateRequestStatusToRollback(String shipmentRequestNum);
+    public List selectByRequestNum(String shipmentRequestNum);
+    public List loadItems();
+    public List loadPendingRequests();
+    public List loadEmpList();
 }

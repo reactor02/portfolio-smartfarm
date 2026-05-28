@@ -182,7 +182,7 @@ public class CodeManageController {
 	
 	
 	//paging
-	@RequestMapping("/ssssspaging")
+	@RequestMapping("/pagingsss")
 	public String goStock(@RequestParam(value = "page", defaultValue = "1")int page,@RequestParam(value="msg", required=false)String msg,Model model) {
 		List result = null;
 		 

@@ -23,8 +23,12 @@ body { font-family:'Malgun Gothic',sans-serif; color:var(--txt); background:var(
 .section-box .section-title { margin-top:0; }
 
 .lot-tree { list-style:none; padding-left:0; }
-.lot-tree li { padding:4px 0; font-size:13px; color:#555; }
-.lot-tree ul { list-style:none; padding-left:20px; border-left:2px solid var(--border-cl); margin-left:8px; }
+.lot-tree > li { padding:4px 0; font-size:14px; font-weight:bold; color:var(--m-cl); }
+.lot-tree ul { list-style:none; padding-left:20px; border-left:2px solid var(--border-cl); margin-left:8px; margin-top:6px; }
+.lot-tree .tree-group-label { font-size:12px; font-weight:bold; color:#888; padding:6px 0 2px 0; }
+.lot-tree .tree-child { font-size:13px; color:#444; padding:3px 0; }
+.lot-tree .tree-item-name { color:#888; font-weight:normal; }
+.lot-tree .tree-empty { font-size:13px; color:#bbb; font-style:italic; padding:2px 0; }
 
 .data-table { width:100%; border-collapse:collapse; margin-top:0.5rem; }
 .data-table th { background:var(--bg); border-bottom:2px solid var(--s-cl); padding:10px; text-align:center; font-size:13px; font-weight:bold; }

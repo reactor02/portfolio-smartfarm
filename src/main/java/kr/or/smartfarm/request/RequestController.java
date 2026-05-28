@@ -58,6 +58,7 @@ public class RequestController {
             String shipmentRequestNum = (String) detail.get("SHIPMENT_REQUEST_NUM");
             int hasShipment = RequestService.hasShipment(shipmentRequestNum);
             model.addAttribute("hasShipment", hasShipment);
+            model.addAttribute("linkedShipments", shipmentService.selectByRequestNum(shipmentRequestNum));
         }
 
         return "content/requestDetail.tiles";
@@ -122,7 +123,23 @@ public class RequestController {
         insertMap.put("request_qty",  requestQty);
 
         RequestService.insertRequest(insertMap);
-        return "redirect:/request";
+        // selectKey로 생성된 shipment_request_num으로 request_id 계산 후 상세 이동
+        String shipmentRequestNum = (String) insertMap.get("shipment_request_num");
+        String newRequestId = shipmentRequestNum.replace("SREQ", "REQ");
+        return "redirect:/requestDetail/" + newRequestId;
+    }
+
+    @PostMapping("/cancelRequest")
+    public String cancelRequest(
+            @RequestParam("shipmentRequestNum") String shipmentRequestNum,
+            @RequestParam("requestId")          String requestId) {
+
+        Map cancelMap = new HashMap();
+        cancelMap.put("shipment_request_num", shipmentRequestNum);
+        cancelMap.put("status_name", "취소");
+        RequestService.updateRequestStatus(cancelMap);
+
+        return "redirect:/requestDetail/" + requestId;
     }
 
     @PostMapping("/dispatchRequest")
@@ -146,7 +163,9 @@ public class RequestController {
         dispatchMap.put("emp_num",   empNum);
 
         shipmentService.dispatchShipment(dispatchMap);
-
-        return "redirect:/requestDetail/" + requestId;
+        // selectKey로 생성된 shipment_num으로 shipment_id 계산 후 출하 상세 이동
+        int shipmentNum = (Integer) dispatchMap.get("shipment_num");
+        String shipmentId = "SHIP" + String.format("%04d", shipmentNum);
+        return "redirect:/shipmentDetail/" + shipmentId;
     }
 }

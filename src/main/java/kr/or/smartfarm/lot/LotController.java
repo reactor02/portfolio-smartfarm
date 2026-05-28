@@ -2,6 +2,7 @@ package kr.or.smartfarm.lot;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -48,9 +49,10 @@ public class LotController {
             );
             return null;
         }
-        model.addAttribute("lotDTO",     lotDTO);
-        model.addAttribute("materials",  lotService.getMaterialsByChildLot(lotDTO.getLot_num()));
-        model.addAttribute("usedIn",     lotService.getParentsByLot(lotDTO.getLot_num()));
+        model.addAttribute("lotDTO",             lotDTO);
+        model.addAttribute("materials",          lotService.getMaterialsByChildLot(lotDTO.getLot_num()));
+        model.addAttribute("usedIn",             lotService.getParentsByLot(lotDTO.getLot_num()));
+        model.addAttribute("recursiveMaterials", lotService.getRecursiveMaterials(lotDTO.getLot_num()));
         return "content/lotDetail.tiles";
     }
 }

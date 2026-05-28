@@ -36,7 +36,37 @@ public class ShipmentController {
         PageInfo<Map<String, Object>> pageInfo = new PageInfo<Map<String, Object>>(result);
         model.addAttribute("pageInfo", pageInfo);
 
+        model.addAttribute("itemList", shipmentService.loadItems());
+        model.addAttribute("empList",  shipmentService.loadEmpList());
+
         return "content/shipment.tiles";
+    }
+
+    @RequestMapping("/loadPendingRequests")
+    @ResponseBody
+    public List loadPendingRequests() {
+        return shipmentService.loadPendingRequests();
+    }
+
+    @PostMapping("/insertShipment")
+    public String insertShipment(
+            @RequestParam("shipmentRequestNum") String shipmentRequestNum,
+            @RequestParam("itemNum")            int    itemNum,
+            @RequestParam("empNum")             int    empNum,
+            @RequestParam("shipmentDate")       String shipmentDate,
+            @RequestParam("planQty")            int    planQty) {
+
+        Map map = new HashMap();
+        map.put("shipment_request_num", shipmentRequestNum);
+        map.put("item_num",      itemNum);
+        map.put("plan_qty",      planQty);
+        map.put("emp_num",       empNum);
+        map.put("shipment_date", shipmentDate);
+
+        shipmentService.dispatchShipment(map);
+        int shipmentNum = (Integer) map.get("shipment_num");
+        String shipmentId = "SHIP" + String.format("%04d", shipmentNum);
+        return "redirect:/shipmentDetail/" + shipmentId;
     }
 
     @RequestMapping("/shipmentDetail/{shipmentId}")
@@ -63,7 +93,8 @@ public class ShipmentController {
             @RequestParam(value = "status", defaultValue = "") String status,
             @RequestParam(value = "keyword", defaultValue = "") String keyword,
             @RequestParam(value = "sDate", defaultValue = "") String sDate,
-            @RequestParam(value = "eDate", defaultValue = "") String eDate) {
+            @RequestParam(value = "eDate", defaultValue = "") String eDate,
+            @RequestParam(value = "item_num", defaultValue = "0") int itemNum) {
 
         Map result = new HashMap();
         try {
@@ -73,6 +104,7 @@ public class ShipmentController {
             searchMap.put("keyword", keyword);
             searchMap.put("sDate", sDate);
             searchMap.put("eDate", eDate);
+            searchMap.put("item_num", itemNum);
 
             List searchResult = shipmentService.searchShipment(searchMap);
             result.put("searchResult", searchResult);
