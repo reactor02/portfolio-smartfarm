@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.smartfarm.codemanage.CodeManageDAO">
+
+	<select id="getCodeDetail"
+		resultType="kr.or.smartfarm.codemanage.CodeManageDTO">
+		SELECT *
+		FROM emp e left outer join dept d
+		on e.dept_num =
+		d.dept_num
+		where emp_num = #{ emp_num }
+	</select>
+
+	<select id="selectd"
+		resultType="kr.or.smartfarm.codemanage.CodeManageDTO">
+        SELECT distinct type
+		FROM item	
+		</select>
+
+	<select id="selectm"
+		resultType="kr.or.smartfarm.codemanage.CodeManageDTO">
+		SELECT emp_num, ename
+		FROM emp 
+		WHERE "E_LEVEL" > 1
+		and dept_num = 2
+	</select>
+
+	
+
+
+	<update id="CodeUpdate"
+		parameterType="kr.or.smartfarm.codemanage.CodeManageDTO">
+		<!-- 인사관리자용: 사원 정보 수정 (권한이 담겨왔을 때만 권한도 함께 수정) -->
+		UPDATE emp
+		<set>
+			<!-- 부서는 무조건 수정 -->
+			dept_num = #{dept_num}
+
+			<!-- 💡 권한 정보(e_level)가 넘어왔을 때만 SET 절에 추가하여 수정함 -->
+			<if test="e_level != null and e_level != ''">
+				e_level = #{e_level}
+			</if>
+		</set>
+		WHERE emp_num = #{emp_num}
+	</update>
+
+	<update id="CodeLevelUpdate"
+		parameterType="kr.or.smartfarm.codemanage.CodeManageDTO">
+		<!-- 사장님용: 부서, 권한을 선택적으로 모두 수정 가능 -->
+		UPDATE emp
+		<set>
+			<if test="e_level != null and e_level != ''">
+				e_level = #{e_level},
+			</if>
+		</set>
+		WHERE emp_num = #{emp_num}
+	</update>
+
+	<update id="CodeRetire" parameterType="kr.or.smartfarm.codemanage.CodeManageDTO">
+		UPDATE item
+		SET item_status = 'N'
+		WHERE TRIM(item_num) = TRIM(#{item_num})
+	</update>
+
+	<insert id="CodeInsert"
+		parameterType="kr.or.smartfarm.codemanage.CodeManageDTO">
+		INSERT INTO emp (
+		EMP_NUM,          <!-- 사원번호 컬럼 -->
+		ENAME,            <!-- 이름 -->
+		PW,               <!-- 비밀번호 (암호화된 문자열) -->
+		E_LEVEL,          <!-- 권한 레벨 -->
+		TEL,              <!-- 연락처 -->
+		HIRE_DATE,        <!-- 입사일 (현재시간) -->
+		STATUS,           <!-- 재직상태 ('Y') -->
+		SECRET,           <!-- 개인정보 -->
+		DEPT_NUM          <!-- 부서번호 -->
+		) VALUES (
+		EMP_SEQ.NEXTVAL,  <!-- 💡 확인하신 시퀀스로 자동 번호 생성! -->
+		#{ename},
+		#{pw},
+		#{e_level},
+		#{tel},
+		SYSDATE,          <!-- 오라클 현재 날짜 주입 -->
+		'Y',              <!-- 기본값 정상 재직('Y') 주입 -->
+		#{secret},
+		#{dept_num}
+		)
+	</insert>
+
+	<select id="selectl"
+		resultType="kr.or.smartfarm.codemanage.CodeManageDTO">
+		SELECT distinct unit
+		FROM item
+	</select>
+
+
+	<select id="getCodes"
+		resultType="kr.or.smartfarm.codemanage.CodeManageDTO">
+		SELECT *
+		FROM item 
+		order by item_num desc
+	</select>
+
+	<select id="CodeSearch" resultType="kr.or.smartfarm.codemanage.CodeManageDTO">
+    SELECT *
+    FROM item
+    <where>
+        <!-- 1. 타입(type) 일치 조건 -->
+        <if test="type != null and type != ''">
+            AND type = #{type}
+        </if>
+
+        <!-- 2. 단위(unit) 일치 조건 -->
+        <if test="unit != null and unit != ''">
+            AND unit = #{unit}
+        </if>
+
+        <!-- 3. 제품명 또는 코드명 키워드 포함 조건 (LIKE 검색) -->
+        <if test="keyword != null and keyword != ''">
+            AND (
+                code LIKE '%' || #{keyword} || '%'
+                OR name LIKE '%' || #{keyword} || '%'
+            )
+        </if>
+    </where>
+    <!-- 오타 교정: itme_num -> item_num -->
+    ORDER BY item_num DESC
+</select>
+
+
+	<select id="searchpw"
+		resultType="kr.or.smartfarm.changepw.ChangepwDTO">
+		SELECT emp_num, secret
+		FROM emp
+		where emp_num = #{ emp_num }
+		and secret = #{ secret }
+	</select>
+
+
+	<update id="changepw">
+		update emp
+		set pw = #{ pw }
+		where emp_num = #{ emp_num
+		}
+	</update>
+
+
+
+
+
+
+</mapper>
+
+
+
+

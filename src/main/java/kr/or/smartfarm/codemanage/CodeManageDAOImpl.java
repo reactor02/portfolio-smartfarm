@@ -13,7 +13,7 @@ public class CodeManageDAOImpl implements CodeManageDAO {
 	private SqlSession sqlSession;
 
 	// 매퍼 XML의 namespace를 상수로 지정해두면 편리합니다.
-	private static final String NAMESPACE = "kr.or.smartfarm.login.LoginDAO.";
+	private static final String NAMESPACE = "kr.or.smartfarm.codemanage.CodeManageDAO.";
 
 	@Override
 	public List<CodeManageDTO> getCodeManage() {
@@ -28,22 +28,6 @@ public class CodeManageDAOImpl implements CodeManageDAO {
 		// TODO Auto-generated method stub
 		
 		List<CodeManageDTO> result = sqlSession.selectList(NAMESPACE + "CodeSearch", searchDTO);
-		
-		return result;
-	}
-	@Override
-	public List<CodeManageDTO> selectd() {
-		// TODO Auto-generated method stub
-		
-		List<CodeManageDTO> result = sqlSession.selectList(NAMESPACE + "selectd");
-		
-		return result;
-	}
-	@Override
-	public List<CodeManageDTO> selectm() {
-		// TODO Auto-generated method stub
-		
-		List<CodeManageDTO> result = sqlSession.selectList(NAMESPACE + "selectm");
 		
 		return result;
 	}
@@ -64,10 +48,10 @@ public class CodeManageDAOImpl implements CodeManageDAO {
 		return result;
 	}
 	@Override
-	public int CodeRetire(CodeManageDTO CodeManageDTO) {
+	public int CodeRetire(int itemNum) {
 		// TODO Auto-generated method stub
 		
-		int result = sqlSession.insert(NAMESPACE + "CodeRetire", CodeManageDTO);
+		int result = sqlSession.insert(NAMESPACE + "CodeRetire", itemNum);
 		
 		return result;
 	}
@@ -76,14 +60,6 @@ public class CodeManageDAOImpl implements CodeManageDAO {
 		// TODO Auto-generated method stub
 		
 		int result = sqlSession.insert(NAMESPACE + "CodeLevelUpdate", CodeManageDTO);
-		
-		return result;
-	}
-	@Override
-	public List<CodeManageDTO> selectl() {
-		// TODO Auto-generated method stub
-		
-		List<CodeManageDTO> result = sqlSession.selectList(NAMESPACE + "selectl");
 		
 		return result;
 	}
@@ -104,5 +80,34 @@ public class CodeManageDAOImpl implements CodeManageDAO {
 
 		return result;
 	}
+	
+	
+	
+	
+	
 
+	@Override
+	public List<CodeManageDTO> selectl() {
+		// TODO Auto-generated method stub
+		
+		List<CodeManageDTO> result = sqlSession.selectList(NAMESPACE + "selectl");
+		
+		return result;
+	}
+	@Override
+	public List<CodeManageDTO> selectd() {
+		// TODO Auto-generated method stub
+		
+		List<CodeManageDTO> result = sqlSession.selectList(NAMESPACE + "selectd");
+		
+		return result;
+	}
+	@Override
+	public List<CodeManageDTO> selectm() {
+		// TODO Auto-generated method stub
+		
+		List<CodeManageDTO> result = sqlSession.selectList(NAMESPACE + "selectm");
+		
+		return result;
+	}
 }
