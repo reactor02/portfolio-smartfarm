@@ -64,30 +64,38 @@
 		WHERE TRIM(item_num) = TRIM(#{item_num})
 	</update>
 
-	<insert id="CodeInsert"
-		parameterType="kr.or.smartfarm.codemanage.CodeManageDTO">
-		INSERT INTO emp (
-		EMP_NUM,          <!-- 사원번호 컬럼 -->
-		ENAME,            <!-- 이름 -->
-		PW,               <!-- 비밀번호 (암호화된 문자열) -->
-		E_LEVEL,          <!-- 권한 레벨 -->
-		TEL,              <!-- 연락처 -->
-		HIRE_DATE,        <!-- 입사일 (현재시간) -->
-		STATUS,           <!-- 재직상태 ('Y') -->
-		SECRET,           <!-- 개인정보 -->
-		DEPT_NUM          <!-- 부서번호 -->
-		) VALUES (
-		EMP_SEQ.NEXTVAL,  <!-- 💡 확인하신 시퀀스로 자동 번호 생성! -->
-		#{ename},
-		#{pw},
-		#{e_level},
-		#{tel},
-		SYSDATE,          <!-- 오라클 현재 날짜 주입 -->
-		'Y',              <!-- 기본값 정상 재직('Y') 주입 -->
-		#{secret},
-		#{dept_num}
-		)
-	</insert>
+	<insert id="CodeInsert" parameterType="kr.or.smartfarm.codemanage.CodeManageDTO">
+    INSERT INTO item (
+        ITEM_NUM,     <!-- 1. 자동 증가 (시퀀스) -->
+        CODE,         <!-- 2. 자동 생성 (규칙 적용) -->
+        NAME,         <!-- 3. 제품명 (화면 입력) -->
+        TYPE,         <!-- 4. 유형 (화면 선택) -->
+        UNIT,         <!-- 5. 단위 (화면 선택) -->
+        PRICE,        <!-- 6. 가격 (화면 입력) -->
+        ITEM_STATUS,  <!-- 7. 자동 주입 (기본값 'A') -->
+        EMP_NUM,      <!-- 8. 담당자 (화면 선택) -->
+        SAFE          <!-- 9. 안전재고 (화면 입력) -->
+    ) VALUES (
+        <!-- 1. ITEM_NUM: 시퀀스 자동 증가 -->
+        item_seq.NEXTVAL,
+        
+        <!-- 2. CODE: 시퀀스 번호를 결합하여 'POT061' 형태로 자동 생성 (오라클 규격) -->
+        'POT' || LPAD(item_seq.CURRVAL, 3, '0'),
+        
+        <!-- 3 ~ 6. 화면 모달창 입력값 바인딩 -->
+        #{name},
+        #{type},
+        #{unit},
+        #{price},
+        
+        <!-- 7. ITEM_STATUS: 등록 시 무조건 활성('A') 상태로 자동 주입 -->
+        'A',
+        
+        <!-- 8 ~ 9. 화면 모달창 입력값 바인딩 -->
+        #{emp_num},
+        #{safe}
+    )
+</insert>
 
 	<select id="selectl"
 		resultType="kr.or.smartfarm.codemanage.CodeManageDTO">
