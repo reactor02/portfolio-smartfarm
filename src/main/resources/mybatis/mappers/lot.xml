@@ -41,7 +41,7 @@
                           OR i.name     LIKE '%' || #{keyword} || '%')
                     </if>
                 </where>
-                ORDER BY l.lot_num DESC
+                ORDER BY l.lot_date DESC NULLS LAST
             ) inner_q
             WHERE ROWNUM &lt;= #{endRow}
         )
@@ -126,30 +126,51 @@
         VALUES (LOT_RELATION_SEQ.NEXTVAL, #{parent_lot_num}, #{child_lot_num})
     </insert>
 
-    <!-- lotDetail: 이 LOT을 만들기 위해 소모된 재료 LOT 목록 -->
+    <!-- lotDetail: 이 LOT 생산에 직접 소모된 재료 LOT 목록 + BOM 기반 소모 수량 (소모자재 테이블용) -->
     <select id="getMaterialsByChildLot" parameterType="int" resultType="LotRelationDTO">
-        SELECT lr.lot_parent AS parent_lot_num,
-               lr.lot_child  AS child_lot_num,
-               l.lot_code    AS parent_lot_code,
-               i.name        AS item_name,
-               l.lot_date
-               
+        SELECT lr.lot_parent                        AS parent_lot_num,
+               lr.lot_child                         AS child_lot_num,
+               l.lot_code                           AS child_lot_code,
+               i.name                               AS item_name,
+               l.lot_date,
+               b.required_qty * parent_l.init_qty   AS required_qty
         FROM lot_relation lr
-        JOIN lot  l ON lr.lot_parent = l.lot_num
-        JOIN item i ON l.item_num = i.item_num
-        WHERE lr.lot_child = #{lot_num}
+        JOIN lot  l        ON lr.lot_child  = l.lot_num        -- 소모재료 LOT 정보
+        JOIN item i        ON l.item_num    = i.item_num
+        JOIN lot  parent_l ON lr.lot_parent = parent_l.lot_num -- 생산LOT (init_qty용)
+        LEFT JOIN bom b    ON b.item_num    = parent_l.item_num
+                          AND b.item_num2   = l.item_num
+        WHERE lr.lot_parent = #{lot_num}   -- lot_parent = 생산된 LOT
     </select>
 
-    <!-- lotDetail: 이 LOT이 투입된 생산 LOT 목록 (공정 이력) -->
+    <!-- lotDetail: 이 LOT이 소모재료로 투입된 상위 생산 LOT 목록 (상위투입 조회) -->
     <select id="getParentsByLot" parameterType="int" resultType="LotRelationDTO">
         SELECT lr.lot_parent AS parent_lot_num,
                lr.lot_child  AS child_lot_num,
-               l.lot_code    AS child_lot_code,
+               l.lot_code    AS parent_lot_code,   -- 생산된 LOT의 코드
                i.name        AS item_name
         FROM lot_relation lr
-        JOIN lot  l ON lr.lot_child = l.lot_num
-        JOIN item i ON l.item_num = i.item_num
-        WHERE lr.lot_parent = #{lot_num}
+        JOIN lot  l ON lr.lot_parent = l.lot_num   -- 생산된 LOT 정보
+        JOIN item i ON l.item_num    = i.item_num
+        WHERE lr.lot_child = #{lot_num}   -- lot_child = 소모재료 LOT
+    </select>
+
+    <!-- lotDetail: CONNECT BY 재귀 — 공정이력 다단계 트리 (hashMap 반환, depth 포함) -->
+    <select id="getRecursiveMaterials" parameterType="int" resultType="hashMap">
+        SELECT LEVEL                               AS depth,
+               lr.lot_parent                       AS parent_lot_num,
+               lr.lot_child                        AS child_lot_num,
+               l.lot_code                          AS child_lot_code,
+               i.name                              AS item_name,
+               b.required_qty * parent_l.init_qty  AS required_qty
+        FROM lot_relation lr
+        JOIN lot  l        ON lr.lot_child  = l.lot_num
+        JOIN item i        ON l.item_num    = i.item_num
+        JOIN lot  parent_l ON lr.lot_parent = parent_l.lot_num
+        LEFT JOIN bom b    ON b.item_num    = parent_l.item_num
+                          AND b.item_num2   = l.item_num
+        START WITH lr.lot_parent = #{lot_num}
+        CONNECT BY PRIOR lr.lot_child = lr.lot_parent
     </select>
 
 </mapper>

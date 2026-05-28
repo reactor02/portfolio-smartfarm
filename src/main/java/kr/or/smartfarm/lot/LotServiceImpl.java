@@ -1,6 +1,7 @@
 package kr.or.smartfarm.lot;
 
 import java.util.List;
+import java.util.Map;
 
 import kr.or.smartfarm.prod.SelectOptionDTO;
 
@@ -57,5 +58,10 @@ public class LotServiceImpl implements LotService {
     @Override
     public List<LotRelationDTO> getParentsByLot(int lot_num) {
         return relationDao.getParentsByLot(lot_num);
+    }
+
+    @Override
+    public List<Map<String, Object>> getRecursiveMaterials(int lot_num) {
+        return relationDao.getRecursiveMaterials(lot_num);
     }
 }

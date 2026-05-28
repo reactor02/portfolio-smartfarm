@@ -14,4 +14,5 @@ public class LotRelationDTO {
     private String item_name;
     private Date   lot_date;       // 소모일 (parent lot 생성일 기준)
     private String lot_status;
+    private int    required_qty;   // BOM.required_qty × 생산LOT.init_qty (소모 계획 수량)
 }
