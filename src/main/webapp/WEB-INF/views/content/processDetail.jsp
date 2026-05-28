@@ -17,7 +17,6 @@ response.setContentType("text/html; charset=utf-8");
 <link rel="stylesheet" href="/resources/css/paging.css">
 <link rel="stylesheet" href="/resources/css/modal.css">
 <style>
-/* ================= 기본 초기화 및 공통 레이아웃 (기존 동일) ================= */
 * {
 	box-sizing: border-box;
 	margin: 0;
@@ -43,7 +42,6 @@ response.setContentType("text/html; charset=utf-8");
 	min-width: 0;
 }
 
-/* ================= 1. 상단 타이틀 & 목록 버튼 ================= */
 .hdr {
 	display: flex;
 	justify-content: space-between;
@@ -81,7 +79,6 @@ response.setContentType("text/html; charset=utf-8");
 	background-color: #B7E4C7;
 }
 
-/* ================= 2. 상세 페이지 전용 섹션 스타일 ================= */
 .detail-section {
 	background-color: #fff;
 	border: 1px solid #bbb;
@@ -101,20 +98,13 @@ response.setContentType("text/html; charset=utf-8");
 	display: inline-block;
 }
 
-/* 2-1. 상단 요약 정보 (그리드 레이아웃) */
-.info-grid-top {
+/* 수정된 그리드 레이아웃: 한 줄에 3개씩, 균등한 간격으로 배치 */
+.info-grid {
     display: grid;
-    grid-template-columns: repeat(5, 1fr); /* 5개 등분 */
-    gap: 15px;
-    margin-bottom: 20px; /* 하단 행과 간격 */
-    padding-bottom: 20px;
-    border-bottom: 1px solid #eee; /* 구분선 (선택사항) */
-}
-
-.info-grid-sub {
-    display: grid;
-    grid-template-columns: repeat(2, 200px); /* 2개 항목을 왼쪽에 배치 */
-    gap: 40px; /* 두 항목 사이 간격 */
+    grid-template-columns: repeat(3, 1fr); /* 3개의 열을 동일한 비율로 분할 */
+    row-gap: 25px; /* 위아래 줄 간격 */
+    column-gap: 20px; /* 좌우 항목 간격 */
+    width: 100%;
 }
 
 .info-item {
@@ -135,79 +125,215 @@ response.setContentType("text/html; charset=utf-8");
 	font-weight: bold;
 }
 
-/* 2-2. 하단 상세 정보 (2단 레이아웃) */
-.info-grid-bottom {
-	display: grid;
-	grid-template-columns: 1fr 1fr;
-	row-gap: 15px;
-	column-gap: 30px;
+.desc-container {
+	display: flex;
+	gap: 20px;
+	height: 350px;
 }
 
-.info-row {
+.desc-image-area {
+	flex: 1;
+	border: 1px solid #ccc;
+	border-radius: 8px;
 	display: flex;
 	align-items: center;
-	font-size: 0.95rem;
+	justify-content: center;
+	overflow: hidden;
+	background-color: #f9f9f9;
 }
 
-.info-row .label {
-	width: 120px;
+.desc-image-area img {
+	width: 100%;
+	height: 100%;
+	object-fit: contain;
+}
+
+.desc-content-area {
+	flex: 1;
+	border: 1px solid #ccc;
+	border-radius: 8px;
+	padding: 15px;
+	overflow-y: auto;
+	font-size: 0.95rem;
+	line-height: 1.6;
+	color: #333;
+}
+
+/* ================= 5. 모달 ================= */
+.modal-overlay {
+	display: none;
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background: rgba(0, 0, 0, 0.5);
+	z-index: 999;
+	justify-content: center;
+	align-items: center;
+}
+
+.modal-content {
+	background: #fff;
+	width: 800px;
+	border-radius: 10px;
+	padding: 30px;
+	box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.modal-content h2 {
+	margin-bottom: 20px;
+	font-size: 1.5rem;
+	color: #2D6A4F;
+	border-bottom: 2px solid #2D6A4F;
+	padding-bottom: 10px;
+}
+
+.modal-section-title {
+	font-size: 1.1rem;
 	font-weight: bold;
+	color: #2D6A4F;
+	margin: 20px 0 10px 0;
+}
+
+.modal-form-grid {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 15px;
+	margin-bottom: 20px;
+}
+
+.modal-form-grid input {
+	padding: 8px;
+	border: 1px solid #ccc;
+	border-radius: 4px;
+	width: 100%;
+}
+
+.modal-input-qty {
+	width: 80px;
+	padding: 5px;
+	text-align: right;
+}
+
+.modal-btns {
+	display: flex;
+	justify-content: center;
+	gap: 10px;
+	margin-top: 30px;
+}
+
+.modal-btns button {
+	padding: 10px 30px;
+	font-size: 1.1rem;
+	font-weight: bold;
+	border-radius: 6px;
+	cursor: pointer;
+	border: 1px solid #999;
+}
+
+.btn-save {
+	background-color: #2D6A4F;
+	color: #fff;
+	border-color: #2D6A4F;
+}
+
+.btn-cancel {
+	background-color: #fff;
 	color: #555;
 }
 
-.info-row .value {
-	color: #222;
-	flex: 1;
+.btn-save:hover {
+	background-color: #1b4332;
 }
 
-.value a {
+.btn-cancel:hover {
+	background-color: #f1f1f1;
+}
+
+.radio-group {
+	display: flex;
+	gap: 20px;
+	margin-top: 10px;
+}
+
+.radio-label {
+	display: flex;
+	align-items: center;
+	cursor: pointer;
+	font-size: 0.95rem;
+	color: #222;
+}
+
+.modal-form-grid input[type="radio"] {
+	appearance: none;
+	-webkit-appearance: none;
+	width: 20px;
+	height: 20px;
+	border: 2px solid #ccc;
+	border-radius: 50%;
+	margin: 0;
+	margin-right: 8px;
+	padding: 0;
+	transition: all 0.2s;
+	position: relative;
+	cursor: pointer;
+}
+
+.modal-form-grid input[type="radio"]:checked {
+	border-color: #2D6A4F;
+}
+
+.modal-form-grid input[type="radio"]:checked::after {
+	content: '';
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	width: 10px;
+	height: 10px;
+	background-color: #2D6A4F;
+	border-radius: 50%;
+}
+
+.modal-form-grid .status-container {
+	grid-column: 1/-1;
+}
+
+.btn-action1 {
+	background-color: #fff;
 	color: #2D6A4F;
-	text-decoration: underline;
+	padding: 10px 24px;
+	border-radius: 6px;
+	border: 1px solid #2D6A4F;
 	font-weight: bold;
+	font-size: 1.05rem;
+	cursor: pointer;
+	box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 2px 3px
+		rgba(0, 0, 0, 0.2);
+	transition: all 0.2s ease-in-out;
+	text-decoration: none;
+	display: inline-block;
+	margin-left: 475px;
 }
 
-/* ================= 3. 데이터 테이블 ================= */
-.tbl-box {
-	background: #fff;
-	border-radius: 8px;
-	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
-	/* 아래 테이블 영역 박스 사이즈 늘림 (데이터 5개 이상 넉넉히 보임) 및 스크롤 생성 */
-	height: 350px;
-	overflow-y: auto;
+.btn-action1:hover {
+	background-color: #B7E4C7;
+	color: #1b4332;
+	border-color: #B7E4C7;
 }
 
-.stk-tbl {
-	width: 100%;
-	border-collapse: collapse;
-	border-top: 2px solid #555;
-	border-bottom: 2px solid #555;
+.btn-del {
+	color: #dc3545;
+	border-color: #dc3545;
 }
 
-.stk-tbl th {
-	background-color: #e9ecef;
-	color: #222;
-	padding: 12px 10px;
-	border: 1px solid #ccc;
-	border-top: none;
-	font-weight: bold;
-	font-size: 0.95rem;
-	/* 스크롤 시 헤더 상단 고정 */
-	position: sticky;
-	top: 0;
-	z-index: 10;
+.btn-del:hover {
+	background-color: #dc3545;
+	color: #fff;
+	border-color: #dc3545;
 }
 
-.stk-tbl td {
-	padding: 12px 10px;
-	border: 1px solid #ccc;
-	text-align: center;
-	color: #333;
-	font-size: 0.95rem;
-}
-
-.stk-tbl tbody tr:hover {
-	background-color: #f1f8f5;
-}
 </style>
 </head>
 <body>
@@ -220,85 +346,49 @@ response.setContentType("text/html; charset=utf-8");
 				
 				<div class="hdr">
 					<h1>공정 관리 상세</h1>
+					<button type="button" class="btn-action1" onclick="openModal()">수정</button>
 					<a href="/process" class="btn-list">목록으로</a>
 				</div>
 
 				<div class="detail-section">
-    <div class="info-grid-top">
-        <div class="info-item">
-            <span class="info-label">공정 품목</span>
-            <span class="info-value">${resultList[0].CODE}</span>
-        </div>
-        <div class="info-item">
-            <span class="info-label">공정 제품 타입</span>
-            <span class="info-value">${resultList[0].NAME}</span>
-        </div>
-        <div class="info-item">
-            <span class="info-label">작업 순서</span>
-            <span class="info-value">${resultList[0].TYPE}</span>
-        </div>
-        <div class="info-item">
-            <span class="info-label">작업 인원</span>
-            <span class="info-value">${resultList[0].UNIT}</span>
-        </div>
-        <div class="info-item">
-            <span class="info-label">등록 일자</span>
-            <span class="info-value">${resultList[0].UNIT}</span>
-        </div>
-        <div class="info-item">
-            <span class="info-label">사용 여부</span>
-            <span class="info-value">${resultList[0].FACILITY_NAME}</span>
-        </div>
-    </div>
-    
-    <div class="info-grid-sub">
-        <div class="info-item">
-            <span class="info-label">총 수량</span>
-            <span class="info-value">${resultList[0].STOCK_QTY}</span>
-        </div>
-        <div class="info-item">
-            <span class="info-label">안전 재고량</span>
-            <span class="info-value">${resultList[0].SAFE}</span>
-        </div>
-    </div>
-</div>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <span class="info-label">공정 품목</span>
+                            <span class="info-value">${resultList[0].NAME}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">공정 제품 타입</span>
+                            <span class="info-value">${resultList[0].TYPE}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">작업 순서</span>
+                            <span class="info-value">${resultList[0].FLOW}</span>
+                        </div>
+                        
+                        <div class="info-item">
+                            <span class="info-label">작업 인원</span>
+                            <span class="info-value">${resultList[0].HEAD_COUNT}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">등록 일자</span>
+                            <span class="info-value">${resultList[0].CREATED_AT}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">사용 여부</span>
+                            <span class="info-value">${resultList[0].PROCESS_STATUS}</span>
+                        </div>
+                    </div>
+                </div>
 
 				<div class="detail-section">
-					<div class="section-title">상세 내용</div>
-					<div class="tbl-box">
-						<table class="stk-tbl">
-							<thead>
-								<tr>
-									<th style="width: 60px;">번호</th>
-									<th>LOT 코드</th>
-									<th>수량</th>
-									<th>입고일</th>
-									<th>유통기한</th>
-									<th>담당자</th>
-								</tr>
-							</thead>
-							<tbody>
-								<c:choose>
-									<c:when test="${not empty resultList}">
-										<c:forEach var="history" items="${resultList}" varStatus="vs">
-											<tr>
-												<td style="font-weight: bold; color: #555;">${vs.count}</td>
-												<td>${history.LOT_CODE}</td>
-												<td>${history.STOCK_QTY}</td>
-												<td><fmt:formatDate value="${history.LOT_DATE}" pattern="yyyy-MM-dd" /></td>
-												<td><fmt:formatDate value="${history.EXPIRY_DATE}" pattern="yyyy-MM-dd" /></td>
-												<td>하드코딩</td>
-											</tr>
-										</c:forEach>
-									</c:when>
-									<c:otherwise>
-										<tr>
-											<td colspan="6" style="padding: 30px; color: #888;">조회된 이력 데이터가 없습니다.</td>
-										</tr>
-									</c:otherwise>
-								</c:choose>
-							</tbody>
-						</table>
+					<div class="section-title">공정 설명</div>
+					<div class="desc-container">
+						<div class="desc-image-area">
+							<img src="/displayImage?fileName=${resultList[0].IMAGE}" alt="공정 이미지" onerror="this.style.display='none'">
+						</div>
+						<div class="desc-content-area">
+							${resultList[0].PROCESS_CONTENT}
+						</div>
 					</div>
 				</div>
 
@@ -308,5 +398,93 @@ response.setContentType("text/html; charset=utf-8");
 		<tiles:insertAttribute name="footer" ignore="true" />
 	</div>
 
+
+
+
+<!-- 		모달영역 -->
+
+<div id="bomEditModal" class="modal-overlay">
+		<div class="modal-content">
+			<h2>BOM 수정</h2>
+
+			<form id="editForm" action="/updateStatus" method="post">
+
+				<input type="hidden" name="bom_num" value="${resultList[0].BOM_NUM}">
+				<div class="modal-section-title">생산품 정보</div>
+				<div class="modal-form-grid">
+					<div>
+						<label class="info-label">품목명</label>
+						<div class="info-value">${resultList[0].NAME}</div>
+					</div>
+					<div>
+						<label class="info-label">기준 생산 수량</label>
+						<div class="info-value">${resultList[0].REQUIRED_QTY}</div>
+					</div>
+					<div class="status-container">
+						<label class="info-label">상태 변경</label>
+						<div class="radio-group">
+							<label class="radio-label"> <input type="radio"
+								name="bom_status" value="Y"
+								${resultList[0].BOM_STATUS == 'Y' ? 'checked' : ''}>사용
+							</label> <label class="radio-label"> <input type="radio"
+								name="bom_status" value="N"
+								${resultList[0].BOM_STATUS == 'N' ? 'checked' : ''}>미사용
+							</label>
+						</div>
+					</div>
+				</div>
+
+				<div class="modal-section-title"
+					style="border-top: 1px dashed #ccc; padding-top: 15px;">| 2.
+					소요 자재</div>
+				<div class="tbl-box" style="height: 250px;">
+					<table class="stk-tbl">
+						<thead>
+							<tr>
+								<th>자재명</th>
+								<th>자재코드</th>
+								<th>단위</th>
+								<th style="width: 100px;">소요수량</th>
+							</tr>
+						</thead>
+						<tbody>
+							<c:forEach var="mat" items="${resultList}" varStatus="vs">
+								<tr>
+									<td>${mat.CNAME}</td>
+									<td>${mat.CCODE}</td>
+									<td>${mat.CUNIT}</td>
+									<td>${mat.CHILD_QTY}</td>
+								</tr>
+							</c:forEach>
+						</tbody>
+					</table>
+				</div>
+
+				<div class="modal-btns">
+					<button type="button" class="btn-save" onclick="submitEdit()">수정</button>
+					<button type="button" class="btn-cancel" onclick="closeModal()">취소</button>
+				</div>
+			</form>
+		</div>
+	</div>
+	
+	
+	
+<script>
+function openModal() {
+	document.getElementById('bomEditModal').style.display = 'flex';
+}
+
+function closeModal() {
+	location.reload();
+}
+
+function submitEdit() {
+	if(confirm("수정된 내용을 저장하시겠습니까?")) {
+		document.getElementById('editForm').submit();
+	}
+}
+
+</script>
 </body>
 </html>
