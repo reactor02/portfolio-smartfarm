@@ -64,6 +64,22 @@ public class UserManageDAOImpl implements UserManageDAO {
 		return result;
 	}
 	@Override
+	public int userRetire(UserManageDTO userManageDTO) {
+		// TODO Auto-generated method stub
+		
+		int result = sqlSession.insert(NAMESPACE + "userRetire", userManageDTO);
+		
+		return result;
+	}
+	@Override
+	public int userLevelUpdate(UserManageDTO userManageDTO) {
+		// TODO Auto-generated method stub
+		
+		int result = sqlSession.insert(NAMESPACE + "userLevelUpdate", userManageDTO);
+		
+		return result;
+	}
+	@Override
 	public List<UserManageDTO> selectl() {
 		// TODO Auto-generated method stub
 		

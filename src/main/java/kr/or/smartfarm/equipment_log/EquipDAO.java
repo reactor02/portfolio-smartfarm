@@ -10,5 +10,6 @@ public interface EquipDAO {
 	public List selectItemEquip(); 
 	public List selectEmp(); 
 	public List searchEquip(Map map);
+	public int insertEquip(EquipDTO dto);
 	
 }

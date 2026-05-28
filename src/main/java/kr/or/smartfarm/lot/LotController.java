@@ -37,6 +37,7 @@ public class LotController {
                          HttpServletRequest request, HttpServletResponse response) throws IOException {
         LotDTO lotDTO = lotService.selectOne(lot_code);
         if (lotDTO == null) {
+        	System.out.println("롯 패스배리어블 접속");
             String url = request.getContextPath() + "/lot";
             response.setContentType("text/html; charset=UTF-8");
             response.getWriter().write(

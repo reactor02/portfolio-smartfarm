@@ -69,23 +69,30 @@
 
     <!-- LOT 등록 (생산 완료 시) -->
     <insert id="insertLot" parameterType="LotDTO">
-        <selectKey keyProperty="lot_num" resultType="int" order="BEFORE">
-            SELECT LOT_SEQ.NEXTVAL FROM DUAL
-        </selectKey>
-        INSERT INTO lot (lot_num, lot_code, item_num, order_num, init_qty, current_qty,
-                          lot_date, expiry_date)
-        VALUES (
-            #{lot_num},
-            'LOT-' || TO_CHAR(SYSDATE, 'YYYYMMDD') || '-' || #{lot_num},
-            #{item_num},
-            #{order_num},
-            #{init_qty},
-            #{current_qty},
-            '생산완료',
-            SYSDATE,
-            CASE WHEN #{type} = 'SEMIPRODUCT' THEN SYSDATE + 10 ELSE SYSDATE + 20 END
-        )
-    </insert>
+    <selectKey keyProperty="lot_num" resultType="int" order="BEFORE">
+        SELECT LOT_SEQ.NEXTVAL FROM DUAL
+    </selectKey>
+    INSERT INTO lot (
+        lot_num, 
+        lot_code, 
+        item_num, 
+        order_num, 
+        init_qty, 
+        current_qty,
+        lot_date, 
+        expiry_date
+    )
+    VALUES (
+        #{lot_num},
+        'LOT-' || TO_CHAR(SYSDATE, 'YYYYMMDD') || '-' || #{lot_num},
+        #{item_num},
+        #{order_num},
+        #{init_qty},
+        #{current_qty},
+        SYSDATE, /* '생산완료' 문자열 대신 오늘 날짜 저장 */
+        CASE WHEN #{type} = 'SEMIPRODUCT' THEN SYSDATE + 10 ELSE SYSDATE + 20 END
+    )
+</insert>
 
     <!-- 현재 수량 차감 -->
     <update id="deductQty">

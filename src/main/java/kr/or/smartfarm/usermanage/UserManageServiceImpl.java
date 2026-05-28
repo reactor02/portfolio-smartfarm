@@ -67,11 +67,25 @@ public class UserManageServiceImpl implements UserManageService {
 	public int userUpdate(UserManageDTO userManageDTO) {
 		// TODO Auto-generated method stub
 		
-		String pw = SHA256Util.encrypt(userManageDTO.getPw());
-		
-		userManageDTO.setPw(pw);
-		
 		int result = userManageDAO.userUpdate(userManageDTO);
+		
+		return result;
+		
+	}
+	@Override
+	public int userRetire(UserManageDTO userManageDTO) {
+		// TODO Auto-generated method stub
+		
+		int result = userManageDAO.userRetire(userManageDTO);
+		
+		return result;
+		
+	}
+	@Override
+	public int userLevelUpdate(UserManageDTO userManageDTO) {
+		// TODO Auto-generated method stub
+		
+		int result = userManageDAO.userLevelUpdate(userManageDTO);
 		
 		return result;
 		

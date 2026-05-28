@@ -83,8 +83,44 @@
 			ename
 		FROM emp
 	</select>
+	
+	<insert id="insertEquip"  parameterType="EquipDTO">
+		INSERT INTO 
+		equipment_log(
+		EQUIP_NUM, 
+		EQUIP_STATUS, 
+		error_sign, 
+		equip_action, 
+		maintenance_date,
+		start_date,
+		end_date,
+		total_runtime,
+		item_num,
+		emp_num
+		)
+	VALUES (
+		EQUIP_SEQ.NEXTVAL,
+		#{equip_status},
+		#{error_sign},
+		#{equip_action},
+		#{maintenance_date},
+		#{start_date},
+		#{end_date},
+		
+		<!--  total_date -->
+		(
+	        SELECT NVL(MAX(TOTAL_RUNTIME), 0)
+	        FROM equipment_log
+	        WHERE ITEM_NUM = #{item_num}
+	    ) +
+    	((#{end_date} - #{start_date}) * 86400),
+    	
+		#{item_num},
+		#{emp_num}
+		 )
+	</insert>
 
-<!-- 기계 누적 가동시간 UPDATE -->
+	<!-- 기계 누적 가동시간 UPDATE -->
 	<update id="total_runtime">
 		UPDATE equipment_log e
 		SET total_runtime = (
