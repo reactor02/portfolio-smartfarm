@@ -32,6 +32,11 @@ function validateReg() {
         alert('생산계획을 선택해주세요.');
         return false;
     }
+    var orderQty = parseInt(document.querySelector('[name="order_qty"]').value);
+    if (!orderQty || orderQty < 1) {
+        alert('지시수량은 1 이상이어야 합니다.');
+        return false;
+    }
     var orderStart = document.getElementById('orderStartInput').value;
     if (!orderStart) {
         alert('작업시작일을 선택해주세요.');

@@ -7,7 +7,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import kr.or.smartfarm.prod.SelectOptionDTO;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -39,6 +38,7 @@ public class WorkController {
     // WorkService 인터페이스의 구현체(WorkServiceImpl)를 스프링이 자동으로 주입
     @Autowired
     WorkService workService;
+
 
     /**
      * 날짜 형식 바인딩 설정.
@@ -104,7 +104,8 @@ public class WorkController {
             );
             return null;
         }
-        model.addAttribute("workDTO", workDTO);
+        model.addAttribute("workDTO",     workDTO);
+        model.addAttribute("processList", workService.getProcessesByItem(workDTO.getItem_num()));
         return "content/workDetail.tiles";
     }
 

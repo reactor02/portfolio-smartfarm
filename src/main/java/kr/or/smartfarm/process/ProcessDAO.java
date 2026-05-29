@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 public interface ProcessDAO{
-	
+
 	public List selectAll2(int pageNum);
 	public List selectDetail2(int itemNum);
 	public List searchProcess2(Map map);
