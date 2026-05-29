@@ -304,7 +304,6 @@ response.setContentType("text/html; charset=utf-8");
 
 	<tiles:insertAttribute name="footer" ignore="true" />
 	
-			
      
 </div>
 

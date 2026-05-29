@@ -13,7 +13,6 @@ public class QcDTO {
 	private String qc_type;
 	private String qc_pass;
 	
-	
 	// item
 	private int item_num;
 	private String code;
@@ -32,6 +31,9 @@ public class QcDTO {
 	// lot 
 	private int lot_num;
 	private String lot_code;
+	
+	// defective
+	private int defect_qty;
 	
 
 }

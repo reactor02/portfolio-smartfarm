@@ -56,10 +56,24 @@ public class QcServiceImpl implements QcService{
 	public int insertQc1(QcDTO qcDTO) {
 		return qcDAO.insertQc1(qcDTO);
 	}
+	@Override
+	public int insertQc2(QcDTO qcDTO) {
+		return qcDAO.insertQc2(qcDTO);
+	}
 
 	@Override
 	public QcDTO qcChk(int qc_num) {
 		return qcDAO.qcChk(qc_num);
+	}
+
+	@Override
+	public QcDTO crrnt_qty(QcDTO qcDTO) {
+		return qcDAO.crrnt_qty(qcDTO);
+	}
+	
+	@Override
+	public int insertDefect(QcDTO qcDTO) {
+		return qcDAO.insertDefect(qcDTO);
 	}
 
 }

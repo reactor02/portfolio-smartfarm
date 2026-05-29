@@ -62,12 +62,32 @@ public class QcDAOImpl implements QcDAO{
 
 	// INSERT
 	public int insertQc1(QcDTO dto) {
-		return sqlSession.insert("mapper.qc.insertQc", dto);
+		return sqlSession.insert("mapper.qc.insertQc1", dto);
 	}
 
+	// QC PASS / FAILED 확인
 	@Override
 	public QcDTO qcChk(int qc_num) {
 		return  sqlSession.selectOne("mapper.qc.qcChk", qc_num);
+	}
+	
+
+	// UPDATE / INSERT2 
+	@Override
+	public int insertQc2(QcDTO dto) {
+		sqlSession.update("mapper.qc.updateIO", dto);
+		return sqlSession.insert("mapper.qc.insertQc2", dto);
+	}
+	
+	// INSERT > DEFECTIVE
+	@Override
+	public int insertDefect(QcDTO dto) {
+		return sqlSession.insert("mapper.qc.insertDefect", dto);
+	}
+
+	@Override
+	public QcDTO crrnt_qty(QcDTO dto) {
+		return sqlSession.selectOne("mapper.qc.crrnt_qty", dto);
 	}
 	
 }

@@ -121,10 +121,7 @@ public class QcController {
 	
 	@RequestMapping("/insertQc")
 	//상세페이지 들어가는 로직
-	public String insertQc(Integer qc_num, QcDTO qcDTO, Model model) {
-		
-		System.out.println("qcDTO : " + qcDTO );
-		System.out.println("qc_num : " + qc_num );
+	public String insertQc(QcDTO qcDTO, Model model) {
 		
 		// qc 출고
 		// io_num > 시퀀스
@@ -138,10 +135,59 @@ public class QcController {
 		// emp_num > dto
 		// qc_chked > 'N'
 		
-		QcDTO qcChk = qcService.qcChk(qc_num);
-		System.out.println("qc_num : " + qcChk.getQc_pass());
+		// 총량 확인
+		QcDTO crrnt_qty = qcService.crrnt_qty(qcDTO);
 		
-//		qcService.insertQc1(qcDTO);
+		if(		   qcDTO.getIo_qty() < 0 
+				|| crrnt_qty.getIo_qty() < qcDTO.getIo_qty()) {
+			
+			System.out.println("잘못된 값입니다."); // 방어 코딩
+			
+		} else if (crrnt_qty.getIo_qty() == qcDTO.getIo_qty()) {
+			// 불량 X qc 등록
+			
+			// io 출고 등록
+			qcService.insertQc1(qcDTO);
+			// io 입고 등록
+			qcService.insertQc2(qcDTO);
+		} else if (crrnt_qty.getIo_qty() > qcDTO.getIo_qty()) {
+			// 불량 O qc 등록
+			int defect_qty = crrnt_qty.getIo_qty() - qcDTO.getIo_qty();
+			qcDTO.setDefect_qty(defect_qty);
+			qcService.insertDefect(qcDTO);
+			
+			// io 출고 등록
+			qcService.insertQc1(qcDTO);
+			// io 입고 등록
+			qcService.insertQc2(qcDTO);
+		}
+		
+		
+		
+//		QcDTO qcChk = qcService.qcChk(qc_num);
+//		String pass = qcChk.getQc_pass();
+		
+
+		// io 입고 등록
+//		if(!("".equals(pass)) && pass != null ) {
+//			if("PASS".equals(pass)) {
+//				// 품질 insert
+//				qcDTO.setQc_pass("PASS");
+//			}
+//			if("FAILED".equals(pass)) {
+//				// 불량 insert
+//				qcDTO.setQc_pass("FAILED");
+//			}
+//			if("WAITING".equals(pass)) {
+//				// 불량 insert
+//				qcDTO.setQc_pass("WAITING");
+//			}
+//		} else {
+//			System.out.println("잘못된 값");
+//		}
+		// io 입고 등록
+//		qcService.insertQc2(qcDTO);
+		
 		
 		return "redirect:qc";
 	}

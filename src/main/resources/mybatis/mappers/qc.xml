@@ -108,7 +108,7 @@
 		    ON io.lot_num = lot.lot_num
 		JOIN item
 		    ON lot.item_num = item.item_num
-		WHERE qc.qc_pass = 'WAITING'
+		WHERE io.qc_chked = 'N'
 		ORDER BY io.io_date DESC
 	</select>
 	
@@ -174,6 +174,94 @@
 		WHERE qc_num = #{qc_num}
 	</select>
 	
+<!-- io_qty 조회 -->
+	<select id="crrnt_qty" resultType="QcDTO" parameterType="QcDTO">
+		SELECT io_qty from io
+		where io_num = ${io_num}
+		
+	</select>
+	
+<!-- 출고 -->
+	<insert id="insertQc1" parameterType="QcDTO">
+		INSERT INTO io (
+		    io_num,
+		    io_type,
+		    io_qty,
+		    io_date,
+		    qc_num,
+		    lot_num,
+		    io_reason,
+		    facility_num,
+		    emp_num,
+		    qc_chked
+		)
+		VALUES (
+		    io_seq.NEXTVAL,
+		    '출고',
+		    #{io_qty},
+		    sysdate,
+		    0,
+		    #{lot_num},
+		    '품질검사',
+		    7,
+		    #{emp_num},
+		    'Y'
+		)
+	</insert>
+	
+	<!-- 업데이트	-->
+	<update id="updateIO" parameterType="QcDTO">
+		UPDATE io
+		SET qc_chked = 'Y'
+		WHERE io_num = #{io_num};
+	</update>
+	
+<!-- 입고	 -->
+	<insert id="insertQc2" parameterType="QcDTO">
+		INSERT INTO io (
+		    io_num,
+		    io_type,
+		    io_qty,
+		    io_date,
+		    qc_num,
+		    lot_num,
+		    io_reason,
+		    facility_num,
+		    emp_num,
+		    qc_chked
+		)
+		VALUES (
+		    io_seq.NEXTVAL,
+		    '입고',
+		    #{io_qty},
+		    sysdate,
+		    #{qc_num},
+		    #{lot_num},
+		    '검사완료',
+		    <!-- 시설 정보 필요시 셀렉트로 고르게	 -->
+		    4,
+		    #{emp_num},
+		    'Y'
+		)
+	</insert>
+	
+<!-- 불량	 -->
+	<insert id="insertDefect" parameterType="QcDTO">
+		INSERT INTO defective (
+		    defect_num ,
+		    defect_reason ,
+		    defect_action ,
+		    defect_qty ,
+		    io_num 
+		)
+		VALUES (
+		    defect_seq.NEXTVAL,
+		    '오염',
+		    '폐기',
+		    #{defect_qty},
+		    #{io_num}
+		)
+	</insert>
 		
 	
 </mapper>
