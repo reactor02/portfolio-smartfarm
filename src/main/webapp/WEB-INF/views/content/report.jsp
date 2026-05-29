@@ -222,6 +222,29 @@ td {
 .more-link:hover {
 	text-decoration: underline;
 }
+
+/* 기본 배지 스타일 */
+.status-badge {
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+/* 상태별 색상 */
+.status-badge.running {
+    color: #49a47a; /* 녹색 */
+}
+
+.status-badge.error {
+    background-color: #e63946; /* 빨간색 */
+}
+
+.status-badge.maintenance {
+    background-color: #ffb703; /* 노랑/주황색 */
+    color: #333; /* 글자색이 밝을 땐 어둡게 */
+}
+
 </style>
 </head>
 <body>
@@ -277,20 +300,26 @@ td {
 								<h3 class="title">설비 가동</h3>
 								<a href="/equip" class="more-link">더보기 +</a>
 							</div>
-							<table>
-								<tr>
-									<th>설비</th>
-									<th>가동률</th>
-								</tr>
-								<tr>
-									<td>라인1</td>
-									<td>85%</td>
-								</tr>
-								<tr>
-									<td>라인2</td>
-									<td>72%</td>
-								</tr>
-							</table>
+							<div>
+								<table>
+									<tr>
+										<th>설비코드</th>
+										<th>설비명</th>
+										<th>상태</th>
+									</tr>
+									<c:forEach var="item" items="${result}" begin="0" end="4">
+										<tr>
+											<td>${item.code}</td>
+											<td>${item.name}</td>
+											<td>
+												<span class="status-badge ${item.equip_status}">
+													${item.equip_status} 
+												</span>
+											</td>
+										</tr>
+									</c:forEach>
+								</table>
+							</div>
 						</div>
 
 						<div class="card">
@@ -319,8 +348,8 @@ td {
 					<div class="grid-2">
 						<div class="card">
 							<div class="card-header-wrapper">
-							<h3 class="title">작업 진행 상황</h3>
-							<a href="/work" class="more-link">더보기 +</a>
+								<h3 class="title">작업 진행 상황</h3>
+								<a href="/work" class="more-link">더보기 +</a>
 							</div>
 							<table id="workTable">
 								<tr>
@@ -343,8 +372,8 @@ td {
 
 						<div class="card">
 							<div class="card-header-wrapper">
-							<h3 class="title">불량 현황</h3>
-							<a href="/defect" class="more-link">더보기 +</a>
+								<h3 class="title">불량 현황</h3>
+								<a href="/defect" class="more-link">더보기 +</a>
 							</div>
 							<table>
 								<tr>
@@ -367,8 +396,8 @@ td {
 					<div class="grid-3">
 						<div class="card">
 							<div class="card-header-wrapper">
-							<h3 class="title">출하</h3>
-							<a href="/shipment" class="more-link">더보기 +</a>
+								<h3 class="title">출하</h3>
+								<a href="/shipment" class="more-link">더보기 +</a>
 							</div>
 							<table>
 								<tr>
@@ -384,35 +413,45 @@ td {
 
 						<div class="card">
 							<div class="card-header-wrapper">
-							<h3 class="title">재고</h3>
-							<a href="/stock" class="more-link">더보기 +</a>
+								<h3 class="title">재고</h3>
+								<a href="/stock" class="more-link">더보기 +</a>
 							</div>
-							<table>
-								<tr>
-									<th>자재</th>
-									<th>수량</th>
-								</tr>
-								<tr>
-									<td>원자재A</td>
-									<td>8200</td>
-								</tr>
-							</table>
+							<div>
+								<table>
+									<tr>
+										<th>자재코드</th>
+										<th>자재명</th>
+										<th>현재고 수량</th>
+									</tr>
+									<c:forEach var="item" items="${result}" begin="0" end="4">
+										<tr>
+											<td>${item.code}</td>
+											<td>${item.name}</td>
+											<td>${item.stock_qty}</td>
+										</tr>
+									</c:forEach>
+								</table>
+							</div>
 						</div>
 
 						<div class="card">
 							<div class="card-header-wrapper">
-							<h3 class="title">설비 다운타임</h3>
-							<a href="/runtime" class="more-link">더보기 +</a>
+								<h3 class="title">BOM 관리</h3>
+								<a href="/runtime" class="more-link">더보기 +</a>
 							</div>
 							<table>
 								<tr>
-									<th>설비</th>
-									<th>시간</th>
+									<th>BOM 코드</th>
+									<th>품목명</th>
+									<th>상태</th>
 								</tr>
-								<tr>
-									<td>라인3</td>
-									<td>2h</td>
-								</tr>
+								<c:forEach var="item" items="${result}" begin="0" end="4">
+									<tr>
+										<td>${item.bom_code}</td>
+										<td>${item.name}</td>
+										<td>${item.bom_status}</td>
+									</tr>
+								</c:forEach>
 							</table>
 						</div>
 					</div>
