@@ -168,7 +168,7 @@ response.setContentType("text/html; charset=utf-8");
             <div class="modal-grid">
                 <div class="modal-field">
                     <label>계획수량</label>
-                    <input type="number" name="plan_qty" placeholder="수량 입력">
+                    <input type="number" name="plan_qty" placeholder="수량 입력" min="1">
                 </div>
                 <div class="modal-field">
                     <label>담당자</label>

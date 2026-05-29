@@ -130,4 +130,7 @@ public interface WorkDAO {
      *               - ioReason: 출고 사유 (예: "생산투입")
      */
     void insertIo(Map<String, Object> params);
+
+    /** 품목별 공정 목록 조회 (작업순서 오름차순, 작업지시 상세 페이지용) */
+    List<Map<String, Object>> getProcessesByItem(int item_num);
 }

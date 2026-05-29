@@ -96,4 +96,10 @@ public class WorkDAOImpl implements WorkDAO {
     public void insertIo(Map<String, Object> params) {
         session.insert("kr.or.smartfarm.work.insertIo", params);
     }
+
+    /** 품목별 공정 목록 조회 (작업순서 오름차순) */
+    @Override
+    public List<Map<String, Object>> getProcessesByItem(int item_num) {
+        return session.selectList("kr.or.smartfarm.work.getProcessesByItem", item_num);
+    }
 }
