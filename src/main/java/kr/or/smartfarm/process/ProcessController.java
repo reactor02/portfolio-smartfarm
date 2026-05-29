@@ -51,7 +51,7 @@ public class ProcessController {
 	    List<Map<String, Object>> result = Service.selectDetail(Num); 
 	    
 	    if (result != null && !result.isEmpty()) {
-	        String uploadPath = "D:\\workspace\\workspace_java\\Zmartfarm\\src\\main\\webapp\\WEB-INF\\views\\processImg";
+	        String uploadPath = "D:\\\\workspace\\\\workspace_java\\\\Zmartfarm\\\\src\\\\main\\\\webapp\\\\resources\\\\processImg\\";
 	        for (Map<String, Object> map : result) {
 	        	System.out.println("DEBUG - Map 전체 데이터: " + map);
 
@@ -131,7 +131,7 @@ public class ProcessController {
 		//모달 등록
 		@RequestMapping("/PinsertController")
 		public String insertController(ProcessDTO dto, Model model) {
-			String uploadFolder = "D:\\workspace\\workspace_java\\Zmartfarm\\src\\main\\webapp\\WEB-INF\\views\\processImg";
+			String uploadFolder = "D:\\\\workspace\\\\workspace_java\\\\Zmartfarm\\\\src\\\\main\\\\webapp\\\\resources\\\\processImg\\";
 			
 			if (dto.getImage() != null && !dto.getImage().isEmpty()) {
 		        
@@ -168,7 +168,7 @@ public class ProcessController {
 		        // 파일명 중복을 방지하기 위해 UUID(고유 식별자) 생성 후 원래 이름과 결합
 		        String savedFileName = UUID.randomUUID().toString() + "_" + originalFileName;
 		        
-		        String uploadPath = "D:\\workspace\\workspace_java\\Zmartfarm\\src\\main\\webapp\\WEB-INF\\views\\processImg"; 
+		        String uploadPath = "D:\\\\workspace\\\\workspace_java\\\\Zmartfarm\\\\src\\\\main\\\\webapp\\\\resources\\\\processImg\\"; 
 		        
 		        File saveFile = new File(uploadPath, savedFileName);
 		        
