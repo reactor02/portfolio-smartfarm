@@ -3,6 +3,12 @@ package kr.or.smartfarm.lot;
 import java.sql.Date;
 import lombok.Data;
 
+/**
+ * LOT 데이터 전송 객체.
+ *
+ * <p>lot 테이블 컬럼 + 화면 표시용 JOIN 컬럼 + QC/페이징 보조 컬럼을 함께 담는다.
+ * (Lombok {@code @Data}로 getter/setter 자동 생성)</p>
+ */
 @Data
 public class LotDTO {
     // lot 테이블

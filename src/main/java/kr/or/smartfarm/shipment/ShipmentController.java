@@ -19,9 +19,20 @@ import com.github.pagehelper.PageInfo;
 
 import kr.or.smartfarm.login.LoginDTO;
 
+/**
+ * 출하 관련 HTTP 요청을 처리하는 컨트롤러.
+ *
+ * <p>출하 목록/검색/상세 조회와 출하지시(insert)·확정(confirm)·취소(cancel)를 담당한다.
+ * 확정/취소의 실제 트랜잭션·방어 로직은 {@link ShipmentService}에 위임하며,
+ * 컨트롤러는 재고 부족 예외를 {@code ?error=stock} 파라미터로 화면에 surface 한다.</p>
+ *
+ * URL 패턴: /shipment, /shipmentDetail/{id}, /insertShipment,
+ *           /confirmShipment, /cancelShipment, /searchShipment, /loadPendingRequests
+ */
 @Controller
 public class ShipmentController {
 
+    /** 출하 비즈니스 로직 서비스 */
     @Autowired
     ShipmentService shipmentService;
 
@@ -56,6 +67,11 @@ public class ShipmentController {
             @RequestParam("shipmentDate")       String shipmentDate,
             @RequestParam("planQty")            int    planQty) {
 
+        // [방어] 계획 수량이 0 이하면 LOT 배정·재고 차감이 무의미하므로 등록을 막는다.
+        if (planQty <= 0) {
+            return "redirect:/shipment";
+        }
+
         Map map = new HashMap();
         map.put("shipment_request_num", shipmentRequestNum);
         map.put("item_num",      itemNum);
@@ -77,7 +93,9 @@ public class ShipmentController {
         Map detail = shipmentService.selectDetail(shipmentId);
         model.addAttribute("detail", detail);
 
-        if (detail != null) {
+        // [방어] detail이 null이거나 SHIPMENT_NUM 컬럼이 null이면 캐스팅에서 NPE 발생.
+        //        두 경우 모두 LOT 조회가 불가능하므로 안전하게 건너뛴다(JSP가 '정보 없음' 처리).
+        if (detail != null && detail.get("SHIPMENT_NUM") != null) {
             int shipmentNum = ((Number) detail.get("SHIPMENT_NUM")).intValue();
             List lots = shipmentService.selectLots(shipmentNum);
             model.addAttribute("lots", lots);
@@ -130,10 +148,17 @@ public class ShipmentController {
             @RequestParam("shipmentRequestNum") String shipmentRequestNum,
             HttpSession session) {
 
+        // [방어] 세션이 없거나 emp_num 파싱 실패 시 시스템 기본 담당자(1)로 대체한다.
+        //        파싱 실패는 데이터 이상 신호이므로 스택트레이스를 남겨 추적할 수 있게 한다.
         LoginDTO loginUser = (LoginDTO) session.getAttribute("loginUser");
         int empNum = 1;
         if (loginUser != null) {
-            try { empNum = Integer.parseInt(loginUser.getEmp_num()); } catch (Exception e) { empNum = 1; }
+            try {
+                empNum = Integer.parseInt(loginUser.getEmp_num());
+            } catch (Exception e) {
+                e.printStackTrace();
+                empNum = 1;
+            }
         }
 
         Map map = new HashMap();
@@ -141,7 +166,13 @@ public class ShipmentController {
         map.put("shipment_request_num", shipmentRequestNum);
         map.put("emp_num",             empNum);
 
-        shipmentService.confirmShipment(map);
+        // [방어] 확정 중 재고 부족(stock_error) 등 예외 발생 시 트랜잭션은 롤백되며,
+        //        화면에 알림을 띄우기 위해 error 파라미터를 붙여 상세 페이지로 redirect.
+        try {
+            shipmentService.confirmShipment(map);
+        } catch (RuntimeException e) {
+            return "redirect:/shipmentDetail/" + shipmentId + "?error=stock";
+        }
         return "redirect:/shipmentDetail/" + shipmentId;
     }
 

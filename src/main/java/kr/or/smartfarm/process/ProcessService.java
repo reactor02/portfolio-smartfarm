@@ -9,4 +9,6 @@ public interface ProcessService {
 	public List selectDetail(int itemNum);
 	public List searchProcess(Map map);
 	public Map modalSearch(String str);
+	public int insertProcess(ProcessDTO dto);
+	public void updateStatus(ProcessDTO dto);
 }

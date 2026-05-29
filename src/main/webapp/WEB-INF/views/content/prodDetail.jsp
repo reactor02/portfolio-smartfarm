@@ -3,12 +3,18 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib prefix="fn"  uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ taglib prefix="tiles" uri="http://tiles.apache.org/tags-tiles"%>
+<%--
+    prodDetail.jsp — 생산계획 상세 화면
+    계획 기본정보 + 진행률 + 연관 작업지시 목록(AJAX 페이징) + 계획 취소.
+    스크립트는 prod/prodDetail.js, 컨트롤러는 /prod/{plan_id}.
+--%>
 
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
 <title>생산계획 상세</title>
+<link rel="stylesheet" href="/resources/css/detail-common.css">
 <link rel="stylesheet" href="/resources/css/prod/prodDetail.css">
 </head>
 <body>

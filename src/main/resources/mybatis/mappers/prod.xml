@@ -8,7 +8,7 @@
     <select id="getList" parameterType="ProdPageDTO" resultType="ProdDTO">
         SELECT plan_num, plan_qty, plan_status, plan_start, plan_end,
                emp_num, plan_id, item_num, item_name, type,
-               ename, facility_num, facility_name, currentqty, total_count
+               ename, facility_num, facility_name, currentqty, order_qty_sum, total_count
         FROM (
             SELECT inner_q.*, ROWNUM AS rn
             FROM (
@@ -26,8 +26,9 @@
                        e.ename,
                        f.facility_num,
                        f.facility_name,
-                       NVL(wo.currentqty, 0) AS currentqty,
-                       COUNT(*) OVER()   AS total_count
+                       NVL(wo.currentqty, 0)       AS currentqty,
+                       NVL(wo.order_qty_sum, 0)    AS order_qty_sum,
+                       COUNT(*) OVER()             AS total_count
                 FROM production_plan pp
                 LEFT JOIN item     i ON pp.item_num    = i.item_num
                 LEFT JOIN emp      e ON pp.emp_num     = e.emp_num
@@ -43,7 +44,9 @@
                 ) pr ON pp.item_num = pr.item_num
                 LEFT JOIN facility f ON pr.facility_num = f.facility_num
                 LEFT JOIN (
-                    SELECT plan_num, SUM(current_qty) AS currentqty
+                    SELECT plan_num,
+                           SUM(current_qty) AS currentqty,
+                           SUM(order_qty)   AS order_qty_sum
                     FROM work_order
                     GROUP BY plan_num
                 ) wo ON pp.plan_num = wo.plan_num
@@ -76,7 +79,7 @@
                           OR i.name     LIKE '%' || #{keyword} || '%')
                     </if>
                 </where>
-                ORDER BY pp.plan_start DESC NULLS LAST
+                ORDER BY pp.plan_num DESC
             ) inner_q
             WHERE ROWNUM &lt;= #{endRow}
         )
@@ -150,7 +153,12 @@
         WHERE pp.plan_id = #{plan_id}
     </select>
 
-    <!-- 등록 (plan_id: 알파벳 순차 자동 생성, 테이블이 비어있으면 'A'부터 시작) -->
+    <!-- 등록 (plan_id: 알파벳 순차 자동 생성, 테이블이 비어있으면 'A'부터 시작)
+         [주의/한계] plan_id는 단일 문자다. MAX(ASCII(plan_id))+1 방식이라
+                     'A'(65)~'Z'(90)까지만 알파벳이고, 26건을 넘기면 '['(91) 등
+                     비알파벳 ASCII 문자가 생성된다. 현재는 생산계획이 26건 이하라는
+                     전제로 운영하며, 그 이상이 필요하면 다중 문자(AA, AB...) 채번 방식으로
+                     교체해야 한다. (기존 데이터 정렬 영향이 있어 이번 변경 범위에서는 제외) -->
     <insert id="insert" parameterType="ProdDTO">
         <selectKey keyProperty="plan_id" resultType="String" order="BEFORE">
             SELECT CHR(NVL(MAX(ASCII(plan_id)), 64) + 1) FROM production_plan

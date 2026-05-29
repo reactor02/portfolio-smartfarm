@@ -6,6 +6,11 @@ response.setContentType("text/html; charset=utf-8");
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+<%--
+    shipment.jsp — 출하 관리 목록 화면 (Tiles content fragment)
+    검색 필터(상태/기간/품목/키워드) + 출하 목록 + 페이징.
+    컨트롤러는 /shipment (ShipmentController.shipmentList), 검색은 /searchShipment AJAX.
+--%>
 <%@ taglib prefix="tiles" uri="http://tiles.apache.org/tags-tiles"%>
 
 <!DOCTYPE html>
@@ -15,6 +20,7 @@ response.setContentType("text/html; charset=utf-8");
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>출하 관리</title>
 <link rel="stylesheet" href="/resources/css/paging.css">
+<link rel="stylesheet" href="/resources/css/list-common.css">
 <link rel="stylesheet" href="/resources/css/modal.css">
 <link rel="stylesheet" href="/resources/css/shipment/shipment.css">
 </head>
@@ -25,7 +31,7 @@ response.setContentType("text/html; charset=utf-8");
 
 	<div class="mat-body">
 		<main class="main-cont">
-			<div class="hdr">
+			<div class="page-hdr">
 				<h1>출하 관리</h1>
 				<button type="button" class="btn-reg" id="btnOpenShipModal">+ 등록하기</button>
 			</div>
@@ -49,7 +55,15 @@ response.setContentType("text/html; charset=utf-8");
 							<option value="취소">취소</option>
 						</select>
 					</div>
-					<div></div>
+					<div>
+						<span class="label">&#9654; 품목명</span>
+						<select id="itemNum" class="form-control">
+							<option value="0">전체</option>
+							<c:forEach var="it" items="${itemList}">
+								<option value="${it.ITEM_NUM}">${it.NAME}</option>
+							</c:forEach>
+						</select>
+					</div>
 				</div>
 
 				<div class="sch-row-3">
@@ -163,13 +177,15 @@ response.setContentType("text/html; charset=utf-8");
 		var eDate   = document.querySelector('#eDate').value;
 		var status  = document.querySelector('#status').value;
 		var keyword = document.querySelector('#keyword').value;
+		var itemNum = document.querySelector('#itemNum').value;
 
 		var params = new URLSearchParams();
-		params.append('page',    pageNum);
-		params.append('sDate',   sDate);
-		params.append('eDate',   eDate);
-		params.append('status',  status);
-		params.append('keyword', keyword);
+		params.append('page',     pageNum);
+		params.append('sDate',    sDate);
+		params.append('eDate',    eDate);
+		params.append('status',   status);
+		params.append('keyword',  keyword);
+		params.append('item_num', itemNum);
 
 		fetch('/searchShipment?' + params.toString())
 		.then(function(response) { return response.json(); })
@@ -219,37 +235,24 @@ response.setContentType("text/html; charset=utf-8");
 	});
 </script>
 
-<!-- ===== 출하지시 등록 모달 ===== -->
+<!-- ===== 출하지시 등록 모달 (메인) ===== -->
 <div id="shipRegModal" class="modal-overlay" style="display:none;">
-	<div class="modal-box modal-box-wide">
+	<div class="modal-box">
 		<h3 class="modal-title">출하지시 등록</h3>
 
 		<form id="shipInsertForm" method="POST" action="/insertShipment">
 			<input type="hidden" id="selectedRequestNum" name="shipmentRequestNum">
 			<input type="hidden" id="selectedItemNum"    name="itemNum">
 
-			<!-- 주문 선택 테이블 -->
+			<!-- 선택된 주문 표시 카드 -->
 			<div class="modal-section-label">주문 선택 <span class="required-mark">*</span></div>
-			<div class="modal-tbl-wrap">
-				<table class="modal-req-tbl">
-					<thead>
-						<tr>
-							<th>요청번호</th>
-							<th>주문일</th>
-							<th>납기일</th>
-							<th>거래처명</th>
-							<th>품목명</th>
-							<th>수량</th>
-						</tr>
-					</thead>
-					<tbody id="pendingRequestBody">
-						<tr><td colspan="6" class="empty-cell">불러오는 중...</td></tr>
-					</tbody>
-				</table>
+			<div class="selected-order-card" id="selectedOrderCard">
+				<span class="empty-order-msg">선택된 주문이 없습니다. 주문 검색 버튼을 눌러 선택하세요.</span>
 			</div>
+			<button type="button" class="btn-pick-order" id="btnOpenOrderModal">&#128269; 주문 검색</button>
 
 			<!-- 입력 필드 -->
-			<div class="modal-grid" style="margin-top:18px;">
+			<div class="modal-grid">
 				<div class="modal-field">
 					<label>담당자 <span class="required-mark">*</span></label>
 					<select id="empNum" name="empNum" class="modal-select">
@@ -263,9 +266,9 @@ response.setContentType("text/html; charset=utf-8");
 					<label>출하일 <span class="required-mark">*</span></label>
 					<input type="date" id="shipmentDate" name="shipmentDate" class="modal-input">
 				</div>
-				<div class="modal-field">
+				<div class="modal-field modal-field-full">
 					<label>계획수량 <span class="required-mark">*</span></label>
-					<input type="number" id="planQty" name="planQty" min="1" value="" class="modal-input">
+					<input type="number" id="planQty" name="planQty" min="1" class="modal-input">
 				</div>
 			</div>
 
@@ -277,11 +280,48 @@ response.setContentType("text/html; charset=utf-8");
 	</div>
 </div>
 
+<!-- ===== 주문 검색 서브모달 ===== -->
+<div id="orderSearchModal" class="modal-overlay modal-sub-overlay" style="display:none;">
+	<div class="modal-box modal-box-wide">
+		<h3 class="modal-title">주문 검색</h3>
+
+		<!-- 검색 입력 -->
+		<div class="order-search-row">
+			<input type="text" id="orderSearchInput" class="order-search-input"
+			       placeholder="요청번호 / 거래처명 / 품목명 검색">
+		</div>
+
+		<!-- 접수 주문 테이블 -->
+		<div class="modal-tbl-wrap">
+			<table class="modal-req-tbl">
+				<thead>
+					<tr>
+						<th>요청번호</th>
+						<th>주문일</th>
+						<th>납기일</th>
+						<th>거래처명</th>
+						<th>품목명</th>
+						<th>수량</th>
+					</tr>
+				</thead>
+				<tbody id="pendingRequestBody">
+					<tr><td colspan="6" class="empty-cell">불러오는 중...</td></tr>
+				</tbody>
+			</table>
+		</div>
+
+		<div class="modal-btn-wrap">
+			<button type="button" class="btn-cancel" id="btnCloseOrderModal">닫기</button>
+		</div>
+	</div>
+</div>
+
 <script>
-	/* ── 모달 열기/닫기 ── */
+	var allPendingOrders = [];
+
+	/* ── 메인 모달 열기/닫기 ── */
 	document.getElementById('btnOpenShipModal').addEventListener('click', function() {
 		resetShipModal();
-		loadPendingRequests();
 		document.getElementById('shipRegModal').style.display = 'flex';
 	});
 	document.getElementById('btnCloseShipModal').addEventListener('click', closeShipModal);
@@ -300,17 +340,43 @@ response.setContentType("text/html; charset=utf-8");
 		document.getElementById('empNum').selectedIndex     = 0;
 		document.getElementById('shipmentDate').value       = '';
 		document.getElementById('planQty').value            = '';
-		document.getElementById('pendingRequestBody').innerHTML =
-			'<tr><td colspan="6" class="empty-cell">불러오는 중...</td></tr>';
+		setSelectedOrderCard(null);
 	}
+
+	/* ── 서브모달 열기/닫기 ── */
+	document.getElementById('btnOpenOrderModal').addEventListener('click', function() {
+		document.getElementById('orderSearchInput').value = '';
+		loadPendingRequests();
+		document.getElementById('orderSearchModal').style.display = 'flex';
+	});
+	document.getElementById('btnCloseOrderModal').addEventListener('click', function() {
+		document.getElementById('orderSearchModal').style.display = 'none';
+	});
+	document.getElementById('orderSearchModal').addEventListener('click', function(e) {
+		if (e.target === this) document.getElementById('orderSearchModal').style.display = 'none';
+	});
 
 	/* ── 접수 주문 목록 AJAX ── */
 	function loadPendingRequests() {
 		fetch('/loadPendingRequests')
 			.then(function(res) { return res.json(); })
-			.then(function(data) { renderPendingTable(data); })
+			.then(function(data) {
+				allPendingOrders = data || [];
+				renderPendingTable(allPendingOrders);
+			})
 			.catch(function(err) { console.error('주문 목록 조회 오류:', err); });
 	}
+
+	/* ── 서브모달 검색 필터 ── */
+	document.getElementById('orderSearchInput').addEventListener('input', function() {
+		var kw = this.value.trim().toLowerCase();
+		if (!kw) { renderPendingTable(allPendingOrders); return; }
+		renderPendingTable(allPendingOrders.filter(function(r) {
+			return (r.REQUEST_ID  || '').toLowerCase().indexOf(kw) !== -1
+			    || (r.VENDER_NAME || '').toLowerCase().indexOf(kw) !== -1
+			    || (r.NAME        || '').toLowerCase().indexOf(kw) !== -1;
+		}));
+	});
 
 	function renderPendingTable(list) {
 		var tbody = document.getElementById('pendingRequestBody');
@@ -320,8 +386,16 @@ response.setContentType("text/html; charset=utf-8");
 		}
 		var html = '';
 		list.forEach(function(r) {
-			html += '<tr class="req-row" onclick="selectRequest(this,\''
-				+ (r.SHIPMENT_REQUEST_NUM || '') + '\',' + (r.ITEM_NUM || 0) + ',' + (r.REQUEST_QTY || 1) + ')">'
+			html += '<tr class="req-row" onclick="selectRequest('
+				+ '\'' + esc(r.SHIPMENT_REQUEST_NUM || '') + '\','
+				+ (r.ITEM_NUM || 0) + ','
+				+ (r.REQUEST_QTY || 1) + ','
+				+ '\'' + esc(r.REQUEST_ID   || '') + '\','
+				+ '\'' + esc(r.VENDER_NAME  || '') + '\','
+				+ '\'' + esc(r.NAME         || '') + '\','
+				+ '\'' + esc(r.REQUEST_DATE || '') + '\','
+				+ '\'' + esc(r.DUE_DATE     || '') + '\''
+				+ ')">'
 				+ '<td>' + (r.REQUEST_ID   || '') + '</td>'
 				+ '<td>' + (r.REQUEST_DATE || '') + '</td>'
 				+ '<td>' + (r.DUE_DATE     || '') + '</td>'
@@ -333,15 +407,40 @@ response.setContentType("text/html; charset=utf-8");
 		tbody.innerHTML = html;
 	}
 
-	/* ── 행 선택 ── */
-	function selectRequest(row, requestNum, itemNum, qty) {
-		document.querySelectorAll('.req-row').forEach(function(r) {
-			r.classList.remove('req-row-selected');
-		});
-		row.classList.add('req-row-selected');
+	function esc(s) { return String(s).replace(/\\/g, '\\\\').replace(/'/g, "\\'"); }
+
+	/* ── 행 선택 → 메인 모달에 반영 후 서브모달 닫기 ── */
+	function selectRequest(requestNum, itemNum, qty, requestId, venderName, itemName, requestDate, dueDate) {
 		document.getElementById('selectedRequestNum').value = requestNum;
 		document.getElementById('selectedItemNum').value    = itemNum;
 		document.getElementById('planQty').value            = qty;
+		setSelectedOrderCard({ requestId: requestId, venderName: venderName,
+		                       itemName: itemName, qty: qty, dueDate: dueDate });
+		document.getElementById('orderSearchModal').style.display = 'none';
+	}
+
+	function setSelectedOrderCard(order) {
+		var card = document.getElementById('selectedOrderCard');
+		if (!order) {
+			card.className = 'selected-order-card';
+			card.innerHTML = '<span class="empty-order-msg">선택된 주문이 없습니다. 주문 검색 버튼을 눌러 선택하세요.</span>';
+			return;
+		}
+		card.className = 'selected-order-card has-order';
+		card.innerHTML = '<div class="order-info-row">'
+			+ mkInfo('요청번호', order.requestId)
+			+ mkInfo('거래처',   order.venderName)
+			+ mkInfo('품목',     order.itemName)
+			+ mkInfo('주문수량', order.qty + ' EA')
+			+ mkInfo('납기일',   order.dueDate)
+			+ '</div>';
+	}
+
+	function mkInfo(label, val) {
+		return '<span class="order-info-item">'
+		     + '<span class="order-info-label">' + label + '</span>'
+		     + '<span class="order-info-val">'   + val   + '</span>'
+		     + '</span>';
 	}
 
 	/* ── 등록 버튼 ── */
@@ -351,10 +450,10 @@ response.setContentType("text/html; charset=utf-8");
 		var shipmentDate = document.getElementById('shipmentDate').value;
 		var planQty      = document.getElementById('planQty').value;
 
-		if (!requestNum)   { alert('주문을 선택해주세요.');     return; }
-		if (!empNum)       { alert('담당자를 선택해주세요.');   return; }
-		if (!shipmentDate) { alert('출하일을 입력해주세요.');   return; }
-		if (!planQty || planQty < 1) { alert('계획수량을 입력해주세요.'); return; }
+		if (!requestNum)            { alert('주문을 선택해주세요.');     return; }
+		if (!empNum)                { alert('담당자를 선택해주세요.');   return; }
+		if (!shipmentDate)          { alert('출하일을 입력해주세요.');   return; }
+		if (!planQty || planQty < 1){ alert('계획수량을 입력해주세요.'); return; }
 
 		document.getElementById('shipInsertForm').submit();
 	});

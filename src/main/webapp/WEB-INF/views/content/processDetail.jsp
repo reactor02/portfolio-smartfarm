@@ -1,4 +1,5 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
 <%
 request.setCharacterEncoding("utf-8");
 response.setContentType("text/html; charset=utf-8");
@@ -46,7 +47,7 @@ response.setContentType("text/html; charset=utf-8");
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
-	background-color: #2D6A4F; 
+	background-color: #2D6A4F;
 	padding: 15px 25px;
 	border-radius: 8px;
 	margin-bottom: 25px;
@@ -69,7 +70,8 @@ response.setContentType("text/html; charset=utf-8");
 	font-weight: bold;
 	font-size: 1.05rem;
 	cursor: pointer;
-	box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 2px 3px rgba(0, 0, 0, 0.2);
+	box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 2px 3px
+		rgba(0, 0, 0, 0.2);
 	transition: background-color 0.2s;
 	text-decoration: none;
 	display: inline-block;
@@ -98,13 +100,12 @@ response.setContentType("text/html; charset=utf-8");
 	display: inline-block;
 }
 
-/* 수정된 그리드 레이아웃: 한 줄에 3개씩, 균등한 간격으로 배치 */
 .info-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr); /* 3개의 열을 동일한 비율로 분할 */
-    row-gap: 25px; /* 위아래 줄 간격 */
-    column-gap: 20px; /* 좌우 항목 간격 */
-    width: 100%;
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	row-gap: 25px;
+	column-gap: 20px;
+	width: 100%;
 }
 
 .info-item {
@@ -159,7 +160,6 @@ response.setContentType("text/html; charset=utf-8");
 	color: #333;
 }
 
-/* ================= 5. 모달 ================= */
 .modal-overlay {
 	display: none;
 	position: fixed;
@@ -334,6 +334,28 @@ response.setContentType("text/html; charset=utf-8");
 	border-color: #dc3545;
 }
 
+#processDesc {
+	max-height: 200px;
+}
+
+.textarea-desc {
+	width: 100%;
+	border: 1px solid #aaa;
+	border-radius: 4px;
+	padding: 10px;
+	font-size: 0.95rem;
+	font-family: 'Malgun Gothic', sans-serif;
+	outline: none;
+	resize: vertical;
+}
+
+.textarea-desc:focus {
+	border-color: #2D6A4F;
+}
+
+#processDesc {
+	max-height: 200px;
+}
 </style>
 </head>
 <body>
@@ -343,7 +365,7 @@ response.setContentType("text/html; charset=utf-8");
 
 		<div class="mat-body">
 			<main class="main-cont">
-				
+
 				<div class="hdr">
 					<h1>공정 관리 상세</h1>
 					<button type="button" class="btn-action1" onclick="openModal()">수정</button>
@@ -351,44 +373,41 @@ response.setContentType("text/html; charset=utf-8");
 				</div>
 
 				<div class="detail-section">
-                    <div class="info-grid">
-                        <div class="info-item">
-                            <span class="info-label">공정 품목</span>
-                            <span class="info-value">${resultList[0].NAME}</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">공정 제품 타입</span>
-                            <span class="info-value">${resultList[0].TYPE}</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">작업 순서</span>
-                            <span class="info-value">${resultList[0].FLOW}</span>
-                        </div>
-                        
-                        <div class="info-item">
-                            <span class="info-label">작업 인원</span>
-                            <span class="info-value">${resultList[0].HEAD_COUNT}</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">등록 일자</span>
-                            <span class="info-value">${resultList[0].CREATED_AT}</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">사용 여부</span>
-                            <span class="info-value">${resultList[0].PROCESS_STATUS}</span>
-                        </div>
-                    </div>
-                </div>
+					<div class="info-grid">
+						<div class="info-item">
+							<span class="info-label">공정 품목</span> <span class="info-value">${resultList[0].NAME}</span>
+						</div>
+						<div class="info-item">
+							<span class="info-label">공정 제품 타입</span> <span class="info-value">${resultList[0].TYPE}</span>
+						</div>
+						<div class="info-item">
+							<span class="info-label">작업 순서</span> <span class="info-value">${resultList[0].FLOW}</span>
+						</div>
+
+						<div class="info-item">
+							<span class="info-label">작업 인원</span> <span class="info-value">${resultList[0].HEAD_COUNT}</span>
+						</div>
+						<div class="info-item">
+							<span class="info-label">등록 일자</span> <span class="info-value">${resultList[0].CREATED_AT}</span>
+						</div>
+						<div class="info-item">
+							<span class="info-label">사용 여부</span> <span class="info-value">${resultList[0].PROCESS_STATUS}</span>
+						</div>
+					</div>
+				</div>
 
 				<div class="detail-section">
 					<div class="section-title">공정 설명</div>
 					<div class="desc-container">
-						<div class="desc-image-area">
-							<img src="/displayImage?fileName=${resultList[0].IMAGE}" alt="공정 이미지" onerror="this.style.display='none'">
-						</div>
+
+						<c:forEach var="detail" items="${resultList}">
+							<div class="desc-image-area">
+								<img src="data:image/png;base64,${detail.base64Image}"
+									alt="공정 이미지" onerror="this.style.display='none'">
+							</div>
+						</c:forEach>
 						<div class="desc-content-area">
-							${resultList[0].PROCESS_CONTENT}
-						</div>
+							${resultList[0].PROCESS_CONTENT}</div>
 					</div>
 				</div>
 
@@ -398,66 +417,78 @@ response.setContentType("text/html; charset=utf-8");
 		<tiles:insertAttribute name="footer" ignore="true" />
 	</div>
 
-
-
-
-<!-- 		모달영역 -->
-
-<div id="bomEditModal" class="modal-overlay">
+	<div id="bomEditModal" class="modal-overlay">
 		<div class="modal-content">
 			<h2>BOM 수정</h2>
 
-			<form id="editForm" action="/updateStatus" method="post">
+			<form id="editForm" accept-charset="UTF-8"
+			enctype="multipart/form-data" action="/PupdateStatus" method="post">
 
-				<input type="hidden" name="bom_num" value="${resultList[0].BOM_NUM}">
-				<div class="modal-section-title">생산품 정보</div>
+				<input type="hidden" name="process_num"
+					value="${resultList[0].PROCESS_NUM}">
+				<div class="modal-section-title">공정 정보</div>
 				<div class="modal-form-grid">
 					<div>
 						<label class="info-label">품목명</label>
 						<div class="info-value">${resultList[0].NAME}</div>
 					</div>
 					<div>
-						<label class="info-label">기준 생산 수량</label>
-						<div class="info-value">${resultList[0].REQUIRED_QTY}</div>
+						<label class="info-label">작업인원</label> <input type="text" name="head_count"
+							value="${resultList[0].HEAD_COUNT}">
 					</div>
-					<div class="status-container">
+					<div>
+						<label class="info-label">작업순서</label> <input type="text" name="flow"
+							value="${resultList[0].FLOW}">
+					</div>
+					<div>
 						<label class="info-label">상태 변경</label>
 						<div class="radio-group">
 							<label class="radio-label"> <input type="radio"
-								name="bom_status" value="Y"
-								${resultList[0].BOM_STATUS == 'Y' ? 'checked' : ''}>사용
+								name="process_status" value="사용"
+								${resultList[0].PROCESS_STATUS == '사용' || resultList[0].PROCESS_STATUS == '사용중' ? 'checked' : ''}>사용
 							</label> <label class="radio-label"> <input type="radio"
-								name="bom_status" value="N"
-								${resultList[0].BOM_STATUS == 'N' ? 'checked' : ''}>미사용
+								name="process_status" value="미사용"
+								${resultList[0].PROCESS_STATUS == '미사용' ? 'checked' : ''}>미사용
 							</label>
 						</div>
 					</div>
 				</div>
 
-				<div class="modal-section-title"
-					style="border-top: 1px dashed #ccc; padding-top: 15px;">| 2.
-					소요 자재</div>
-				<div class="tbl-box" style="height: 250px;">
-					<table class="stk-tbl">
-						<thead>
-							<tr>
-								<th>자재명</th>
-								<th>자재코드</th>
-								<th>단위</th>
-								<th style="width: 100px;">소요수량</th>
-							</tr>
-						</thead>
-						<tbody>
-							<c:forEach var="mat" items="${resultList}" varStatus="vs">
-								<tr>
-									<td>${mat.CNAME}</td>
-									<td>${mat.CCODE}</td>
-									<td>${mat.CUNIT}</td>
-									<td>${mat.CHILD_QTY}</td>
-								</tr>
-							</c:forEach>
-						</tbody>
-					</table>
+				<div class="modal-field modal-field-full"
+					style="display: flex; flex-direction: row; gap: 20px; margin-top: 20px;">
+					<div
+						style="flex: 1; display: flex; flex-direction: column; gap: 10px;">
+						<div>
+							<label for="processImage">공정 이미지 첨부</label> <input type="file"
+								name="image" id="processImage" accept="image/*"
+								style="width: 100%; border: 1px solid #aaa; border-radius: 4px; padding: 6px; background: #fff; cursor: pointer; margin-top: 5px;"
+								onchange="previewModalImage(this)">
+						</div>
+						<div id="imagePreviewContainer"
+							style="width: 100%; min-height: 150px; border: 1px solid #ddd; border-radius: 4px; display: flex; align-items: center; justify-content: center; background-color: #f9f9f9; overflow: hidden; flex: 1;">
+							<c:choose>
+								<c:when test="${not empty resultList[0].base64Image}">
+									<span id="noImageText" style="display: none; color: #999; font-size: 14px;">첨부 된 이미지가 없습니다.</span>
+									<img id="previewImage"
+										src="data:image/png;base64,${resultList[0].base64Image}"
+										alt="미리보기"
+										style="max-width: 100%; max-height: 200px; object-fit: contain;">
+								</c:when>
+								<c:otherwise>
+									<span id="noImageText" style="color: #999; font-size: 14px;">첨부 된 이미지가 없습니다.</span>
+									<img id="previewImage" src="#" alt="미리보기"
+										style="display: none; max-width: 100%; max-height: 200px; object-fit: contain;">
+								</c:otherwise>
+							</c:choose>
+						</div>
+					</div>
+
+					<div style="flex: 1; display: flex; flex-direction: column;">
+						<label for="processDesc">공정 설명</label>
+						<textarea name="process_content" id="processDesc"
+							class="textarea-desc" placeholder="해당 공정에 대한 상세 설명을 작성해주세요."
+							style="margin-top: 5px; flex: 1; resize: none;">${resultList[0].PROCESS_CONTENT}</textarea>
+					</div>
 				</div>
 
 				<div class="modal-btns">
@@ -467,24 +498,39 @@ response.setContentType("text/html; charset=utf-8");
 			</form>
 		</div>
 	</div>
-	
-	
-	
-<script>
-function openModal() {
-	document.getElementById('bomEditModal').style.display = 'flex';
-}
 
-function closeModal() {
-	location.reload();
-}
+	<script>
+		function openModal() {
+			document.getElementById('bomEditModal').style.display = 'flex';
+		}
 
-function submitEdit() {
-	if(confirm("수정된 내용을 저장하시겠습니까?")) {
-		document.getElementById('editForm').submit();
-	}
-}
+		function closeModal() {
+			location.reload();
+		}
 
-</script>
+		function submitEdit() {
+			if (confirm("수정된 내용을 저장하시겠습니까?")) {
+				document.getElementById('editForm').submit();
+			}
+		}
+
+		function previewModalImage(input) {
+			const previewImg = document.getElementById('previewImage');
+			const noImgText = document.getElementById('noImageText');
+			
+			if (input.files && input.files[0]) {
+				const reader = new FileReader();
+				reader.onload = function(e) {
+					previewImg.src = e.target.result;
+					previewImg.style.display = 'block';
+					if(noImgText) noImgText.style.display = 'none';
+				}
+				reader.readAsDataURL(input.files[0]);
+			} else {
+				// 파일 선택을 취소했을 때 기존 이미지가 있다면 유지, 없다면 초기화 로직 구현 가능
+				// 현재는 파일이 없을 경우 변경하지 않음.
+			}
+		}
+	</script>
 </body>
 </html>

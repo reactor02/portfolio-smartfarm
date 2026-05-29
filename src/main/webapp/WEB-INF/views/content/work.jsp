@@ -1,6 +1,11 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c"   uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%--
+    work.jsp — 작업지시 관리 목록 화면 (Tiles content fragment)
+    구성: 검색 필터(기간/상태/품목/키워드) + 목록 테이블 + 페이징 + 등록 모달.
+    동작 스크립트는 work/work.js, 컨트롤러는 /work (WorkController.workList).
+--%>
 <link rel="stylesheet" href="/resources/css/list-common.css">
 <link rel="stylesheet" href="/resources/css/modal.css">
 <link rel="stylesheet" href="/resources/css/work/work.css">
@@ -143,6 +148,8 @@
                         <input type="text" id="planDisplay" readonly placeholder="계획 선택 후 표시"
                                class="plan-display-input">
                         <input type="hidden" name="plan_num" id="planNumInput">
+                        <input type="hidden" id="planStartInput">
+                        <input type="hidden" id="planEndInput">
                         <button type="button" onclick="openPlanModal()"
                                 class="btn-search-sm">검색</button>
                     </div>
@@ -162,7 +169,7 @@
                 </div>
                 <div class="modal-field">
                     <label>작업시작일</label>
-                    <input type="date" name="order_start" required>
+                    <input type="date" name="order_start" id="orderStartInput" required>
                 </div>
                 <div class="modal-field modal-field-full">
                     <label>지시사항</label>

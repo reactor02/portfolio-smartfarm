@@ -5,12 +5,18 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ taglib prefix="tiles" uri="http://tiles.apache.org/tags-tiles"%>
+<%--
+    workDetail.jsp — 작업지시 상세 화면
+    기본정보 + 진행률 게이지 + 액션 버튼(시작/완료/생산/취소).
+    버튼 동작은 work/workDetail.js, 컨트롤러는 /work/{id} (WorkController.detail).
+--%>
 
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
 <title>작업지시 상세</title>
+<link rel="stylesheet" href="/resources/css/detail-common.css">
 <link rel="stylesheet" href="/resources/css/work/workDetail.css">
 </head>
 <body>
@@ -141,6 +147,27 @@
         </div>
 
     </main>
+
+<!-- 작업일 오류 알림 모달 -->
+<div id="dateErrModal" style="display:none; position:fixed; inset:0;
+     background:rgba(0,0,0,0.45); z-index:9999;
+     align-items:center; justify-content:center;">
+    <div style="background:#fff; border-radius:12px; padding:32px 36px;
+                max-width:340px; width:90%; box-shadow:0 8px 28px rgba(0,0,0,0.2);
+                text-align:center; font-family:'Malgun Gothic',sans-serif;">
+        <div style="font-size:2.2rem; margin-bottom:14px;">📅</div>
+        <div style="font-size:1.1rem; font-weight:bold; color:#333; margin-bottom:8px;">
+            작업일이 아닙니다
+        </div>
+        <div style="font-size:0.88rem; color:#666; margin-bottom:24px;">
+            작업시작일: <strong id="dateErrDate" style="color:#2D6A4F;"></strong>
+        </div>
+        <button onclick="document.getElementById('dateErrModal').style.display='none'"
+                style="padding:10px 32px; background:#2D6A4F; color:#fff;
+                       border:none; border-radius:6px; font-size:0.95rem;
+                       font-weight:bold; cursor:pointer;">확인</button>
+    </div>
+</div>
 
 <script>
     var WORK_ORDER_ID = '${workDTO.work_order_id}';

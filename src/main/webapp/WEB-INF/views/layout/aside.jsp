@@ -1,5 +1,11 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
+	 <%request.setCharacterEncoding("utf-8");
+	response.setContentType("text/html; charset=utf-8;"); %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+<%@ taglib prefix="tiles" uri="http://tiles.apache.org/tags-tiles" %>
 <aside class="side">
 	<ul class="nav-list">
 		<li class="nav-item"><a href="/dashboard" class="nav-btn">대시보드</a></li>
@@ -45,7 +51,7 @@
 				<li><a href="">이력 추적</a></li>
 			</ul>
 		</li>
-		<li class="nav-item"><a href="/" class="nav-btn">입고/출고 관리</a></li>
+		<li class="nav-item"><a href="/io" class="nav-btn">입고/출고 관리</a></li>
 		<li class="nav-item">
 			<div class="nav-btn toggle-btn">출하 관리</div>
 			<ul class="sub-nav">
@@ -55,5 +61,9 @@
 		</li>
 		<li class="nav-item"><a href="/board" class="nav-btn">게시판</a></li>
 		<li class="nav-item"><a href="/report" class="nav-btn">리포트</a></li>
-	</ul>
+		<c:if test="${not empty sessionScope.loginUser && (sessionScope.role == 3 || sessionScope.role == 4)}">
+    <li class="nav-item"><a href="/usermanage" class="nav-btn">사용자 관리</a></li>
+</c:if>
+	
+		</ul>
 </aside>
