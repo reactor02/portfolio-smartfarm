@@ -9,4 +9,6 @@ public interface ProcessDAO{
 	public List selectDetail2(int itemNum);
 	public List searchProcess2(Map map);
 	public List modalSearch2(String str);
+	public int insertProcess2(ProcessDTO dto);
+	public void updateStatus2(ProcessDTO dto);
 }

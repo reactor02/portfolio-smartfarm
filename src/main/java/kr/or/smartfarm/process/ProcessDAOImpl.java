@@ -9,6 +9,9 @@ import org.springframework.stereotype.Repository;
 
 import com.github.pagehelper.PageHelper;
 
+import kr.or.smartfarm.bom.BomDTO;
+import kr.or.smartfarm.stock.StockDTO;
+
 @Repository
 public class ProcessDAOImpl implements ProcessDAO{
 
@@ -52,5 +55,18 @@ public class ProcessDAOImpl implements ProcessDAO{
 			List result = sqlSession.selectList("kr.or.process.processModalSearch", str);
 			System.out.println(result);
 			return result;
+		}
+		
+		@Override
+		public int insertProcess2(ProcessDTO dto) {
+			
+			int result = sqlSession.insert("kr.or.process.Processinsert", dto);
+			return result;
+		}
+		
+		@Override
+		public void updateStatus2(ProcessDTO dto) {
+			sqlSession.update("kr.or.process.updateProcessStatus", dto);
+			return;
 		}
 }
