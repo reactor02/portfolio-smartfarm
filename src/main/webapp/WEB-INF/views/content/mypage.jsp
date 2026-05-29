@@ -19,60 +19,22 @@ response.setContentType("text/html; charset=utf-8");
 <link rel="stylesheet" href="/resources/css/modal.css">
 
 <style>
-/* 마이페이지 메인 레이아웃: 목록 검색창 너비와 완벽히 핏을 맞추기 위한 가로 플렉스 및 하단 여백 강제 고정 */
-.mypage-wrapper { display: flex !important; gap: 24px !important; width: 100% !important; max-width: 100% !important; margin: 0 auto !important; padding-bottom: 30px !important; align-items: flex-start !important; }
 
-/* 대시보드 전용 카드 박스: 목록 박스의 테두리 두께 및 곡률(#bbb, 10px)을 그대로 이식하고 답답한 내부 여백 축소 */
-.mypage-wrapper .mp-card { flex: 1 !important; min-width: 0 !important; min-height: 440px !important; display: flex !important; flex-direction: column !important; background: #fff !important; border: 1px solid #bbb !important; border-radius: 10px !important; padding: 22px 25px !important; box-shadow: 0 2px 8px rgba(0, 0, 0, .03) !important; }
+/* 모달 오버레이 */
+body .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(0,0,0,.5); z-index: 2000; }
 
-/* 카드 내부 헤더 영역: 제목과 버튼의 수평 정렬 밸런스를 맞추고 하단 경계선의 밀착도 미세조정 */
-.mypage-wrapper .mp-card-hdr { display: flex !important; justify-content: space-between !important; align-items: center !important; padding-bottom: 10px !important; margin-bottom: 20px !important; border-bottom: 1px solid #ddd !important; }
-.mypage-wrapper .mp-card-hdr h2 { font-size: 1.2rem !important; color: #222 !important; font-weight: 700 !important; margin: 0 !important; }
+/* 모달 콘텐츠 박스: 자바스크립트가 부모를 block으로 바꿔도 무조건 화면 정중앙 고정 */
+body .modal-box.password-modal-size { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 100%; max-width: 400px; padding: 25px 30px; background-color: #fff; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,.15); box-sizing: border-box; }
 
-/* 내 정보 수정 버튼: 테이블 우상단 '+ 등록하기' 버튼의 압축된 크기감을 그대로 반영한 콤팩트 규격 */
-.mypage-wrapper .mp-btn-edit { background-color: #fff !important; color: #2D6A4F !important; padding: 20px 20px !important; border: 1px solid #2D6A4F !important; border-radius: 4px !important; font-size: .85rem !important; font-weight: 700 !important; cursor: pointer !important; transition: .2s !important; }
-.mypage-wrapper .mp-btn-edit:hover { background-color: #B7E4C7 !important; }
+/* 입력 폼 그룹 */
+div .mp-form-group-vertical { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
+div .mp-form-group-vertical label { font-size: .9rem; font-weight: 700; color: #333; }
+div .mp-form-group-vertical .form-control { width: 100%; height: 38px; padding: 0 10px; border: 1px solid #aaa; border-radius: 4px; font-size: .95rem; outline: none; }
+div .mp-form-group-vertical .form-control:focus { border-color: #2D6A4F; }
 
-/* 프로필 입력 폼 레이아웃: 테이블 행(Row) 높이의 컴팩트한 감각을 반영하여 입력 필드 간 수직 간격 밀착 */
-.mypage-wrapper .mp-profile-form { display: flex !important; flex-direction: column !important; gap: 12px !important; }
-.mypage-wrapper .mp-form-group { display: flex !important; align-items: center !important; }
-.mypage-wrapper .mp-form-group label { width: 85px !important; flex-shrink: 0 !important; font-size: .9rem !important; font-weight: 700 !important; color: #333 !important; }
+/* 검증 메시지 */
+div .pwd-msg-box { font-size: .85rem; font-weight: 700; margin-top: 4px; min-height: 18px; }
 
-/* 마이페이지 전용 읽기창: 기존 .form-control 규격을 강제 상속하며 테두리 색상과 좌우 여백 미세 정돈 */
-.mypage-wrapper .form-control.read-only-field { flex: 1 !important; width: 100% !important; height: 38px !important; padding: 0 10px !important; background-color: #f9f9f9 !important; color: #555 !important; border: 1px solid #aaa !important; border-radius: 4px !important; font-size: .9rem !important; cursor: default !important; }
-
-/* 현황판 위젯 레이아웃: 목록 테이블 헤더의 콤팩트한 비율을 계승하여 상하 크기를 슬림하게 줄인 3단 보드 */
-.mypage-wrapper .mp-status-board { display: flex !important; gap: 12px !important; margin-bottom: 15px !important; }
-.mypage-wrapper .mp-status-item { flex: 1 !important; display: flex !important; flex-direction: column !important; align-items: center !important; padding: 12px 10px !important; border-radius: 6px !important; border: 1px solid #ccc !important; }
-
-/* 위젯 상태별 파스텔톤 배경: 목록 화면의 깔끔한 톤앤매너와 어우러지는 소프트 피드백 색상 매칭 */
-.mypage-wrapper .status-waiting { background-color: #EBF8FF !important; border-color: #BEE3F8 !important; }
-.mypage-wrapper .status-ongoing { background-color: #FEFCBF !important; border-color: #FAF089 !important; }
-.mypage-wrapper .status-complete { background-color: #E6F4EA !important; border-color: #B7E4C7 !important; }
-.mypage-wrapper .status-title { font-size: .85rem !important; color: #555 !important; font-weight: 700 !important; margin-bottom: 2px !important; }
-.mypage-wrapper .status-number { font-size: 1.1rem !important; color: #222 !important; font-weight: 700 !important; }
-
-/* 중앙 안내 문구 영역: 과도하게 자리를 차지하던 가짜 박스 형태를 완전히 지우고 여백 유연화 처리 */
-.mypage-wrapper .mp-summary-zone { flex: 1 !important; display: flex !important; align-items: center !important; justify-content: center !important; padding: 15px !important; margin-bottom: 15px !important; background: none !important; border: none !important; }
-.mypage-wrapper .mp-summary-zone p { font-size: .9rem !important; color: #666 !important; text-align: center !important; }
-
-/* 하단 푸터 바로가기 영역: 전체 카드 높이가 줄어듦에 따라 자연스럽게 우하단에 안착되도록 여백 조정 */
-.mypage-wrapper .mp-card-footer { margin-top: auto !important; text-align: right !important; }
-
-/* 모달 전 체 오버레이: 전체 화면을 어둡게 덮고 내부 요소를 스크롤에 관계없이 화면 정중앙 정렬 */
-.modal-overlay { position: fixed !important; top: 0 !important; left: 0 !important; width: 100vw !important; height: 100vh !important; background-color: rgba(0, 0, 0, .5) !important; z-index: 2000 !important; display: flex !important; align-items: center !important; justify-content: center !important; }
-
-/* 모달 콘텐츠 박스: 오버레이 중앙에 완전히 밀착 고정시키고 그림자 및 라운딩 규격 매칭 */
-.modal-box.password-modal-size { position: relative !important; width: 100% !important; max-width: 400px !important; padding: 25px 30px !important; background-color: #fff !important; border-radius: 10px !important; box-shadow: 0 4px 15px rgba(0, 0, 0, .15) !important; box-sizing: border-box !important; }
-
-/* 모달 내부 입력 폼: 세로 배치 레이아웃 구성 및 행간 컴팩트 간격 최적화 */
-.mp-form-group-vertical { display: flex !important; flex-direction: column !important; gap: 6px !important; margin-bottom: 16px !important; }
-.mp-form-group-vertical label { font-size: .9rem !important; font-weight: 700 !important; color: #333 !important; }
-.mp-form-group-vertical .form-control { width: 100% !important; height: 38px !important; padding: 0 10px !important; border: 1px solid #aaa !important; border-radius: 4px !important; font-size: .95rem !important; outline: none !important; }
-.mp-form-group-vertical .form-control:focus { border-color: #2D6A4F !important; }
-
-/* 실시간 검증 메시지 박스: 정규식 경고 및 일치 텍스트 배치를 위한 하단 공간 확보 */
-.pwd-msg-box { font-size: .85rem !important; font-weight: 700 !important; margin-top: 4px !important; min-height: 18px !important; }
 
 </style>
 </head>
@@ -186,25 +148,26 @@ response.setContentType("text/html; charset=utf-8");
                 <!-- 새 비밀번호 -->
                 <div class="mp-form-group-vertical">
                     <label for="newPwd">새 비밀번호</label>
-                     <input type="password" 
-           name="pw" 
-           placeholder="비밀번호를 입력해주세요." 
-           class="form-control" 
-           required
-           pattern="(?=.*[a-zA-Z])(?=.*\d)(?=.*[!@#$%^&*()_+~`\-={}\[\]:;&quot;'<>,.?\/]).{8,20}"
-           title="비밀번호는 영문, 숫자, 특수문자를 포함하여 8~20자로 입력해주세요.">
+                     <!-- 새 비밀번호 입력창 수정본 -->
+<input type="password" 
+       name="pw" 
+       placeholder="비밀번호를 입력해주세요." 
+       class="form-control" 
+       required
+       pattern="(?=.*[a-zA-Z])(?=.*\d)(?=.*[^a-zA-Z0-9]).{8,20}"
+       title="비밀번호는 영문, 숫자, 특수문자를 포함하여 8~20자로 입력해주세요.">
                 </div>
 
                 <!-- 새 비밀번호 확인 -->
                 <div class="mp-form-group-vertical">
                     <label for="confirmPwd">새 비밀번호 확인</label>
-                   <input type="password" 
-           name="pw2" 
-           placeholder="비밀번호를 입력해주세요." 
-           class="form-control" 
-           required
-           pattern="(?=.*[a-zA-Z])(?=.*\d)(?=.*[!@#$%^&*()_+~`\-={}\[\]:;&quot;'<>,.?\/]).{8,20}"
-           title="비밀번호는 영문, 숫자, 특수문자를 포함하여 8~20자로 입력해주세요.">
+            <input type="password" 
+       name="pw2" 
+       placeholder="비밀번호를 입력해주세요." 
+       class="form-control" 
+       required
+       pattern="(?=.*[a-zA-Z])(?=.*\d)(?=.*[^a-zA-Z0-9]).{8,20}"
+       title="비밀번호는 영문, 숫자, 특수문자를 포함하여 8~20자로 입력해주세요.">
                     <!-- 메시지 출력 공간 (비밀번호 일치 여부 등 텍스트 노출) -->
                     <div id="pwdMsg" class="pwd-msg-box"></div>
                 </div>
@@ -226,16 +189,21 @@ response.setContentType("text/html; charset=utf-8");
 				<!-- 스크립트 -->
 				<script>
 				
-				/* 모달 제어 엘리먼트 정의: 비밀번호 변경 팝업창 조작을 위한 핵심 구성요소 쿼리 매핑 */
+				
+				/* ==========================================
+				 * [1] 엘리먼트 정의 및 쿼리 매핑
+				 * ========================================== */
 				const pwBtn = document.querySelector('#pw-btn');
 				const pwdModal = document.getElementById("pwdModal");
 				const pwdForm = document.getElementById("pwd-form");
-				const currentPwd = document.getElementById("currentPwd");
+				// currentPwd 정의 제거 (화면에 없으므로 삭제)
 				const pw = document.querySelector('input[name="pw"]');
 				const pw2 = document.querySelector('input[name="pw2"]');
 				const pwdMsg = document.getElementById("pwdMsg");
 
-				/* 1. 모달 개폐 이벤트: 변경 버튼 클릭 시 팝업을 활성화하고 취소 시 폼 리셋 및 메시지 초기화 */
+				/* ==========================================
+				 * [2] 모달 개폐 및 초기화 이벤트
+				 * ========================================== */
 				pwBtn.addEventListener('click', () => pwdModal.style.display = "block");
 
 				document.getElementById("btnPwdCancel").addEventListener("click", () => {
@@ -244,29 +212,63 @@ response.setContentType("text/html; charset=utf-8");
 				    pwdMsg.textContent = "";
 				});
 
-				/* 2. 실시간 일치 검증: 새 비밀번호 입력란 타이핑 시 시스템 고유 딥그린(#2D6A4F) 및 레드 테마 실시간 피드백 */
+				/* ==========================================
+				 * [3] 실시간 비밀번호 일치 검증
+				 * ========================================== */
 				pw2.addEventListener("input", () => {
-				    if (!pw.value && !pw2.value) { pwdMsg.textContent = ""; return; }
+				    if (!pw.value && !pw2.value) { 
+				        pwdMsg.textContent = ""; 
+				        return; 
+				    }
 				    const isMatch = pw.value === pw2.value;
 				    pwdMsg.textContent = isMatch ? "비밀번호가 일치합니다." : "새 비밀번호가 일치하지 않습니다.";
 				    pwdMsg.style.color = isMatch ? "#2D6A4F" : "#d9534f";
 				});
 
-				/* 3. 최종 정형 검증 및 제출: 공백 유무 및 불일치 최종 스크리닝 후 confirm 컨펌 거쳐 서브밋 실행 */
-				document.getElementById("btnPwdSubmit").addEventListener("click", () => {
-				    if (!currentPwd.value || !pw.value || !pw2.value) {
+				/* ==========================================
+				 * [4] 최종 정형 검증 및 비동기(Fetch) 제출
+				 * ========================================== */
+				document.getElementById("btnPwdSubmit").addEventListener("click", function(e) {
+				    e.preventDefault(); 
+
+				    // 1. 공백 유무 검증 (currentPwd.value 조건 제거)
+				    if (!pw.value || !pw2.value) {
 				        alert("모든 필드를 입력해주세요.");
 				        return;
 				    }
+				    
+				    // 2. 새 비밀번호 일치 최종 검증
 				    if (pw.value !== pw2.value) {
 				        alert("새 비밀번호 확인이 일치하지 않습니다.");
 				        return;
 				    }
+
+				    // 3. 최종 컨펌 후 비동기 데이터 전송
 				    if (confirm("비밀번호를 변경하시겠습니까?")) {
-				        pwdForm.submit();
+				        const formData = new FormData(pwdForm);
+
+				        fetch('/mpchangepw', { 
+				            method: 'POST',
+				            body: formData
+				        })
+				        .then(response => response.json())
+				        .then(data => {
+				            if (data.success) {
+				                alert('비밀번호가 성공적으로 변경되었습니다.');
+				                pwdModal.style.display = 'none'; 
+				                pwdForm.reset();                 
+				                pwdMsg.textContent = "";         
+				            } else {
+				                alert('비밀번호 변경에 실패했습니다: ' + data.message);
+				            }
+				        })
+				        .catch(error => {
+				            console.error('Error:', error);
+				            alert('오류가 발생했습니다. 다시 시도해주세요.');
+				        });
 				    }
 				});
-    
+				
     
 </script>
 </body>
