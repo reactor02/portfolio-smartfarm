@@ -1,5 +1,4 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-	pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%
 request.setCharacterEncoding("utf-8");
 response.setContentType("text/html; charset=utf-8");
@@ -18,7 +17,6 @@ response.setContentType("text/html; charset=utf-8");
 <link rel="stylesheet" href="/resources/css/paging.css">
 <link rel="stylesheet" href="/resources/css/modal.css">
 <style>
-/* 기본 초기화 */
 * {
 	box-sizing: border-box;
 	margin: 0;
@@ -26,7 +24,6 @@ response.setContentType("text/html; charset=utf-8");
 	font-family: 'Malgun Gothic', sans-serif;
 }
 
-/* 레이아웃 골격 */
 .mat-all {
 	display: flex;
 	flex-direction: column;
@@ -52,12 +49,11 @@ response.setContentType("text/html; charset=utf-8");
 	min-width: 0;
 }
 
-/* ========== 1. 상단 타이틀 & 등록 버튼 ========== */
 .hdr {
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
-	background-color: #2D6A4F; /* 메인 컬러 배경 */
+	background-color: #2D6A4F;
 	padding: 15px 25px;
 	border-radius: 8px;
 	margin-bottom: 25px;
@@ -66,40 +62,21 @@ response.setContentType("text/html; charset=utf-8");
 
 .hdr h1 {
 	font-size: 1.8rem;
-	color: #ffffff; /* 화이트 통일 */
+	color: #ffffff;
 	font-weight: bold;
 	letter-spacing: -1px;
 }
 
 .btn-reg {
 	background-color: #fff;
-	color: #2D6A4F; /* 텍스트가 아닌 명확한 버튼 디자인 */
+	color: #2D6A4F;
 	padding: 10px 24px;
 	border-radius: 6px;
 	border: 1px solid #2D6A4F;
 	font-weight: bold;
 	font-size: 1.05rem;
 	cursor: pointer;
-	box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 2px 3px
-		rgba(0, 0, 0, 0.2);
-	transition: background-color 0.2s;
-}
-
-.btn-plus:hover {
-	background-color: #B7E4C7;
-}
-
-.btn-plus {
-	background-color: #fff;
-	color: #2D6A4F; /* 텍스트가 아닌 명확한 버튼 디자인 */
-	padding: 10px 24px;
-	border-radius: 6px;
-	border: 1px solid #2D6A4F;
-	font-weight: bold;
-	font-size: 1.05rem;
-	cursor: pointer;
-	box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 2px 3px
-		rgba(0, 0, 0, 0.2);
+	box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 2px 3px rgba(0, 0, 0, 0.2);
 	transition: background-color 0.2s;
 }
 
@@ -107,31 +84,50 @@ response.setContentType("text/html; charset=utf-8");
 	background-color: #B7E4C7;
 }
 
-/* ========== 2. 검색 영역 (입력창, 버튼 높이 및 정렬 완벽화) ========== */
-.sch-wrap {
+.btn-plus {
 	background-color: #fff;
-	border: 1px solid #bbb;
-	border-radius: 10px;
+	color: #2D6A4F;
+	padding: 10px 24px;
+	border-radius: 6px;
+	border: 1px solid #2D6A4F;
+	font-weight: bold;
+	font-size: 1.05rem;
+	cursor: pointer;
+	box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 2px 3px rgba(0, 0, 0, 0.2);
+	transition: background-color 0.2s;
+}
+
+.btn-plus:hover {
+	background-color: #B7E4C7;
+}
+
+.sch-wrap {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	background-color: #f8f9fa;
+	border: 1px solid #d1d5db;
+	border-radius: 8px;
 	padding: 20px 25px;
 	margin-bottom: 25px;
 	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
 }
-/* Flex를 이용한 양극단 정렬 */
+
+.sch-left {
+	display: flex;
+	flex-direction: column;
+	gap: 15px;
+}
+
 .sch-row {
 	display: flex;
-	justify-content: space-between;
 	align-items: center;
-	margin-bottom: 15px;
+	gap: 15px;
 }
 
-.sch-row:last-child {
-	margin-bottom: 0;
-}
-
-.sch-left, .sch-right {
+.sch-right {
 	display: flex;
-	align-items: center;
-	gap: 12px;
+	gap: 10px;
 }
 
 .label {
@@ -143,7 +139,6 @@ response.setContentType("text/html; charset=utf-8");
 	white-space: nowrap;
 }
 
-/* 폼 요소 공통 규격 (높이 강제 일치) */
 .form-control {
 	height: 38px;
 	border: 1px solid #aaa;
@@ -152,6 +147,7 @@ response.setContentType("text/html; charset=utf-8");
 	font-size: 0.95rem;
 	outline: none;
 	transition: border-color 0.2s;
+	background-color: #fff;
 }
 
 .form-control:focus {
@@ -159,10 +155,9 @@ response.setContentType("text/html; charset=utf-8");
 }
 
 select.form-control {
-	width: 140px;
+	width: 150px;
 }
 
-/* 커스텀 검색창 (돋보기 포함) */
 .sch-input-box {
 	display: flex;
 	align-items: center;
@@ -171,7 +166,11 @@ select.form-control {
 	height: 38px;
 	background: #fff;
 	padding-left: 10px;
-	width: 220px;
+	width: 385px;
+}
+
+.sch-input-box:focus-within {
+	border-color: #2D6A4F;
 }
 
 .sch-input-box input {
@@ -183,10 +182,9 @@ select.form-control {
 	font-size: 0.95rem;
 }
 
-/* 검색 버튼 (높이 맞춤) */
 .btn-sch {
-	height: 38px;
-	padding: 0 20px;
+	height: 42px;
+	padding: 0 24px;
 	background-color: #fff;
 	color: #2D6A4F;
 	border: 1px solid #2D6A4F;
@@ -202,8 +200,8 @@ select.form-control {
 }
 
 .select-reset {
-	height: 38px;
-	padding: 0 20px;
+	height: 42px;
+	padding: 0 24px;
 	background-color: #fff;
 	color: #2D6A4F;
 	border: 1px solid #2D6A4F;
@@ -216,9 +214,10 @@ select.form-control {
 
 .select-reset:hover {
 	background-color: #FFB703;
+	color: #fff;
+	border-color: #FFB703;
 }
 
-/* ========== 3. 커스텀 라디오 버튼 ========== */
 .radio-label {
 	display: flex;
 	align-items: center;
@@ -254,10 +253,9 @@ select.form-control {
 	width: 10px;
 	height: 10px;
 	border-radius: 50%;
-	background-color: #4A90E2; /* 선택 시 파란색 원 */
+	background-color: #4A90E2;
 }
 
-/* ========== 4. 데이터 테이블 ========== */
 .tbl-box {
 	background: #fff;
 	border-radius: 8px;
@@ -303,10 +301,11 @@ select.form-control {
 .link-txt:hover {
 	text-decoration: underline;
 }
-#processDesc{
+
+#processDesc {
 	max-height: 200px;
 }
-/* 추가된 텍스트 에어리어 스타일 */
+
 .textarea-desc {
 	width: 100%;
 	border: 1px solid #aaa;
@@ -315,9 +314,7 @@ select.form-control {
 	font-size: 0.95rem;
 	font-family: 'Malgun Gothic', sans-serif;
 	outline: none;
-	resize: vertical; /* 세로 크기 조절만 허용 */
-
-	
+	resize: vertical;
 }
 
 .textarea-desc:focus {
@@ -339,34 +336,35 @@ select.form-control {
 
 				<form name="searchFrm" method="get">
 					<div class="sch-wrap">
-
-						<div class="sch-row">
-							<div class="sch-left">
-								<span class="label">▶ 생산제품 타입</span> <select id="type"
-									class="form-control">
+						<div class="sch-left">
+							<div class="sch-row">
+								<span class="label">▶ 생산제품 타입</span>
+								<select id="type" class="form-control">
 									<option value="all">선택</option>
 									<option value="product">완제품</option>
 									<option value="semiproduct">반제품</option>
-								</select> <span class="label">▶ 사용 여부</span> <select id="process_status"
-									class="form-control">
+								</select>
+								
+								<span class="label" style="margin-left: 20px;">▶ 사용 여부</span>
+								<select id="process_status" class="form-control">
 									<option value="all">전체</option>
 									<option value="사용중">사용중</option>
 									<option value="미사용">미사용</option>
 								</select>
 							</div>
-						</div>
-
-						<div class="sch-row">
-							<div class="sch-right">
+							
+							<div class="sch-row">
 								<div class="sch-input-box">
-									<span style="color: #888;">&#128269;</span> <input type="text"
-										id="keyword" value="" placeholder="공정 품목 검색">
+									<span style="color: #888;">&#128269;</span>
+									<input type="text" id="keyword" value="" placeholder="공정 품목 검색">
 								</div>
-								<button type="button" class="btn-sch">검색</button>
-								<button type="button" class="select-reset">검색 초기화</button>
 							</div>
 						</div>
-
+						
+						<div class="sch-right">
+							<button type="button" class="btn-sch">검색</button>
+							<button type="button" class="select-reset">검색 초기화</button>
+						</div>
 					</div>
 				</form>
 
@@ -440,14 +438,11 @@ select.form-control {
 							id="itemSearch" class="searchgo" placeholder="품목명 검색">
 					</div>
 
-<!-- 					<div class="modal-field"> -->
-<!-- 						<label for="stockQty">개수</label> <input type="number" -->
-<!-- 							name="stock_qty" id="stockQty" min="1" placeholder="수량 입력"> -->
-<!-- 					</div> -->
 					<div class="modal-field">
 						<label for="headCount">작업 인원</label> <input type="number"
 							name="head_count" id="head_count" min="1" placeholder="필요 작업인원 입력">
 					</div>
+					
 					<div class="modal-field">
 						<label for="flowOrder">작업 순서</label> <input type="number"
 							name="flow" id="flow" min="1"
@@ -560,7 +555,6 @@ select.form-control {
 			movePage(1)
 		})
 		
-		
 		function movePage(pageNum) {
 			let type = document.querySelector("#type").value;
 			let process_status = document.querySelector("#process_status").value;
@@ -613,6 +607,7 @@ select.form-control {
 		plus_btn.addEventListener('click', ()=>{
 			modal.style.display = "block";
 		})
+		
 		const cancel = document.querySelector(".btn-cancel");
 		cancel.addEventListener('click',()=>{
 			modal.style.display = "none";
@@ -640,7 +635,7 @@ select.form-control {
 				uploadData(data);
 			})
 			.catch(error=>{
-				console.log("등록모달 검색 에러 났음", error);
+				console.log(error);
 			});
 		})
 			
@@ -680,11 +675,30 @@ select.form-control {
 			
 		const btn_plus = document.querySelector(".btn-plus");
 		btn_plus.addEventListener('click',()=>{
-			
 			const radio = document.querySelector("input[type='radio']:checked");
-			
-			if(radio == null){
-				alert("선택된 항목이 없습니다.");
+			if(!radio){
+				alert("품목을 선택해주세요.");
+				return;
+			}
+
+			const headCount = document.querySelector("#head_count").value.trim();
+			if(headCount === "" || isNaN(headCount) || Number(headCount) <= 0){
+				alert("작업 인원을 올바르게 입력해주세요.");
+				document.querySelector("#head_count").focus();
+				return;
+			}
+
+			const flow = document.querySelector("#flow").value.trim();
+			if(flow === "" || isNaN(flow) || Number(flow) <= 0){
+				alert("작업 순서를 올바르게 입력해주세요.");
+				document.querySelector("#flow").focus();
+				return;
+			}
+
+			const processDesc = document.querySelector("#processDesc").value.trim();
+			if(processDesc === ""){
+				alert("공정 설명을 입력해주세요.");
+				document.querySelector("#processDesc").focus();
 				return;
 			}
 			
@@ -693,7 +707,6 @@ select.form-control {
 		});
 		
 		const msgFlag = "${msg}";
-		console.log("msgFlag: ", msgFlag);
 		if(msgFlag == "true"){
 			alert("등록되었습니다.");
 			window.history.replaceState({}, document.title, window.location.pathname);

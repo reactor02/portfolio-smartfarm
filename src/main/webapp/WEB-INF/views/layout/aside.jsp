@@ -19,7 +19,6 @@
 				<li><a href="/facility">시설 관리</a></li>
 				<li><a href="/equip">설비 관리</a></li>
 				<li><a href="/vender">거래처 관리</a></li>
-				<li><a href="">사용자/권한 관리</a></li>
 			</ul>
 		</li>
 		<li class="nav-item">
