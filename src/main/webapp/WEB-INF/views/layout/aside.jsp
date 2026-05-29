@@ -45,7 +45,7 @@
 				<li><a href="">이력 추적</a></li>
 			</ul>
 		</li>
-		<li class="nav-item"><a href="/" class="nav-btn">입고/출고 관리</a></li>
+		<li class="nav-item"><a href="/io" class="nav-btn">입고/출고 관리</a></li>
 		<li class="nav-item">
 			<div class="nav-btn toggle-btn">출하 관리</div>
 			<ul class="sub-nav">
