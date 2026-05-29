@@ -100,6 +100,8 @@ public class LotController {
             );
             return null;
         }
+        model.addAttribute("lotCode", lot_code );
+        
         model.addAttribute("lotDTO",             lotDTO);
         // 이 LOT 생산에 사용된 소모재료 LOT (직접 1단계)
         model.addAttribute("materials",          lotService.getMaterialsByChildLot(lotDTO.getLot_num()));

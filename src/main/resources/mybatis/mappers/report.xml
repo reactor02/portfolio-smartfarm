@@ -10,23 +10,59 @@
 		left join stock s on s.item_num = i.item_num
 		left join bom b on b.item_num = i.item_num
 		left join equipment_log e on e.item_num = i.item_num
+		left join lot l on l.item_num = i.item_num
 	</sql>
 	
 	<select id="getReportList" resultType="kr.or.smartfarm.report.ReportSummaryDTO">
 		select 
 			i.item_num, i.code, i.name, s.stock_qty,
-			b.bom_code, b.bom_status, e.start_date, e.equip_status
+			b.bom_code, b.bom_status, e.start_date, e.equip_status, l.lot_code, l.lot_date
 		<include refid="BaseTableJoin" />
 		where 1=1
 		<if test="startDate != null and endDate != null"> 
 			and e.start_date between #{startDate} and #{endDate}
 		</if>
 	</select>
-
-
-
+	
+	<select id="getQcList" resultType="kr.or.smartfarm.report.ReportSummaryDTO">
+		 SELECT
+            io.io_date,
+            qc.qc_type,
+            qc.qc_pass,
+            item.name
+            FROM io
+        JOIN qc
+            ON qc.qc_num = io.qc_num
+        JOIN lot
+            ON io.lot_num = lot.lot_num
+        JOIN item
+            ON lot.item_num = item.item_num
+        ORDER BY io.io_date DESC
+	</select>
+	
+	<select id="getIOList" resultType="kr.or.smartfarm.report.ReportSummaryDTO"> 
+		SELECT 
+        i.io_type, 
+        ii.name,
+        f.facility_name,
+        TO_CHAR(i.io_date, 'YYYY-MM-DD') AS io_date
+        FROM io i
+        JOIN lot l ON l.lot_num = i.lot_num
+        JOIN item ii ON ii.item_num = l.item_num
+        JOIN facility f ON i.facility_num = f.facility_num
+        ORDER BY i.io_num DESC
+	</select>
 	
 	
+	<select id="getProcList" resultType="kr.or.smartfarm.report.ReportSummaryDTO">
+		 SELECT 
+        i.name, i.type,
+        p.process_status
+        FROM process p
+        JOIN item i ON p.item_num = i.item_num
+        WHERE i.TYPE IN ('PRODUCT', 'SEMIPRODUCT') 
+         ORDER BY i.item_num DESC
+	</select>
 </mapper>
 
 

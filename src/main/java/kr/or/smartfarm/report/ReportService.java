@@ -17,4 +17,19 @@ public class ReportService {
 		
 		return result;
 	}
+	
+	public List selectQc() {
+		List result = reportDAO.selectQc();
+		return result;
+	}
+	
+	public List selectIO() {
+		List result = reportDAO.selectIO();
+		return result;
+	}
+	
+	public List selectProc() {
+		List result = reportDAO.selectProc();
+		return result;
+	}
 }

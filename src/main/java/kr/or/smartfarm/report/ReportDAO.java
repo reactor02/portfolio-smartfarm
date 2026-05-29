@@ -16,4 +16,18 @@ public class ReportDAO {
 		List<ReportSummaryDTO> result = sqlSession.selectList("mapper.report.getReportList");
 		return result;
  	}
+	
+	public List<ReportSummaryDTO> selectQc(){
+		List<ReportSummaryDTO> result = sqlSession.selectList("mapper.report.getQcList");
+		return result;
+	}
+	public List<ReportSummaryDTO> selectIO(){
+		List<ReportSummaryDTO> result = sqlSession.selectList("mapper.report.getIOList");
+		return result;
+	}
+	
+	public List<ReportSummaryDTO> selectProc(){
+		List<ReportSummaryDTO> result = sqlSession.selectList("mapper.report.getProcList");
+		return result;
+	}
 }

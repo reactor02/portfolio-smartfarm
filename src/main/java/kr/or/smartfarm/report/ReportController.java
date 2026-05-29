@@ -16,9 +16,20 @@ public class ReportController {
 	@GetMapping("/report")
 	public String report(Model model) {
 	    try {
+	    	
 	        List<ReportSummaryDTO> result = reportService.selectAll();
 	        System.out.println("조회된 데이터 개수: " + result.size());
 	        model.addAttribute("result", result);
+	        
+	        List<ReportSummaryDTO> resultqc = reportService.selectQc();
+	        model.addAttribute("resultqc", resultqc);
+	        
+	        List<ReportSummaryDTO> resultIO = reportService.selectIO(); 
+	        model.addAttribute("resultIO", resultIO);
+	        
+	        List<ReportSummaryDTO> resultProc = reportService.selectProc();
+	        model.addAttribute("resultProc", resultProc);
+	        
 	    } catch (Exception e) {
 	        System.out.println("에러 발생 지점: " + e.getMessage());
 	        e.printStackTrace(); 
