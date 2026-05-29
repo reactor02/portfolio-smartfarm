@@ -232,17 +232,28 @@ td {
 }
 
 /* 상태별 색상 */
-.status-badge.running {
+.status-badge.RUNNING {
     color: #49a47a; /* 녹색 */
 }
 
-.status-badge.error {
-    background-color: #e63946; /* 빨간색 */
+.status-badge.ERROR {
+  color: #e63946; /* 빨간색 */
 }
 
-.status-badge.maintenance {
-    background-color: #ffb703; /* 노랑/주황색 */
-    color: #333; /* 글자색이 밝을 땐 어둡게 */
+.status-badge.MAINTENANCE {
+   color: #ffb703; /* 노랑/주황색 */
+}
+.status-badge.WAITING {
+	color: #ffb703;
+}
+.status-badge.PASS {
+	 color: #49a47a;
+}
+.status-badge.사용중 {
+ 	color: #49a47a;
+}
+.status-badge.미사용 {
+	color: #e63946;
 }
 
 </style>
@@ -324,23 +335,25 @@ td {
 
 						<div class="card">
 							<div class="card-header-wrapper">
-								<h3 class="title">생산 계획</h3>
+								<h3 class="title">공정</h3>
 								<a href="/plan" class="more-link">더보기 +</a>
 							</div>
-							<table>
-								<tr>
-									<th>제품</th>
-									<th>수량</th>
-								</tr>
-								<tr>
-									<td>A</td>
-									<td>5000</td>
-								</tr>
-								<tr>
-									<td>B</td>
-									<td>3000</td>
-								</tr>
-							</table>
+							<div>
+								<table>
+									<tr>
+										<th>공정 품목</th>
+										<th>사용 여부</th>
+									</tr>
+									<c:forEach var="item" items="${resultProc}" begin="0" end="4">
+										<tr>
+											<td>${item.name}</td>
+											<td>
+												<span class="status-badge ${item.process_status}">${item.process_status}</span>
+											</td>
+										</tr>
+									</c:forEach>
+								</table>
+							</div>
 						</div>
 					</div>
 
@@ -348,47 +361,54 @@ td {
 					<div class="grid-2">
 						<div class="card">
 							<div class="card-header-wrapper">
-								<h3 class="title">작업 진행 상황</h3>
-								<a href="/work" class="more-link">더보기 +</a>
+								<h3 class="title">품질 관리</h3>
+								<a href="/qc" class="more-link">더보기 +</a>
 							</div>
-							<table id="workTable">
-								<tr>
-									<th>날짜</th>
-									<th>작업</th>
-									<th>진행률</th>
-								</tr>
-								<tr data-date="2026-06-01">
-									<td>2026-06-01</td>
-									<td>조립</td>
-									<td>60%</td>
-								</tr>
-								<tr data-date="2026-06-03">
-									<td>2026-06-03</td>
-									<td>검사</td>
-									<td>90%</td>
-								</tr>
-							</table>
+							<div>
+								<table>
+									<tr>
+										<th>품목명</th>
+										<th>검사구분</th>
+										<th>통과여부</th>
+										<th>검사일</th>
+									</tr>
+									<c:forEach var="item" items="${resultqc}" begin="0" end="4">
+										<tr>
+											<td>${item.name}</td>
+											<td>${item.qc_type}</td>
+											<td>
+												<span class="status-badge ${item.qc_pass}">${item.qc_pass}</span>
+											</td>
+											<td>${item.io_date}</td>
+										</tr>
+									</c:forEach>
+								</table>
+							</div>
 						</div>
 
 						<div class="card">
 							<div class="card-header-wrapper">
-								<h3 class="title">불량 현황</h3>
+								<h3 class="title">입출고 관리</h3>
 								<a href="/defect" class="more-link">더보기 +</a>
 							</div>
-							<table>
-								<tr>
-									<th>유형</th>
-									<th>수량</th>
-								</tr>
-								<tr>
-									<td>스크래치</td>
-									<td>12</td>
-								</tr>
-								<tr>
-									<td>파손</td>
-									<td>5</td>
-								</tr>
-							</table>
+							<div>
+								<table>
+									<tr>
+										<th>자재명</th>
+										<th>입/출고 여부</th>
+										<th>날짜</th>
+										<th>저장위치</th>
+									</tr>
+									<c:forEach var="item" items="${resultIO}" begin="0" end="4">
+										<tr>
+											<td>${item.name}</td>
+											<td>${item.io_type}</td>
+											<td>${item.io_date}</td>
+											<td>${item.facility_name}</td>
+										</tr>
+									</c:forEach>
+								</table>
+							</div>
 						</div>
 					</div>
 
@@ -396,19 +416,25 @@ td {
 					<div class="grid-3">
 						<div class="card">
 							<div class="card-header-wrapper">
-								<h3 class="title">출하</h3>
+								<h3 class="title">Lot 관리</h3>
 								<a href="/shipment" class="more-link">더보기 +</a>
 							</div>
-							<table>
-								<tr>
-									<th>제품</th>
-									<th>수량</th>
-								</tr>
-								<tr>
-									<td>A</td>
-									<td>1200</td>
-								</tr>
-							</table>
+							<div>
+								<table>
+									<tr>
+										<th>LOT 번호</th>
+										<th>품목명</th>
+										<th>생성일</th>
+									</tr>
+									<c:forEach var="item" items="${result}" begin="0" end="4">
+										<tr>
+											<td>${item.lot_code}</td>
+											<td>${item.name}</td>
+											<td>${item.lot_date}</td>
+										</tr>
+									</c:forEach>
+								</table>
+							</div>
 						</div>
 
 						<div class="card">
