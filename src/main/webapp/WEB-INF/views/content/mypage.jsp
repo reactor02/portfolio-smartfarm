@@ -30,7 +30,7 @@ response.setContentType("text/html; charset=utf-8");
 .mypage-wrapper .mp-card-hdr h2 { font-size: 1.2rem !important; color: #222 !important; font-weight: 700 !important; margin: 0 !important; }
 
 /* 내 정보 수정 버튼: 테이블 우상단 '+ 등록하기' 버튼의 압축된 크기감을 그대로 반영한 콤팩트 규격 */
-.mypage-wrapper .mp-btn-edit { background-color: #fff !important; color: #2D6A4F !important; padding: 5px 14px !important; border: 1px solid #2D6A4F !important; border-radius: 4px !important; font-size: .85rem !important; font-weight: 700 !important; cursor: pointer !important; transition: .2s !important; }
+.mypage-wrapper .mp-btn-edit { background-color: #fff !important; color: #2D6A4F !important; padding: 20px 20px !important; border: 1px solid #2D6A4F !important; border-radius: 4px !important; font-size: .85rem !important; font-weight: 700 !important; cursor: pointer !important; transition: .2s !important; }
 .mypage-wrapper .mp-btn-edit:hover { background-color: #B7E4C7 !important; }
 
 /* 프로필 입력 폼 레이아웃: 테이블 행(Row) 높이의 컴팩트한 감각을 반영하여 입력 필드 간 수직 간격 밀착 */
@@ -59,16 +59,31 @@ response.setContentType("text/html; charset=utf-8");
 /* 하단 푸터 바로가기 영역: 전체 카드 높이가 줄어듦에 따라 자연스럽게 우하단에 안착되도록 여백 조정 */
 .mypage-wrapper .mp-card-footer { margin-top: auto !important; text-align: right !important; }
 
+/* 모달 전 체 오버레이: 전체 화면을 어둡게 덮고 내부 요소를 스크롤에 관계없이 화면 정중앙 정렬 */
+.modal-overlay { position: fixed !important; top: 0 !important; left: 0 !important; width: 100vw !important; height: 100vh !important; background-color: rgba(0, 0, 0, .5) !important; z-index: 2000 !important; display: flex !important; align-items: center !important; justify-content: center !important; }
+
+/* 모달 콘텐츠 박스: 오버레이 중앙에 완전히 밀착 고정시키고 그림자 및 라운딩 규격 매칭 */
+.modal-box.password-modal-size { position: relative !important; width: 100% !important; max-width: 400px !important; padding: 25px 30px !important; background-color: #fff !important; border-radius: 10px !important; box-shadow: 0 4px 15px rgba(0, 0, 0, .15) !important; box-sizing: border-box !important; }
+
+/* 모달 내부 입력 폼: 세로 배치 레이아웃 구성 및 행간 컴팩트 간격 최적화 */
+.mp-form-group-vertical { display: flex !important; flex-direction: column !important; gap: 6px !important; margin-bottom: 16px !important; }
+.mp-form-group-vertical label { font-size: .9rem !important; font-weight: 700 !important; color: #333 !important; }
+.mp-form-group-vertical .form-control { width: 100% !important; height: 38px !important; padding: 0 10px !important; border: 1px solid #aaa !important; border-radius: 4px !important; font-size: .95rem !important; outline: none !important; }
+.mp-form-group-vertical .form-control:focus { border-color: #2D6A4F !important; }
+
+/* 실시간 검증 메시지 박스: 정규식 경고 및 일치 텍스트 배치를 위한 하단 공간 확보 */
+.pwd-msg-box { font-size: .85rem !important; font-weight: 700 !important; margin-top: 4px !important; min-height: 18px !important; }
+
 </style>
 </head>
 <body>
 
 <!-- 타이틀 헤더: 공통 .hdr 스타일 적용 -->
 <div class="hdr"  style="max-width: 955px !important; margin: 30px 0 0 30px !important; ">
-    <h1>사용자 관리</h1>
+    <h1>마이페이지</h1>
     <div>
     
-    <button type="button" class="btn-reg">비밀번호 변경</button>
+    <button name="pw-btn" id="pw-btn" type="button" class="btn-reg">비밀번호 변경</button>
     </div>
 </div>
 
@@ -77,36 +92,52 @@ response.setContentType("text/html; charset=utf-8");
 <div class="mypage-wrapper" style="display: flex !important; gap: 40px !important; width: 100% !important; max-width: 950px !important; margin: 30px 0 0 30px !important; padding-bottom: 30px !important; align-items: flex-start !important;">
     
     <!-- [왼쪽] 마이페이지 내 정보 카드 -->
-    <div class="mp-card" style="flex: 1 !important; min-width: 0 !important; min-height: 440px !important; display: flex !important; flex-direction: column !important; background: #fff !important; border: 1px solid #bbb !important; border-radius: 10px !important; padding: 22px 25px !important; box-shadow: 0 2px 8px rgba(0, 0, 0, .03) !important;">
-        <div class="mp-card-hdr" style="display: flex !important; justify-content: space-between !important; align-items: center !important; padding-bottom: 10px !important; margin-bottom: 20px !important; border-bottom: 1px solid #ddd !important;">
-            <h2 style="font-size: 1.25rem !important; color: #222 !important; font-weight: 700 !important; margin: 0 !important;">마이페이지</h2>
-        </div>
-        
+<div class="mp-card" style="flex: 1 !important; min-width: 0 !important; min-height: 440px !important; display: flex !important; flex-direction: column !important; background: #fff !important; border: 1px solid #bbb !important; border-radius: 10px !important; padding: 22px 25px !important; box-shadow: 0 2px 8px rgba(0, 0, 0, .03) !important;">
+    <div class="mp-card-hdr" style="display: flex !important; justify-content: space-between !important; align-items: center !important; padding-bottom: 10px !important; margin-bottom: 20px !important; border-bottom: 1px solid #ddd !important;">
+        <h2 style="font-size: 1.25rem !important; color: #222 !important; font-weight: 700 !important; margin: 0 !important;">내 정보 카드</h2>
+    </div>
+    
+    <form id="info-form" action="/user/updateInfo" method="post" style="margin: 0;">
         <div class="mp-profile-form" style="display: flex !important; flex-direction: column !important; gap: 12px !important;">
             <div class="mp-form-group" style="display: flex !important; align-items: center !important;">
                 <label style="width: 85px !important; flex-shrink: 0 !important; font-size: .95rem !important; font-weight: 700 !important; color: #333 !important;">이름</label>
-                <input type="text" class="form-control read-only-field" value="${loginUser.ename}" readonly style="flex: 1 !important; width: 100% !important; height: 38px !important; padding: 0 10px !important; background-color: #f9f9f9 !important; color: #555 !important; border: 1px solid #aaa !important; border-radius: 4px !important; font-size: .95rem !important; cursor: default !important;" />
+                <!-- 💡 수정을 위해 id="user-ename" 및 name="ename" 추가 -->
+                <input type="text" id="user-ename" name="ename" class="form-control read-only-field" value="${loginUser.ename}" readonly style="flex: 1 !important; width: 100% !important; height: 38px !important; padding: 0 10px !important; background-color: #f9f9f9 !important; color: #555 !important; border: 1px solid #aaa !important; border-radius: 4px !important; font-size: .95rem !important; cursor: default !important; transition: all 0.2s;" />
             </div>
+            
             <div class="mp-form-group" style="display: flex !important; align-items: center !important;">
                 <label style="width: 85px !important; flex-shrink: 0 !important; font-size: .95rem !important; font-weight: 700 !important; color: #333 !important;">비밀번호</label>
-                <input type="password" class="form-control read-only-field" value="********" readonly style="flex: 1 !important; width: 100% !important; height: 38px !important; padding: 0 10px !important; background-color: #f9f9f9 !important; color: #555 !important; border: 1px solid #aaa !important; border-radius: 4px !important; font-size: .95rem !important; cursor: default !important;" />
+                <div style="flex: 1 !important; display: flex !important; gap: 10px !important;">
+                    <input type="password" class="form-control read-only-field" value="********" readonly style="flex: 1 !important; height: 38px !important; padding: 0 10px !important; background-color: #f9f9f9 !important; color: #555 !important; border: 1px solid #aaa !important; border-radius: 4px !important; font-size: .95rem !important; cursor: default !important;" />
+                </div>
             </div>
+            
             <div class="mp-form-group" style="display: flex !important; align-items: center !important;">
                 <label style="width: 85px !important; flex-shrink: 0 !important; font-size: .95rem !important; font-weight: 700 !important; color: #333 !important;">연락처</label>
-                <input type="text" class="form-control read-only-field" value="${loginUser.tel}" readonly style="flex: 1 !important; width: 100% !important; height: 38px !important; padding: 0 10px !important; background-color: #f9f9f9 !important; color: #555 !important; border: 1px solid #aaa !important; border-radius: 4px !important; font-size: .95rem !important; cursor: default !important;" />
+                <input type="text" id="user-tel" name="tel" class="form-control read-only-field" value="${loginUser.tel}" readonly style="flex: 1 !important; width: 100% !important; height: 38px !important; padding: 0 10px !important; background-color: #f9f9f9 !important; color: #555 !important; border: 1px solid #aaa !important; border-radius: 4px !important; font-size: .95rem !important; cursor: default !important; transition: all 0.2s;" />
             </div>
+            
             <div class="mp-form-group" style="display: flex !important; align-items: center !important;">
                 <label style="width: 85px !important; flex-shrink: 0 !important; font-size: .95rem !important; font-weight: 700 !important; color: #333 !important;">부서코드</label>
                 <input type="text" class="form-control read-only-field" value="${loginUser.dept_num}" readonly style="flex: 1 !important; width: 100% !important; height: 38px !important; padding: 0 10px !important; background-color: #f9f9f9 !important; color: #555 !important; border: 1px solid #aaa !important; border-radius: 4px !important; font-size: .95rem !important; cursor: default !important;" />
             </div>
+            
             <div class="mp-form-group" style="display: flex !important; align-items: center !important;">
                 <label style="width: 85px !important; flex-shrink: 0 !important; font-size: .95rem !important; font-weight: 700 !important; color: #333 !important;">입사일</label>
                 <input type="text" class="form-control read-only-field" value="${loginUser.hire_date}" readonly style="flex: 1 !important; width: 100% !important; height: 38px !important; padding: 0 10px !important; background-color: #f9f9f9 !important; color: #555 !important; border: 1px solid #aaa !important; border-radius: 4px !important; font-size: .95rem !important; cursor: default !important;" />
             </div>
             
-            <button type="button" class="btn-reg" style="margin-top : 15px;">내 정보 수정</button>
+            <div id="btn-group-normal" style="margin-top: 15px; display: block;">
+                <button id="edit-btn" type="button" class="btn-reg" style="width: 100%;">내 정보 수정</button>
+            </div>
+            
+            <div id="btn-group-edit" style="margin-top: 15px; display: none; gap: 10px;">
+                <button id="save-btn" type="button" class="btn-reg" style="flex: 1; background-color: #2D6A4F !important; color: #fff !important; border-color: #2D6A4F !important;">저장</button>
+                <button id="cancel-btn" type="button" class="select-reset" style="flex: 1; margin: 0;">취소</button>
+            </div>
         </div>
-    </div>
+    </form>
+</div>
 
     <!-- [오른쪽] 내 오늘 작업 대시보드 카드 -->
     <div class="mp-card" style="flex: 1 !important; min-width: 0 !important; min-height: 440px !important; display: flex !important; flex-direction: column !important; background: #fff !important; border: 1px solid #bbb !important; border-radius: 10px !important; padding: 22px 25px !important; box-shadow: 0 2px 8px rgba(0, 0, 0, .03) !important;">
@@ -151,11 +182,6 @@ response.setContentType("text/html; charset=utf-8");
         <form method="POST" action="/pwdUpdate" id="pwd-form">
             <div class="pwd-modal-body">
                 
-                <!-- 현재 비밀번호 -->
-                <div class="mp-form-group-vertical">
-                    <label for="currentPwd">현재 비밀번호</label>
-                    <input type="password" name="currentPwd" id="currentPwd" class="form-control" placeholder="현재 비밀번호를 입력하세요.">
-                </div>
 
                 <!-- 새 비밀번호 -->
                 <div class="mp-form-group-vertical">
@@ -188,8 +214,8 @@ response.setContentType("text/html; charset=utf-8");
             <!-- 하단 버튼 영역 (공통 테마 맞춤) -->
             <div class="modal-btn-wrap" style="margin-top: 25px; display: flex; justify-content: flex-end; gap: 10px;">
                 <!-- 공통 .btn-plus 기반 스타일 활용 -->
-                <button type="button" id="btnPwdSubmit" class="mp-btn-edit" style="background-color: #2D6A4F; color: #fff;">변경</button>
-                <button type="button" id="btnPwdCancel" class="mp-btn-edit">취소</button>
+                <button type="button" id="btnPwdSubmit" class="mp-btn-edit btn-reg" style="background-color: #2D6A4F; color: #fff;">변경</button>
+                <button type="button" id="btnPwdCancel" class="mp-btn-edit btn-reg">취소</button>
             </div>
         </form>
     </div>
@@ -199,30 +225,36 @@ response.setContentType("text/html; charset=utf-8");
 				<!-- 스크립트 -->
 				<!-- 스크립트 -->
 				<script>
+				
+				/* 모달 제어 엘리먼트 정의: 비밀번호 변경 팝업창 조작을 위한 핵심 구성요소 쿼리 매핑 */
+				const pwBtn = document.querySelector('#pw-btn');
 				const pwdModal = document.getElementById("pwdModal");
 				const pwdForm = document.getElementById("pwd-form");
+				const currentPwd = document.getElementById("currentPwd");
 				const pw = document.querySelector('input[name="pw"]');
 				const pw2 = document.querySelector('input[name="pw2"]');
 				const pwdMsg = document.getElementById("pwdMsg");
 
-				// 1. 모달 열기 및 취소
-				document.getElementById("btnOpenPwdModal")?.addEventListener("click", () => pwdModal.style.display = "block");
+				/* 1. 모달 개폐 이벤트: 변경 버튼 클릭 시 팝업을 활성화하고 취소 시 폼 리셋 및 메시지 초기화 */
+				pwBtn.addEventListener('click', () => pwdModal.style.display = "block");
+
 				document.getElementById("btnPwdCancel").addEventListener("click", () => {
 				    pwdModal.style.display = "none";
 				    pwdForm.reset();
 				    pwdMsg.textContent = "";
 				});
 
-				// 2. pw2 타이핑할 때마다 실시간 일치 여부 검사 (추가된 기능 🚀)
+				/* 2. 실시간 일치 검증: 새 비밀번호 입력란 타이핑 시 시스템 고유 딥그린(#2D6A4F) 및 레드 테마 실시간 피드백 */
 				pw2.addEventListener("input", () => {
+				    if (!pw.value && !pw2.value) { pwdMsg.textContent = ""; return; }
 				    const isMatch = pw.value === pw2.value;
 				    pwdMsg.textContent = isMatch ? "비밀번호가 일치합니다." : "새 비밀번호가 일치하지 않습니다.";
-				    pwdMsg.style.color = isMatch ? "#2D6A4F" : "#d9534f"; // 일치하면 딥그린, 다르면 레드
+				    pwdMsg.style.color = isMatch ? "#2D6A4F" : "#d9534f";
 				});
 
-				// 3. 변경 버튼 클릭 시 최종 검증 및 제출
+				/* 3. 최종 정형 검증 및 제출: 공백 유무 및 불일치 최종 스크리닝 후 confirm 컨펌 거쳐 서브밋 실행 */
 				document.getElementById("btnPwdSubmit").addEventListener("click", () => {
-				    if (!document.getElementById("currentPwd").value || !pw.value || !pw2.value) {
+				    if (!currentPwd.value || !pw.value || !pw2.value) {
 				        alert("모든 필드를 입력해주세요.");
 				        return;
 				    }

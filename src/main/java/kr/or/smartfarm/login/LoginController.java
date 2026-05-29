@@ -42,11 +42,27 @@ public class LoginController {
 	    
 	    LoginDTO login = loginService.loginCheck(loginDTO);
 	    LoginResponseDTO response = new LoginResponseDTO();
-	            
+	       
+	    int permission = -1;
+	    
+	    if(login.getE_level() == 1 ) {
+	    	permission = 1;
+	    }
+	    if(login.getE_level() == 2 ) {
+	    	permission = 2;
+	    }
+	    if(login.getE_level() == 3 ) {
+	    	permission = 3;
+	    }
+	    if(login.getE_level() == 2 && login.getDept_num() == 1) {
+	    	permission = 4;
+	    }
+	    
 	    if (login != null) {
 	        // [세션 처리]
 	        HttpSession session = request.getSession();
 	        session.setAttribute("loginUser", login); 
+	        session.setAttribute("role", permission); 
 	        session.setMaxInactiveInterval(1800); 
 	        
 	        // 💡 자바스크립트 .then(data => { ... }) 쪽으로 성공 신호를 보냅니다.
