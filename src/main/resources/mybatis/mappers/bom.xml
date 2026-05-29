@@ -149,14 +149,17 @@ AND i.TYPE IN ('PRODUCT', 'SEMIPRODUCT')
 
 <!-- 디테일셀렉트 -->
 <select id="detailSelect" resultType="hashMap" parameterType="string">
-    SELECT 
-        p.NAME, b.BOM_NUM, b.REQUIRED_QTY, b.BOM_CODE,p.ITEM_NUM, 
+SELECT 
+        p.NAME, b.BOM_NUM, b.REQUIRED_QTY, b.BOM_CODE, b.ITEM_NUM, 
         b.BOM_STATUS, b.CREATED_AT, b.CHILD_QTY, p.TYPE, p.UNIT,
         i.NAME AS CNAME, i.CODE AS CCODE, i.UNIT AS CUNIT
     FROM BOM b
     JOIN ITEM p ON b.ITEM_NUM = p.ITEM_NUM
     JOIN ITEM i ON b.ITEM_NUM2 = i.ITEM_NUM
-    WHERE b.BOM_NUM = #{bom_num}  ORDER BY b.BOM_NUM ASC
+    WHERE b.ITEM_NUM = (
+        SELECT ITEM_NUM FROM BOM WHERE BOM_NUM = #{bom_num}
+    )
+    ORDER BY b.BOM_NUM ASC
 </select>
 
 <update id="updateBomStatus" parameterType="kr.or.smartfarm.bom.BomDTO">

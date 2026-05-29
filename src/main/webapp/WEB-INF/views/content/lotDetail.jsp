@@ -13,6 +13,7 @@
 <title>LOT 관리 상세</title>
 <link rel="stylesheet" href="/resources/css/detail-common.css">
 <link rel="stylesheet" href="/resources/css/lot/lotDetail.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 </head>
 <body>
 <main class="cont">
@@ -179,6 +180,10 @@
             </table>
         </div>
     </div><!-- /tab-lothistory -->
+    
+<!--     qr코드 -->
+    <div id="qrcode"></div>
+    
 
 </main>
 
@@ -239,6 +244,8 @@
         });
         tbody.innerHTML = html;
     }
+    const lotCode = "${lotCode}";  // 또는 "${lot_code}"
+    new QRCode(document.getElementById("qrcode"), "http://localhost:8080/lot/" + lotCode);
 </script>
 </body>
 </html>
