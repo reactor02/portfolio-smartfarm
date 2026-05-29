@@ -9,27 +9,89 @@
 
 	<select id="selectAllDefective" resultType="DefectiveDTO">
 		SELECT
-			defect.defect_num,
-			defect.defect_reason,
-			defect.defect_action,
-			defect.defect_status,
+			defective.defect_num,
+			defective.defect_reason,
+			defective.defect_action,
+			qc.qc_type,
 			io.io_num,
 			io.io_reason,
 			io.io_qty,
 			io.io_date,
 			item.item_num,
 			item.name,
-			item.code
+			item.unit,
+			lot.lot_code,
+			emp.ename
 		FROM defective
 		JOIN io
 		    ON defective.io_num = io.io_num
+		JOIN emp
+		    ON io.emp_num = emp.emp_num
 		JOIN lot
 			ON io.lot_num = lot.lot_num
 		JOIN item
 			ON lot.item_num = item.item_num
-		WHERE io.io_reason = '폐기'
+		JOIN qc
+			ON qc.qc_num = io.qc_num
 	</select>
 	
+	<select id="selectQcType" resultType="string">
+		SELECT qc_type
+		FROM qc
+		WHERE qc_type != 'BEING'
+		GROUP BY qc_type
+	</select>
+ 
+		<!-- 검색 조건에 맞게 검색 -->
+	<select id="searchDefect" resultType="hashMap" parameterType="map">
+		SELECT
+			defective.defect_num,
+			defective.defect_reason,
+			defective.defect_action,
+			qc.qc_type,
+			io.io_num,
+			io.io_reason,
+			io.io_qty,
+			io.io_date,
+			item.item_num,
+			item.unit,
+			item.name,
+			lot.lot_code,
+			emp.ename
+		FROM defective
+		JOIN io
+		    ON defective.io_num = io.io_num
+		JOIN emp
+		    ON io.emp_num = emp.emp_num
+		JOIN lot
+			ON io.lot_num = lot.lot_num
+		JOIN item
+			ON lot.item_num = item.item_num
+		JOIN qc
+			ON qc.qc_num = io.qc_num
+		
+	    <where>
+	    
+		<!-- 날짜 조회 -->
+	     <if test="sDate != null and sDate != '' and eDate != null and eDate != ''">
+		    AND io.io_date >= TO_DATE(#{sDate}, 'YYYY-MM-DD')
+		    AND io.io_date &lt; TO_DATE(#{eDate}, 'YYYY-MM-DD') + 1
+		</if>
+		<!-- item_num 검색 -->
+	        <if test="type != null and type != '' and type != 'all'">
+				AND qc.qc_type = #{type}
+			</if>
+	    <!-- 품목명 검색 --> 
+	        <if test="keyword != null and keyword != ''">
+	        	AND (
+		        	upper(item.name) LIKE ('%' || upper(#{keyword}) || '%')
+		         OR upper(lot.lot_code) LIKE ('%' || upper(#{keyword}) || '%')
+		         )
+	   	 	</if>
+	    </where>
+	    
+	  	ORDER BY io.io_date DESC
+    </select>
 	
 </mapper>
 

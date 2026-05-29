@@ -119,6 +119,7 @@ public class QcController {
 		return "content/qcDetail.tiles";
 	}
 	
+	@ResponseBody
 	@RequestMapping("/insertQc")
 	//상세페이지 들어가는 로직
 	public String insertQc(QcDTO qcDTO, Model model) {
@@ -137,11 +138,12 @@ public class QcController {
 		
 		// 총량 확인
 		QcDTO crrnt_qty = qcService.crrnt_qty(qcDTO);
-		
+		// lot_num 조사
 		if(		   qcDTO.getIo_qty() < 0 
 				|| crrnt_qty.getIo_qty() < qcDTO.getIo_qty()) {
 			
 			System.out.println("잘못된 값입니다."); // 방어 코딩
+			model.addAttribute("msg", "잘못된 값입니다.");
 			
 		} else if (crrnt_qty.getIo_qty() == qcDTO.getIo_qty()) {
 			// 불량 X qc 등록
