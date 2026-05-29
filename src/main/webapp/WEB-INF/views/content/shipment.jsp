@@ -6,6 +6,11 @@ response.setContentType("text/html; charset=utf-8");
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+<%--
+    shipment.jsp — 출하 관리 목록 화면 (Tiles content fragment)
+    검색 필터(상태/기간/품목/키워드) + 출하 목록 + 페이징.
+    컨트롤러는 /shipment (ShipmentController.shipmentList), 검색은 /searchShipment AJAX.
+--%>
 <%@ taglib prefix="tiles" uri="http://tiles.apache.org/tags-tiles"%>
 
 <!DOCTYPE html>

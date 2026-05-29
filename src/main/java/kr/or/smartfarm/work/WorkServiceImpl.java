@@ -90,13 +90,30 @@ public class WorkServiceImpl implements WorkService {
 
     @Override
     public void produce(String work_order_id) {
+        // [0][방어] 식별자 누락 차단 — work_order_id가 비어 있으면 조회 자체가 무의미
+        if (work_order_id == null || work_order_id.trim().isEmpty()) {
+            throw new IllegalArgumentException("work_order_id is required");
+        }
+
         // [1] 작업지시 상세 조회 (item_num, type, order_qty, order_num, plan_num 포함)
         WorkDTO work = dao.getSelectOne(work_order_id);
+        // [방어] 존재하지 않는/이미 삭제된 작업지시면 work가 null → 이후 getter에서 NPE.
+        //        잘못된 호출이므로 명확히 예외로 끊어 생산 처리를 진행하지 않는다.
+        if (work == null) {
+            throw new IllegalArgumentException("work order not found: " + work_order_id);
+        }
+
         int itemNum  = work.getItem_num();
         int orderQty = work.getOrder_qty();
         int orderNum = work.getOrder_num();
         int planNum  = work.getPlan_num();
         String type  = work.getType();
+
+        // [방어] 생산 수량이 0 이하면 LOT 생성·자재 차감이 무의미하거나 음수 차감을 유발.
+        //        데이터 무결성을 위해 진행 전에 차단한다.
+        if (orderQty <= 0) {
+            throw new IllegalArgumentException("order_qty must be positive: " + orderQty);
+        }
 
         // [2] BOM 재료 목록 조회
         List<BomDTO> materials = dao.getMaterialsByItem(itemNum);

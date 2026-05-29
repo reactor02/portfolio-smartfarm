@@ -153,7 +153,12 @@
         WHERE pp.plan_id = #{plan_id}
     </select>
 
-    <!-- 등록 (plan_id: 알파벳 순차 자동 생성, 테이블이 비어있으면 'A'부터 시작) -->
+    <!-- 등록 (plan_id: 알파벳 순차 자동 생성, 테이블이 비어있으면 'A'부터 시작)
+         [주의/한계] plan_id는 단일 문자다. MAX(ASCII(plan_id))+1 방식이라
+                     'A'(65)~'Z'(90)까지만 알파벳이고, 26건을 넘기면 '['(91) 등
+                     비알파벳 ASCII 문자가 생성된다. 현재는 생산계획이 26건 이하라는
+                     전제로 운영하며, 그 이상이 필요하면 다중 문자(AA, AB...) 채번 방식으로
+                     교체해야 한다. (기존 데이터 정렬 영향이 있어 이번 변경 범위에서는 제외) -->
     <insert id="insert" parameterType="ProdDTO">
         <selectKey keyProperty="plan_id" resultType="String" order="BEFORE">
             SELECT CHR(NVL(MAX(ASCII(plan_id)), 64) + 1) FROM production_plan

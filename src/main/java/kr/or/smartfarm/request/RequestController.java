@@ -94,13 +94,18 @@ public class RequestController {
         Map detail = RequestService.selectDetail(requestId);
         model.addAttribute("detail", detail);
 
+        // [방어] detail이 null이면(없는 요청 ID) 하위 조회를 건너뛰어 NPE를 막는다.
+        //        또한 SHIPMENT_REQUEST_NUM 컬럼이 null이면 출하지시 조회가 무의미하므로
+        //        해당 키가 채워진 경우에만 연계 출하지시를 조회한다.
         if (detail != null) {
             String shipmentRequestNum = (String) detail.get("SHIPMENT_REQUEST_NUM");
-            // 해당 요청에 유효한(취소 아닌) 출하지시가 존재하는지 여부 (0이면 없음)
-            int hasShipment = RequestService.hasShipment(shipmentRequestNum);
-            model.addAttribute("hasShipment", hasShipment);
-            // 연계된 출하지시 목록 (상세 페이지 하단 테이블에 표시)
-            model.addAttribute("linkedShipments", shipmentService.selectByRequestNum(shipmentRequestNum));
+            if (shipmentRequestNum != null) {
+                // 해당 요청에 유효한(취소 아닌) 출하지시가 존재하는지 여부 (0이면 없음)
+                int hasShipment = RequestService.hasShipment(shipmentRequestNum);
+                model.addAttribute("hasShipment", hasShipment);
+                // 연계된 출하지시 목록 (상세 페이지 하단 테이블에 표시)
+                model.addAttribute("linkedShipments", shipmentService.selectByRequestNum(shipmentRequestNum));
+            }
         }
 
         return "content/requestDetail.tiles";
@@ -207,6 +212,11 @@ public class RequestController {
         // selectKey로 생성된 shipment_request_num으로 request_id 계산 후 상세 이동
         // 예: SREQ0001 → REQ0001
         String shipmentRequestNum = (String) insertMap.get("shipment_request_num");
+        // [방어] selectKey가 동작하지 않아 번호가 채워지지 않으면 replace()에서 NPE.
+        //        이 경우 상세로 갈 식별자가 없으므로 목록으로 안전하게 되돌린다.
+        if (shipmentRequestNum == null) {
+            return "redirect:/request";
+        }
         String newRequestId = shipmentRequestNum.replace("SREQ", "REQ");
         return "redirect:/requestDetail/" + newRequestId;
     }

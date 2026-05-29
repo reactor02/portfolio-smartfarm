@@ -3,6 +3,11 @@
 request.setCharacterEncoding("utf-8");
 response.setContentType("text/html; charset=utf-8");
 %>
+<%--
+    prod.jsp — 생산계획 관리 목록 화면 (Tiles content fragment)
+    검색 필터 + 생산계획 목록 + 페이징 + 등록 모달.
+    스크립트는 prod/prod.js, 컨트롤러는 /prod (ProdController.list).
+--%>
 <%@ taglib prefix="c"   uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <%@ taglib prefix="fn"  uri="http://java.sun.com/jsp/jstl/functions"%>

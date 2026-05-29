@@ -5,6 +5,11 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ taglib prefix="tiles" uri="http://tiles.apache.org/tags-tiles"%>
+<%--
+    workDetail.jsp — 작업지시 상세 화면
+    기본정보 + 진행률 게이지 + 액션 버튼(시작/완료/생산/취소).
+    버튼 동작은 work/workDetail.js, 컨트롤러는 /work/{id} (WorkController.detail).
+--%>
 
 <!DOCTYPE html>
 <html>

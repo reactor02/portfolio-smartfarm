@@ -1,3 +1,10 @@
+/*
+ * prodDetail.js — 생산계획 상세 화면 스크립트
+ *   진행률 게이지, 연관 작업지시 목록 AJAX 조회/페이징, 계획 취소.
+ *   PLAN_QTY/CURRENT_QTY/PLAN_ID 전역값은 JSP가 주입한다.
+ */
+
+/** 작업 상태 문자열 → CSS 배지 클래스 매핑 */
 function getBadgeClass(status) {
     if (status === '대기') return 'badge-wait';
     if (status === '진행') return 'badge-progress';
@@ -6,13 +13,15 @@ function getBadgeClass(status) {
     return '';
 }
 
+// 로딩 시 진행률 바 채우고 작업지시 목록 1페이지 조회
 window.onload = function () {
-    var pct = PLAN_QTY > 0 ? Math.min((CURRENT_QTY / PLAN_QTY) * 100, 100) : 0;
+    var pct = PLAN_QTY > 0 ? Math.min((CURRENT_QTY / PLAN_QTY) * 100, 100) : 0;   // 0 나눗셈 방지
     document.getElementById('progressBar').style.width = pct.toFixed(1) + '%';
     document.getElementById('progressText').innerText  = pct.toFixed(1) + '%';
     loadWorkOrders(1);
 };
 
+/** 이 생산계획에 연관된 작업지시 목록을 AJAX로 조회해 테이블/페이징 렌더링 */
 function loadWorkOrders(page) {
     fetch('/prod/' + PLAN_ID + '/work-orders?page=' + page)
         .then(function(r) { return r.json(); })
@@ -58,6 +67,7 @@ function loadWorkOrders(page) {
         });
 }
 
+/** 생산계획 취소 처리 */
 function cancelPlan() {
     if (!confirm('해당 생산계획을 취소하시겠습니까?')) return;
     fetch('/prod/' + PLAN_ID + '/cancel', { method: 'POST' })

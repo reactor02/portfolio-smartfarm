@@ -4,6 +4,12 @@ import java.sql.Date;
 
 import lombok.Data;
 
+/**
+ * 출하요청(주문) 데이터 전송 객체.
+ *
+ * <p>요청 기본 컬럼 + 거래처(Vendor)/사원(emp)/품목(Item) JOIN 컬럼을 담는다.
+ * (Lombok {@code @Data}로 getter/setter 자동 생성)</p>
+ */
 @Data
 public class RequestDTO {
     private String request_id;
