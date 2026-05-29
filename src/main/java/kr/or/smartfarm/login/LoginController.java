@@ -31,6 +31,15 @@ public class LoginController {
 		
 	}
 	
+	@RequestMapping("/logout")
+	public String logout(HttpSession session) {
+	    // 세션의 모든 정보를 초기화합니다.
+	    session.invalidate();
+
+	    // 로그인 페이지 또는 메인 페이지로 이동합니다.
+	    return "proj3Login.nohead"; 
+	}
+	
 	@PostMapping("/login")
 	@ResponseBody // 💡 반드시 필요! 자바스크립트 fetch가 이 어노테이션 덕분에 JSON을 읽을 수 있습니다.
 	public LoginResponseDTO semiLogin(
