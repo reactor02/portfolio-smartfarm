@@ -4,6 +4,12 @@ import java.sql.Date;
 
 import lombok.Data;
 
+/**
+ * 출하 데이터 전송 객체.
+ *
+ * <p>shipment 기본 컬럼 + 사원(emp)/출하요청(shipment_request)/품목(item)/거래처(vender)
+ * JOIN 컬럼을 담는다. (Lombok {@code @Data}로 getter/setter 자동 생성)</p>
+ */
 @Data
 public class ShipmentDTO {
 	  private String shipment_num;

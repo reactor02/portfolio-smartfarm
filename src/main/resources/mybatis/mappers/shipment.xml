@@ -191,10 +191,13 @@
     </select>
 
     <!-- 출하확정: LOT 수량 차감 -->
+    <!-- [방어] current_qty >= qty 일 때만 차감 → 음수 재고 방지.
+         보유 수량이 부족하면 영향 행 0을 반환하며, 서비스단에서 예외 발생시켜 롤백한다. -->
     <update id="deductLotQty" parameterType="map">
         UPDATE lot
         SET current_qty = current_qty - #{qty}
         WHERE lot_num = #{lot_num}
+          AND current_qty &gt;= #{qty}
     </update>
 
     <!-- 출하확정: IO 출고 이력 등록 (io_reason: '출하' or '분할') -->
@@ -206,8 +209,12 @@
     </insert>
 
     <!-- 출하확정: 출하 상태 → 출하완료 -->
+    <!-- [방어] '출하대기' 건만 변경(중복 확정 방지). 더블클릭/새로고침 시 두 번째 호출은
+         영향 행 0을 반환 → 서비스단에서 선점 실패로 간주하고 즉시 종료한다. -->
     <update id="confirmShipmentStatus" parameterType="int">
-        UPDATE shipment SET shipment_status = '출하완료' WHERE shipment_num = #{_parameter}
+        UPDATE shipment SET shipment_status = '출하완료'
+        WHERE shipment_num = #{_parameter}
+          AND shipment_status = '출하대기'
     </update>
 
     <!-- 출하확정: request 상태 → 출하완료 -->
@@ -218,8 +225,12 @@
     </update>
 
     <!-- 취소: 출하 상태 → 취소 -->
+    <!-- [방어] '출하대기' 건만 취소 가능. '출하완료' 건은 재고 차감·자식 LOT 생성이
+         완료된 상태라 단순 취소 시 재고 복구가 안 되어 무결성이 깨지므로 차단한다. -->
     <update id="cancelShipmentStatus" parameterType="int">
-        UPDATE shipment SET shipment_status = '취소' WHERE shipment_num = #{_parameter}
+        UPDATE shipment SET shipment_status = '취소'
+        WHERE shipment_num = #{_parameter}
+          AND shipment_status = '출하대기'
     </update>
 
     <!-- 취소: request 상태 → 접수 (롤백) -->

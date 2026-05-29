@@ -94,12 +94,17 @@
     )
 </insert>
 
-    <!-- 현재 수량 차감 -->
+    <!-- 현재 수량 차감
+         [방어] current_qty >= deduct_qty : 보유 수량 이상 차감 불가(음수 재고 방지)
+         [방어] deduct_qty > 0           : 음수 차감(=재고 증가) 방지. deduct_qty가 음수면
+                                           current_qty >= 음수 가 항상 참이 되어 재고가
+                                           잘못 늘어나므로 양수만 허용한다. -->
     <update id="deductQty">
         UPDATE lot
         SET current_qty = current_qty - #{deduct_qty}
         WHERE lot_num = #{lot_num}
           AND current_qty >= #{deduct_qty}
+          AND #{deduct_qty} > 0
     </update>
 
     <!-- QC pass + 유통기한 내 재료 LOT FIFO 조회 (qc_num 포함) -->
@@ -222,7 +227,7 @@
             LEFT JOIN process pc           ON ppc.item_num   = pc.item_num
             LEFT JOIN emp ec               ON woc.emp_num    = ec.emp_num
             START WITH lr.lot_parent = #{lot_num}
-            CONNECT BY PRIOR lr.lot_child = lr.lot_parent
+            CONNECT BY NOCYCLE PRIOR lr.lot_child = lr.lot_parent
 
             UNION ALL
 
@@ -246,7 +251,7 @@
             JOIN vender vc             ON src.vender_num            = vc.vender_num
             LEFT JOIN emp ec           ON sc.emp_num                = ec.emp_num
             START WITH lr.lot_parent = #{lot_num}
-            CONNECT BY PRIOR lr.lot_child = lr.lot_parent
+            CONNECT BY NOCYCLE PRIOR lr.lot_child = lr.lot_parent
         )
         ORDER BY depth, gubun DESC
     </select>
@@ -266,7 +271,7 @@
         LEFT JOIN bom b    ON b.item_num    = parent_l.item_num
                           AND b.item_num2   = l.item_num
         START WITH lr.lot_parent = #{lot_num}
-        CONNECT BY PRIOR lr.lot_child = lr.lot_parent
+        CONNECT BY NOCYCLE PRIOR lr.lot_child = lr.lot_parent  <!-- [방어] 순환 시 ORA-01436 방지 -->
     </select>
 
 </mapper>

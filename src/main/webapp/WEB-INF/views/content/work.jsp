@@ -1,6 +1,11 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c"   uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%--
+    work.jsp — 작업지시 관리 목록 화면 (Tiles content fragment)
+    구성: 검색 필터(기간/상태/품목/키워드) + 목록 테이블 + 페이징 + 등록 모달.
+    동작 스크립트는 work/work.js, 컨트롤러는 /work (WorkController.workList).
+--%>
 <link rel="stylesheet" href="/resources/css/list-common.css">
 <link rel="stylesheet" href="/resources/css/modal.css">
 <link rel="stylesheet" href="/resources/css/work/work.css">

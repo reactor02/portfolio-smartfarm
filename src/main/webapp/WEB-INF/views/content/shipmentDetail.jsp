@@ -5,7 +5,13 @@ response.setContentType("text/html; charset=utf-8");
 %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="tiles" uri="http://tiles.apache.org/tags-tiles"%>
-
+<%--
+    shipmentDetail.jsp — 출하 상세 화면
+    기본정보 + 수량 현황(계획/완료/잔여) + 진행률 + 연결 주문/LOT 목록 + 액션(확정/취소).
+    완료수량은 배정 LOT 수량 합계로 계산하며, 출하확정 중 재고 부족 시
+    컨트롤러가 ?error=stock 으로 리다이렉트하면 하단 스크립트가 alert를 띄운다.
+    컨트롤러는 /shipmentDetail/{shipmentId} (ShipmentController.shipmentDetail).
+--%>
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -192,6 +198,11 @@ response.setContentType("text/html; charset=utf-8");
         if (bar)  bar.style.width = pct + '%';
         if (text) text.textContent = pct + '%';
     })();
+
+    // [방어] 출하확정 중 재고 부족(stock_error)으로 롤백된 경우 — 컨트롤러가 ?error=stock 으로 redirect
+    <c:if test="${param.error == 'stock'}">
+        alert('재고가 부족하여 출하확정을 완료하지 못했습니다. 재고를 확인해 주세요.');
+    </c:if>
 </script>
 
 </body>

@@ -1,6 +1,11 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c"   uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%--
+    lotDetail.jsp — LOT 상세 화면
+    LOT 기본정보 + 소모자재(상위) 관계 + 롯이력 추적 트리(재귀 조회 결과)를 표시한다.
+    롯이력/소모자재 데이터는 LotController가 getRecursiveMaterials/getLotHistory로 조회.
+--%>
 <!DOCTYPE html>
 <html>
 <head>

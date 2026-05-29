@@ -3,6 +3,12 @@ package kr.or.smartfarm.shipment;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * 출하 데이터 접근 인터페이스. 구현은 {@link ShipmentDAOImpl}.
+ *
+ * <p>상태 변경/수량 차감 메서드(confirmShipmentStatus, cancelShipmentStatus,
+ * deductLotQty 등)는 영향 행 수를 반환하여 서비스 계층의 방어코딩에 사용된다.</p>
+ */
 public interface ShipmentDAO {
     public List selectAll(int pageNum);
     public List searchShipment(Map map);

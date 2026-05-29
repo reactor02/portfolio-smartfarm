@@ -6,6 +6,14 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 
 import lombok.Data;
 
+/**
+ * 작업지시(work_order) 데이터 전송 객체.
+ *
+ * <p>work_order 테이블 컬럼 + emp/item/production_plan/process JOIN 컬럼 +
+ * 페이징용 total_count를 함께 담는다. order_id/order_status는 SQL에서
+ * work_order_id/work_status 별칭으로 매핑된다.
+ * 날짜 필드는 {@code @JsonFormat}으로 JSON 직렬화 시 yyyy-MM-dd로 표기된다.</p>
+ */
 @Data
 public class WorkDTO {
 	// work_order 테이블 컬럼
