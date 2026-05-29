@@ -15,5 +15,8 @@ public interface QcDAO {
 	public QcDTO selectDetail(int io_num);
 	public List selectLog(int io_num); 
 	public int insertQc1(QcDTO dto);
+	public int insertQc2(QcDTO dto);
+	public int insertDefect(QcDTO dto);
 	public QcDTO qcChk(int qc_num); 
+	public QcDTO crrnt_qty(QcDTO dto);
 }
