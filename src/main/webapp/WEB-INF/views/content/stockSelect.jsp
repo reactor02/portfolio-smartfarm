@@ -305,7 +305,6 @@ background-color: #FFB703;
     padding: 30px;
     border-radius: 8px;
     max-width: 90%;      /* 화면이 작아질 경우를 대비 */
-    max-height: 80vh;    /* 화면 높이보다 커지지 않게 제한 */
     overflow-y: auto;    /* 내용이 길어지면 내부 스크롤 */
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
 }
