@@ -211,6 +211,18 @@
         VALUES (IO_SEQ.NEXTVAL, #{ioType}, #{ioQty}, SYSDATE, #{qcNum}, #{lotNum}, #{planNum}, #{ioReason})
     </insert>
 
+    <!-- 작업지시 상세용: 품목별 공정 목록 (작업순서 오름차순) -->
+    <select id="getProcessesByItem" parameterType="int" resultType="hashMap">
+        SELECT process_num     AS PROCESS_NUM,
+               flow            AS FLOW,
+               process_content AS PROCESS_CONTENT,
+               process_status  AS PROCESS_STATUS
+        FROM process
+        WHERE item_num = #{_parameter}
+          AND process_status = '사용중'
+        ORDER BY flow ASC
+    </select>
+
     <!-- 생산계획 검색 (AJAX 모달용, 취소·완료 제외) -->
     <select id="searchPlans" parameterType="map" resultType="ProdDTO">
         SELECT plan_id, plan_num, plan_qty, item_name, plan_status,
@@ -235,6 +247,7 @@
                 LEFT JOIN item i ON pp.item_num = i.item_num
                 LEFT JOIN emp  e ON pp.emp_num  = e.emp_num
                 WHERE pp.plan_status NOT IN ('취소', '완료')
+                  AND (pp.plan_end IS NULL OR pp.plan_end >= TRUNC(SYSDATE))
                 <if test="keyword != null and keyword != ''">
                     AND (pp.plan_id LIKE '%' || #{keyword} || '%'
                       OR i.name     LIKE '%' || #{keyword} || '%')

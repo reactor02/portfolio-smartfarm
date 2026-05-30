@@ -143,9 +143,9 @@ response.setContentType("text/html; charset=utf-8");
 	                </div>
 	                
 	                <div class="modal-field">
-	                    <label>대상 개수</label>
-	                   	<input type="number" name="io_qty">
-	                   	<span>SELECT 값보다 적거나 같은 값을 입력해주세요. </span>
+	                    <label>검사 개수</label>
+	                   	<input id="qty-id" type="number" name="io_qty">
+	                   	<span></span>
 	                </div>
 	                <div class="modal-field">
 	                    <label>검사 구분</label>
@@ -174,6 +174,9 @@ response.setContentType("text/html; charset=utf-8");
 	            </div>
 	        </div>
        	</form>
+       	
+<!-- 값 response 모달 -->
+
      </div>
 </body>
 <script>
@@ -282,6 +285,7 @@ document.getElementById('regModal').addEventListener('click', function(e) {
     if (e.target === this) this.style.display = 'none';
 });
 
+
 /* 날짜 유효성 검사 로직 */
 function validateDate() {
 	const start = document.getElementById('sDate').value;
@@ -386,14 +390,7 @@ const itemSearch = document.querySelector("#itemSearch");
 		const btn_plus = document.querySelector(".btn-plus");
 		btn_plus.addEventListener('click',()=>{
 			
-			//개수 인풋 값
-			const quantity = document.querySelector("#quantity").value;
-			//체크된 라디오 
-			const radio = document.querySelector("input[type='radio']:checked");
-			if(radio == null){//방어로직 : 아무 것도 선택하지 않았다면 작동
-				alert("선택된 항목이 없습니다.");
-			return;
-			}
+			
 			if(quantity < 0){
 				alert("개수를 제대로 확인해주세요");
 				return;

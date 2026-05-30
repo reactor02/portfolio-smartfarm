@@ -25,4 +25,26 @@ public class DefectiveDAOImpl implements DefectiveDAO{
 		return result;
 	}
 	
+	// SEARCH > LIST
+	@Override
+	public List searchDefect(Map map) {
+		List result = null;
+		
+		int pageNum = (Integer)map.get("page");
+		PageHelper.startPage(pageNum, 10);
+		
+		result = sqlSession.selectList("mapper.defective.searchDefect", map);
+		
+		return result;
+	}
+	
+	@Override
+	public List selectQcType() {
+		
+		List result = sqlSession.selectList("mapper.defective.selectQcType");
+		
+		return result;
+	}
+	
+	
 }

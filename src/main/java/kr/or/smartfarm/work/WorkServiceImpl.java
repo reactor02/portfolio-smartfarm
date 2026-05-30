@@ -194,6 +194,11 @@ public class WorkServiceImpl implements WorkService {
     }
 
     @Override
+    public List<Map<String, Object>> getProcessesByItem(int item_num) {
+        return dao.getProcessesByItem(item_num);
+    }
+
+    @Override
     public Map<String, Object> searchPlans(String keyword, int page) {
         prodDao.syncPlanStatus();   // plan_start 지난 대기 → 진행 동기화
         int size     = 5;
