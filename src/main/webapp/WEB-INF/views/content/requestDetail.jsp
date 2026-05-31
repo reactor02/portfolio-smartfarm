@@ -7,8 +7,7 @@ response.setContentType("text/html; charset=utf-8");
 <%@ taglib prefix="tiles" uri="http://tiles.apache.org/tags-tiles"%>
 <%--
     requestDetail.jsp — 출하요청 상세 화면
-    요청 기본정보 + 연계 출하지시 목록 + 액션(출하지시/취소).
-    hasShipment 값으로 '출하지시' 버튼 노출을 제어한다.
+    요청 기본정보 + 연계 출하지시 목록 + 액션(취소).
     컨트롤러는 /requestDetail/{requestId} (RequestController.requestDetail).
 --%>
 

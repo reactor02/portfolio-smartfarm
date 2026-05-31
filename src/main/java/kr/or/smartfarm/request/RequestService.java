@@ -62,14 +62,6 @@ public interface RequestService {
      */
     public Map selectDetail(String requestId);
 
-    /**
-     * 해당 출하요청에 유효한(취소 아닌) 출하지시가 존재하는지 확인한다.
-     * 반환값이 0이면 출하지시 버튼을 표시한다.
-     *
-     * @param shipmentRequestNum 출하요청 번호 (SREQ0001 형태)
-     * @return 유효한 출하지시 건수 (0: 없음, 1 이상: 있음)
-     */
-    public int hasShipment(String shipmentRequestNum);
 
     /**
      * 출하요청의 상태를 변경한다. (취소, 출하대기, 출하완료 등)

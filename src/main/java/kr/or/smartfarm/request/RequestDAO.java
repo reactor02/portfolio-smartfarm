@@ -19,8 +19,6 @@ public interface RequestDAO {
     public int insertRequest(Map map);
     /** 단건 상세 조회 */
     public Map selectDetail(String requestId);
-    /** 유효 출하지시 존재 여부 */
-    public int hasShipment(String shipmentRequestNum);
-    /** 요청 상태 갱신 */
+/** 요청 상태 갱신 */
     public int updateRequestStatus(Map map);
 }

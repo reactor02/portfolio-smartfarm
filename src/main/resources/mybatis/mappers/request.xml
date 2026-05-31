@@ -99,14 +99,6 @@
         WHERE SR.request_id = #{_parameter}
     </select>
 
-    <!-- 출하 존재 여부 확인 (출하지시 버튼 표시 제어) -->
-    <select id="hasShipment" resultType="int" parameterType="string">
-        SELECT COUNT(*)
-        FROM shipment
-        WHERE shipment_request_num = #{_parameter}
-          AND shipment_status != '취소'
-    </select>
-
     <!-- 요청 상태 변경 -->
     <update id="updateRequestStatus" parameterType="map">
         UPDATE shipment_request

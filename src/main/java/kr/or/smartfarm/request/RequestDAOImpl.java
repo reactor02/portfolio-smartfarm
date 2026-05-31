@@ -62,13 +62,7 @@ public class RequestDAOImpl implements RequestDAO {
         return sqlSession.selectOne("kr.or.smartfarm.request.loadRequestDetail", requestId);
     }
 
-    /** 유효한 출하지시 존재 여부 (COUNT, 0이면 없음) */
-    @Override
-    public int hasShipment(String shipmentRequestNum) {
-        return sqlSession.selectOne("kr.or.smartfarm.request.hasShipment", shipmentRequestNum);
-    }
-
-    /** 요청 상태 갱신 (status_name → status_num 서브쿼리 매핑) */
+/** 요청 상태 갱신 (status_name → status_num 서브쿼리 매핑) */
     @Override
     public int updateRequestStatus(Map map) {
         return sqlSession.update("kr.or.smartfarm.request.updateRequestStatus", map);
