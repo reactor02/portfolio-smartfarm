@@ -33,7 +33,8 @@
                 <c:if test="${workDTO.work_status == '진행'}">
                     <button type="button" class="btn-action" onclick="produceWork()">작업완료</button>
                 </c:if>
-                <c:if test="${workDTO.work_status != '완료' and workDTO.work_status != '취소'}">
+                <%-- 취소버튼: e_level >= 3(사장) 또는 담당자 본인 + 진행 가능 상태 --%>
+                <c:if test="${canCancel and workDTO.work_status != '완료' and workDTO.work_status != '취소'}">
                     <button type="button" class="btn-action btn-del" onclick="cancelWork()">취소</button>
                 </c:if>
                 <button type="button" class="btn-action" onclick="location.href='/work'">목록으로</button>

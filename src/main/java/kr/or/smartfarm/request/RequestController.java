@@ -86,7 +86,7 @@ public class RequestController {
     @RequestMapping("/requestDetail/{requestId}")
     public String requestDetail(
             @PathVariable("requestId") String requestId,
-            Model model) {
+            Model model, HttpSession session) {
 
         // 요청 ID로 단건 상세 조회
         Map detail = RequestService.selectDetail(requestId);
@@ -101,6 +101,16 @@ public class RequestController {
                 model.addAttribute("linkedShipments", shipmentService.selectByRequestNum(shipmentRequestNum));
             }
         }
+
+        // 취소 권한: e_level >= 3(사장) 또는 담당자 본인 (VENDER.emp_num = 우리 회사 담당자)
+        LoginDTO loginUser = (LoginDTO) session.getAttribute("loginUser");
+        boolean canCancel = false;
+        if (loginUser != null) {
+            String recordEmpNum = RequestService.getEmpNum(requestId);
+            canCancel = loginUser.getE_level() >= 3
+                     || loginUser.getEmp_num().equals(recordEmpNum);
+        }
+        model.addAttribute("canCancel", canCancel);
 
         return "content/requestDetail.tiles";
     }
@@ -127,7 +137,8 @@ public class RequestController {
             @RequestParam(value = "keyword", defaultValue = "") String keyword,
             @RequestParam(value = "status", defaultValue = "") String status,
             @RequestParam(value = "sDate", defaultValue = "") String sDate,
-            @RequestParam(value = "eDate", defaultValue = "") String eDate) {
+            @RequestParam(value = "eDate", defaultValue = "") String eDate,
+            @RequestParam(value = "sort", defaultValue = "reg") String sort) {
 
         Map result = new HashMap();
         try {
@@ -137,6 +148,7 @@ public class RequestController {
             searchMap.put("type", type);
             searchMap.put("keyword", keyword);
             searchMap.put("status", status);
+            searchMap.put("sort", sort);
             // [방어] 날짜 형식이 YYYY-MM-DD가 아니면 TO_DATE() 에서 Oracle 오류 발생.
             //        잘못된 형식이면 빈 문자열로 대체하여 날짜 필터 없이 검색한다.
             if (!sDate.matches("\\d{4}-\\d{2}-\\d{2}")) sDate = "";
@@ -197,7 +209,14 @@ public class RequestController {
             @RequestParam("item_num")     int    itemNum,
             @RequestParam("request_date") String requestDate,
             @RequestParam("due_date")     String dueDate,
-            @RequestParam(value = "request_qty", defaultValue = "1") int requestQty) {
+            @RequestParam(value = "request_qty", defaultValue = "1") int requestQty,
+            HttpSession session) {
+
+        // [권한] e_level 2 이상(팀장·사장)만 등록 가능
+        LoginDTO loginUser = (LoginDTO) session.getAttribute("loginUser");
+        if (loginUser == null || loginUser.getE_level() < 2) {
+            return "redirect:/request?error=forbidden";
+        }
 
         // [방어] 날짜 필수값 · 형식 검증
         //        비어있거나 YYYY-MM-DD 패턴이 아니면 request.xml의 TO_DATE() 호출 시
@@ -248,7 +267,16 @@ public class RequestController {
     @PostMapping("/cancelRequest")
     public String cancelRequest(
             @RequestParam("shipmentRequestNum") String shipmentRequestNum,
-            @RequestParam("requestId")          String requestId) {
+            @RequestParam("requestId")          String requestId,
+            HttpSession session) {
+
+        // [권한] e_level >= 3(사장) 또는 담당자 본인만 취소 가능
+        LoginDTO loginUser = (LoginDTO) session.getAttribute("loginUser");
+        if (loginUser == null) return "redirect:/login";
+        String recordEmpNum = RequestService.getEmpNum(requestId);
+        boolean allowed = loginUser.getE_level() >= 3
+                       || loginUser.getEmp_num().equals(recordEmpNum);
+        if (!allowed) return "redirect:/requestDetail/" + requestId + "?error=forbidden";
 
         Map cancelMap = new HashMap();
         cancelMap.put("shipment_request_num", shipmentRequestNum);

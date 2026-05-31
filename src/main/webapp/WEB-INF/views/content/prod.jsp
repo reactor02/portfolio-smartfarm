@@ -20,7 +20,10 @@ response.setContentType("text/html; charset=utf-8");
 <!-- 타이틀 & 등록 버튼 -->
 <div class="page-hdr">
     <h1>생산계획 관리</h1>
-    <button type="button" id="btnOpenModal" class="btn-reg">+ 등록하기</button>
+    <%-- e_level 2 이상(팀장·사장)만 등록버튼 표시 --%>
+    <c:if test="${sessionScope.loginUser.e_level >= 2}">
+        <button type="button" id="btnOpenModal" class="btn-reg">+ 등록하기</button>
+    </c:if>
 </div>
 
 <!-- 검색 폼 -->
@@ -49,6 +52,14 @@ response.setContentType("text/html; charset=utf-8");
                     <option value="진행" <c:if test="${param.plan_status == '진행'}">selected</c:if>>진행</option>
                     <option value="취소" <c:if test="${param.plan_status == '취소'}">selected</c:if>>취소</option>
                     <option value="완료" <c:if test="${param.plan_status == '완료'}">selected</c:if>>완료</option>
+                </select>
+            </div>
+            <div>
+                <span class="label">▶ 정렬순서</span>
+                <select name="sort" class="form-control">
+                    <option value="reg"   ${param.sort == 'reg'   || empty param.sort ? 'selected' : ''}>최근 등록순</option>
+                    <option value="start" ${param.sort == 'start' ? 'selected' : ''}>빠른 생산일순</option>
+                    <option value="end"   ${param.sort == 'end'   ? 'selected' : ''}>빠른 마감일순</option>
                 </select>
             </div>
             <div>
@@ -172,12 +183,8 @@ response.setContentType("text/html; charset=utf-8");
                 </div>
                 <div class="modal-field">
                     <label>담당자</label>
-                    <select name="emp_num">
-                        <option value="">선택</option>
-                        <c:forEach var="e" items="${empList}">
-                            <option value="${e.num}">${e.name}</option>
-                        </c:forEach>
-                    </select>
+                    <span class="modal-readonly">${sessionScope.loginUser.ename}</span>
+                    <input type="hidden" name="emp_num" value="${sessionScope.loginUser.emp_num}">
                 </div>
                 <div class="modal-field">
                     <label>생산일자</label>

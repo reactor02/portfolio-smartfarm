@@ -6,6 +6,9 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import kr.or.smartfarm.login.LoginDTO;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -90,7 +93,8 @@ public class ProdController {
      */
     @RequestMapping("/{plan_id}")
     public String detail(@PathVariable String plan_id, Model model,
-                         HttpServletRequest request, HttpServletResponse response) throws IOException {
+                         HttpServletRequest request, HttpServletResponse response,
+                         HttpSession session) throws IOException {
         ProdDTO prodDTO = prodService.selectOne(plan_id);
         if (prodDTO == null) {
             // 해당 계획이 없을 경우 사용자에게 알림 후 목록 화면으로 이동
@@ -104,6 +108,16 @@ public class ProdController {
             );
             return null;
         }
+
+        // 취소 권한: e_level >= 3(사장) 또는 담당자 본인
+        LoginDTO loginUser = (LoginDTO) session.getAttribute("loginUser");
+        boolean canCancel = false;
+        if (loginUser != null) {
+            String recordEmpNum = prodService.getEmpNum(plan_id);
+            canCancel = loginUser.getE_level() >= 3
+                     || loginUser.getEmp_num().equals(recordEmpNum);
+        }
+        model.addAttribute("canCancel", canCancel);
         model.addAttribute("prodDTO",  prodDTO);
         model.addAttribute("empList",  prodService.getEmpList());
         return "content/prodDetail.tiles";
@@ -121,7 +135,12 @@ public class ProdController {
      * @return 등록된 상세 페이지로의 리다이렉트 경로
      */
     @RequestMapping(value = "/create", method = RequestMethod.POST)
-    public String create(@ModelAttribute ProdDTO prodDTO) {
+    public String create(@ModelAttribute ProdDTO prodDTO, HttpSession session) {
+        // [권한] e_level 2 이상(팀장·사장)만 등록 가능
+        LoginDTO loginUser = (LoginDTO) session.getAttribute("loginUser");
+        if (loginUser == null || loginUser.getE_level() < 2) {
+            return "redirect:/prod?error=forbidden";
+        }
         prodService.create(prodDTO);
         return "redirect:/prod/" + prodDTO.getPlan_id();
     }
@@ -139,7 +158,14 @@ public class ProdController {
      */
     @RequestMapping(value = "/{plan_id}/cancel", method = RequestMethod.POST)
     @ResponseBody
-    public String cancel(@PathVariable String plan_id) {
+    public String cancel(@PathVariable String plan_id, HttpSession session) {
+        // [권한] e_level >= 3(사장) 또는 담당자 본인만 취소 가능
+        LoginDTO loginUser = (LoginDTO) session.getAttribute("loginUser");
+        if (loginUser == null) return "unauthorized";
+        String recordEmpNum = prodService.getEmpNum(plan_id);
+        boolean allowed = loginUser.getE_level() >= 3
+                       || loginUser.getEmp_num().equals(recordEmpNum);
+        if (!allowed) return "forbidden";
         prodService.updateStatus(plan_id, "취소");
         return "ok";
     }

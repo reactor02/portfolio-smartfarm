@@ -19,6 +19,9 @@ public interface RequestDAO {
     public int insertRequest(Map map);
     /** 단건 상세 조회 */
     public Map selectDetail(String requestId);
-/** 요청 상태 갱신 */
+    /** 요청 상태 갱신 */
     public int updateRequestStatus(Map map);
+
+    /** 출하요청 담당자 emp_num 조회 (VENDER.emp_num, 취소 권한 검증용) */
+    public String getEmpNum(String requestId);
 }

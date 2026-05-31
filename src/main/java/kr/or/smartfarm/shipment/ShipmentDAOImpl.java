@@ -157,4 +157,10 @@ public class ShipmentDAOImpl implements ShipmentDAO {
     public int updateShipmentLotRef(Map map) {
         return sqlSession.update("kr.or.smartfarm.shipment.updateShipmentLotRef", map);
     }
+
+    /** 출하 담당자 emp_num 조회 (취소/확정 권한 검증용) */
+    @Override
+    public String getEmpNum(String shipmentId) {
+        return sqlSession.selectOne("kr.or.smartfarm.shipment.getEmpNum", shipmentId);
+    }
 }

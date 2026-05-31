@@ -239,4 +239,10 @@ public class ShipmentServiceImpl implements ShipmentService {
     public List loadEmpList() {
         return shipmentDAO.loadEmpList();
     }
+
+    /** 출하 담당자 emp_num 조회 (취소/확정 권한 검증용) */
+    @Override
+    public String getEmpNum(String shipmentId) {
+        return shipmentDAO.getEmpNum(shipmentId);
+    }
 }

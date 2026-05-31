@@ -26,7 +26,8 @@ response.setContentType("text/html; charset=utf-8");
     <div class="hdr">
         <h1>주문 상세</h1>
         <div class="hdr-right">
-            <c:if test="${detail.REQUEST_STATUS != '취소' and detail.REQUEST_STATUS != '출하완료'}">
+            <%-- 취소버튼: e_level >= 3(사장) 또는 담당자 본인 + 진행 가능 상태 --%>
+            <c:if test="${canCancel and detail.REQUEST_STATUS != '취소' and detail.REQUEST_STATUS != '출하완료'}">
                 <form method="POST" action="/cancelRequest" style="display:inline;">
                     <input type="hidden" name="shipmentRequestNum" value="${detail.SHIPMENT_REQUEST_NUM}">
                     <input type="hidden" name="requestId"          value="${detail.REQUEST_ID}">
@@ -141,6 +142,11 @@ response.setContentType("text/html; charset=utf-8");
     </c:choose>
 
 </main>
+
+<%-- [권한] 담당자 아닌 사람이 취소 시도한 경우 --%>
+<c:if test="${param.error == 'forbidden'}">
+    <script src="/resources/js/common/alertForbidden.js"></script>
+</c:if>
 
 </body>
 </html>

@@ -72,4 +72,12 @@ public interface ProdService {
      * @return list, totalPages, totalCount, currentPage 키를 담은 Map
      */
     Map<String, Object>   getWorkOrders(int plan_num, int page);
+
+    /**
+     * 생산계획 담당자 emp_num 조회 (취소 권한 검증용)
+     *
+     * @param plan_id 생산계획 식별자
+     * @return 담당자 emp_num 문자열
+     */
+    String getEmpNum(String plan_id);
 }

@@ -78,8 +78,17 @@
                         AND (pp.plan_id LIKE '%' || #{keyword} || '%'
                           OR i.name     LIKE '%' || #{keyword} || '%')
                     </if>
+                    <!-- 자동 상태 필터: 빠른 ~~순 + 상태 미선택 시 완료/취소 제외 -->
+                    <if test="sort != null and sort != 'reg' and (plan_status == null or plan_status == '')">
+                        AND pp.plan_status NOT IN ('완료', '취소')
+                    </if>
                 </where>
-                ORDER BY pp.plan_num DESC
+                ORDER BY
+                <choose>
+                    <when test="sort == 'start'">pp.plan_start ASC</when>
+                    <when test="sort == 'end'">pp.plan_end ASC</when>
+                    <otherwise>pp.plan_num DESC</otherwise>
+                </choose>
             ) inner_q
             WHERE ROWNUM &lt;= #{endRow}
         )
@@ -94,11 +103,17 @@
           AND SYSDATE >= plan_start
     </update>
 
-    <!-- 직원 드롭다운 옵션 조회 -->
+    <!-- 직원 드롭다운 옵션 조회 (재직자만 STATUS = 'N') -->
     <select id="getEmpList" resultType="SelectOptionDTO">
         SELECT emp_num AS num, ename AS name
         FROM emp
+        WHERE status = 'N'
         ORDER BY emp_num
+    </select>
+
+    <!-- 생산계획 담당자 emp_num 조회 (취소 권한 검증용) -->
+    <select id="getEmpNum" resultType="String" parameterType="String">
+        SELECT emp_num FROM production_plan WHERE plan_id = #{plan_id}
     </select>
 
     <!-- 시설 드롭다운 옵션 조회 -->

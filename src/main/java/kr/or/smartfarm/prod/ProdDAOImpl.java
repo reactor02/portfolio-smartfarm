@@ -109,4 +109,10 @@ public class ProdDAOImpl implements ProdDAO {
     public List<WorkDTO> getWorkOrders(Map<String, Object> params) {
         return session.selectList("kr.or.smartfarm.prod.getWorkOrders", params);
     }
+
+    /** 생산계획 담당자 emp_num 조회 (취소 권한 검증용) */
+    @Override
+    public String getEmpNum(String plan_id) {
+        return session.selectOne("kr.or.smartfarm.prod.getEmpNum", plan_id);
+    }
 }

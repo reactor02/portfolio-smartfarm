@@ -28,4 +28,5 @@ public class WorkPageDTO {
 	private String item_type   = "";
 	private int    item_num    = 0;
 	private String keyword     = "";
+	private String sort        = "reg";  // 정렬: reg(최근 등록순), start(빠른 작업일순)
 }

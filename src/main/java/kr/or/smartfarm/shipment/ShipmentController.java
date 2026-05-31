@@ -63,9 +63,23 @@ public class ShipmentController {
     public String insertShipment(
             @RequestParam("shipmentRequestNum") String shipmentRequestNum,
             @RequestParam("itemNum")            int    itemNum,
-            @RequestParam("empNum")             int    empNum,
             @RequestParam("shipmentDate")       String shipmentDate,
-            @RequestParam("planQty")            int    planQty) {
+            @RequestParam("planQty")            int    planQty,
+            HttpSession session) {
+
+        // [권한] e_level 2 이상(팀장·사장)만 등록 가능
+        LoginDTO loginUser = (LoginDTO) session.getAttribute("loginUser");
+        if (loginUser == null || loginUser.getE_level() < 2) {
+            return "redirect:/shipment?error=forbidden";
+        }
+
+        // [권한] 로그인 사용자를 담당자로 자동 설정
+        int empNum = 1;
+        try {
+            empNum = Integer.parseInt(loginUser.getEmp_num());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         // [방어] 계획 수량이 0 이하면 LOT 배정·재고 차감이 무의미하므로 등록을 막는다.
         if (planQty <= 0) {
@@ -88,7 +102,7 @@ public class ShipmentController {
     @RequestMapping("/shipmentDetail/{shipmentId}")
     public String shipmentDetail(
             @PathVariable("shipmentId") String shipmentId,
-            Model model) {
+            Model model, HttpSession session) {
 
         Map detail = shipmentService.selectDetail(shipmentId);
         model.addAttribute("detail", detail);
@@ -101,6 +115,16 @@ public class ShipmentController {
             model.addAttribute("lots", lots);
         }
 
+        // 취소 권한: e_level >= 3(사장) 또는 담당자 본인
+        LoginDTO loginUser = (LoginDTO) session.getAttribute("loginUser");
+        boolean canCancel = false;
+        if (loginUser != null) {
+            String recordEmpNum = shipmentService.getEmpNum(shipmentId);
+            canCancel = loginUser.getE_level() >= 3
+                     || loginUser.getEmp_num().equals(recordEmpNum);
+        }
+        model.addAttribute("canCancel", canCancel);
+
         return "content/shipmentDetail.tiles";
     }
 
@@ -112,7 +136,8 @@ public class ShipmentController {
             @RequestParam(value = "keyword", defaultValue = "") String keyword,
             @RequestParam(value = "sDate", defaultValue = "") String sDate,
             @RequestParam(value = "eDate", defaultValue = "") String eDate,
-            @RequestParam(value = "item_num", defaultValue = "0") int itemNum) {
+            @RequestParam(value = "item_num", defaultValue = "0") int itemNum,
+            @RequestParam(value = "sort", defaultValue = "reg") String sort) {
 
         Map result = new HashMap();
         try {
@@ -120,6 +145,7 @@ public class ShipmentController {
             searchMap.put("page", page);
             searchMap.put("status", status);
             searchMap.put("keyword", keyword);
+            searchMap.put("sort", sort);
             // [방어] 날짜 형식이 YYYY-MM-DD가 아니면 TO_DATE() 에서 Oracle 오류 발생.
             //        잘못된 형식이면 빈 문자열로 대체하여 날짜 필터 없이 검색한다.
             if (!sDate.matches("\\d{4}-\\d{2}-\\d{2}")) sDate = "";
@@ -152,17 +178,20 @@ public class ShipmentController {
             @RequestParam("shipmentRequestNum") String shipmentRequestNum,
             HttpSession session) {
 
-        // [방어] 세션이 없거나 emp_num 파싱 실패 시 시스템 기본 담당자(1)로 대체한다.
-        //        파싱 실패는 데이터 이상 신호이므로 스택트레이스를 남겨 추적할 수 있게 한다.
         LoginDTO loginUser = (LoginDTO) session.getAttribute("loginUser");
+        if (loginUser == null) return "redirect:/login";
+
+        // [권한] 담당자 본인만 출하확정 가능
+        String recordEmpNum = shipmentService.getEmpNum(shipmentId);
+        if (!loginUser.getEmp_num().equals(recordEmpNum)) {
+            return "redirect:/shipmentDetail/" + shipmentId + "?error=forbidden";
+        }
+
         int empNum = 1;
-        if (loginUser != null) {
-            try {
-                empNum = Integer.parseInt(loginUser.getEmp_num());
-            } catch (Exception e) {
-                e.printStackTrace();
-                empNum = 1;
-            }
+        try {
+            empNum = Integer.parseInt(loginUser.getEmp_num());
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
         Map map = new HashMap();
@@ -184,7 +213,16 @@ public class ShipmentController {
     public String cancelShipment(
             @RequestParam("shipmentNum")        int    shipmentNum,
             @RequestParam("shipmentId")         String shipmentId,
-            @RequestParam("shipmentRequestNum") String shipmentRequestNum) {
+            @RequestParam("shipmentRequestNum") String shipmentRequestNum,
+            HttpSession session) {
+
+        // [권한] e_level >= 3(사장) 또는 담당자 본인만 취소 가능
+        LoginDTO loginUser = (LoginDTO) session.getAttribute("loginUser");
+        if (loginUser == null) return "redirect:/login";
+        String recordEmpNum = shipmentService.getEmpNum(shipmentId);
+        boolean allowed = loginUser.getE_level() >= 3
+                       || loginUser.getEmp_num().equals(recordEmpNum);
+        if (!allowed) return "redirect:/shipmentDetail/" + shipmentId + "?error=forbidden";
 
         Map map = new HashMap();
         map.put("shipment_num",        shipmentNum);

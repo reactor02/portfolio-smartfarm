@@ -70,7 +70,15 @@
                 </otherwise>
             </choose>
         </if>
-        ORDER BY SR.shipment_request_num DESC
+        <!-- 자동 상태 필터: 빠른 납기일순 + 상태 미선택 시 출하완료/취소 제외 -->
+        <if test="sort != null and sort == 'due' and (status == null or status == '' or status == 'all')">
+            AND RS.status_name NOT IN ('출하완료', '취소')
+        </if>
+        ORDER BY
+        <choose>
+            <when test="sort != null and sort == 'due'">SR.due_date ASC</when>
+            <otherwise>SR.shipment_request_num DESC</otherwise>
+        </choose>
     </select>
 
     <!-- 단건 상세 조회 -->
@@ -97,6 +105,14 @@
         JOIN emp    E ON V.emp_num     = E.emp_num
         JOIN item   I ON SR.item_num   = I.item_num
         WHERE SR.request_id = #{_parameter}
+    </select>
+
+    <!-- 출하요청 담당자 emp_num 조회 (취소 권한 검증용, VENDER.emp_num = 우리 회사 담당자) -->
+    <select id="getEmpNum" resultType="String" parameterType="String">
+        SELECT V.emp_num
+        FROM shipment_request SR
+        JOIN vender V ON SR.vender_num = V.vender_num
+        WHERE SR.request_id = #{requestId}
     </select>
 
     <!-- 요청 상태 변경 -->

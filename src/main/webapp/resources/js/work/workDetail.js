@@ -33,8 +33,10 @@ function startWork() {
     fetch('/work/' + WORK_ORDER_ID + '/start', { method: 'POST' })
         .then(function(r) { return r.text(); })
         .then(function(result) {
-            if (result === 'date_error') { showDateErr(); return; }
-            if (result === 'error')      { alert('처리할 수 없는 작업입니다.'); return; }
+            if (result === 'forbidden')    { alert('담당자가 아닙니다.'); return; }
+            if (result === 'unauthorized') { location.href = '/login'; return; }
+            if (result === 'date_error')   { showDateErr(); return; }
+            if (result === 'error')        { alert('처리할 수 없는 작업입니다.'); return; }
             location.reload();
         })
         .catch(function() { alert('처리 중 오류가 발생했습니다.'); });
@@ -45,7 +47,11 @@ function completeWork() {
     if (!confirm('작업을 완료하시겠습니까?')) return;
     fetch('/work/' + WORK_ORDER_ID + '/complete', { method: 'POST' })
         .then(function(r) { return r.text(); })
-        .then(function() { location.reload(); })
+        .then(function(result) {
+            if (result === 'forbidden')    { alert('담당자가 아닙니다.'); return; }
+            if (result === 'unauthorized') { location.href = '/login'; return; }
+            location.reload();
+        })
         .catch(function() { alert('처리 중 오류가 발생했습니다.'); });
 }
 
@@ -55,6 +61,8 @@ function produceWork() {
     fetch('/work/' + WORK_ORDER_ID + '/produce', { method: 'POST' })
         .then(function(r) { return r.text(); })
         .then(function(result) {
+            if (result === 'forbidden')    { alert('담당자가 아닙니다.'); return; }
+            if (result === 'unauthorized') { location.href = '/login'; return; }
             if (result === 'stock_error') {
                 alert('원재료 재고가 부족합니다.\nBOM 기준 재고를 확인해주세요.');
                 return;
@@ -70,6 +78,10 @@ function cancelWork() {
     if (!confirm('작업지시를 취소하시겠습니까? 취소 후에는 변경이 불가합니다.')) return;
     fetch('/work/' + WORK_ORDER_ID + '/cancel', { method: 'POST' })
         .then(function(r) { return r.text(); })
-        .then(function() { location.reload(); })
+        .then(function(result) {
+            if (result === 'forbidden')    { alert('권한이 없습니다.'); return; }
+            if (result === 'unauthorized') { location.href = '/login'; return; }
+            location.reload();
+        })
         .catch(function() { alert('처리 중 오류가 발생했습니다.'); });
 }

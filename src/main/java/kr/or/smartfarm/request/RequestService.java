@@ -70,4 +70,7 @@ public interface RequestService {
      * @return UPDATE 영향 행 수
      */
     public int updateRequestStatus(Map map);
+
+    /** 출하요청 담당자 emp_num 조회 (VENDER.emp_num, 취소 권한 검증용) */
+    public String getEmpNum(String requestId);
 }
