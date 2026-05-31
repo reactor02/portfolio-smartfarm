@@ -120,6 +120,10 @@ public class ShipmentController {
             searchMap.put("page", page);
             searchMap.put("status", status);
             searchMap.put("keyword", keyword);
+            // [방어] 날짜 형식이 YYYY-MM-DD가 아니면 TO_DATE() 에서 Oracle 오류 발생.
+            //        잘못된 형식이면 빈 문자열로 대체하여 날짜 필터 없이 검색한다.
+            if (!sDate.matches("\\d{4}-\\d{2}-\\d{2}")) sDate = "";
+            if (!eDate.matches("\\d{4}-\\d{2}-\\d{2}")) eDate = "";
             searchMap.put("sDate", sDate);
             searchMap.put("eDate", eDate);
             searchMap.put("item_num", itemNum);

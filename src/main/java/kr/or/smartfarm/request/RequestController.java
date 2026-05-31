@@ -143,6 +143,10 @@ public class RequestController {
             searchMap.put("type", type);
             searchMap.put("keyword", keyword);
             searchMap.put("status", status);
+            // [방어] 날짜 형식이 YYYY-MM-DD가 아니면 TO_DATE() 에서 Oracle 오류 발생.
+            //        잘못된 형식이면 빈 문자열로 대체하여 날짜 필터 없이 검색한다.
+            if (!sDate.matches("\\d{4}-\\d{2}-\\d{2}")) sDate = "";
+            if (!eDate.matches("\\d{4}-\\d{2}-\\d{2}")) eDate = "";
             searchMap.put("sDate", sDate);
             searchMap.put("eDate", eDate);
 
@@ -200,6 +204,22 @@ public class RequestController {
             @RequestParam("request_date") String requestDate,
             @RequestParam("due_date")     String dueDate,
             @RequestParam(value = "request_qty", defaultValue = "1") int requestQty) {
+
+        // [방어] 날짜 필수값 · 형식 검증
+        //        비어있거나 YYYY-MM-DD 패턴이 아니면 request.xml의 TO_DATE() 호출 시
+        //        Oracle ORA-01847(일 값이 범위를 벗어남) 등의 오류가 500으로 노출된다.
+        if (requestDate == null || requestDate.trim().isEmpty()
+                || dueDate == null || dueDate.trim().isEmpty()) {
+            return "redirect:/request";
+        }
+        if (!requestDate.matches("\\d{4}-\\d{2}-\\d{2}")
+                || !dueDate.matches("\\d{4}-\\d{2}-\\d{2}")) {
+            return "redirect:/request";
+        }
+        // [방어] 수량 0 이하 차단 — 0건 주문은 무의미하며 음수는 재고 증가를 유발할 수 있다.
+        if (requestQty <= 0) {
+            return "redirect:/request";
+        }
 
         Map insertMap = new HashMap();
         insertMap.put("vender_num",   venderSeq);
