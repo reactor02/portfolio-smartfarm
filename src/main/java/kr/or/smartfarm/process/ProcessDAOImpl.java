@@ -69,4 +69,5 @@ public class ProcessDAOImpl implements ProcessDAO{
 			sqlSession.update("kr.or.process.updateProcessStatus", dto);
 			return;
 		}
+
 }

@@ -15,7 +15,10 @@
 <!-- 타이틀 헤더 -->
 <div class="page-hdr">
     <h1>작업지시 관리</h1>
-    <button class="btn-reg" onclick="document.getElementById('workRegModal').style.display='flex'">+ 등록하기</button>
+    <%-- e_level 2 이상(팀장·사장)만 등록버튼 표시 --%>
+    <c:if test="${sessionScope.loginUser.e_level >= 2}">
+        <button class="btn-reg" onclick="document.getElementById('workRegModal').style.display='flex'">+ 등록하기</button>
+    </c:if>
 </div>
 
 <!-- 검색 필터 -->
@@ -38,6 +41,13 @@
                     <option value="진행"  <c:if test="${page.work_status == '진행'}">selected</c:if>>진행</option>
                     <option value="완료"  <c:if test="${page.work_status == '완료'}">selected</c:if>>완료</option>
                     <option value="취소"  <c:if test="${page.work_status == '취소'}">selected</c:if>>취소</option>
+                </select>
+            </div>
+            <div>
+                <span class="label">▶ 정렬순서</span>
+                <select name="sort" class="form-control">
+                    <option value="reg"   <c:if test="${page.sort == 'reg' || empty page.sort}">selected</c:if>>최근 등록순</option>
+                    <option value="start" <c:if test="${page.sort == 'start'}">selected</c:if>>빠른 작업일순</option>
                 </select>
             </div>
             <div>
@@ -156,12 +166,8 @@
                 </div>
                 <div class="modal-field">
                     <label>담당자</label>
-                    <select name="emp_num" required>
-                        <option value="">선택</option>
-                        <c:forEach var="e" items="${empList}">
-                            <option value="${e.num}">${e.name}</option>
-                        </c:forEach>
-                    </select>
+                    <span class="modal-readonly">${sessionScope.loginUser.ename}</span>
+                    <input type="hidden" name="emp_num" value="${sessionScope.loginUser.emp_num}">
                 </div>
                 <div class="modal-field">
                     <label>지시수량</label>

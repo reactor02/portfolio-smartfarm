@@ -28,10 +28,9 @@ import kr.or.smartfarm.shipment.ShipmentService;
  *   - 출하요청 상세 조회
  *   - 출하요청 등록 (신규 주문 생성)
  *   - 출하요청 취소
- *   - 출하지시 실행 (ShipmentService.dispatchShipment 위임)
  *
  * URL 패턴: /request, /requestDetail/{id}, /searchRequest,
- *           /searchVender, /insertRequest, /cancelRequest, /dispatchRequest
+ *           /searchVender, /insertRequest, /cancelRequest
  */
 @Controller
 public class RequestController {
@@ -79,7 +78,6 @@ public class RequestController {
      * 출하요청 상세 페이지를 반환한다.
      *
      * request_id로 단건 조회 후 해당 요청에 연계된 출하지시 목록도 함께 조회한다.
-     * hasShipment 값을 통해 JSP에서 '출하지시' 버튼 표시 여부를 제어한다.
      *
      * @param requestId URL 경로에서 추출한 요청 ID (예: REQ0001)
      * @param model     뷰에 전달할 데이터 컨테이너
@@ -88,25 +86,31 @@ public class RequestController {
     @RequestMapping("/requestDetail/{requestId}")
     public String requestDetail(
             @PathVariable("requestId") String requestId,
-            Model model) {
+            Model model, HttpSession session) {
 
         // 요청 ID로 단건 상세 조회
         Map detail = RequestService.selectDetail(requestId);
         model.addAttribute("detail", detail);
 
         // [방어] detail이 null이면(없는 요청 ID) 하위 조회를 건너뛰어 NPE를 막는다.
-        //        또한 SHIPMENT_REQUEST_NUM 컬럼이 null이면 출하지시 조회가 무의미하므로
-        //        해당 키가 채워진 경우에만 연계 출하지시를 조회한다.
+        //        SHIPMENT_REQUEST_NUM이 채워진 경우에만 연계 출하지시를 조회한다.
         if (detail != null) {
             String shipmentRequestNum = (String) detail.get("SHIPMENT_REQUEST_NUM");
             if (shipmentRequestNum != null) {
-                // 해당 요청에 유효한(취소 아닌) 출하지시가 존재하는지 여부 (0이면 없음)
-                int hasShipment = RequestService.hasShipment(shipmentRequestNum);
-                model.addAttribute("hasShipment", hasShipment);
                 // 연계된 출하지시 목록 (상세 페이지 하단 테이블에 표시)
                 model.addAttribute("linkedShipments", shipmentService.selectByRequestNum(shipmentRequestNum));
             }
         }
+
+        // 취소 권한: e_level >= 3(사장) 또는 담당자 본인 (VENDER.emp_num = 우리 회사 담당자)
+        LoginDTO loginUser = (LoginDTO) session.getAttribute("loginUser");
+        boolean canCancel = false;
+        if (loginUser != null) {
+            String recordEmpNum = RequestService.getEmpNum(requestId);
+            canCancel = loginUser.getE_level() >= 3
+                     || loginUser.getEmp_num().equals(recordEmpNum);
+        }
+        model.addAttribute("canCancel", canCancel);
 
         return "content/requestDetail.tiles";
     }
@@ -133,7 +137,8 @@ public class RequestController {
             @RequestParam(value = "keyword", defaultValue = "") String keyword,
             @RequestParam(value = "status", defaultValue = "") String status,
             @RequestParam(value = "sDate", defaultValue = "") String sDate,
-            @RequestParam(value = "eDate", defaultValue = "") String eDate) {
+            @RequestParam(value = "eDate", defaultValue = "") String eDate,
+            @RequestParam(value = "sort", defaultValue = "reg") String sort) {
 
         Map result = new HashMap();
         try {
@@ -143,6 +148,11 @@ public class RequestController {
             searchMap.put("type", type);
             searchMap.put("keyword", keyword);
             searchMap.put("status", status);
+            searchMap.put("sort", sort);
+            // [방어] 날짜 형식이 YYYY-MM-DD가 아니면 TO_DATE() 에서 Oracle 오류 발생.
+            //        잘못된 형식이면 빈 문자열로 대체하여 날짜 필터 없이 검색한다.
+            if (!sDate.matches("\\d{4}-\\d{2}-\\d{2}")) sDate = "";
+            if (!eDate.matches("\\d{4}-\\d{2}-\\d{2}")) eDate = "";
             searchMap.put("sDate", sDate);
             searchMap.put("eDate", eDate);
 
@@ -199,7 +209,30 @@ public class RequestController {
             @RequestParam("item_num")     int    itemNum,
             @RequestParam("request_date") String requestDate,
             @RequestParam("due_date")     String dueDate,
-            @RequestParam(value = "request_qty", defaultValue = "1") int requestQty) {
+            @RequestParam(value = "request_qty", defaultValue = "1") int requestQty,
+            HttpSession session) {
+
+        // [권한] e_level 2 이상(팀장·사장)만 등록 가능
+        LoginDTO loginUser = (LoginDTO) session.getAttribute("loginUser");
+        if (loginUser == null || loginUser.getE_level() < 2) {
+            return "redirect:/request?error=forbidden";
+        }
+
+        // [방어] 날짜 필수값 · 형식 검증
+        //        비어있거나 YYYY-MM-DD 패턴이 아니면 request.xml의 TO_DATE() 호출 시
+        //        Oracle ORA-01847(일 값이 범위를 벗어남) 등의 오류가 500으로 노출된다.
+        if (requestDate == null || requestDate.trim().isEmpty()
+                || dueDate == null || dueDate.trim().isEmpty()) {
+            return "redirect:/request";
+        }
+        if (!requestDate.matches("\\d{4}-\\d{2}-\\d{2}")
+                || !dueDate.matches("\\d{4}-\\d{2}-\\d{2}")) {
+            return "redirect:/request";
+        }
+        // [방어] 수량 0 이하 차단 — 0건 주문은 무의미하며 음수는 재고 증가를 유발할 수 있다.
+        if (requestQty <= 0) {
+            return "redirect:/request";
+        }
 
         Map insertMap = new HashMap();
         insertMap.put("vender_num",   venderSeq);
@@ -234,7 +267,16 @@ public class RequestController {
     @PostMapping("/cancelRequest")
     public String cancelRequest(
             @RequestParam("shipmentRequestNum") String shipmentRequestNum,
-            @RequestParam("requestId")          String requestId) {
+            @RequestParam("requestId")          String requestId,
+            HttpSession session) {
+
+        // [권한] e_level >= 3(사장) 또는 담당자 본인만 취소 가능
+        LoginDTO loginUser = (LoginDTO) session.getAttribute("loginUser");
+        if (loginUser == null) return "redirect:/login";
+        String recordEmpNum = RequestService.getEmpNum(requestId);
+        boolean allowed = loginUser.getE_level() >= 3
+                       || loginUser.getEmp_num().equals(recordEmpNum);
+        if (!allowed) return "redirect:/requestDetail/" + requestId + "?error=forbidden";
 
         Map cancelMap = new HashMap();
         cancelMap.put("shipment_request_num", shipmentRequestNum);
@@ -245,50 +287,4 @@ public class RequestController {
         return "redirect:/requestDetail/" + requestId;
     }
 
-    /**
-     * 출하지시를 실행하고 생성된 출하 상세 페이지로 리다이렉트한다.
-     *
-     * 내부적으로 ShipmentService.dispatchShipment()를 호출하며,
-     * 해당 메서드가 FIFO LOT 배정과 요청 상태 변경을 트랜잭션으로 처리한다.
-     * 로그인 사용자 정보가 없으면 emp_num = 1을 기본값으로 사용한다.
-     *
-     * @param shipmentRequestNum 출하요청 번호 (SREQ0001 형태)
-     * @param itemNum            출하할 품목 번호
-     * @param requestQty         출하 계획 수량
-     * @param requestId          요청 ID (리다이렉트용)
-     * @param session            로그인 사용자 정보를 담고 있는 HTTP 세션
-     * @return 생성된 출하 상세 페이지(shipmentDetail)로 리다이렉트
-     */
-    @PostMapping("/dispatchRequest")
-    public String dispatchRequest(
-            @RequestParam("shipmentRequestNum") String shipmentRequestNum,
-            @RequestParam("itemNum")            int    itemNum,
-            @RequestParam("requestQty")         int    requestQty,
-            @RequestParam("requestId")          String requestId,
-            HttpSession session) {
-
-        // 세션에서 로그인 사용자의 emp_num을 꺼낸다. 세션이 없으면 기본값 1 사용
-        LoginDTO loginUser = (LoginDTO) session.getAttribute("loginUser");
-        int empNum = 1;
-        if (loginUser != null) {
-            try { empNum = Integer.parseInt(loginUser.getEmp_num()); } catch (Exception e) { empNum = 1; }
-        }
-
-        Map dispatchMap = new HashMap();
-        dispatchMap.put("shipment_request_num", shipmentRequestNum);
-        dispatchMap.put("item_num",  itemNum);
-        dispatchMap.put("plan_qty",  requestQty);
-        dispatchMap.put("emp_num",   empNum);
-
-        // ShipmentService에 출하지시 로직 위임:
-        //   1) SHIPMENT 레코드 INSERT (selectKey로 shipment_num 채번)
-        //   2) FIFO LOT 배정 및 shipment_lot INSERT
-        //   3) 요청 상태 → '출하대기'
-        shipmentService.dispatchShipment(dispatchMap);
-        // selectKey로 생성된 shipment_num으로 shipment_id 계산 후 출하 상세 이동
-        // 예: 1 → SHIP0001
-        int shipmentNum = (Integer) dispatchMap.get("shipment_num");
-        String shipmentId = "SHIP" + String.format("%04d", shipmentNum);
-        return "redirect:/shipmentDetail/" + shipmentId;
-    }
 }

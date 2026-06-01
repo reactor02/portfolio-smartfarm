@@ -64,7 +64,15 @@
                 </otherwise>
             </choose>
         </if>
-        ORDER BY S.shipment_num DESC
+        <!-- 자동 상태 필터: 빠른 출하일순 + 상태 미선택 시 출하완료/취소 제외 -->
+        <if test="sort != null and sort == 'date' and (status == null or status == '' or status == 'all')">
+            AND S.shipment_status NOT IN ('출하완료', '취소')
+        </if>
+        ORDER BY
+        <choose>
+            <when test="sort != null and sort == 'date'">S.shipment_date ASC</when>
+            <otherwise>S.shipment_num DESC</otherwise>
+        </choose>
     </select>
 
     <!-- 출하 단건 상세 조회 -->
@@ -100,7 +108,8 @@
             SL.lot_num,
             SL.qty,
             L.lot_code,
-            TO_CHAR(L.lot_date, 'YYYY-MM-DD') AS lot_date,
+            TO_CHAR(L.lot_date,    'YYYY-MM-DD') AS lot_date,
+            TO_CHAR(L.expiry_date, 'YYYY-MM-DD') AS expiry_date,
             I.name AS item_name
         FROM shipment_lot SL
         JOIN lot  L ON SL.lot_num  = L.lot_num
@@ -109,11 +118,15 @@
         ORDER BY L.lot_date ASC
     </select>
 
-    <!-- FIFO 가용 LOT 조회 (출하지시용) -->
+    <!-- FIFO 가용 LOT 조회 (출하지시용)
+         [방어] PRODUCT 타입 품목만 출하 가능
+         [방어] qc.qc_pass = 'PASS' 인 LOT만 배정 — QC 미통과·미검사 LOT 제외 -->
     <select id="getAvailableLotsForShipment" resultType="hashMap" parameterType="int">
         SELECT L.lot_num, L.current_qty, TO_CHAR(L.lot_date, 'YYYY-MM-DD') AS lot_date
         FROM lot L
+        JOIN item I ON L.item_num = I.item_num
         WHERE L.item_num = #{_parameter}
+          AND UPPER(I.type) = 'PRODUCT'
           AND L.current_qty > 0
           AND L.expiry_date >= SYSDATE
           AND NOT EXISTS (
@@ -121,6 +134,12 @@
               JOIN shipment S ON SL.shipment_num = S.shipment_num
               WHERE SL.lot_num = L.lot_num
                 AND S.shipment_status != '취소'
+          )
+          AND EXISTS (
+              SELECT 1 FROM io io2
+              JOIN qc q ON io2.qc_num = q.qc_num
+              WHERE io2.lot_num = L.lot_num
+                AND UPPER(q.qc_pass) = 'PASS'
           )
         ORDER BY L.lot_date ASC
     </select>
@@ -144,11 +163,17 @@
         ORDER BY SR.shipment_request_num DESC
     </select>
 
-    <!-- 담당자 목록 (출하지시 모달용) -->
+    <!-- 담당자 목록 (출하지시 모달용, 재직자만 STATUS = 'N') -->
     <select id="loadEmpList" resultType="hashMap">
         SELECT emp_num, ename
         FROM emp
+        WHERE status = 'N'
         ORDER BY emp_num
+    </select>
+
+    <!-- 출하 담당자 emp_num 조회 (취소/확정 권한 검증용) -->
+    <select id="getEmpNum" resultType="String" parameterType="String">
+        SELECT emp_num FROM shipment WHERE shipment_id = #{shipmentId}
     </select>
 
     <!-- 출하 등록 (shipment_date 파라미터 사용, 없으면 SYSDATE) -->
@@ -201,11 +226,12 @@
     </update>
 
     <!-- 출하확정: IO 출고 이력 등록 (io_reason: '출하' or '분할') -->
+    <!-- [수정] qc_num NOT NULL(출고는 0), qc_chked NOT NULL('Y'), plan_num 컬럼 없음 -->
     <insert id="insertShipmentIo" parameterType="map">
         INSERT INTO io
-            (io_num, io_type, io_qty, io_date, qc_num, lot_num, plan_num, io_reason, facility_num, emp_num)
+            (io_num, io_type, io_qty, io_date, qc_num, lot_num, io_reason, facility_num, emp_num, qc_chked)
         VALUES
-            (io_seq.NEXTVAL, '출고', #{qty}, SYSDATE, NULL, #{lot_num}, NULL, #{io_reason}, 3, #{emp_num})
+            (io_seq.NEXTVAL, '출고', #{qty}, SYSDATE, 0, #{lot_num}, #{io_reason}, 3, #{emp_num}, 'Y')
     </insert>
 
     <!-- 출하확정: 출하 상태 → 출하완료 -->

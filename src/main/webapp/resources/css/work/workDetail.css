@@ -8,3 +8,10 @@
 /* 작업지시 취소 버튼 — 텍스트 레드, 배경 화이트 */
 .btn-del       { color: #dc3545; border-color: #dc3545; background-color: #fff; }
 .btn-del:hover { background-color: #dc3545; color: #fff; border-color: #dc3545; }
+
+/* 공정 순서별 링크 */
+.process-link-item   { display: flex; align-items: center; gap: 10px; margin: 4px 0; }
+.process-order-badge { display: inline-block; min-width: 60px; padding: 2px 8px;
+                       background: #B7E4C7; color: #2D6A4F; border-radius: 10px;
+                       font-size: 12px; font-weight: bold; text-align: center; }
+.process-empty       { color: #999; font-size: 0.9rem; }

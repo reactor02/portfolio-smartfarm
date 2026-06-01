@@ -46,10 +46,12 @@
 		)
 	</insert>
 
+	<!-- 재직자만 조회 (STATUS = 'N') -->
 	<select id="getEmpList"
 		resultType="kr.or.smartfarm.vender.VenderDTO">
 		select emp_num, ename
 		from emp
+		where status = 'N'
 	</select>
 
 	<update id="updateVender"

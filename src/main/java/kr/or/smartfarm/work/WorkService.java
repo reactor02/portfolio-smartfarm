@@ -107,4 +107,15 @@ public interface WorkService {
      * @return Map { list, currentPage, totalPages, totalCount }
      */
     Map<String, Object> searchPlans(String keyword, int page);
+
+    /** 품목별 공정 목록 조회 (작업순서 오름차순, 작업지시 상세 페이지용) */
+    List<Map<String, Object>> getProcessesByItem(int item_num);
+
+    /**
+     * 작업지시 담당자 emp_num 조회 (취소/완료 권한 검증용)
+     *
+     * @param work_order_id 작업지시 ID
+     * @return 담당자 emp_num 문자열
+     */
+    String getEmpNum(String work_order_id);
 }

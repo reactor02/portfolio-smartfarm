@@ -5,9 +5,11 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import kr.or.smartfarm.login.LoginDTO;
 
 import kr.or.smartfarm.prod.SelectOptionDTO;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -39,6 +41,7 @@ public class WorkController {
     // WorkService 인터페이스의 구현체(WorkServiceImpl)를 스프링이 자동으로 주입
     @Autowired
     WorkService workService;
+
 
     /**
      * 날짜 형식 바인딩 설정.
@@ -90,7 +93,8 @@ public class WorkController {
      */
     @RequestMapping("/{work_order_id}")
     public String detail(@PathVariable String work_order_id, Model model,
-                         HttpServletRequest request, HttpServletResponse response) throws IOException {
+                         HttpServletRequest request, HttpServletResponse response,
+                         HttpSession session) throws IOException {
         WorkDTO workDTO = workService.selectOne(work_order_id);
         if (workDTO == null) {
             // 잘못된 ID 접근 시 사용자에게 알림을 표시하고 목록으로 이동
@@ -104,7 +108,18 @@ public class WorkController {
             );
             return null;
         }
-        model.addAttribute("workDTO", workDTO);
+
+        // 취소 권한: e_level >= 3(사장) 또는 담당자 본인
+        LoginDTO loginUser = (LoginDTO) session.getAttribute("loginUser");
+        boolean canCancel = false;
+        if (loginUser != null) {
+            String recordEmpNum = workService.getEmpNum(work_order_id);
+            canCancel = loginUser.getE_level() >= 3
+                     || loginUser.getEmp_num().equals(recordEmpNum);
+        }
+        model.addAttribute("canCancel", canCancel);
+        model.addAttribute("workDTO",     workDTO);
+        model.addAttribute("processList", workService.getProcessesByItem(workDTO.getItem_num()));
         return "content/workDetail.tiles";
     }
 
@@ -119,7 +134,13 @@ public class WorkController {
      */
     @RequestMapping(method = RequestMethod.POST)
     public String insert(@ModelAttribute WorkDTO workDTO,
-                         HttpServletRequest request, HttpServletResponse response) throws IOException {
+                         HttpServletRequest request, HttpServletResponse response,
+                         HttpSession session) throws IOException {
+        // [권한] e_level 2 이상(팀장·사장)만 등록 가능
+        LoginDTO loginUser = (LoginDTO) session.getAttribute("loginUser");
+        if (loginUser == null || loginUser.getE_level() < 2) {
+            return "redirect:/work?error=forbidden";
+        }
         if (workDTO.getOrder_start() == null) {
             // 작업시작일 미입력 시 사용자에게 경고 후 이전 페이지로 복귀
             response.setContentType("text/html; charset=UTF-8");
@@ -142,7 +163,14 @@ public class WorkController {
      */
     @RequestMapping(value = "/{work_order_id}/cancel", method = RequestMethod.POST)
     @ResponseBody
-    public String cancel(@PathVariable String work_order_id) {
+    public String cancel(@PathVariable String work_order_id, HttpSession session) {
+        // [권한] e_level >= 3(사장) 또는 담당자 본인만 취소 가능
+        LoginDTO loginUser = (LoginDTO) session.getAttribute("loginUser");
+        if (loginUser == null) return "unauthorized";
+        String recordEmpNum = workService.getEmpNum(work_order_id);
+        boolean allowed = loginUser.getE_level() >= 3
+                       || loginUser.getEmp_num().equals(recordEmpNum);
+        if (!allowed) return "forbidden";
         workService.cancel(work_order_id);
         return "ok";
     }
@@ -160,7 +188,12 @@ public class WorkController {
      */
     @RequestMapping(value = "/{work_order_id}/start", method = RequestMethod.POST)
     @ResponseBody
-    public String start(@PathVariable String work_order_id) {
+    public String start(@PathVariable String work_order_id, HttpSession session) {
+        // [권한] 담당자 본인만 작업시작 가능
+        LoginDTO loginUser = (LoginDTO) session.getAttribute("loginUser");
+        if (loginUser == null) return "unauthorized";
+        String recordEmpNum = workService.getEmpNum(work_order_id);
+        if (!loginUser.getEmp_num().equals(recordEmpNum)) return "forbidden";
         WorkDTO dto = workService.selectOne(work_order_id);
         if (dto == null || dto.getOrder_start() == null) return "error";
         java.time.LocalDate today      = java.time.LocalDate.now();
@@ -181,7 +214,12 @@ public class WorkController {
      */
     @RequestMapping(value = "/{work_order_id}/complete", method = RequestMethod.POST)
     @ResponseBody
-    public String complete(@PathVariable String work_order_id) {
+    public String complete(@PathVariable String work_order_id, HttpSession session) {
+        // [권한] 담당자 본인만 작업완료 가능
+        LoginDTO loginUser = (LoginDTO) session.getAttribute("loginUser");
+        if (loginUser == null) return "unauthorized";
+        String recordEmpNum = workService.getEmpNum(work_order_id);
+        if (!loginUser.getEmp_num().equals(recordEmpNum)) return "forbidden";
         workService.complete(work_order_id);
         return "ok";
     }
@@ -204,7 +242,12 @@ public class WorkController {
      */
     @RequestMapping(value = "/{work_order_id}/produce", method = RequestMethod.POST)
     @ResponseBody
-    public String produce(@PathVariable String work_order_id) {
+    public String produce(@PathVariable String work_order_id, HttpSession session) {
+        // [권한] 담당자 본인만 생산완료 가능
+        LoginDTO loginUser = (LoginDTO) session.getAttribute("loginUser");
+        if (loginUser == null) return "unauthorized";
+        String recordEmpNum = workService.getEmpNum(work_order_id);
+        if (!loginUser.getEmp_num().equals(recordEmpNum)) return "forbidden";
         try {
             workService.produce(work_order_id);
             return "ok";

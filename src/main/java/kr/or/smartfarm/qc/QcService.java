@@ -14,4 +14,7 @@ public interface QcService {
 	public List selectAllQc();
 	public QcDTO qcChk(int qc_num);
 	public int insertQc1(QcDTO qcDTO);
+	public int insertQc2(QcDTO qcDTO);
+	public int insertDefect(QcDTO qcDTO);
+	public QcDTO crrnt_qty(QcDTO qcDTO);
 }

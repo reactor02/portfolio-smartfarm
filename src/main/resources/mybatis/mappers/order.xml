@@ -57,8 +57,16 @@
                         AND (wo.order_id LIKE '%' || #{keyword} || '%'
                           OR i.name      LIKE '%' || #{keyword} || '%')
                     </if>
+                    <!-- 자동 상태 필터: 빠른 작업일순 + 상태 미선택 시 완료/취소 제외 -->
+                    <if test="sort != null and sort != 'reg' and (work_status == null or work_status == '')">
+                        AND wo.order_status NOT IN ('완료', '취소')
+                    </if>
                 </where>
-                ORDER BY wo.order_num DESC
+                ORDER BY
+                <choose>
+                    <when test="sort == 'start'">wo.order_start ASC</when>
+                    <otherwise>wo.order_num DESC</otherwise>
+                </choose>
             ) inner_q
             WHERE ROWNUM &lt;= #{endRow}
         )
@@ -149,9 +157,16 @@
         ORDER BY type, name
     </select>
 
-    <!-- 담당자 옵션 -->
+    <!-- 담당자 옵션 (재직자만 STATUS = 'N') -->
     <select id="getEmpOptions" resultType="SelectOptionDTO">
-        SELECT emp_num AS num, ename AS name FROM emp ORDER BY emp_num
+        SELECT emp_num AS num, ename AS name FROM emp
+        WHERE status = 'N'
+        ORDER BY emp_num
+    </select>
+
+    <!-- 작업지시 담당자 emp_num 조회 (취소/완료 권한 검증용) -->
+    <select id="getEmpNum" resultType="String" parameterType="String">
+        SELECT emp_num FROM work_order WHERE work_order_id = #{work_order_id}
     </select>
 
     <!-- 생산계획 옵션 (취소 제외) -->
@@ -211,6 +226,18 @@
         VALUES (IO_SEQ.NEXTVAL, #{ioType}, #{ioQty}, SYSDATE, #{qcNum}, #{lotNum}, #{planNum}, #{ioReason})
     </insert>
 
+    <!-- 작업지시 상세용: 품목별 공정 목록 (작업순서 오름차순) -->
+    <select id="getProcessesByItem" parameterType="int" resultType="hashMap">
+        SELECT process_num     AS PROCESS_NUM,
+               flow            AS FLOW,
+               process_content AS PROCESS_CONTENT,
+               process_status  AS PROCESS_STATUS
+        FROM process
+        WHERE item_num = #{_parameter}
+          AND process_status = '사용중'
+        ORDER BY flow ASC
+    </select>
+
     <!-- 생산계획 검색 (AJAX 모달용, 취소·완료 제외) -->
     <select id="searchPlans" parameterType="map" resultType="ProdDTO">
         SELECT plan_id, plan_num, plan_qty, item_name, plan_status,
@@ -235,6 +262,7 @@
                 LEFT JOIN item i ON pp.item_num = i.item_num
                 LEFT JOIN emp  e ON pp.emp_num  = e.emp_num
                 WHERE pp.plan_status NOT IN ('취소', '완료')
+                  AND (pp.plan_end IS NULL OR pp.plan_end >= TRUNC(SYSDATE))
                 <if test="keyword != null and keyword != ''">
                     AND (pp.plan_id LIKE '%' || #{keyword} || '%'
                       OR i.name     LIKE '%' || #{keyword} || '%')

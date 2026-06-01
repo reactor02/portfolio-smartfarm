@@ -86,4 +86,12 @@ public interface ProdDAO {
      * @return 작업지시 목록 (각 행에 total_count 포함)
      */
     public List<WorkDTO>         getWorkOrders(Map<String, Object> params);
+
+    /**
+     * 생산계획 담당자 emp_num 조회 (취소 권한 검증용)
+     *
+     * @param plan_id 생산계획 식별자
+     * @return 담당자 emp_num 문자열, 없으면 null
+     */
+    public String getEmpNum(String plan_id);
 }

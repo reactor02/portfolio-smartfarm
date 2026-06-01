@@ -104,7 +104,7 @@ response.setContentType("text/html; charset=utf-8");
 .sch-wrap {
 	display: flex;
 	justify-content: space-between;
-	align-items: center;
+	align-items: flex-end;
 	background-color: #f8f9fa;
 	border: 1px solid #d1d5db;
 	border-radius: 8px;
@@ -163,10 +163,10 @@ select.form-control {
 	align-items: center;
 	border: 1px solid #aaa;
 	border-radius: 4px;
-	height: 38px;
+	height: 42px;
 	background: #fff;
 	padding-left: 10px;
-	width: 385px;
+	width: 570px;
 }
 
 .sch-input-box:focus-within {
@@ -319,6 +319,31 @@ select.form-control {
 
 .textarea-desc:focus {
 	border-color: #2D6A4F;
+}
+										
+/* 모달 내부 박스 중앙 정렬 및 크기 지정 */
+.modal-box {
+    background: #fff;
+    padding: 30px;
+    border-radius: 8px;
+    max-width: 90%;      /* 화면이 작아질 경우를 대비 */
+    overflow-y: auto;    /* 내용이 길어지면 내부 스크롤 */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+.modal-overlay {
+    position: fixed; /* 화면 기준 고정 */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5); /* 반투명 배경 */
+    
+    /* 여기서 중앙 정렬 핵심! */
+    display: flex;         
+    justify-content: center; /* 가로 중앙 */
+    align-items: center;     /* 세로 중앙 */
+    
+    z-index: 1000; /* 다른 요소보다 위에 표시 */
 }
 </style>
 </head>
@@ -605,7 +630,7 @@ select.form-control {
 		const plus_btn = document.querySelector(".btn-reg");
 		const modal = document.querySelector(".modal-overlay");
 		plus_btn.addEventListener('click', ()=>{
-			modal.style.display = "block";
+			modal.style.display = "flex";
 		})
 		
 		const cancel = document.querySelector(".btn-cancel");

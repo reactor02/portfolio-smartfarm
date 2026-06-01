@@ -129,31 +129,32 @@ response.setContentType("text/html; charset=utf-8");
 	<!-- 등록 모달 -->
 	<div id="regModal" class="modal-overlay" style="display:none;">
 	    <div class="modal-box">
-	        <h3 class="modal-title">품질검사 완료 등록</h3>
+	        <h3 class="modal-title">품질검사 등록</h3>
 	        <form id="regForm" action="${pageContext.request.contextPath}/insertQc" method="post">
 	            <div class="modal-grid">
 	                <div class="modal-field">
-	                    <label>검사한 품목</label>
-	                   	<select name="lot_num">
-	                   		<option value="">lot코드 / 품목명 / 입고날짜 / 총량 / 담당자 </option>
+	                    <label>검사 품목 lot</label>
+	                   	<select name="io_num">
+	                   		<option value="">lot코드 / 품목명 / 입고날짜 / 총량  </option>
 	                   		<c:forEach var="i" items="${waiting}">
-	                            <option value="${i.lot_num}">${i.lot_code} / ${i.name} / ${i.io_date} / ${i.io_qty}${i.unit} / ${i.ename} / </option>
+	                            <option value="${i.io_num}">${i.lot_code} / ${i.name} / ${i.io_date} / ${i.io_qty}${i.unit}  </option>
 	                        </c:forEach>
 	                   	</select>
-	                   	<input type="hidden" name="" value="">
 	                </div>
 	                
 	                <div class="modal-field">
-	                    <label>검사 완료 개수</label>
-	                   	<input type="number" name="io_qty">
-	                   	<span>SELECT 값보다 적거나 같은 값을 입력해주세요. </span>
+	                    <label>검사 개수</label>
+	                   	<input id="qty-id" type="number" name="io_qty">
+	                   	<span></span>
 	                </div>
 	                <div class="modal-field">
 	                    <label>검사 구분</label>
 	                   	<select name="qc_num">
 	                        <option value="">선택</option>
 	                        <c:forEach var="qc" items="${qc}">
-	                            <option value="${qc.qc_num}">${qc.qc_type} ${qc.qc_pass}</option>
+	                        	<c:if test="${qc.qc_pass eq 'PASS' and qc.qc_type ne 'EQUIP'}">
+	                            	<option value="${qc.qc_num}">${qc.qc_type} ${qc.qc_pass}</option>
+	                            </c:if> 
 	                        </c:forEach>
 	                    </select>
 	                </div>
@@ -173,6 +174,9 @@ response.setContentType("text/html; charset=utf-8");
 	            </div>
 	        </div>
        	</form>
+       	
+<!-- 값 response 모달 -->
+
      </div>
 </body>
 <script>
@@ -281,6 +285,7 @@ document.getElementById('regModal').addEventListener('click', function(e) {
     if (e.target === this) this.style.display = 'none';
 });
 
+
 /* 날짜 유효성 검사 로직 */
 function validateDate() {
 	const start = document.getElementById('sDate').value;
@@ -385,14 +390,7 @@ const itemSearch = document.querySelector("#itemSearch");
 		const btn_plus = document.querySelector(".btn-plus");
 		btn_plus.addEventListener('click',()=>{
 			
-			//개수 인풋 값
-			const quantity = document.querySelector("#quantity").value;
-			//체크된 라디오 
-			const radio = document.querySelector("input[type='radio']:checked");
-			if(radio == null){//방어로직 : 아무 것도 선택하지 않았다면 작동
-				alert("선택된 항목이 없습니다.");
-			return;
-			}
+			
 			if(quantity < 0){
 				alert("개수를 제대로 확인해주세요");
 				return;

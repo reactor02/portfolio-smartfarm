@@ -28,4 +28,5 @@ public class ProdPageDTO {
     private int item_num;
     private String item_type = "";
     private String keyword = "";
+    private String sort = "reg";  // 정렬: reg(최근 등록순), start(빠른 생산일순), end(빠른 마감일순)
 }

@@ -194,6 +194,11 @@ public class WorkServiceImpl implements WorkService {
     }
 
     @Override
+    public List<Map<String, Object>> getProcessesByItem(int item_num) {
+        return dao.getProcessesByItem(item_num);
+    }
+
+    @Override
     public Map<String, Object> searchPlans(String keyword, int page) {
         prodDao.syncPlanStatus();   // plan_start 지난 대기 → 진행 동기화
         int size     = 5;
@@ -215,5 +220,11 @@ public class WorkServiceImpl implements WorkService {
         result.put("totalPages",  totalPages);
         result.put("totalCount",  totalCount);
         return result;
+    }
+
+    /** 작업지시 담당자 emp_num 조회 (취소/완료 권한 검증용) */
+    @Override
+    public String getEmpNum(String work_order_id) {
+        return dao.getEmpNum(work_order_id);
     }
 }

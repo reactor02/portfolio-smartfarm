@@ -198,30 +198,27 @@ AND i.TYPE IN ('PRODUCT', 'SEMIPRODUCT')
     </insert>
 
 
+    <!-- [수정] plan_num 제거, qc_chked NOT NULL 추가(생산투입=N) -->
     <insert id="insertIo" parameterType="kr.or.smartfarm.io.IoDTO">
         INSERT INTO io (
-            io_num,
-            io_type,
-            io_qty,
-            io_date,
-            qc_num,
-            lot_num,
-            plan_num,
-            io_reason,
-            facility_num,
-            emp_num
+            io_num, io_type, io_qty, io_date, qc_num,
+            lot_num, io_reason, facility_num, emp_num, qc_chked
         ) VALUES (
             io_seq.NEXTVAL,
             #{io_type},
             #{io_qty},
             #{io_date},
             (
-                SELECT MIN(qc_num) 
-                FROM qc 
+                SELECT MIN(qc_num)
+                FROM qc
                 WHERE qc_type = (SELECT type FROM item WHERE item_num = #{item_num})
                   AND qc_pass = 'WAITING'
             ),
-            #{lot_num},          1,                   #{io_reason},
-            3,                   NULL                 )
+            #{lot_num},
+            #{io_reason},
+            3,
+            NULL,
+            'N'
+        )
     </insert>
 </mapper>

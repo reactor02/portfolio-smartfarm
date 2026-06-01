@@ -32,4 +32,7 @@ public interface ShipmentService {
     public List loadPendingRequests();
     /** 담당자 옵션 목록 */
     public List loadEmpList();
+
+    /** 출하 담당자 emp_num 조회 (취소/확정 권한 검증용) */
+    public String getEmpNum(String shipmentId);
 }
