@@ -104,7 +104,39 @@
 	
 	
 	<!-- 5. KPT 불량 개수 -->
-	
+	<select id="getKPIDefect" resultType="kr.or.smartfarm.dashboard.DashDTO"> 
+		SELECT count(*) as defect_qty
+		FROM defective
+		JOIN io
+		    ON defective.io_num = io.io_num
+		JOIN emp
+		    ON io.emp_num = emp.emp_num
+		JOIN lot
+			ON io.lot_num = lot.lot_num
+		JOIN item
+			ON lot.item_num = item.item_num
+		JOIN qc
+			ON qc.qc_num = io.qc_num
+		where
+		<choose>
+			<when test="startDate != null and endDate != null">
+				io_date between to_date(#{startDate}, 'yyyy-mm-dd')
+				and to_date(#{endDate}, 'yyyy-mm-dd') + 1
+			</when>
+
+			<when test="period == 'day'">
+				 trunc(io_date) = trunc(sysdate)
+			</when>
+			<when test="period == 'week'">
+				 trunc(io_date) >= trunc(sysdate, 'IW')
+				and trunc(io_date) &lt; trunc(sysdate, 'IW') + 7
+			</when>
+			<when test="period == 'month'">
+				 trunc(io_date) >= trunc(sysdate, 'MM')
+				and trunc(io_date) &lt; add_months(trunc(sysdate, 'MM'), 1)
+			</when>
+		</choose>
+	</select>
 
 
 

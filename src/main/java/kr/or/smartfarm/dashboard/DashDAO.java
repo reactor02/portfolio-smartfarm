@@ -42,5 +42,14 @@ public class DashDAO {
 		return result;
 	}
 	
+	public List<DashDTO> selectKPIDefect(String period, String startDate, String endDate){
+		Map<String, Object> param =new HashMap<>();
+		param.put("period", period);
+		param.put("startDate", startDate);
+		param.put("endDate", endDate);
+		List<DashDTO> result = sqlSession.selectList("mapper.dash.getKPIDefect", param);
+		return result;
+	}
+	
 	
 }

@@ -30,4 +30,9 @@ public class DashService {
 			List result = dashDAO.selectKPIShip(period, startDate, endDate); 
 			return result;
 		}
+		
+		public List selectKPIDefect(String period, String startDate, String endDate) {
+			List result = dashDAO.selectKPIDefect(period, startDate, endDate);
+			return result;
+		}
 }

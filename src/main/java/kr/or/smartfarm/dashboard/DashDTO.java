@@ -25,4 +25,8 @@ public class DashDTO {
 	private String plan_status;
 	private String shipment_status;
 	private String dt;
+	
+	// 불량 개수 
+	private int defect_qty;
+	private Date io_date;
 }

@@ -48,6 +48,8 @@ public class DashController {
 			model.addAttribute("resultKPIPP", resultKPIPP);
 			List<DashDTO> resultKPIShip = dashService.selectKPIShip(period, startDate, endDate);
 			model.addAttribute("resultKPIShip", resultKPIShip);
+			List<DashDTO> resultKPIDefect = dashService.selectKPIDefect(period, startDate, endDate);
+			model.addAttribute("resultKPIDefect", resultKPIDefect);
 			model.addAttribute("period", period);
 			model.addAttribute("startDate", startDate);
 			model.addAttribute("endDate", endDate);

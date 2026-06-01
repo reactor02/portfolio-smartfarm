@@ -311,10 +311,19 @@ body {
 					</c:choose>
 				</div>
 				</c:forEach>
+				<c:forEach var="k" items="${resultKPIDefect}">
 				<div class="kpi-card">
-					<div class="kpi-title">출하량</div>
-					<div class="kpi-value">11,980 EA</div>
+					<div class="kpi-title">불량수</div>
+					<c:choose>
+					<c:when test="${not empty k.defect_qty}">
+					<div class="kpi-value">${k.defect_qty} EA</div>
+					</c:when>
+					<c:otherwise>
+						<div class="kpi-value">0 EA</div>
+					</c:otherwise>
+					</c:choose>
 				</div>
+				</c:forEach>
 				<div class="kpi-card">
 					<div class="kpi-title">불량수</div>
 					<div class="kpi-value">8 건</div>
