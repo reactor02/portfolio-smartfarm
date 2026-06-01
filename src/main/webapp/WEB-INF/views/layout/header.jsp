@@ -124,7 +124,7 @@ margin: 0px !important;
     <div id="dashboardContainer" class="dashboard-slide-panel">
         
         <div class="dashboard-content-wrapper">
-        <c:import url="/dashboard" />
+        <c:import url="/dashboard2" />
             </div>
         
         <div class="dashboard-close-bar">
