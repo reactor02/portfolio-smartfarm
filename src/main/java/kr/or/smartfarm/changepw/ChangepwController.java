@@ -106,7 +106,7 @@ public class ChangepwController {
 	        
 	        // [조건 2] 로그인 화면에 해당하는 Tiles 정의(Definition) 이름 리턴
 	        // 💡 프로젝트의 tiles.xml에 등록된 로그인 화면 이름으로 적어주세요 (예: "login.nohead" 등)
-	        return "login.nohead"; 
+	        return "proj3Login.nohead"; 
 	       
 	    } else {
 	        model.addAttribute("message", "비밀번호 변경에 실패했습니다. 다시 시도해주세요.");
