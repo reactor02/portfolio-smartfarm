@@ -112,6 +112,7 @@ function resetModal() {
 	document.getElementById('selectedVenderSeq').value  = '';
 	document.getElementById('dueDate').value            = '';
 	document.getElementById('requestQty').value         = '1';
+	document.getElementById('requestContent').value     = '';
 	document.getElementById('itemSelect').selectedIndex = 0;
 	document.getElementById('venderDropdown').style.display = 'none';
 	document.getElementById('requestDate').value = new Date().toISOString().split('T')[0];

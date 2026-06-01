@@ -32,11 +32,6 @@
             <span class="info-label">LOT 번호</span>
             <span class="info-value">${lotDTO.lot_code}</span>
         </div>
-
-        <div class="info-item">
-            <span class="info-label">품목 유형</span>
-            <span class="info-value">${lotDTO.type}</span>
-        </div>
         <div class="info-item">
             <span class="info-label">품목명</span>
             <span class="info-value">${lotDTO.item_name}</span>
@@ -44,6 +39,10 @@
         <div class="info-item">
             <span class="info-label">품목 코드</span>
             <span class="info-value">${lotDTO.code}</span>
+        </div>
+        <div class="info-item">
+            <span class="info-label">품목 유형</span>
+            <span class="info-value">${lotDTO.type}</span>
         </div>
         <div class="info-item">
             <span class="info-label">초기 수량</span>
@@ -64,15 +63,11 @@
     </div>
 
     <!-- 2. 탭 네비게이션 -->
-    <div class="tab-nav" style="display:flex; gap:4px; margin-bottom:0; border-bottom:2px solid #d9d9d9;">
-        <button class="tab-btn active" onclick="switchTab('relation', this)"
-                style="padding:8px 20px; border:1px solid #d9d9d9; border-bottom:none; background:#fff;
-                       cursor:pointer; font-size:14px; border-radius:4px 4px 0 0;">
+    <div class="tab-nav">
+        <button class="tab-btn active" onclick="switchTab('relation', this)">
             연관관계 · 소모자재
         </button>
-        <button class="tab-btn" onclick="switchTab('lothistory', this)"
-                style="padding:8px 20px; border:1px solid #d9d9d9; border-bottom:none; background:#f5f5f5;
-                       cursor:pointer; font-size:14px; border-radius:4px 4px 0 0; color:#888;">
+        <button class="tab-btn" onclick="switchTab('lothistory', this)">
             롯이력
         </button>
     </div>
@@ -188,64 +183,8 @@
 </main>
 
 <script>
-    /* ── 탭 전환 ── */
-    let lotHistoryLoaded = false;
-
-    function switchTab(name, btn) {
-        document.querySelectorAll('.tab-btn').forEach(function(b) {
-            b.classList.remove('active');
-            b.style.background  = '#f5f5f5';
-            b.style.color       = '#888';
-            b.style.borderBottom = 'none';
-        });
-        document.querySelectorAll('.tab-panel').forEach(function(p) {
-            p.style.display = 'none';
-        });
-        btn.classList.add('active');
-        btn.style.background  = '#fff';
-        btn.style.color       = '#000';
-        btn.style.borderBottom = '2px solid #fff';
-        document.getElementById('tab-' + name).style.display = 'block';
-
-        if (name === 'lothistory' && !lotHistoryLoaded) {
-            fetch('/lot/${lotDTO.lot_code}/lotHistory')
-                .then(function(r) { return r.json(); })
-                .then(renderLotHistory)
-                .catch(function(err) { console.error('롯이력 로드 오류:', err); });
-            lotHistoryLoaded = true;
-        }
-    }
-
-    /* ── 롯이력 렌더링 ── */
-    function renderLotHistory(data) {
-        var tbody = document.getElementById('lothistory-body');
-        if (!data || data.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="10" class="empty-cell">롯이력이 없습니다.</td></tr>';
-            return;
-        }
-        var html = '';
-        data.forEach(function(r) {
-            var isShipment = (r.GUBUN === '출하');
-            html += '<tr>'
-                + '<td>' + (r.DEPTH       != null ? r.DEPTH       : 0)   + '</td>'
-                + '<td>' + (r.LOT_CODE    || '-') + '</td>'
-                + '<td>' + (r.ITEM_NAME   || '-') + '</td>'
-                + '<td>' + (r.ITEM_TYPE   || '-') + '</td>'
-                + '<td><span style="padding:2px 8px; border-radius:10px; font-size:12px; font-weight:bold;'
-                +      (isShipment ? 'background:#fff7e6;color:#fa8c16;border:1px solid #ffd591;'
-                                   : 'background:#f6ffed;color:#52c41a;border:1px solid #b7eb8f;') + '">'
-                +      (r.GUBUN || '-') + '</span></td>'
-                + '<td>' + (r.ID_COL      || '-') + '</td>'
-                + '<td>' + (r.CONTENT_COL || '-') + '</td>'
-                + '<td>' + (r.DATE_COL    || '-') + '</td>'
-                + '<td>' + (r.STATUS_COL  || '-') + '</td>'
-                + '<td>' + (r.WORKER      || '-') + '</td>'
-                + '</tr>';
-        });
-        tbody.innerHTML = html;
-    }
-    const lotCode = "${lotCode}";  // LotController가 model.addAttribute("lotCode", lot_code)로 주입
-    new QRCode(document.getElementById("qrcode"), "http://localhost:8080/lot/" + lotCode);
+    const lotCode = "${lotCode}";
 </script>
+<script src="/resources/js/lot/lotDetail.js"></script>
 </body>
 </html>

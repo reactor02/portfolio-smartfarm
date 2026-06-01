@@ -24,8 +24,8 @@
 		<li class="nav-item">
 			<div class="nav-btn toggle-btn">생산 관리</div>
 			<ul class="sub-nav">
-				<li><a href="">생산 계획</a></li>
-				<li><a href="">작업 지시</a></li>
+				<li><a href="/prod">생산 계획</a></li>
+				<li><a href="/work">작업 지시</a></li>
 				<li><a href="">실적 등록</a></li>
 			</ul>
 		</li>
@@ -46,7 +46,7 @@
 		<li class="nav-item">
 			<div class="nav-btn toggle-btn">이력 및 추적 관리</div>
 			<ul class="sub-nav">
-				<li><a href="">Lot 번호 관리</a></li>
+				<li><a href="/lot">LOT 관리</a></li>
 				<li><a href="">이력 추적</a></li>
 			</ul>
 		</li>

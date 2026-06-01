@@ -188,11 +188,11 @@ response.setContentType("text/html; charset=utf-8");
                 </div>
                 <div class="modal-field">
                     <label>생산일자</label>
-                    <input type="date" name="plan_start">
+                    <input type="date" name="plan_start" required>
                 </div>
                 <div class="modal-field">
                     <label>생산마감</label>
-                    <input type="date" name="plan_end">
+                    <input type="date" name="plan_end" required>
                 </div>
                 <div class="modal-field">
                     <label>품목</label>

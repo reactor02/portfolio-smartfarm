@@ -14,6 +14,8 @@
             TO_CHAR(SR.due_date,     'YYYY-MM-DD') AS due_date,
             RS.status_name AS request_status,
             SR.request_qty,
+            NVL((SELECT SUM(s.plan_qty) FROM shipment s
+                 WHERE s.shipment_request_num = SR.shipment_request_num), 0) AS shipped_qty,
             V.vender_name,
             V.vender_type,
             E.ename,
@@ -36,6 +38,8 @@
             TO_CHAR(SR.due_date,     'YYYY-MM-DD') AS due_date,
             RS.status_name AS request_status,
             SR.request_qty,
+            NVL((SELECT SUM(s.plan_qty) FROM shipment s
+                 WHERE s.shipment_request_num = SR.shipment_request_num), 0) AS shipped_qty,
             V.vender_name,
             V.vender_type,
             E.ename,
@@ -90,6 +94,9 @@
             TO_CHAR(SR.due_date,     'YYYY-MM-DD') AS due_date,
             RS.status_name AS request_status,
             SR.request_qty,
+            SR.content,
+            NVL((SELECT SUM(s.plan_qty) FROM shipment s
+                 WHERE s.shipment_request_num = SR.shipment_request_num), 0) AS shipped_qty,
             V.vender_name,
             V.vender_type,
             V.vender_num,
@@ -151,7 +158,7 @@
             SELECT 'SREQ' || LPAD(REQUEST_SEQ.NEXTVAL, 4, '0') FROM DUAL
         </selectKey>
         INSERT INTO shipment_request
-            (shipment_request_num, request_id, request_date, vender_num, due_date, status_num, item_num, request_qty)
+            (shipment_request_num, request_id, request_date, vender_num, due_date, status_num, item_num, request_qty, content)
         VALUES
             (#{shipment_request_num},
              REPLACE(#{shipment_request_num}, 'SREQ', 'REQ'),
@@ -160,7 +167,8 @@
              TO_DATE(#{due_date}, 'YYYY-MM-DD'),
              (SELECT status_num FROM request_status WHERE status_name = '접수'),
              #{item_num},
-             #{request_qty})
+             #{request_qty},
+             #{content})
     </insert>
 
 </mapper>

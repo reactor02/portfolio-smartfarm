@@ -100,6 +100,15 @@ public class ProdDAOImpl implements ProdDAO {
     }
 
     /**
+     * SUM(current_qty) >= plan_qty 달성 계획을 "완료"로 일괄 업데이트
+     * - SQL ID: kr.or.smartfarm.prod.syncCompletePlanStatus
+     */
+    @Override
+    public int syncCompletePlanStatus() {
+        return session.update("kr.or.smartfarm.prod.syncCompletePlanStatus");
+    }
+
+    /**
      * 특정 생산계획에 속한 작업지시 목록 조회 (페이징)
      * - SQL ID: kr.or.smartfarm.prod.getWorkOrders
      *
