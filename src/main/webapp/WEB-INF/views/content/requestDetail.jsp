@@ -96,6 +96,34 @@ response.setContentType("text/html; charset=utf-8");
                 </div>
             </div>
 
+            <!-- 출하 수량 현황 -->
+            <div class="section-box">
+                <div class="section-title">출하 수량 현황</div>
+                <div class="status-grid">
+                    <div class="status-card">
+                        <div class="info-label">주문 수량</div>
+                        <div class="status-num">${detail.REQUEST_QTY} EA</div>
+                    </div>
+                    <div class="status-card">
+                        <div class="info-label info-label-accent">출하 완료</div>
+                        <div class="status-num status-num-accent">${detail.SHIPPED_QTY} EA</div>
+                    </div>
+                    <div class="status-card">
+                        <div class="info-label">잔여 수량</div>
+                        <div class="status-num">
+                            ${detail.REQUEST_QTY - detail.SHIPPED_QTY < 0 ? 0 : detail.REQUEST_QTY - detail.SHIPPED_QTY} EA
+                        </div>
+                    </div>
+                </div>
+                <div class="progress-box">
+                    <div class="info-label">출하 진행률</div>
+                    <div class="progress-bar-bg">
+                        <div class="progress-bar-fill" id="progressBar"></div>
+                    </div>
+                    <div class="progress-text" id="progressText"></div>
+                </div>
+            </div>
+
             <!-- 연계된 출하지시 -->
             <div class="section-box">
                 <div class="section-title">연계된 출하지시</div>
@@ -148,6 +176,14 @@ response.setContentType("text/html; charset=utf-8");
     </c:choose>
 
 </main>
+
+<c:if test="${not empty detail}">
+<script>
+var REQ_QTY    = ${detail.REQUEST_QTY};
+var SHIPPED_QTY = ${detail.SHIPPED_QTY};
+</script>
+<script src="/resources/js/request/requestDetail.js"></script>
+</c:if>
 
 <%-- [권한] 담당자 아닌 사람이 취소 시도한 경우 --%>
 <c:if test="${param.error == 'forbidden'}">

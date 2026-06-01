@@ -1,6 +1,7 @@
 /*
  * request.js — 출하요청(주문) 목록 화면 스크립트
- *   날짜 유효성, AJAX 검색/페이징, 카드 렌더링, 수량 비교 차트, 주문 등록 모달, 거래처 검색 드롭다운.
+ *   날짜 유효성, AJAX 검색/페이징, 주문 등록 모달, 거래처 검색 드롭다운.
+ *   JSP 인라인 스크립트를 외부 파일로 분리.
  */
 
 /* ── 날짜 유효성 ── */
@@ -26,39 +27,6 @@ function renderPagination(pInfo) {
 	document.querySelector(".pagination-container").innerHTML = html;
 }
 
-/* ── 카드 렌더링 ── */
-function renderCards(items) {
-	var grid = document.getElementById('request-body');
-	if (!items || items.length === 0) {
-		grid.innerHTML = '<div class="card-empty">조회된 결과가 없습니다.</div>';
-		return;
-	}
-	var html = '';
-	items.forEach(function(item) {
-		var statusClass =
-			item.REQUEST_STATUS === '접수'    ? 'badge-progress' :
-			item.REQUEST_STATUS === '출하대기' ? 'badge-waiting'  :
-			item.REQUEST_STATUS === '출하완료' ? 'badge-done'     :
-			item.REQUEST_STATUS === '취소'    ? 'badge-cancel'   : '';
-		var reqQty  = parseInt(item.REQUEST_QTY  || 0);
-		var shipQty = parseInt(item.SHIPPED_QTY  || 0);
-		var pct = reqQty > 0 ? Math.min(100, Math.round(shipQty / reqQty * 100)) : 0;
-
-		html += '<div class="req-card" onclick="location.href=\'/requestDetail/' + (item.REQUEST_ID || '') + '\'">'
-			+ '<div class="req-card-top">'
-			+   '<span class="badge ' + statusClass + '">' + (item.REQUEST_STATUS || '') + '</span>'
-			+   '<span class="req-card-date">납기 ' + (item.DUE_DATE || '-') + '</span>'
-			+ '</div>'
-			+ '<div class="req-card-id">' + (item.REQUEST_ID || '') + '</div>'
-			+ '<div class="req-card-vender">' + (item.VENDER_NAME || '') + '</div>'
-			+ '<div class="req-card-item">' + (item.NAME || '') + ' · ' + (item.ENAME || '') + '</div>'
-			+ '<div class="req-card-qty">주문 <strong>' + reqQty + '</strong> / 출하 <strong>' + shipQty + '</strong></div>'
-			+ '<div class="req-progress-bg"><div class="req-progress-fill" style="width:' + pct + '%"></div></div>'
-			+ '</div>';
-	});
-	grid.innerHTML = html;
-}
-
 /* ── 목록 검색 / 페이지 이동 ── */
 function movePage(pageNum) {
 	const sDate   = document.getElementById('sDate').value;
@@ -79,16 +47,34 @@ function movePage(pageNum) {
 	fetch('/searchRequest?' + params.toString())
 		.then(res => res.json())
 		.then(data => {
+			const tbody = document.getElementById('request-body');
 			if (!data.searchResult || data.searchResult.length === 0) {
-				renderCards([]);
+				tbody.innerHTML = "<tr><td colspan='8' class='empty-cell'>조회된 결과가 없습니다.</td></tr>";
 				renderPagination(data.pageInfo);
-				updateChart([]);
 				return;
 			}
 			if (data.status === "good") {
-				renderCards(data.searchResult);
+				let html = "";
+				data.searchResult.forEach(function(item, i) {
+					const statusClass =
+						item.REQUEST_STATUS === '접수'    ? 'badge-progress' :
+						item.REQUEST_STATUS === '출하대기' ? 'badge-waiting'  :
+						item.REQUEST_STATUS === '출하완료' ? 'badge-done'     :
+						item.REQUEST_STATUS === '취소'    ? 'badge-cancel'   : '';
+
+					html += '<tr>'
+						+ '<td class="num-cell">' + (i + 1 + (data.pageInfo.pageNum - 1) * data.pageInfo.pageSize) + '</td>'
+						+ '<td><a href="/requestDetail/' + (item.REQUEST_ID || '') + '" class="link-id">' + (item.REQUEST_ID || '') + '</a></td>'
+						+ '<td>' + (item.DUE_DATE      || '') + '</td>'
+						+ '<td>' + (item.VENDER_NAME   || '') + '</td>'
+						+ '<td>' + (item.NAME          || '') + '</td>'
+						+ '<td>' + (item.REQUEST_QTY   || '') + '</td>'
+						+ '<td>' + (item.ENAME         || '') + '</td>'
+						+ '<td><span class="badge ' + statusClass + '">' + (item.REQUEST_STATUS || '') + '</span></td>'
+						+ '</tr>';
+				});
+				tbody.innerHTML = html;
 				renderPagination(data.pageInfo);
-				updateChart(data.searchResult);
 			}
 		})
 		.catch(err => console.error("데이터 통신 오류:", err));
@@ -96,53 +82,6 @@ function movePage(pageNum) {
 
 document.getElementById('btnSearch').addEventListener('click', () => movePage(1));
 document.getElementById('btnReset').addEventListener('click',  () => location.reload());
-
-/* ════════════════════════════════
-   수량 비교 차트 (Chart.js)
-   INITIAL_CHART_DATA는 JSP가 주입한다.
-   ════════════════════════════════ */
-var reqChart = null;
-
-function buildChartData(items) {
-	return {
-		labels:   items.map(function(d) { return d.REQUEST_ID  || d.id      || ''; }),
-		qtyData:  items.map(function(d) { return parseInt(d.REQUEST_QTY || d.qty     || 0); }),
-		shipData: items.map(function(d) { return parseInt(d.SHIPPED_QTY || d.shipped || 0); })
-	};
-}
-
-function initChart(rawData) {
-	var d = buildChartData(rawData);
-	var ctx = document.getElementById('requestChart').getContext('2d');
-	reqChart = new Chart(ctx, {
-		type: 'bar',
-		data: {
-			labels: d.labels,
-			datasets: [
-				{ label: '주문수량', data: d.qtyData,  backgroundColor: '#B7E4C7', borderRadius: 4 },
-				{ label: '출하수량', data: d.shipData, backgroundColor: '#2D6A4F', borderRadius: 4 }
-			]
-		},
-		options: {
-			responsive: true,
-			plugins: { legend: { position: 'top' } },
-			scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
-		}
-	});
-}
-
-function updateChart(items) {
-	if (!reqChart) return;
-	var d = buildChartData(items);
-	reqChart.data.labels            = d.labels;
-	reqChart.data.datasets[0].data  = d.qtyData;
-	reqChart.data.datasets[1].data  = d.shipData;
-	reqChart.update();
-}
-
-if (typeof INITIAL_CHART_DATA !== 'undefined' && INITIAL_CHART_DATA.length > 0) {
-	initChart(INITIAL_CHART_DATA);
-}
 
 /* ════════════════════════════════
    모달 열기 / 닫기 / 초기화

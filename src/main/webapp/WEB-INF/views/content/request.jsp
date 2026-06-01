@@ -18,7 +18,6 @@ response.setContentType("text/html; charset=utf-8");
 <link rel="stylesheet" href="/resources/css/list-common.css">
 <link rel="stylesheet" href="/resources/css/modal.css">
 <link rel="stylesheet" href="/resources/css/request/request.css">
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 
@@ -76,43 +75,51 @@ response.setContentType("text/html; charset=utf-8");
 					</div>
 				</div>
 
-				<!-- 수량 비교 차트 -->
-				<div class="chart-wrap">
-					<canvas id="requestChart"></canvas>
-				</div>
-
-				<!-- 카드 그리드 -->
-				<div class="card-grid" id="request-body">
-					<c:choose>
-						<c:when test="${not empty result}">
-							<c:forEach var="item" items="${result}">
-								<c:set var="pct" value="${item.REQUEST_QTY > 0 ? (item.SHIPPED_QTY > item.REQUEST_QTY ? 100 : item.SHIPPED_QTY * 100 / item.REQUEST_QTY) : 0}"/>
-								<div class="req-card" onclick="location.href='/requestDetail/${item.REQUEST_ID}'">
-									<div class="req-card-top">
-										<span class="badge
-											<c:choose>
-												<c:when test="${item.REQUEST_STATUS == '접수'}">badge-progress</c:when>
-												<c:when test="${item.REQUEST_STATUS == '출하대기'}">badge-waiting</c:when>
-												<c:when test="${item.REQUEST_STATUS == '출하완료'}">badge-done</c:when>
-												<c:when test="${item.REQUEST_STATUS == '취소'}">badge-cancel</c:when>
-											</c:choose>
-										">${item.REQUEST_STATUS}</span>
-										<span class="req-card-date">납기 ${item.DUE_DATE}</span>
-									</div>
-									<div class="req-card-id">${item.REQUEST_ID}</div>
-									<div class="req-card-vender">${item.VENDER_NAME}</div>
-									<div class="req-card-item">${item.NAME} · ${item.ENAME}</div>
-									<div class="req-card-qty">주문 <strong>${item.REQUEST_QTY}</strong> / 출하 <strong>${item.SHIPPED_QTY}</strong></div>
-									<div class="req-progress-bg">
-										<div class="req-progress-fill" style="width:${pct}%"></div>
-									</div>
-								</div>
-							</c:forEach>
-						</c:when>
-						<c:otherwise>
-							<div class="card-empty">등록된 출하 요청이 없습니다.</div>
-						</c:otherwise>
-					</c:choose>
+				<div class="tbl-box">
+					<table class="stk-tbl">
+						<thead>
+							<tr>
+								<th class="col-no">번호</th>
+								<th>요청번호</th>
+								<th>납기일</th>
+								<th>거래처명</th>
+								<th>품목명</th>
+								<th>수량</th>
+								<th>담당자</th>
+								<th>상태</th>
+							</tr>
+						</thead>
+						<tbody id="request-body">
+							<c:choose>
+								<c:when test="${not empty result}">
+									<c:forEach var="item" items="${result}" varStatus="vs">
+										<tr>
+											<td class="num-cell">${vs.count}</td>
+											<td><a href="/requestDetail/${item.REQUEST_ID}" class="link-id">${item.REQUEST_ID}</a></td>
+											<td>${item.DUE_DATE}</td>
+											<td>${item.VENDER_NAME}</td>
+											<td>${item.NAME}</td>
+											<td>${item.REQUEST_QTY}</td>
+											<td>${item.ENAME}</td>
+											<td>
+												<span class="badge
+													<c:choose>
+														<c:when test="${item.REQUEST_STATUS == '접수'}">badge-progress</c:when>
+														<c:when test="${item.REQUEST_STATUS == '출하대기'}">badge-waiting</c:when>
+														<c:when test="${item.REQUEST_STATUS == '출하완료'}">badge-done</c:when>
+														<c:when test="${item.REQUEST_STATUS == '취소'}">badge-cancel</c:when>
+													</c:choose>
+												">${item.REQUEST_STATUS}</span>
+											</td>
+										</tr>
+									</c:forEach>
+								</c:when>
+								<c:otherwise>
+									<tr><td colspan="8" class="empty-cell">등록된 출하 요청이 없습니다.</td></tr>
+								</c:otherwise>
+							</c:choose>
+						</tbody>
+					</table>
 				</div>
 
 				<div id="paging-area">
@@ -193,13 +200,6 @@ response.setContentType("text/html; charset=utf-8");
 		</div>
 	</div>
 
-<script>
-var INITIAL_CHART_DATA = [
-    <c:forEach var="item" items="${result}" varStatus="vs">
-    { id: '<c:out value="${item.REQUEST_ID}"/>', qty: ${item.REQUEST_QTY}, shipped: ${item.SHIPPED_QTY} }<c:if test="${!vs.last}">,</c:if>
-    </c:forEach>
-];
-</script>
 <script src="/resources/js/request/request.js"></script>
 </body>
 </html>
