@@ -83,6 +83,14 @@ public interface WorkDAO {
     List<SelectOptionDTO> getEmpOptions();
 
     /**
+     * 실무자 선택 옵션 목록을 반환한다. (e_level=1, 재직자만)
+     * SQL: kr.or.smartfarm.work.getWorkerOptions
+     *
+     * @return 실무자 목록 (num: emp_num, name: ename)
+     */
+    List<SelectOptionDTO> getWorkerOptions();
+
+    /**
      * 생산계획 선택 옵션 목록을 반환한다. (취소 제외)
      * SQL: kr.or.smartfarm.work.getPlanOptions
      *

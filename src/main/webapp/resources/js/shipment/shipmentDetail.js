@@ -105,7 +105,12 @@ function downloadSingleLabel() {
         margin: 5,
         filename: currentLot ? ('label_' + currentLot.lotCode + '.pdf') : 'label.pdf',
         image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true },
+        html2canvas: { 
+            scale: 2, 
+            useCORS: true,
+            scrollY: 0,          // 스크롤 위치 때문에 상단/하단이 밀리는 현상 방지
+            windowScrollY: 0 
+        },
         jsPDF: { unit: 'mm', format: 'a6', orientation: 'portrait' }
     }).from(preview).save();
 }
@@ -128,26 +133,33 @@ function downloadAllLabels() {
 
     grid.innerHTML = html;
 
-    // html2canvas가 캡처할 수 있도록 화면 밖에 임시 표시
-    area.style.cssText = 'display:block; position:fixed; left:-9999px; top:0;';
+    // display: block 상태에서 브라우저가 높이를 온전히 계산할 수 있도록 설정
+    // left: 0, top: 0으로 하되 z-index와 투명도로 숨기는 것이 html2canvas 캡처에 더 안전합니다.
+    area.style.cssText = 'display:block; position:fixed; left:0; top:0; z-index:-9999; opacity:0; width:100%;';
 
     LOT_DATA.forEach(function(lot, idx) {
         var qrId = 'qr-dl-' + idx + '-' + lot.lotCode.replace(/[^a-zA-Z0-9]/g, '_');
         generateQR(qrId, lot.lotCode, 100);
     });
 
+    // LOT 개수가 많을 경우를 대비해 대기 시간을 800ms 정도로 여유롭게 조절
     setTimeout(function() {
         html2pdf().set({
             margin: 5,
             filename: 'labels_' + SHIPMENT_DATA.shipmentId + '.pdf',
             image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { scale: 2, useCORS: true },
+            html2canvas: { 
+                scale: 2, 
+                useCORS: true,
+                scrollY: 0,
+                windowScrollY: 0
+            },
             jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
         }).from(grid).save().then(function() {
             area.style.cssText = '';
             grid.innerHTML = '';
         });
-    }, 400);
+    }, 800); // 400ms -> 800ms로 상향
 }
 
 /* ── 라벨 모달 닫기 ── */

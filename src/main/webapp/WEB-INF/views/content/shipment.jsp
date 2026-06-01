@@ -97,6 +97,7 @@ response.setContentType("text/html; charset=utf-8");
 							<th>품목명</th>
 							<th>계획수량</th>
 							<th>담당자</th>
+							<th>실무자</th>
 							<th>상태</th>
 						</tr>
 					</thead>
@@ -112,6 +113,7 @@ response.setContentType("text/html; charset=utf-8");
 										<td>${item.NAME}</td>
 										<td>${item.PLAN_QTY}</td>
 										<td>${item.ENAME}</td>
+										<td>${item.WORKER_ENAME}</td>
 										<td>
 											<c:choose>
 												<c:when test="${item.SHIPMENT_STATUS == '출하대기'}">
@@ -136,7 +138,7 @@ response.setContentType("text/html; charset=utf-8");
 							</c:when>
 							<c:otherwise>
 								<tr>
-									<td colspan="8" class="empty-cell">조회된 결과가 없습니다.</td>
+									<td colspan="9" class="empty-cell">조회된 결과가 없습니다.</td>
 								</tr>
 							</c:otherwise>
 						</c:choose>
@@ -176,6 +178,15 @@ response.setContentType("text/html; charset=utf-8");
 					<label>담당자</label>
 					<span class="modal-readonly">${sessionScope.loginUser.ename}</span>
 					<input type="hidden" id="empNum" name="empNum" value="${sessionScope.loginUser.emp_num}">
+				</div>
+				<div class="modal-field">
+					<label>실무자</label>
+					<select name="workerNum" class="form-control" required>
+						<option value="">실무자 선택</option>
+						<c:forEach var="w" items="${workerList}">
+							<option value="${w.EMP_NUM}">${w.ENAME}</option>
+						</c:forEach>
+					</select>
 				</div>
 				<div class="modal-field">
 					<label>출하일 <span class="required-mark">*</span></label>

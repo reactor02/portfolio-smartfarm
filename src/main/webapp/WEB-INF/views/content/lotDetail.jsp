@@ -3,8 +3,8 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%--
     lotDetail.jsp — LOT 상세 화면
-    LOT 기본정보 + 소모자재(상위) 관계 + 롯이력 추적 트리(재귀 조회 결과)를 표시한다.
-    롯이력/소모자재 데이터는 LotController가 getRecursiveMaterials/getLotHistory로 조회.
+    LOT 기본정보 + 소모자재(상위) 관계 + 공정이력 추적 트리(재귀 조회 결과)를 표시한다.
+    공정이력/소모자재 데이터는 LotController가 getRecursiveMaterials/getLotHistory로 조회.
 --%>
 <!DOCTYPE html>
 <html>
@@ -68,7 +68,7 @@
             연관관계 · 소모자재
         </button>
         <button class="tab-btn" onclick="switchTab('lothistory', this)">
-            롯이력
+            공정이력
         </button>
     </div>
 
@@ -151,7 +151,7 @@
     </div>
     </div><!-- /tab-relation -->
 
-    <!-- 탭 2: 롯이력 -->
+    <!-- 탭 2: 공정이력 -->
     <div id="tab-lothistory" class="tab-panel" style="display:none;">
         <div class="section-box" style="padding:16px 0;">
             <table class="data-table">
@@ -162,7 +162,7 @@
                         <th>품목명</th>
                         <th>유형</th>
                         <th>구분</th>
-                        <th>ID</th>
+                        <th>작업지시번호</th>
                         <th>내용(공정/거래처)</th>
                         <th>날짜</th>
                         <th>상태</th>
@@ -170,7 +170,7 @@
                     </tr>
                 </thead>
                 <tbody id="lothistory-body">
-                    <tr><td colspan="10" class="empty-cell">롯이력 탭을 클릭하면 로드됩니다.</td></tr>
+                    <tr><td colspan="10" class="empty-cell">공정이력 탭을 클릭하면 로드됩니다.</td></tr>
                 </tbody>
             </table>
         </div>
