@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="mapper.dash">
+ 
+
+	<select id="getBoardList"
+		resultType="kr.or.smartfarm.dashboard.DashDTO">
+		SELECT b.*, e.ename
+		FROM board b
+		LEFT JOIN emp e ON b.emp_num
+		= e.emp_num
+		where b.category = '공지'
+	</select>
+
+	
+
+
+
+</mapper>
+
+

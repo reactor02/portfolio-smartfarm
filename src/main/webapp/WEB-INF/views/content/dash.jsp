@@ -373,20 +373,20 @@ body {
 			</div>
 
 			<div class="panel">
-				<h2>공지사항</h2>
+				<div class="card-header-wrapper">
+								<h3 class="title">공지사항</h3>
+								<a href="/plan" class="more-link">더보기 +</a>
+							</div>
 				<ul class="notice-list">
+					<c:forEach var="item" items="${resultB}">
 					<li class="notice-item">
-						<span>6월 시스템 점검 안내 (6/8 00:00 ~ 02:00)</span>
-						<span style="font-size: 13px; color: #777;">2025-06-04</span>
+						<span><a href="${pageContext.request.contextPath}/board/one"
+							class="link-txt">${item.title}</a></span>
+						<span style="font-size: 13px; color: #777;">
+						${item.created_at}</span>
 					</li>
-					<li class="notice-item">
-						<span>신규 자재 코드 등록 안내</span>
-						<span style="font-size: 13px; color: #777;">2025-06-03</span>
-					</li>
-					<li class="notice-item">
-						<span>MES 사용자 교육 일정 안내</span>
-						<span style="font-size: 13px; color: #777;">2025-06-02</span>
-					</li>
+					</c:forEach>
+					
 				</ul>
 			</div>
 
