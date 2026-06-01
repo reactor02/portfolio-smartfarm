@@ -32,10 +32,10 @@ String vender_type = request.getParameter("vender_type");
 }
 
 .mat-all {
-	display: flex; 
-	flex-direction : column;
-	min-height : 100vh;
-	background-color : #f4f7f6;
+	display: flex;
+	flex-direction: column;
+	min-height: 100vh;
+	background-color: #f4f7f6;
 }
 
 body {
@@ -223,178 +223,284 @@ body {
 	color: #aaa;
 	margin-bottom: 10px;
 }
+
+.card-header-wrapper {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 12px;
+}
+
+.more-link {
+	font-size: 12px;
+	color: #2D6A4f;
+	text-decoration: none;
+	font-weight: bold;
+}
+
+.more-link:hover {
+	text-decoration: underline;
+}
+
+.btn-per {
+    padding: 6px 12px;
+    margin-right: 8px;
+    border-radius: 6px;
+    background: #eee;
+    text-decoration: none;
+    color: #333;
+}
+
+.btn-per.active {
+	background : #2D6A4F; 
+	color : #fff; 
+	font-weight: bold;
+}
+
+.btn-per:hover {
+	background-color: #1b433; 
+	transform : translateY(-1px);
+	box-shadow : 0 2px 6px rgba(0,0,0,0.1);
+} 
+
+.date-sep {
+	margin: 0 8px 0 0; 
+	font-weight: bold;
+	color: #555;
+}
 </style>
 </head>
 <body>
-	
+
 	<div class="mat-all">
 		<tiles:insertAttribute name="header" ignore="true" />
-		
+
 		<main class="main-cont">
-		
-		<div class="header">
-			<h1>대시보드</h1>
-			<div class="date-area">
-				<input type="date" class="date-input" value="2025-06-04">
-				<button class="btn-search">조회</button>
+			<form action="/dashboard" method="get">
+			<div class="header">
+				<h1>대시보드</h1>
+				<div class="date-area">
+					<a href="/dashboard?period=day" class="btn-per ${period == 'day' ? 'active' : ''}">오늘</a>
+					<a href="/dashboard?period=week" class="btn-per ${period == 'week' ? 'active' : ''}">이번주</a>
+					<a href="/dashboard?period=month" class="btn-per ${period == 'month' ? 'active' : ''}">이번달</a>
+					<input type="date" class="date-input" name="startDate" value="${startDate}" >
+					<span class="date-sep">~</span>
+					<input type="date" class="date-input" name="endDate" value="${endDate}" >
+					<button type="submit" class="btn-search">조회</button>
+				</div>
 			</div>
-		</div>
+			</form>
 
-		<div class="kpi-wrapper">
-			<div class="kpi-card">
-				<div class="kpi-title">총 생산량</div>
-				<div class="kpi-value">12,540 EA</div>
-			</div>
-			<div class="kpi-card">
-				<div class="kpi-title">평균 불량률</div>
-				<div class="kpi-value">2.13 %</div>
-			</div>
-			<div class="kpi-card">
-				<div class="kpi-title">출하량</div>
-				<div class="kpi-value">11,980 EA</div>
-			</div>
-			<div class="kpi-card">
-				<div class="kpi-title">재고 부족</div>
-				<div class="kpi-value">8 건</div>
-			</div>
-		</div>
-
-		<div class="main-grid">
-			
-			<div class="panel">
-				<h2>생산 계획</h2>
-				<table class="data-table">
-					<thead>
-						<tr>
-							<th>생산 계획명</th>
-							<th>제품명</th>
-							<th>계획 수량</th>
-							<th>진행률</th>
-							<th>상태</th>
-						</tr>
-					</thead>
-					<tbody>
-						<tr>
-							<td>6월 1주차 생산계획</td>
-							<td>제품 A</td>
-							<td>5,000 EA</td>
-							<td>
-								<div class="progress-container">
-									<div class="progress-bar" style="width: 75%;"></div>
-								</div>
-								<span style="font-size: 13px;">75%</span>
-							</td>
-							<td><span class="badge badge-green">진행중</span></td>
-						</tr>
-						<tr>
-							<td>6월 2주차 생산계획</td>
-							<td>제품 B</td>
-							<td>6,000 EA</td>
-							<td>
-								<div class="progress-container">
-									<div class="progress-bar" style="width: 30%;"></div>
-								</div>
-								<span style="font-size: 13px;">30%</span>
-							</td>
-							<td><span class="badge badge-green">진행중</span></td>
-						</tr>
-						<tr>
-							<td>6월 3주차 생산계획</td>
-							<td>제품 C</td>
-							<td>4,000 EA</td>
-							<td>
-								<div class="progress-container">
-									<div class="progress-bar" style="width: 0%;"></div>
-								</div>
-								<span style="font-size: 13px;">0%</span>
-							</td>
-							<td><span class="badge badge-gray">대기</span></td>
-						</tr>
-					</tbody>
-				</table>
+			<div class="kpi-wrapper">
+				<c:forEach var="k" items="${resultKPIPP}">
+				<div class="kpi-card">
+					<div class="kpi-title">총 생산량</div>
+					<div class="kpi-value">${k.plan_qty} 건</div>
+				</div>
+				</c:forEach>
+				<c:forEach var="k" items="${resultKPIShip}">
+				<div class="kpi-card">
+					<div class="kpi-title">출하량</div>
+					<c:choose>
+					<c:when test="${not empty k.ship_qty}" > 
+					<div class="kpi-value">${k.ship_qty} 건</div>
+					</c:when>
+					<c:otherwise> 
+						<div class="kpi-value">0 건</div>
+					</c:otherwise>
+					</c:choose>
+				</div>
+				</c:forEach>
+				<div class="kpi-card">
+					<div class="kpi-title">출하량</div>
+					<div class="kpi-value">11,980 EA</div>
+				</div>
+				<div class="kpi-card">
+					<div class="kpi-title">불량수</div>
+					<div class="kpi-value">8 건</div>
+				</div>
 			</div>
 
-			<div class="panel">
-				<h2>작업 지시 현황</h2>
-				<table class="data-table">
-					<thead>
-						<tr>
-							<th>작업 지시번호</th>
-							<th>제품명</th>
-							<th>지시 수량</th>
-							<th>진행률</th>
-							<th>상태</th>
-						</tr>
-					</thead>
-					<tbody>
-						<tr>
-							<td>WO-250604-001</td>
-							<td>제품 A</td>
-							<td>1,000 EA</td>
-							<td>
-								<div class="progress-container">
-									<div class="progress-bar" style="width: 60%;"></div>
-								</div>
-								<span style="font-size: 13px;">60%</span>
-							</td>
-							<td><span class="badge badge-green">진행중</span></td>
-						</tr>
-						<tr>
-							<td>WO-250604-002</td>
-							<td>제품 B</td>
-							<td>1,500 EA</td>
-							<td>
-								<div class="progress-container">
-									<div class="progress-bar" style="width: 40%;"></div>
-								</div>
-								<span style="font-size: 13px;">40%</span>
-							</td>
-							<td><span class="badge badge-green">진행중</span></td>
-						</tr>
-						<tr>
-							<td>WO-250603-003</td>
-							<td>제품 C</td>
-							<td>800 EA</td>
-							<td>
-								<div class="progress-container">
-									<div class="progress-bar" style="width: 100%;"></div>
-								</div>
-								<span style="font-size: 13px;">100%</span>
-							</td>
-							<td><span class="badge badge-blue">완료</span></td>
-						</tr>
-					</tbody>
-				</table>
-			</div>
+			<div class="main-grid">
 
-			<div class="panel">
-				<h2>재고 현황</h2>
-				<div class="empty-chart">(바 차트 영역)</div>
-			</div>
+				<div class="panel">
+					<h2>생산 계획</h2>
+					<table class="data-table">
+						<thead>
+							<tr>
+								<th>생산 계획명</th>
+								<th>제품명</th>
+								<th>계획 수량</th>
+								<th>진행률</th>
+								<th>상태</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>6월 1주차 생산계획</td>
+								<td>제품 A</td>
+								<td>5,000 EA</td>
+								<td>
+									<div class="progress-container">
+										<div class="progress-bar" style="width: 75%;"></div>
+									</div> <span style="font-size: 13px;">75%</span>
+								</td>
+								<td><span class="badge badge-green">진행중</span></td>
+							</tr>
+							<tr>
+								<td>6월 2주차 생산계획</td>
+								<td>제품 B</td>
+								<td>6,000 EA</td>
+								<td>
+									<div class="progress-container">
+										<div class="progress-bar" style="width: 30%;"></div>
+									</div> <span style="font-size: 13px;">30%</span>
+								</td>
+								<td><span class="badge badge-green">진행중</span></td>
+							</tr>
+							<tr>
+								<td>6월 3주차 생산계획</td>
+								<td>제품 C</td>
+								<td>4,000 EA</td>
+								<td>
+									<div class="progress-container">
+										<div class="progress-bar" style="width: 0%;"></div>
+									</div> <span style="font-size: 13px;">0%</span>
+								</td>
+								<td><span class="badge badge-gray">대기</span></td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
 
-			<div class="panel">
-				<div class="card-header-wrapper">
-								<h3 class="title">공지사항</h3>
-								<a href="/plan" class="more-link">더보기 +</a>
-							</div>
-				<ul class="notice-list">
-					<c:forEach var="item" items="${resultB}">
-					<li class="notice-item">
-						<span><a href="${pageContext.request.contextPath}/board/one"
-							class="link-txt">${item.title}</a></span>
-						<span style="font-size: 13px; color: #777;">
-						${item.created_at}</span>
-					</li>
-					</c:forEach>
-					
-				</ul>
-			</div>
+				<div class="panel">
+					<h2>작업 지시 현황</h2>
+					<table class="data-table">
+						<thead>
+							<tr>
+								<th>작업 지시번호</th>
+								<th>제품명</th>
+								<th>지시 수량</th>
+								<th>진행률</th>
+								<th>상태</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>WO-250604-001</td>
+								<td>제품 A</td>
+								<td>1,000 EA</td>
+								<td>
+									<div class="progress-container">
+										<div class="progress-bar" style="width: 60%;"></div>
+									</div> <span style="font-size: 13px;">60%</span>
+								</td>
+								<td><span class="badge badge-green">진행중</span></td>
+							</tr>
+							<tr>
+								<td>WO-250604-002</td>
+								<td>제품 B</td>
+								<td>1,500 EA</td>
+								<td>
+									<div class="progress-container">
+										<div class="progress-bar" style="width: 40%;"></div>
+									</div> <span style="font-size: 13px;">40%</span>
+								</td>
+								<td><span class="badge badge-green">진행중</span></td>
+							</tr>
+							<tr>
+								<td>WO-250603-003</td>
+								<td>제품 C</td>
+								<td>800 EA</td>
+								<td>
+									<div class="progress-container">
+										<div class="progress-bar" style="width: 100%;"></div>
+									</div> <span style="font-size: 13px;">100%</span>
+								</td>
+								<td><span class="badge badge-blue">완료</span></td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
 
-		</div>
+				<div class="panel">
+					<h2>생산/출하 그래프</h2>
+					<canvas id="myChart"></canvas>
+				</div>
+
+				<div class="panel">
+					<div class="card-header-wrapper">
+						<h3 class="title">공지사항</h3>
+						<a href="/board" class="more-link">더보기 +</a>
+					</div>
+					<ul class="notice-list">
+						<c:forEach var="item" items="${resultB}">
+							<li class="notice-item"><span><a
+									href="${pageContext.request.contextPath}/board/one?board_num=${item.board_num}"
+									class="link-txt">${item.title}</a></span> <span
+								style="font-size: 13px; color: #777;"> ${item.created_at}</span>
+							</li>
+						</c:forEach>
+
+					</ul>
+				</div>
+
+			</div>
 		</main>
-		
+
 		<tiles:insertAttribute name="footer" ignore="true" />
 	</div>
+	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+
+	<script> 
+	
+		const chartData = JSON.parse('${chartData}');
+		const labels = chartData.map(d => d.dt);
+		const planData = chartData.map(d => d.plan_qty);
+		const shipData = chartData.map(d => d.ship_qty);
+		
+		
+		const data = {
+				labels: labels,
+				datasets: [
+					{
+						label : '생산계획',
+						data:planData,
+						borderWidth :2 ,
+						fill: false,
+						tension : 0.3 ,
+						borderColor : 'gray',
+						borderDash: [5,5]
+					},
+					{
+						label : '출하량',
+						data:shipData,
+						borderWidth : 2,
+						fill : false,
+						tension : 0.3,
+						borderColor : 'blue'
+					}
+				]
+				};
+		
+		const config = {
+				type: 'line',
+				data : data, 
+				options:{
+					responsive: true, 
+					plugins: {
+						legend : {
+							position : 'top',
+						}
+					}
+				}
+		};
+		
+		new Chart(document.getElementById('myChart'),config);
+		
+		
+	</script>
 
 </body>
 </html>

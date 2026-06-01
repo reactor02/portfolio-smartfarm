@@ -15,4 +15,19 @@ public class DashService {
 			List result = dashDAO.selectBoard();
 			return result;
 		}
+		
+		public List selectPS() {
+			List result = dashDAO.selectPS();
+			return result;
+		}
+		
+		public List selectKPIPP(String period, String startDate, String endDate) {
+			List result = dashDAO.selectKPIPP(period, startDate, endDate); 
+			return result;
+		}
+		
+		public List selectKPIShip(String period, String startDate, String endDate) {
+			List result = dashDAO.selectKPIShip(period, startDate, endDate); 
+			return result;
+		}
 }
