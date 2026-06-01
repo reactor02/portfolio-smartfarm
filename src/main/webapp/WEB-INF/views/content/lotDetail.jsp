@@ -32,11 +32,6 @@
             <span class="info-label">LOT 번호</span>
             <span class="info-value">${lotDTO.lot_code}</span>
         </div>
-
-        <div class="info-item">
-            <span class="info-label">품목 유형</span>
-            <span class="info-value">${lotDTO.type}</span>
-        </div>
         <div class="info-item">
             <span class="info-label">품목명</span>
             <span class="info-value">${lotDTO.item_name}</span>
@@ -44,6 +39,10 @@
         <div class="info-item">
             <span class="info-label">품목 코드</span>
             <span class="info-value">${lotDTO.code}</span>
+        </div>
+        <div class="info-item">
+            <span class="info-label">품목 유형</span>
+            <span class="info-value">${lotDTO.type}</span>
         </div>
         <div class="info-item">
             <span class="info-label">초기 수량</span>

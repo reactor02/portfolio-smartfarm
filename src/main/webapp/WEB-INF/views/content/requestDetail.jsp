@@ -51,12 +51,17 @@ response.setContentType("text/html; charset=utf-8");
                         <span class="info-value">${detail.REQUEST_ID}</span>
                     </div>
                     <div class="info-item">
-                        <span class="info-label">등록일</span>
-                        <span class="info-value">${detail.REQUEST_DATE}</span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-label">납기일</span>
-                        <span class="info-value">${detail.DUE_DATE}</span>
+                        <span class="info-label">상태</span>
+                        <span class="info-value">
+                            <span class="badge
+                                <c:choose>
+                                    <c:when test="${detail.REQUEST_STATUS == '접수'}">badge-progress</c:when>
+                                    <c:when test="${detail.REQUEST_STATUS == '출하대기'}">badge-waiting</c:when>
+                                    <c:when test="${detail.REQUEST_STATUS == '출하완료'}">badge-done</c:when>
+                                    <c:when test="${detail.REQUEST_STATUS == '취소'}">badge-cancel</c:when>
+                                </c:choose>
+                            ">${detail.REQUEST_STATUS}</span>
+                        </span>
                     </div>
                     <div class="info-item">
                         <span class="info-label">거래처</span>
@@ -71,21 +76,16 @@ response.setContentType("text/html; charset=utf-8");
                         <span class="info-value">${detail.REQUEST_QTY}</span>
                     </div>
                     <div class="info-item">
+                        <span class="info-label">납기일</span>
+                        <span class="info-value">${detail.DUE_DATE}</span>
+                    </div>
+                    <div class="info-item">
                         <span class="info-label">담당자</span>
                         <span class="info-value">${detail.ENAME}</span>
                     </div>
                     <div class="info-item">
-                        <span class="info-label">상태</span>
-                        <span class="info-value">
-                            <span class="badge
-                                <c:choose>
-                                    <c:when test="${detail.REQUEST_STATUS == '접수'}">badge-progress</c:when>
-                                    <c:when test="${detail.REQUEST_STATUS == '출하대기'}">badge-waiting</c:when>
-                                    <c:when test="${detail.REQUEST_STATUS == '출하완료'}">badge-done</c:when>
-                                    <c:when test="${detail.REQUEST_STATUS == '취소'}">badge-cancel</c:when>
-                                </c:choose>
-                            ">${detail.REQUEST_STATUS}</span>
-                        </span>
+                        <span class="info-label">등록일</span>
+                        <span class="info-value">${detail.REQUEST_DATE}</span>
                     </div>
                     <c:if test="${not empty detail.CONTENT}">
                     <div class="info-item info-item-full">

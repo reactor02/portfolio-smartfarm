@@ -53,10 +53,6 @@
                 <span class="badge <c:choose><c:when test="${workDTO.work_status == '대기'}">badge-wait</c:when><c:when test="${workDTO.work_status == '진행'}">badge-progress</c:when><c:when test="${workDTO.work_status == '완료'}">badge-done</c:when><c:when test="${workDTO.work_status == '취소'}">badge-cancel</c:when></c:choose>">${workDTO.work_status}</span>
             </div>
             <div class="info-item">
-                <span class="info-label">작업자</span>
-                <span class="info-value">${workDTO.ename}</span>
-            </div>
-            <div class="info-item">
                 <span class="info-label">품목명</span>
                 <span class="info-value">${workDTO.item_name}</span>
             </div>
@@ -75,6 +71,10 @@
             <div class="info-item">
                 <span class="info-label">작업완료</span>
                 <span class="info-value"><fmt:formatDate value="${workDTO.order_end}" pattern="yyyy-MM-dd"/></span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">작업자</span>
+                <span class="info-value">${workDTO.ename}</span>
             </div>
             <div class="info-item">
                 <span class="info-label">등록일시</span>
