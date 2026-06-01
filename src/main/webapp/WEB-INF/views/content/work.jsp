@@ -94,6 +94,7 @@
                 <th>품목명</th>
                 <th>품목분류</th>
                 <th>지시수량</th>
+                <th>생산완료</th>
                 <th>담당자</th>
                 <th>실무자</th>
                 <th>작업일</th>
@@ -115,6 +116,7 @@
                                 <c:otherwise>${w.type}</c:otherwise>
                             </c:choose></td>
                             <td>${w.order_qty}</td>
+                            <td>${w.current_qty}</td>
                             <td>${w.ename}</td>
                             <td>${w.worker_ename}</td>
                             <td><fmt:formatDate value="${w.order_start}" pattern="yyyy-MM-dd"/></td>
@@ -125,7 +127,7 @@
                     </c:forEach>
                 </c:when>
                 <c:otherwise>
-                    <tr><td colspan="10" class="empty-cell">등록된 작업지시가 없습니다.</td></tr>
+                    <tr><td colspan="11" class="empty-cell">등록된 작업지시가 없습니다.</td></tr>
                 </c:otherwise>
             </c:choose>
         </tbody>

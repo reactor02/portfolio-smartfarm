@@ -11,6 +11,7 @@ public class BomDTO {
 
 	private int bom_num; //시퀀스
 	private int required_qty; //요구량(기준생산수량)
+	private int child_qty;    //기준생산수량 대비 투입 소모자재 수량
 	private String bom_status; //사용여부(Y / N)
 	private String bom_code;//봄코드
 	private Date created_at;//등록일자
