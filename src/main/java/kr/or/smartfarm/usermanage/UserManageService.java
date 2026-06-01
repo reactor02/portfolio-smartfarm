@@ -4,11 +4,12 @@ import java.util.List;
 
 public interface UserManageService {
 	
-	public List<UserManageDTO> getUserManage();
+	public List<UserManageDTO> getUserManage(int pageNum);
 	public List<UserManageDTO> getUserSearch(UserManageDTO searchDTO);
 	public List<UserManageDTO> selectd();
 	public List<UserManageDTO> selectl();
 	public List<UserManageDTO> selectm();
+	public List<UserManageDTO> selectw();
 	public int userInsert(UserManageDTO userManageDTO);
 	public int userUpdate(UserManageDTO userManageDTO);
 	public int userRetire(UserManageDTO userManageDTO);

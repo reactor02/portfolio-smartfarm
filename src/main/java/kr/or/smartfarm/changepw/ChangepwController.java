@@ -10,6 +10,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import kr.or.smartfarm.login.LoginDTO;
@@ -160,6 +161,54 @@ public class ChangepwController {
 	    } else {
 	        response.put("success", false);
 	        response.put("message", "비밀번호 변경에 실패했습니다. 기존 비밀번호와 같거나 정보가 다릅니다.");
+	    }
+	    
+	    return response; 
+	}
+	
+
+	@PostMapping("/updatemp")
+	@ResponseBody 
+	public Map<String, Object> updatempPost( 
+	        @RequestBody ChangepwDTO updatempDTO, // 💡 JS에서 보낸 JSON을 파싱하기 위해 @RequestBody 유지
+	        HttpSession session
+	        ) {
+	    
+	    System.out.println("updatempPost 실행");
+	    Map<String, Object> response = new HashMap();
+	    
+	    // 1. 세션에서 현재 로그인된 유저 정보(loginUser)를 안전하게 가져옵니다.
+	    LoginDTO loginUser = (LoginDTO) session.getAttribute("loginUser");
+	    
+	    // [방어로직] 세션 만료 시 에러 차단
+	    if (loginUser == null) {
+	        response.put("success", false);
+	        response.put("message", "로그인 세션이 만료되었습니다. 다시 로그인해주세요.");
+	        return response;
+	    }
+	    
+	    // 2. 세션에 들어있던 현재 로그인 유저의 사원번호(emp_num)를 추출합니다.
+	    String empNum = loginUser.getEmp_num(); 
+	    
+	    // 3. 화면에서 받아온 이름/연락처 뭉치(updateData)에 추출한 사원번호를 심어줍니다.
+	    updatempDTO.setEmp_num(empNum); 
+	    
+	    // 4. DB로 보내서 "사원번호가 이거인 사람의 이름과 연락처를 고쳐라" 로직 수행 (결과 행 수 리턴)
+	    int result = changepwService.updatemp(updatempDTO);
+	    
+	    // 5. 결과 검증 (1이면 성공, 아니면 실패)
+	    if (result == 1) {
+	        // 💡 가장 중요한 세션 동기화 처리!
+	        // DB가 업데이트되었으니 세션에 보관 중인 이름과 연락처도 함께 갱신해 줍니다.
+	        loginUser.setEname(updatempDTO.getEname());
+	        loginUser.setTel(updatempDTO.getTel());
+	        session.setAttribute("loginUser", loginUser); 
+	        
+	        response.put("success", true);
+	        response.put("message", "내 정보가 성공적으로 수정되었습니다.");
+	    } else {
+	        response.put("success", false);
+	        response.put("message", "정보 수정에 실패했습니다. 데이터를 다시 확인해 주세요.");
 	    }
 	    
 	    return response; 
