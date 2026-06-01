@@ -60,3 +60,72 @@
 .vender-list-cell       { padding: 8px 12px; }
 .vender-list-cell-muted { padding: 8px 12px; color: #555; }
 .vender-list-empty      { padding: 20px; text-align: center; color: #999; }
+
+/* ══════════════════════════════════════════
+   수량 비교 차트
+   ══════════════════════════════════════════ */
+.chart-wrap {
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin-bottom: 20px;
+    max-height: 240px;
+}
+.chart-wrap canvas { max-height: 200px; }
+
+/* ══════════════════════════════════════════
+   카드 그리드
+   ══════════════════════════════════════════ */
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.card-empty {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 40px;
+    color: #999;
+    font-size: 0.95rem;
+}
+
+.req-card {
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+    padding: 18px 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    cursor: pointer;
+    transition: box-shadow 0.15s, transform 0.15s;
+}
+.req-card:hover { box-shadow: 0 4px 16px rgba(45,106,79,0.15); transform: translateY(-2px); }
+
+.req-card-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.req-card-date  { font-size: 12px; color: #888; }
+.req-card-id    { font-size: 15px; font-weight: bold; color: #2D6A4F; margin-bottom: 4px; }
+.req-card-vender { font-size: 14px; font-weight: 600; color: #222; margin-bottom: 2px; }
+.req-card-item  { font-size: 13px; color: #666; margin-bottom: 10px; }
+.req-card-qty   { font-size: 13px; color: #444; margin-bottom: 6px; }
+.req-card-qty strong { color: #2D6A4F; }
+
+.req-progress-bg {
+    height: 6px;
+    background: #e8e8e8;
+    border-radius: 3px;
+    overflow: hidden;
+}
+.req-progress-fill {
+    height: 100%;
+    background: #2D6A4F;
+    border-radius: 3px;
+    transition: width 0.3s;
+}

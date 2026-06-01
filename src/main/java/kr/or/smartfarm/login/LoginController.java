@@ -54,20 +54,19 @@ public class LoginController {
 	       
 	    int permission = -1;
 	    
-	    if(login.getE_level() == 1 ) {
-	    	permission = 1;
-	    }
-	    if(login.getE_level() == 2 ) {
-	    	permission = 2;
-	    }
-	    if(login.getE_level() == 3 ) {
-	    	permission = 3;
-	    }
-	    if(login.getE_level() == 2 && login.getDept_num() == 1) {
-	    	permission = 4;
-	    }
 	    
 	    if (login != null) {
+	    	
+	    	if(login.getE_level() == 1 ) {
+	    		permission = 1;
+	    	} else if(login.getE_level() == 2 && login.getDept_num() == 1) {
+	    		permission = 4;
+	    	} else if(login.getE_level() == 2 ) {
+	    		permission = 2;
+	    	} else if(login.getE_level() == 3 ) {
+	    		permission = 3;
+	    	} 
+	    	
 	        // [세션 처리]
 	        HttpSession session = request.getSession();
 	        session.setAttribute("loginUser", login); 

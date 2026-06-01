@@ -210,6 +210,7 @@ public class RequestController {
             @RequestParam("request_date") String requestDate,
             @RequestParam("due_date")     String dueDate,
             @RequestParam(value = "request_qty", defaultValue = "1") int requestQty,
+            @RequestParam(value = "content", defaultValue = "") String content,
             HttpSession session) {
 
         // [권한] e_level 2 이상(팀장·사장)만 등록 가능
@@ -240,6 +241,7 @@ public class RequestController {
         insertMap.put("request_date", requestDate);
         insertMap.put("due_date",     dueDate);
         insertMap.put("request_qty",  requestQty);
+        insertMap.put("content",      content);
 
         RequestService.insertRequest(insertMap);
         // selectKey로 생성된 shipment_request_num으로 request_id 계산 후 상세 이동

@@ -161,70 +161,55 @@
 }
 
 /* ══════════════════════════════════
-   인쇄용 숨김 영역 (화면에서 비표시)
+   PDF 생성용 숨김 영역 (화면에서 비표시, JS가 임시 표시)
    ══════════════════════════════════ */
 #printLabelArea {
     display: none;
 }
 
 /* ══════════════════════════════════
-   @media print — 인쇄 시 레이아웃
+   PDF 라벨 그리드 / 카드 (html2pdf이 캡처)
    ══════════════════════════════════ */
-@media print {
-    /* 라벨 영역 외 모든 요소 숨김 */
-    body > * {
-        display: none !important;
-    }
+.print-label-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12mm;
+    padding: 8mm;
+}
 
-    #printLabelArea {
-        display: block !important;
-    }
+.label-print-card {
+    width: 85mm;
+    border: 1.5pt solid #2D6A4F;
+    border-radius: 4pt;
+    overflow: hidden;
+    font-family: 'Malgun Gothic', sans-serif;
+    font-size: 9pt;
+    background: #fff;
+}
 
-    /* 라벨 그리드: A4 한 줄에 2개 */
-    .print-label-grid {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 12mm;
-        padding: 8mm;
-    }
+.label-print-card .label-header {
+    background: #2D6A4F;
+    color: #fff;
+    text-align: center;
+    padding: 6pt 0 5pt;
+    font-size: 11pt;
+    font-weight: bold;
+}
 
-    .label-print-card {
-        width: 85mm;
-        border: 1.5pt solid #2D6A4F;
-        border-radius: 4pt;
-        overflow: hidden;
-        font-family: 'Malgun Gothic', sans-serif;
-        font-size: 9pt;
-        page-break-inside: avoid;
-        background: #fff;
-    }
+.label-print-card .label-body {
+    padding: 6pt 8pt;
+}
 
-    .label-print-card .label-header {
-        background: #2D6A4F !important;
-        color: #fff !important;
-        -webkit-print-color-adjust: exact;
-        print-color-adjust: exact;
-        text-align: center;
-        padding: 6pt 0 5pt;
-        font-size: 11pt;
-        font-weight: bold;
-    }
+.label-print-card .label-table td:first-child {
+    width: 52pt;
+    color: #555;
+    font-size: 8pt;
+}
 
-    .label-print-card .label-body {
-        padding: 6pt 8pt;
-    }
+.label-print-card .label-table td {
+    padding: 3pt 4pt;
+}
 
-    .label-print-card .label-table td:first-child {
-        width: 52pt;
-        color: #555;
-        font-size: 8pt;
-    }
-
-    .label-print-card .label-table td {
-        padding: 3pt 4pt;
-    }
-
-    .label-print-card .label-qr {
-        padding: 6pt 0 5pt;
-    }
+.label-print-card .label-qr {
+    padding: 6pt 0 5pt;
 }

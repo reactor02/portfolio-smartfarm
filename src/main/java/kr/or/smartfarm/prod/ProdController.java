@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import kr.or.smartfarm.login.LoginDTO;
+import kr.or.smartfarm.work.WorkService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -37,6 +38,9 @@ public class ProdController {
     // 생산계획 서비스 계층 의존성 주입
     @Autowired
     ProdService prodService;
+
+    @Autowired
+    WorkService workService;
 
     /**
      * 날짜 타입 바인딩 설정
@@ -117,9 +121,10 @@ public class ProdController {
             canCancel = loginUser.getE_level() >= 3
                      || loginUser.getEmp_num().equals(recordEmpNum);
         }
-        model.addAttribute("canCancel", canCancel);
-        model.addAttribute("prodDTO",  prodDTO);
-        model.addAttribute("empList",  prodService.getEmpList());
+        model.addAttribute("canCancel",    canCancel);
+        model.addAttribute("prodDTO",      prodDTO);
+        model.addAttribute("empList",      prodService.getEmpList());
+        model.addAttribute("processList",  workService.getProcessesByItem(prodDTO.getItem_num()));
         return "content/prodDetail.tiles";
     }
 
@@ -140,6 +145,10 @@ public class ProdController {
         LoginDTO loginUser = (LoginDTO) session.getAttribute("loginUser");
         if (loginUser == null || loginUser.getE_level() < 2) {
             return "redirect:/prod?error=forbidden";
+        }
+        // [방어] 생산일자·생산마감 필수값 검증 — null이면 Oracle TO_DATE() 오류 발생
+        if (prodDTO.getPlan_start() == null || prodDTO.getPlan_end() == null) {
+            return "redirect:/prod?error=invalid";
         }
         prodService.create(prodDTO);
         return "redirect:/prod/" + prodDTO.getPlan_id();

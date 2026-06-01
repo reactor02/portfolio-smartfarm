@@ -19,6 +19,10 @@ function showDateErr() {
     document.getElementById('dateErrModal').style.display = 'flex';
 }
 
+function closeDateErrModal() {
+    document.getElementById('dateErrModal').style.display = 'none';
+}
+
 /** 작업 시작 — 오늘이 작업시작일일 때만 진행(아니면 날짜 오류 모달) */
 function startWork() {
     var today    = new Date();

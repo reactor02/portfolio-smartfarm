@@ -37,4 +37,18 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('regModal').addEventListener('click', function(e) {
         if (e.target === this) this.style.display = 'none';
     });
+
+    document.getElementById('regForm').addEventListener('submit', function(e) {
+        var start = this.plan_start.value;
+        var end   = this.plan_end.value;
+        if (!start || !end) {
+            e.preventDefault();
+            alert('생산일자와 생산마감은 필수 입력값입니다.');
+            return;
+        }
+        if (start > end) {
+            e.preventDefault();
+            alert('생산일자는 생산마감보다 이후일 수 없습니다.');
+        }
+    });
 });

@@ -90,61 +90,64 @@ function showLabel(idx) {
     document.getElementById('labelModal').style.display = 'flex';
 }
 
-/* ── 단일 라벨 인쇄 ── */
-function printSingleLabel() {
-    var grid = document.getElementById('printLabelGrid');
+/* ── 단일 라벨 PDF 다운로드 ── */
+function downloadSingleLabel() {
     var preview = document.getElementById('labelPreview');
     if (!preview || !preview.innerHTML) return;
 
-    // 현재 모달에 표시 중인 라벨 하나만 인쇄 영역에 복사
-    grid.innerHTML = '<div class="label-print-card">' + preview.innerHTML + '</div>';
-
-    // QR 코드 재생성 (복사된 DOM에 id가 중복되지 않도록 새 id 사용)
     var currentLot = null;
     LOT_DATA.forEach(function(lot) {
         var qrId = 'qr-modal-' + lot.lotCode.replace(/[^a-zA-Z0-9]/g, '_');
         if (document.getElementById(qrId)) currentLot = lot;
     });
 
-    if (currentLot) {
-        // 인쇄용 QR은 printLabelGrid 내에 새로 생성
-        var printQrId = 'qr-print-single-' + currentLot.lotCode.replace(/[^a-zA-Z0-9]/g, '_');
-        var qrDivs = grid.querySelectorAll('.label-qr');
-        if (qrDivs.length > 0) {
-            qrDivs[0].id = printQrId;
-            qrDivs[0].innerHTML = '';
-            generateQR(printQrId, currentLot.lotCode, 100);
-        }
-    }
-
-    setTimeout(function() { window.print(); }, 300);
+    html2pdf().set({
+        margin: 5,
+        filename: currentLot ? ('label_' + currentLot.lotCode + '.pdf') : 'label.pdf',
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true },
+        jsPDF: { unit: 'mm', format: 'a6', orientation: 'portrait' }
+    }).from(preview).save();
 }
 
-/* ── 전체 라벨 인쇄 ── */
-function printAllLabels() {
+/* ── 전체 라벨 PDF 다운로드 ── */
+function downloadAllLabels() {
     if (!LOT_DATA || LOT_DATA.length === 0) {
-        alert('배정된 LOT가 없어 인쇄할 라벨이 없습니다.');
+        alert('배정된 LOT가 없어 다운로드할 라벨이 없습니다.');
         return;
     }
 
+    var area = document.getElementById('printLabelArea');
     var grid = document.getElementById('printLabelGrid');
     var html = '';
 
     LOT_DATA.forEach(function(lot, idx) {
-        var qrId = 'qr-print-all-' + idx + '-' + lot.lotCode.replace(/[^a-zA-Z0-9]/g, '_');
+        var qrId = 'qr-dl-' + idx + '-' + lot.lotCode.replace(/[^a-zA-Z0-9]/g, '_');
         html += '<div class="label-print-card">' + buildLabelHTML(lot, SHIPMENT_DATA, qrId) + '</div>';
     });
 
     grid.innerHTML = html;
 
-    // QR 코드 생성 (DOM 삽입 직후)
+    // html2canvas가 캡처할 수 있도록 화면 밖에 임시 표시
+    area.style.cssText = 'display:block; position:fixed; left:-9999px; top:0;';
+
     LOT_DATA.forEach(function(lot, idx) {
-        var qrId = 'qr-print-all-' + idx + '-' + lot.lotCode.replace(/[^a-zA-Z0-9]/g, '_');
+        var qrId = 'qr-dl-' + idx + '-' + lot.lotCode.replace(/[^a-zA-Z0-9]/g, '_');
         generateQR(qrId, lot.lotCode, 100);
     });
 
-    // QR 렌더링 대기 후 인쇄 다이얼로그 열기
-    setTimeout(function() { window.print(); }, 400);
+    setTimeout(function() {
+        html2pdf().set({
+            margin: 5,
+            filename: 'labels_' + SHIPMENT_DATA.shipmentId + '.pdf',
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2, useCORS: true },
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        }).from(grid).save().then(function() {
+            area.style.cssText = '';
+            grid.innerHTML = '';
+        });
+    }, 400);
 }
 
 /* ── 라벨 모달 닫기 ── */

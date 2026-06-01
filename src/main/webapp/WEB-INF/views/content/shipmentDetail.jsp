@@ -67,8 +67,17 @@ response.setContentType("text/html; charset=utf-8");
                         <span class="info-value">${detail.SHIPMENT_ID}</span>
                     </div>
                     <div class="info-item">
-                        <span class="info-label">등록일</span>
-                        <span class="info-value">${detail.SHIPMENT_DATE}</span>
+                        <span class="info-label">상태</span>
+                        <span class="info-value">
+                            <span class="badge
+                                <c:choose>
+                                    <c:when test="${detail.SHIPMENT_STATUS == '출하대기'}">badge-waiting</c:when>
+                                    <c:when test="${detail.SHIPMENT_STATUS == '진행'}">badge-progress</c:when>
+                                    <c:when test="${detail.SHIPMENT_STATUS == '출하완료'}">badge-done</c:when>
+                                    <c:when test="${detail.SHIPMENT_STATUS == '취소'}">badge-cancel</c:when>
+                                </c:choose>
+                            ">${detail.SHIPMENT_STATUS}</span>
+                        </span>
                     </div>
                     <div class="info-item">
                         <span class="info-label">거래처</span>
@@ -83,17 +92,8 @@ response.setContentType("text/html; charset=utf-8");
                         <span class="info-value">${detail.ENAME}</span>
                     </div>
                     <div class="info-item">
-                        <span class="info-label">상태</span>
-                        <span class="info-value">
-                            <span class="badge
-                                <c:choose>
-                                    <c:when test="${detail.SHIPMENT_STATUS == '출하대기'}">badge-waiting</c:when>
-                                    <c:when test="${detail.SHIPMENT_STATUS == '진행'}">badge-progress</c:when>
-                                    <c:when test="${detail.SHIPMENT_STATUS == '출하완료'}">badge-done</c:when>
-                                    <c:when test="${detail.SHIPMENT_STATUS == '취소'}">badge-cancel</c:when>
-                                </c:choose>
-                            ">${detail.SHIPMENT_STATUS}</span>
-                        </span>
+                        <span class="info-label">등록일</span>
+                        <span class="info-value">${detail.SHIPMENT_DATE}</span>
                     </div>
                 </div>
             </div>
@@ -153,8 +153,8 @@ response.setContentType("text/html; charset=utf-8");
                 <div class="section-title-row">
                     <span class="section-title">연결 LOT 번호</span>
                     <c:if test="${not empty lots}">
-                        <button type="button" class="btn-label-all" onclick="printAllLabels()">
-                            &#128424; 전체 라벨 다운로드
+                        <button type="button" class="btn-label-all" onclick="downloadAllLabels()">
+                            &#128229; 전체 라벨 다운로드
                         </button>
                     </c:if>
                 </div>
@@ -209,7 +209,7 @@ response.setContentType("text/html; charset=utf-8");
     <div class="label-modal-box">
         <div class="label-card" id="labelPreview"></div>
         <div class="label-modal-btns">
-            <button type="button" class="btn-label-print" onclick="printSingleLabel()">&#128424; 인쇄</button>
+            <button type="button" class="btn-label-print" onclick="downloadSingleLabel()">&#128229; PDF 저장</button>
             <button type="button" class="btn-label-close" onclick="closeLabelModal()">닫기</button>
         </div>
     </div>
@@ -246,6 +246,7 @@ response.setContentType("text/html; charset=utf-8");
     ];
 </script>
 <script src="/resources/js/lib/qrcode.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <script src="/resources/js/shipment/shipmentDetail.js"></script>
 
 <%-- 재고 부족 알림 --%>

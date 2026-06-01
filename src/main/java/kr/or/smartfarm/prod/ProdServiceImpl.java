@@ -42,7 +42,8 @@ public class ProdServiceImpl implements ProdService {
         page.setEndRow(endRow);
 
         // plan_start 가 지난 "대기" 계획을 "진행"으로 일괄 업데이트
-        dao.syncPlanStatus();   // plan_start 지난 대기 → 진행 동기화
+        dao.syncPlanStatus();           // 대기 → 진행
+        dao.syncCompletePlanStatus();   // 진행/대기 → 완료 (SUM(current_qty) >= plan_qty 달성 시)
         List<ProdDTO> list = dao.getList(page);
 
         // 전체 건수를 기반으로 페이지 메타 정보 계산

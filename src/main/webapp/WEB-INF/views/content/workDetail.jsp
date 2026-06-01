@@ -53,10 +53,6 @@
                 <span class="badge <c:choose><c:when test="${workDTO.work_status == '대기'}">badge-wait</c:when><c:when test="${workDTO.work_status == '진행'}">badge-progress</c:when><c:when test="${workDTO.work_status == '완료'}">badge-done</c:when><c:when test="${workDTO.work_status == '취소'}">badge-cancel</c:when></c:choose>">${workDTO.work_status}</span>
             </div>
             <div class="info-item">
-                <span class="info-label">작업자</span>
-                <span class="info-value">${workDTO.ename}</span>
-            </div>
-            <div class="info-item">
                 <span class="info-label">품목명</span>
                 <span class="info-value">${workDTO.item_name}</span>
             </div>
@@ -75,6 +71,10 @@
             <div class="info-item">
                 <span class="info-label">작업완료</span>
                 <span class="info-value"><fmt:formatDate value="${workDTO.order_end}" pattern="yyyy-MM-dd"/></span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">작업자</span>
+                <span class="info-value">${workDTO.ename}</span>
             </div>
             <div class="info-item">
                 <span class="info-label">등록일시</span>
@@ -161,23 +161,14 @@
     </main>
 
 <!-- 작업일 오류 알림 모달 -->
-<div id="dateErrModal" style="display:none; position:fixed; inset:0;
-     background:rgba(0,0,0,0.45); z-index:9999;
-     align-items:center; justify-content:center;">
-    <div style="background:#fff; border-radius:12px; padding:32px 36px;
-                max-width:340px; width:90%; box-shadow:0 8px 28px rgba(0,0,0,0.2);
-                text-align:center; font-family:'Malgun Gothic',sans-serif;">
-        <div style="font-size:2.2rem; margin-bottom:14px;">📅</div>
-        <div style="font-size:1.1rem; font-weight:bold; color:#333; margin-bottom:8px;">
-            작업일이 아닙니다
+<div id="dateErrModal">
+    <div class="date-err-box">
+        <div class="date-err-icon">📅</div>
+        <div class="date-err-title">작업일이 아닙니다</div>
+        <div class="date-err-msg">
+            작업시작일: <strong id="dateErrDate" class="date-err-date"></strong>
         </div>
-        <div style="font-size:0.88rem; color:#666; margin-bottom:24px;">
-            작업시작일: <strong id="dateErrDate" style="color:#2D6A4F;"></strong>
-        </div>
-        <button onclick="document.getElementById('dateErrModal').style.display='none'"
-                style="padding:10px 32px; background:#2D6A4F; color:#fff;
-                       border:none; border-radius:6px; font-size:0.95rem;
-                       font-weight:bold; cursor:pointer;">확인</button>
+        <button class="date-err-btn" onclick="closeDateErrModal()">확인</button>
     </div>
 </div>
 
