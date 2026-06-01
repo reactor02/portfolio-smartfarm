@@ -16,12 +16,26 @@ String vender_type = request.getParameter("vender_type");
 <meta charset="UTF-8">
 <title>대시보드</title>
 <style>
+
 /* 기본 초기화 */
 * {
 	box-sizing: border-box;
 	margin: 0;
 	padding: 0;
 	font-family: 'Malgun Gothic', sans-serif; /* 한국어 가독성을 위해 맑은고딕 설정 */
+}
+
+.main-cont {
+	flex: 1;
+	padding: 2rem 2.5rem;
+	min-width: 0;
+}
+
+.mat-all {
+	display: flex; 
+	flex-direction : column;
+	min-height : 100vh;
+	background-color : #f4f7f6;
 }
 
 body {
@@ -212,9 +226,11 @@ body {
 </style>
 </head>
 <body>
-
-	<div class="container">
+	
+	<div class="mat-all">
 		<tiles:insertAttribute name="header" ignore="true" />
+		
+		<main class="main-cont">
 		
 		<div class="header">
 			<h1>대시보드</h1>
@@ -375,7 +391,8 @@ body {
 			</div>
 
 		</div>
-
+		</main>
+		
 		<tiles:insertAttribute name="footer" ignore="true" />
 	</div>
 
