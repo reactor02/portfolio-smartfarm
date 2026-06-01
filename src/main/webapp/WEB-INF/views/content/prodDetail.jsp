@@ -99,8 +99,20 @@
         <!-- 4. 공정 정보 -->
         <div class="section-title">■ 공정 정보</div>
         <div class="process-link-wrap">
-            <span class="info-label">공정 정보 링크:</span>
-            <a href="/process/item/${prodDTO.item_num}" class="link-text">${prodDTO.item_name} 공정관리 링크</a>
+            <span class="info-label">공정 순서별 링크:</span>
+            <c:choose>
+                <c:when test="${not empty processList}">
+                    <c:forEach var="proc" items="${processList}">
+                        <div class="process-link-item">
+                            <span class="process-order-badge">순서 ${proc.FLOW}</span>
+                            <a href="/processDetail?process_num=${proc.PROCESS_NUM}" class="link-txt">공정 상세 보기</a>
+                        </div>
+                    </c:forEach>
+                </c:when>
+                <c:otherwise>
+                    <span class="process-empty">등록된 공정이 없습니다.</span>
+                </c:otherwise>
+            </c:choose>
         </div>
         <div class="instruction-box">
             <span class="info-label info-label-block">상세 지시사항</span>

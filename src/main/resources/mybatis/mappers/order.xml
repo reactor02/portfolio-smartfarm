@@ -166,7 +166,7 @@
 
     <!-- 작업지시 담당자 emp_num 조회 (취소/완료 권한 검증용) -->
     <select id="getEmpNum" resultType="String" parameterType="String">
-        SELECT emp_num FROM work_order WHERE work_order_id = #{work_order_id}
+        SELECT emp_num FROM work_order WHERE order_id = #{work_order_id}
     </select>
 
     <!-- 생산계획 옵션 (취소 제외) -->
@@ -199,16 +199,16 @@
 
     <!-- 작업완료 시 생산계획 완료 처리: SUM(current_qty) >= plan_qty 이면 '완료' 저장 -->
     <update id="completePlanIfDone" parameterType="String">
-        UPDATE production_plan pp
-        SET pp.plan_status = '완료'
-        WHERE pp.plan_num = (
+        UPDATE production_plan
+        SET plan_status = '완료'
+        WHERE plan_num = (
             SELECT plan_num FROM work_order WHERE order_id = #{value}
         )
-        AND pp.plan_status NOT IN ('취소', '완료')
-        AND pp.plan_qty &lt;= (
+        AND plan_status NOT IN ('취소', '완료')
+        AND plan_qty &lt;= (
             SELECT NVL(SUM(wo.current_qty), 0)
             FROM work_order wo
-            WHERE wo.plan_num = pp.plan_num
+            WHERE wo.plan_num = production_plan.plan_num
         )
     </update>
 

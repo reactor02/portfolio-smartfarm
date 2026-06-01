@@ -15,3 +15,17 @@
                        background: #B7E4C7; color: #2D6A4F; border-radius: 10px;
                        font-size: 12px; font-weight: bold; text-align: center; }
 .process-empty       { color: #999; font-size: 0.9rem; }
+
+/* 작업일 오류 모달 */
+#dateErrModal  { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.45);
+                 z-index: 9999; align-items: center; justify-content: center; }
+.date-err-box  { background: #fff; border-radius: 12px; padding: 32px 36px;
+                 max-width: 340px; width: 90%; box-shadow: 0 8px 28px rgba(0,0,0,0.2);
+                 text-align: center; font-family: 'Malgun Gothic', sans-serif; }
+.date-err-icon  { font-size: 2.2rem; margin-bottom: 14px; }
+.date-err-title { font-size: 1.1rem; font-weight: bold; color: #333; margin-bottom: 8px; }
+.date-err-msg   { font-size: 0.88rem; color: #666; margin-bottom: 24px; }
+.date-err-date  { color: #2D6A4F; }
+.date-err-btn   { padding: 10px 32px; background: #2D6A4F; color: #fff;
+                  border: none; border-radius: 6px; font-size: 0.95rem;
+                  font-weight: bold; cursor: pointer; }

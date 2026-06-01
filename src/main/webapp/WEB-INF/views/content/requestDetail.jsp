@@ -87,6 +87,12 @@ response.setContentType("text/html; charset=utf-8");
                             ">${detail.REQUEST_STATUS}</span>
                         </span>
                     </div>
+                    <c:if test="${not empty detail.CONTENT}">
+                    <div class="info-item info-item-full">
+                        <span class="info-label">상세지시사항</span>
+                        <span class="info-value">${detail.CONTENT}</span>
+                    </div>
+                    </c:if>
                 </div>
             </div>
 

@@ -103,6 +103,18 @@
           AND SYSDATE >= plan_start
     </update>
 
+    <!-- 상태 동기화: SUM(current_qty) >= plan_qty 달성 계획 → 완료 일괄 업데이트 -->
+    <update id="syncCompletePlanStatus">
+        UPDATE production_plan
+        SET plan_status = '완료'
+        WHERE plan_status NOT IN ('취소', '완료')
+          AND plan_qty &lt;= (
+              SELECT NVL(SUM(wo.current_qty), 0)
+              FROM work_order wo
+              WHERE wo.plan_num = production_plan.plan_num
+          )
+    </update>
+
     <!-- 직원 드롭다운 옵션 조회 (재직자만 STATUS = 'N') -->
     <select id="getEmpList" resultType="SelectOptionDTO">
         SELECT emp_num AS num, ename AS name
@@ -134,9 +146,8 @@
     <select id="getOne" parameterType="String" resultType="ProdDTO">
         SELECT pp.plan_num, pp.plan_id, pp.plan_qty,
                CASE
-                   WHEN pp.plan_status = '취소'       THEN '취소'
-                   WHEN SYSDATE > pp.plan_end         THEN '완료'
-                   WHEN SYSDATE >= pp.plan_start      THEN '진행'
+                   WHEN pp.plan_status IN ('취소', '완료') THEN pp.plan_status
+                   WHEN SYSDATE >= pp.plan_start           THEN '진행'
                    ELSE '대기'
                END AS plan_status,
                pp.plan_start, pp.plan_end,

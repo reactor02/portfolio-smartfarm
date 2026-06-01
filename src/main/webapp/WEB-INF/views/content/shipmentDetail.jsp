@@ -153,8 +153,8 @@ response.setContentType("text/html; charset=utf-8");
                 <div class="section-title-row">
                     <span class="section-title">연결 LOT 번호</span>
                     <c:if test="${not empty lots}">
-                        <button type="button" class="btn-label-all" onclick="printAllLabels()">
-                            &#128424; 전체 라벨 다운로드
+                        <button type="button" class="btn-label-all" onclick="downloadAllLabels()">
+                            &#128229; 전체 라벨 다운로드
                         </button>
                     </c:if>
                 </div>
@@ -209,7 +209,7 @@ response.setContentType("text/html; charset=utf-8");
     <div class="label-modal-box">
         <div class="label-card" id="labelPreview"></div>
         <div class="label-modal-btns">
-            <button type="button" class="btn-label-print" onclick="printSingleLabel()">&#128424; 인쇄</button>
+            <button type="button" class="btn-label-print" onclick="downloadSingleLabel()">&#128229; PDF 저장</button>
             <button type="button" class="btn-label-close" onclick="closeLabelModal()">닫기</button>
         </div>
     </div>
@@ -246,6 +246,7 @@ response.setContentType("text/html; charset=utf-8");
     ];
 </script>
 <script src="/resources/js/lib/qrcode.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <script src="/resources/js/shipment/shipmentDetail.js"></script>
 
 <%-- 재고 부족 알림 --%>
