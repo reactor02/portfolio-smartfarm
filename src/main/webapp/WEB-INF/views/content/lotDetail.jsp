@@ -244,7 +244,7 @@
         });
         tbody.innerHTML = html;
     }
-    const lotCode = "${lotCode}";  // 또는 "${lot_code}"
+    const lotCode = "${lotCode}";  // LotController가 model.addAttribute("lotCode", lot_code)로 주입
     new QRCode(document.getElementById("qrcode"), "http://localhost:8080/lot/" + lotCode);
 </script>
 </body>

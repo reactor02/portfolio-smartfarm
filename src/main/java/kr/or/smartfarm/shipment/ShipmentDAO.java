@@ -34,4 +34,7 @@ public interface ShipmentDAO {
     public int insertSplitLot(Map map);
     public int insertLotRelationForShipment(Map map);
     public int updateShipmentLotRef(Map map);
+
+    /** 출하 담당자 emp_num 조회 (취소/확정 권한 검증용) */
+    public String getEmpNum(String shipmentId);
 }

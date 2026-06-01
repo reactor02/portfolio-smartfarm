@@ -164,4 +164,10 @@ public class ProdServiceImpl implements ProdService {
         result.put("currentPage", page);
         return result;
     }
+
+    /** 생산계획 담당자 emp_num 조회 (취소 권한 검증용) */
+    @Override
+    public String getEmpNum(String plan_id) {
+        return dao.getEmpNum(plan_id);
+    }
 }

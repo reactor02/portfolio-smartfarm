@@ -102,4 +102,10 @@ public class WorkDAOImpl implements WorkDAO {
     public List<Map<String, Object>> getProcessesByItem(int item_num) {
         return session.selectList("kr.or.smartfarm.work.getProcessesByItem", item_num);
     }
+
+    /** 작업지시 담당자 emp_num 조회 (취소/완료 권한 검증용) */
+    @Override
+    public String getEmpNum(String work_order_id) {
+        return session.selectOne("kr.or.smartfarm.work.getEmpNum", work_order_id);
+    }
 }

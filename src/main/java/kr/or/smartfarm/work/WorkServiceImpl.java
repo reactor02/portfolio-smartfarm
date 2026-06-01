@@ -221,4 +221,10 @@ public class WorkServiceImpl implements WorkService {
         result.put("totalCount",  totalCount);
         return result;
     }
+
+    /** 작업지시 담당자 emp_num 조회 (취소/완료 권한 검증용) */
+    @Override
+    public String getEmpNum(String work_order_id) {
+        return dao.getEmpNum(work_order_id);
+    }
 }

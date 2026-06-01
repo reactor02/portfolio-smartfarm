@@ -72,6 +72,10 @@ function cancelPlan() {
     if (!confirm('해당 생산계획을 취소하시겠습니까?')) return;
     fetch('/prod/' + PLAN_ID + '/cancel', { method: 'POST' })
         .then(function(r) { return r.text(); })
-        .then(function() { location.reload(); })
+        .then(function(result) {
+            if (result === 'forbidden')    { alert('권한이 없습니다.'); return; }
+            if (result === 'unauthorized') { location.href = '/login'; return; }
+            location.reload();
+        })
         .catch(function() { alert('처리 중 오류가 발생했습니다.'); });
 }

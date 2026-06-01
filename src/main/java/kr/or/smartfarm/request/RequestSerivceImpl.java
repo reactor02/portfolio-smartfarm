@@ -56,15 +56,15 @@ public class RequestSerivceImpl implements RequestService {
         return requestDAO.selectDetail(requestId);
     }
 
-    /** 해당 요청에 유효한(취소 아닌) 출하지시 존재 여부 (0이면 없음) */
-    @Override
-    public int hasShipment(String shipmentRequestNum) {
-        return requestDAO.hasShipment(shipmentRequestNum);
-    }
-
     /** 요청 상태 변경 (status_name으로 status_num을 서브쿼리 조회하여 갱신) */
     @Override
     public int updateRequestStatus(Map map) {
         return requestDAO.updateRequestStatus(map);
+    }
+
+    /** 출하요청 담당자 emp_num 조회 (VENDER.emp_num, 취소 권한 검증용) */
+    @Override
+    public String getEmpNum(String requestId) {
+        return requestDAO.getEmpNum(requestId);
     }
 }

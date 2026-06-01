@@ -8,8 +8,7 @@ response.setContentType("text/html; charset=utf-8");
 <%--
     shipmentDetail.jsp — 출하 상세 화면
     기본정보 + 수량 현황(계획/완료/잔여) + 진행률 + 연결 주문/LOT 목록 + 액션(확정/취소).
-    완료수량은 배정 LOT 수량 합계로 계산하며, 출하확정 중 재고 부족 시
-    컨트롤러가 ?error=stock 으로 리다이렉트하면 하단 스크립트가 alert를 띄운다.
+    LOT 테이블에 "라벨 보기" 버튼 + "전체 라벨 다운로드" 버튼 포함.
     컨트롤러는 /shipmentDetail/{shipmentId} (ShipmentController.shipmentDetail).
 --%>
 <!DOCTYPE html>
@@ -19,6 +18,7 @@ response.setContentType("text/html; charset=utf-8");
 <title>출하 상세</title>
 <link rel="stylesheet" href="/resources/css/detail-common.css">
 <link rel="stylesheet" href="/resources/css/shipment/shipmentDetail.css">
+<link rel="stylesheet" href="/resources/css/shipment/label.css">
 </head>
 <body>
 
@@ -36,7 +36,8 @@ response.setContentType("text/html; charset=utf-8");
                             onclick="return confirm('출하확정하시겠습니까? 재고가 차감됩니다.')">출하확정</button>
                 </form>
             </c:if>
-            <c:if test="${detail.SHIPMENT_STATUS != '취소' and detail.SHIPMENT_STATUS != '출하완료'}">
+            <%-- 취소버튼: e_level >= 3(사장) 또는 담당자 본인 + 진행 가능 상태 --%>
+            <c:if test="${canCancel and detail.SHIPMENT_STATUS != '취소' and detail.SHIPMENT_STATUS != '출하완료'}">
                 <form method="POST" action="/cancelShipment" style="display:inline;">
                     <input type="hidden" name="shipmentNum"        value="${detail.SHIPMENT_NUM}">
                     <input type="hidden" name="shipmentId"         value="${detail.SHIPMENT_ID}">
@@ -147,8 +148,16 @@ response.setContentType("text/html; charset=utf-8");
                 </div>
             </div>
 
+            <%-- ══ 연결 LOT 번호 (라벨 기능 포함) ══ --%>
             <div class="section-box">
-                <div class="section-title">연결 LOT 번호</div>
+                <div class="section-title-row">
+                    <span class="section-title">연결 LOT 번호</span>
+                    <c:if test="${not empty lots}">
+                        <button type="button" class="btn-label-all" onclick="printAllLabels()">
+                            &#128424; 전체 라벨 다운로드
+                        </button>
+                    </c:if>
+                </div>
                 <table class="data-table">
                     <thead>
                         <tr>
@@ -156,22 +165,29 @@ response.setContentType("text/html; charset=utf-8");
                             <th>품목명</th>
                             <th>배정수량</th>
                             <th>생성일</th>
+                            <th>유통기한</th>
+                            <th>라벨</th>
                         </tr>
                     </thead>
                     <tbody>
                         <c:choose>
                             <c:when test="${not empty lots}">
-                                <c:forEach var="lot" items="${lots}">
+                                <c:forEach var="lot" items="${lots}" varStatus="vs">
                                     <tr>
                                         <td>${lot.LOT_CODE}</td>
                                         <td>${lot.ITEM_NAME}</td>
                                         <td>${lot.QTY}</td>
                                         <td>${lot.LOT_DATE}</td>
+                                        <td>${not empty lot.EXPIRY_DATE ? lot.EXPIRY_DATE : '-'}</td>
+                                        <td>
+                                            <button type="button" class="btn-label"
+                                                    onclick="showLabel(${vs.index})">라벨 보기</button>
+                                        </td>
                                     </tr>
                                 </c:forEach>
                             </c:when>
                             <c:otherwise>
-                                <tr><td colspan="4" class="empty-cell">배정된 LOT가 없습니다.</td></tr>
+                                <tr><td colspan="6" class="empty-cell">배정된 LOT가 없습니다.</td></tr>
                             </c:otherwise>
                         </c:choose>
                     </tbody>
@@ -188,22 +204,58 @@ response.setContentType("text/html; charset=utf-8");
 
 </main>
 
-<script>
-    (function() {
-        var planQty     = parseInt('${detail.PLAN_QTY}') || 0;
-        var completeQty = parseInt('${completeQty}')     || 0;
-        var pct = planQty > 0 ? Math.min(100, Math.round(completeQty / planQty * 100)) : 0;
-        var bar  = document.getElementById('progressBar');
-        var text = document.getElementById('progressText');
-        if (bar)  bar.style.width = pct + '%';
-        if (text) text.textContent = pct + '%';
-    })();
+<%-- ══ 라벨 미리보기 모달 ══ --%>
+<div id="labelModal" class="modal-overlay" style="display:none;">
+    <div class="label-modal-box">
+        <div class="label-card" id="labelPreview"></div>
+        <div class="label-modal-btns">
+            <button type="button" class="btn-label-print" onclick="printSingleLabel()">&#128424; 인쇄</button>
+            <button type="button" class="btn-label-close" onclick="closeLabelModal()">닫기</button>
+        </div>
+    </div>
+</div>
 
-    // [방어] 출하확정 중 재고 부족(stock_error)으로 롤백된 경우 — 컨트롤러가 ?error=stock 으로 redirect
-    <c:if test="${param.error == 'stock'}">
-        alert('재고가 부족하여 출하확정을 완료하지 못했습니다. 재고를 확인해 주세요.');
-    </c:if>
+<%-- ══ 인쇄 전용 전체 라벨 영역 ══ --%>
+<div id="printLabelArea">
+    <div class="print-label-grid" id="printLabelGrid"></div>
+</div>
+
+<%-- JSP 서버값을 JS 전역변수로 주입 --%>
+<script>
+    var PLAN_QTY     = parseInt('${detail.PLAN_QTY}') || 0;
+    var COMPLETE_QTY = parseInt('${completeQty}')     || 0;
+
+    var SHIPMENT_DATA = {
+        shipmentId:  '${detail.SHIPMENT_ID}',
+        venderName:  '<c:out value="${detail.VENDER_NAME}" escapeXml="false"/>',
+        requestId:   '${detail.REQUEST_ID}',
+        dueDate:     '${detail.DUE_DATE}',
+        shipmentDate:'${detail.SHIPMENT_DATE}'
+    };
+
+    var LOT_DATA = [
+        <c:forEach var="lot" items="${lots}" varStatus="vs">
+        {
+            lotCode:    '${lot.LOT_CODE}',
+            itemName:   '<c:out value="${lot.ITEM_NAME}" escapeXml="false"/>',
+            qty:        '${lot.QTY}',
+            lotDate:    '${lot.LOT_DATE}',
+            expiryDate: '${not empty lot.EXPIRY_DATE ? lot.EXPIRY_DATE : ""}'
+        }<c:if test="${!vs.last}">,</c:if>
+        </c:forEach>
+    ];
 </script>
+<script src="/resources/js/lib/qrcode.min.js"></script>
+<script src="/resources/js/shipment/shipmentDetail.js"></script>
+
+<%-- 재고 부족 알림 --%>
+<c:if test="${param.error == 'stock'}">
+    <script src="/resources/js/common/alertStock.js"></script>
+</c:if>
+<%-- 권한 없음 알림 --%>
+<c:if test="${param.error == 'forbidden'}">
+    <script src="/resources/js/common/alertForbidden.js"></script>
+</c:if>
 
 </body>
 </html>

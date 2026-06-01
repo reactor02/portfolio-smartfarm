@@ -8,6 +8,6 @@ public class DashController {
 
 	@GetMapping("/dashboard")
 	public String dashboard() {
-		return "content/dash";
+		return "content/dash.tiles";
 	}
 }

@@ -25,7 +25,8 @@
         <div class="hdr">
             <h1>생산계획 상세</h1>
             <div class="hdr-right">
-                <c:if test="${prodDTO.plan_status != '취소' and prodDTO.plan_status != '완료'}">
+                <%-- 취소버튼: e_level >= 3(사장) 또는 담당자 본인 + 진행 가능 상태 --%>
+                <c:if test="${canCancel and prodDTO.plan_status != '취소' and prodDTO.plan_status != '완료'}">
                     <button type="button" class="btn-action btn-del" onclick="cancelPlan()">취소</button>
                 </c:if>
                 <button type="button" class="btn-action" onclick="location.href='/prod'">목록으로</button>
