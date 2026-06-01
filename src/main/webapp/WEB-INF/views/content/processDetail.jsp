@@ -368,7 +368,9 @@ response.setContentType("text/html; charset=utf-8");
 
 				<div class="hdr">
 					<h1>공정 관리 상세</h1>
+					<c:if test="${sessionScope.role >= 2}">
 					<button type="button" class="btn-action1" onclick="openModal()">수정</button>
+					</c:if>
 					<a href="/process" class="btn-list">목록으로</a>
 				</div>
 

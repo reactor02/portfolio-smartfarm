@@ -533,7 +533,9 @@ response.setContentType("text/html; charset=utf-8");
 				<div class="hdr">
 					<h1>BOM 상세</h1>
 					<div class="hdr-right">
+					<c:if test="${sessionScope.role >= 2}">
 						<button type="button" class="btn-action" onclick="openModal()">수정</button>
+					</c:if>
 						<a href="/selectBom" class="btn-action">목록으로</a>
 					</div>
 				</div>
