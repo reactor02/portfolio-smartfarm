@@ -57,7 +57,7 @@ function movePage(pageNum) {
 		var tbody = document.querySelector('#shipment-body');
 
 		if (!data.searchResult || data.searchResult.length == 0) {
-			tbody.innerHTML = '<tr><td colspan="8" class="empty-cell">조회된 결과가 없습니다.</td></tr>';
+			tbody.innerHTML = '<tr><td colspan="9" class="empty-cell">조회된 결과가 없습니다.</td></tr>';
 			renderPagination(data.pageInfo);
 			return;
 		}
@@ -82,6 +82,7 @@ function movePage(pageNum) {
 				      + '<td>' + (item.NAME          || '') + '</td>'
 				      + '<td>' + (item.PLAN_QTY      || '') + '</td>'
 				      + '<td>' + (item.ENAME         || '') + '</td>'
+				      + '<td>' + (item.WORKER_ENAME  || '') + '</td>'
 				      + '<td><span class="badge ' + statusClass + '">' + statusLabel + '</span></td>'
 				      + '</tr>';
 			}
