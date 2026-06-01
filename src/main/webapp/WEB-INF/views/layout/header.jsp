@@ -2,6 +2,10 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 
 <style>
+body{
+padding: 0px !important;
+margin: 0px !important;
+}
    .dashboard-wrapper {
     position: relative; 
     margin-left: 1px; 
