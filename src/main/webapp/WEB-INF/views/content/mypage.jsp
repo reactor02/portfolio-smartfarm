@@ -64,7 +64,7 @@ div .pwd-msg-box { font-size: .85rem; font-weight: 700; margin-top: 4px; min-hei
             <div class="mp-form-group" style="display: flex !important; align-items: center !important;">
                 <label style="width: 85px !important; flex-shrink: 0 !important; font-size: .95rem !important; font-weight: 700 !important; color: #333 !important;">이름</label>
                 <!-- 💡 수정을 위해 id="user-ename" 및 name="ename" 추가 -->
-                <input type="text" id="user-ename" name="ename" class="form-control read-only-field" value="${loginUser.ename}" readonly style="flex: 1 !important; width: 100% !important; height: 38px !important; padding: 0 10px !important; background-color: #f9f9f9 !important; color: #555 !important; border: 1px solid #aaa !important; border-radius: 4px !important; font-size: .95rem !important; cursor: default !important; transition: all 0.2s;" />
+                <input type="text" id="user-ename" name="ename" class="form-control read-only-field" value="${loginUser.ename}"  style="flex: 1 !important; width: 100% !important; height: 38px !important; padding: 0 10px !important; background-color: #f9f9f9 !important; color: #555 !important; border: 1px solid #aaa !important; border-radius: 4px !important; font-size: .95rem !important; cursor: default !important; transition: all 0.2s;" />
             </div>
             
             <div class="mp-form-group" style="display: flex !important; align-items: center !important;">
@@ -76,7 +76,7 @@ div .pwd-msg-box { font-size: .85rem; font-weight: 700; margin-top: 4px; min-hei
             
             <div class="mp-form-group" style="display: flex !important; align-items: center !important;">
                 <label style="width: 85px !important; flex-shrink: 0 !important; font-size: .95rem !important; font-weight: 700 !important; color: #333 !important;">연락처</label>
-                <input type="text" id="user-tel" name="tel" class="form-control read-only-field" value="${loginUser.tel}" readonly style="flex: 1 !important; width: 100% !important; height: 38px !important; padding: 0 10px !important; background-color: #f9f9f9 !important; color: #555 !important; border: 1px solid #aaa !important; border-radius: 4px !important; font-size: .95rem !important; cursor: default !important; transition: all 0.2s;" />
+                <input type="text" id="user-tel" name="tel" class="form-control read-only-field" value="${loginUser.tel}" style="flex: 1 !important; width: 100% !important; height: 38px !important; padding: 0 10px !important; background-color: #f9f9f9 !important; color: #555 !important; border: 1px solid #aaa !important; border-radius: 4px !important; font-size: .95rem !important; cursor: default !important; transition: all 0.2s;" />
             </div>
             
             <div class="mp-form-group" style="display: flex !important; align-items: center !important;">
@@ -231,7 +231,7 @@ div .pwd-msg-box { font-size: .85rem; font-weight: 700; margin-top: 4px; min-hei
 				document.getElementById("btnPwdSubmit").addEventListener("click", function(e) {
 				    e.preventDefault(); 
 
-				    // 1. 공백 유무 검증 (currentPwd.value 조건 제거)
+				    // 1. 공백 유무 검증
 				    if (!pw.value || !pw2.value) {
 				        alert("모든 필드를 입력해주세요.");
 				        return;
@@ -243,28 +243,51 @@ div .pwd-msg-box { font-size: .85rem; font-weight: 700; margin-top: 4px; min-hei
 				        return;
 				    }
 
-				    // 3. 최종 컨펌 후 비동기 데이터 전송
+				    // ⭐ 3. HTML5 pattern (정규식) 유효성 강제 검증 추가
+				    if (!pwdForm.checkValidity()) {
+				        // pattern 지침에 적힌 title 메시지를 경고창으로 출력
+				        alert(pw.title || "비밀번호 형식이 올바르지 않습니다.");
+				        return;
+				    }
+
+				    // 4. 최종 컨펌 후 비동기 데이터 전송
 				    if (confirm("비밀번호를 변경하시겠습니까?")) {
-				        const formData = new FormData(pwdForm);
+				        
+				        // ⭐ 스프링 DTO 커맨드 객체가 매핑할 수 있도록 URLSearchParams 형식으로 변환
+				        const searchParams = new URLSearchParams();
+				        searchParams.append("pw", pw.value);
+				        searchParams.append("pw2", pw2.value);
 
 				        fetch('/mpchangepw', { 
 				            method: 'POST',
-				            body: formData
+				            headers: {
+				                'Content-Type': 'application/x-www-form-urlencoded' // 폼 전송 표준 헤더 명시
+				            },
+				            body: searchParams
 				        })
-				        .then(response => response.json())
+				        .then(response => {
+				            // 서버 응답이 JSON이 아닐 경우(예: 404, 500 에러 페이지) 처리
+				            if (!response.ok) {
+				                throw new Error('서버 응답 오류 발생');
+				            }
+				            return response.json();
+				        })
 				        .then(data => {
 				            if (data.success) {
 				                alert('비밀번호가 성공적으로 변경되었습니다.');
 				                pwdModal.style.display = 'none'; 
 				                pwdForm.reset();                 
-				                pwdMsg.textContent = "";         
+				                pwdMsg.textContent = "";     
+				                
+				                // 💡 필요 시 로그인 페이지 이동 추가
+				                window.location.href = '/login'; 
 				            } else {
 				                alert('비밀번호 변경에 실패했습니다: ' + data.message);
 				            }
 				        })
 				        .catch(error => {
 				            console.error('Error:', error);
-				            alert('오류가 발생했습니다. 다시 시도해주세요.');
+				            alert('오류가 발생했습니다. 입력 형식을 다시 확인하거나 잠시 후 시도해주세요.');
 				        });
 				    }
 				});

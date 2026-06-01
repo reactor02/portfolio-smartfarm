@@ -5,7 +5,7 @@ import lombok.Data;
 @Data
 public class ChangepwDTO {
 	
-	int emp_num;
+	String emp_num;
 	String ename;
 	String pw;
 	String pw2;
