@@ -7,7 +7,7 @@
     <!-- 목록 조회 (페이징 + 필터) -->
     <select id="getList" parameterType="WorkPageDTO" resultType="WorkDTO">
         SELECT order_num, work_order_id, plan_id, item_name, type,
-               order_qty, ename, worker_ename, order_start, work_status, total_count
+               order_qty, current_qty, ename, worker_ename, order_start, work_status, total_count
         FROM (
             SELECT inner_q.*, ROWNUM AS rn
             FROM (
@@ -16,6 +16,7 @@
                        pp.plan_id,
                        i.name         AS item_name,
                        wo.order_qty   AS order_qty,
+                       wo.current_qty,
                        e.ename,
                        w.ename        AS worker_ename,
                        wo.order_start,

@@ -138,7 +138,7 @@
                l.lot_code                           AS child_lot_code,
                i.name                               AS item_name,
                l.lot_date,
-               b.required_qty * parent_l.init_qty   AS required_qty
+               b.child_qty * parent_l.init_qty / b.required_qty AS required_qty
         FROM lot_relation lr
         JOIN lot  l        ON lr.lot_child  = l.lot_num        -- 소모재료 LOT 정보
         JOIN item i        ON l.item_num    = i.item_num
@@ -196,7 +196,7 @@
                     i.type                                   AS item_type,
                     '원자재투입'                             AS gubun,
                     wo.order_id                              AS id_col,
-                    p.flow || '. ' || p.process_content      AS content_col,
+                    TO_CHAR(p.flow)                          AS content_col,
                     TO_CHAR(wo.order_start, 'YYYY-MM-DD HH24:MI:SS') AS date_col,
                     wo.order_status                          AS status_col,
                     e.ename                                  AS worker,
@@ -223,7 +223,7 @@
                     i.type                                   AS item_type,
                     '완제품생산'                             AS gubun,
                     wo.order_id                              AS id_col,
-                    p.flow || '. ' || p.process_content      AS content_col,
+                    TO_CHAR(p.flow)                          AS content_col,
                     TO_CHAR(wo.order_start, 'YYYY-MM-DD HH24:MI:SS') AS date_col,
                     wo.order_status                          AS status_col,
                     e.ename                                  AS worker,
@@ -278,7 +278,7 @@
                lr.lot_child                        AS child_lot_num,
                l.lot_code                          AS child_lot_code,
                i.name                              AS item_name,
-               b.required_qty * parent_l.init_qty  AS required_qty
+               b.child_qty * parent_l.init_qty / b.required_qty  AS required_qty
         FROM lot_relation lr
         JOIN lot  l        ON lr.lot_child  = l.lot_num
         JOIN item i        ON l.item_num    = i.item_num

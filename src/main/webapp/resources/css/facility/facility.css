@@ -1,0 +1,206 @@
+<style>
+
+/* ===== 메인 ===== */
+.main-cont{
+    padding: 30px;
+    background-color: #f6f7fb;
+    min-height: 100vh;
+}
+
+/* ===== 상단 헤더 ===== */
+.hdr{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.hdr h1{
+    font-size: 28px;
+    font-weight: bold;
+    color: #333;
+}
+
+/* 등록 버튼 */
+.btn-reg{
+    border: none;
+    background-color: #4e73df;
+    color: white;
+    padding: 10px 18px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: bold;
+    transition: 0.2s;
+}
+
+.btn-reg:hover{
+    background-color: #375ad3;
+}
+
+/* ===== 상태 카드 ===== */
+.status-wrap{
+    display: flex;
+    gap: 18px;
+    margin-bottom: 30px;
+}
+
+.status-card{
+    flex: 1;
+    min-width: 180px;
+
+    background-color: white;
+    border-radius: 12px;
+
+    border-left: 6px solid #d9d9d9;
+
+    padding: 20px;
+
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+
+    transition: 0.2s;
+}
+
+.status-card:hover{
+    transform: translateY(-3px);
+}
+
+.status-normal{
+    border-left: 6px solid #42c76b;
+}
+
+.status-warning{
+    border-left: 6px solid #f0b429;
+}
+
+.status-danger{
+    border-left: 6px solid #ea5455;
+}
+
+.status-title{
+    font-size: 15px;
+    color: #666;
+    margin-bottom: 10px;
+}
+
+.status-count{
+    font-size: 34px;
+    font-weight: bold;
+    color: #222;
+}
+
+.status-unit{
+    font-size: 16px;
+    margin-left: 4px;
+}
+
+/* ===== 시설 카드 영역 ===== */
+.facility-grid{
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 22px;
+}
+
+/* ===== 시설 카드 ===== */
+.facility-card{
+    background-color: white;
+
+    border-radius: 14px;
+
+    border-top: 6px solid #42c76b;
+
+    padding: 22px;
+
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+
+    transition: 0.2s;
+}
+
+.facility-card:hover{
+    transform: translateY(-4px);
+    box-shadow: 0 5px 18px rgba(0,0,0,0.08);
+}
+
+/* 상태별 카드 */
+.facility-warning{
+    border-top-color: #f0b429;
+}
+
+.facility-danger{
+    border-top-color: #ea5455;
+}
+
+/* 경고 상태 (10% 이상 차이 날 때) */
+.facility-card.yellow {
+    border-top-color: #f0b429;
+}
+
+/* 위험 상태 (15% 이상 차이 날 때) */
+.facility-card.red {
+    border-top-color: #ea5455;
+}
+
+.text-warning { color: #f0b429 }
+.text-danger { color: #ea5455 }
+
+/* 시설명 */
+.facility-name{
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 18px;
+    color: #333;
+}
+
+/* 시설 정보 */
+.facility-info{
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.facility-info div{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    font-size: 15px;
+
+    border-bottom: 1px solid #f1f1f1;
+
+    padding-bottom: 6px;
+}
+
+.facility-info span:first-child{
+    color: #777;
+    font-weight: 600;
+}
+
+.facility-value{
+    font-weight: bold;
+    color: #222;
+}
+
+/* ===== 반응형 ===== */
+@media screen and (max-width: 1200px){
+
+    .facility-grid{
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media screen and (max-width: 768px){
+
+    .status-wrap{
+        flex-wrap: wrap;
+    }
+
+    .status-card{
+        min-width: calc(50% - 10px);
+    }
+
+    .facility-grid{
+        grid-template-columns: 1fr;
+    }
+}
+
+</style>

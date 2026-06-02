@@ -35,6 +35,8 @@
         <typeAlias type="kr.or.smartfarm.usermanage.UserManageDTO" alias="UserManageDTO"/>
         <!-- vender -->
         <typeAlias type="kr.or.smartfarm.vender.VenderDTO" alias="VenderDTO"/>
+        <!-- facility -->
+        <typeAlias type="kr.or.smartfarm.facility.FacilityDTO" alias="FacilityDTO"/>
     </typeAliases>
     
       

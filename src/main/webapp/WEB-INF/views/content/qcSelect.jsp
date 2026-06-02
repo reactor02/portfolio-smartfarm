@@ -143,7 +143,7 @@ response.setContentType("text/html; charset=utf-8");
 	                </div>
 	                
 	                <div class="modal-field">
-	                    <label>검사 개수</label>
+	                    <label>PASS 개수</label>
 	                   	<input id="qty-id" type="number" name="io_qty">
 	                   	<span></span>
 	                </div>
@@ -175,9 +175,9 @@ response.setContentType("text/html; charset=utf-8");
 	        </div>
        	</form>
        	
-<!-- 값 response 모달 -->
-
+		</div>
      </div>
+   
 </body>
 <script>
 

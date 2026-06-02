@@ -26,6 +26,14 @@
 		WHERE "E_LEVEL" > 1
 		and dept_num = 2
 	</select>
+	
+	<select id="selectw" resultType="kr.or.smartfarm.usermanage.TodayWorkDTO">
+    SELECT * 
+      FROM work_order
+     WHERE TRUNC(created_at) = TRUNC(SYSDATE)
+     ORDER BY created_at DESC
+     
+</select>
 
 	
 
