@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="mapper.file">
+
+
+	<insert id="insertFile"> 
+		insert into files(file_num, file_name, board_num, uploaded_at) 
+		values (file_seq.nextval, #{file_name}, #{board_num}, sysdate)
+	</insert>
+	
+	<select id="findByBoardNum" resultType = "kr.or.smartfarm.files.FileDTO">
+		select * from files 
+		where board_num = #{board_num}
+	</select>
+
+
+
+
+</mapper>

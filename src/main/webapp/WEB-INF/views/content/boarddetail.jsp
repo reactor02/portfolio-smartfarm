@@ -282,7 +282,22 @@ body {
 
 
 	<%-- 내용 --%>
-	<div class="detail-content">${boardDTO.content}</div>
+	<div class="detail-content">
+		${boardDTO.content}
+		
+		<h3> 첨부파일</h3>
+		<c:if test="${not empty files}"> 
+			<ul>
+				<c:forEach var="file" items="${files}">
+					<li>
+						<a href="/file/download?fileName=${file.file_name}">
+						${file.file_name}
+						</a>
+					</li>
+				</c:forEach>
+			</ul>
+		</c:if>
+	</div>
 
 
 	<div class="comment-section">

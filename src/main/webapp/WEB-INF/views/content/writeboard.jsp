@@ -163,8 +163,9 @@ select.form-control {
 				</div>
 
 				<div class="write-content">
-					<form action="${pageContext.request.contextPath}/board/${mode == 'modify' ? 'modify' : 'write'}" method="post">
-						
+					<form action="${pageContext.request.contextPath}/board/${mode == 'modify' ? 'modify' : 'write'}" 
+						  method="post" enctype="multipart/form-data">
+					
 						<c:if test="${mode == 'modify'}">
 							<input type="hidden" name="board_num" value="${board.board_num}" />
 						</c:if>
@@ -179,12 +180,13 @@ select.form-control {
 
 						<!-- 제목 -->
 						<div style="margin-bottom: 15px;">
-							<input type="text" name="title" value="${board.title}" placeholder="제목을 입력하세요" 
+							<input type="text" id="title" name="title" value="${board.title}" placeholder="제목을 입력하세요" 
 							class="form-control" style="width:100%;" />
 						</div>
 
 						<!-- 에디터 영역 -->
 						<div id="editor">${board.content}</div>
+						<input type = "file" id="fileInput" name="files" multiple>
 
 						<!-- 실제 전송될 값 -->
 						<input type="hidden" name="content" id="content" value="${board.content}" />
@@ -212,9 +214,11 @@ select.form-control {
 		});
 
 		// submit 전에 내용 넣기
-		document.querySelector("form").addEventListener("submit", function() {
-			document.querySelector("#content").value = editor.getHTML();
-		});
+		  // submit 전에 content만 넣기
+    document.querySelector("form").addEventListener("submit", function(e) {
+        // 에디터 내용을 hidden input에 넣기
+        document.querySelector("#content").value = editor.getHTML();
+    });
 	</script>
 
 

@@ -1,5 +1,7 @@
 package kr.or.smartfarm.board;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -7,6 +9,10 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,8 +21,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.github.pagehelper.PageInfo;
+
+import kr.or.smartfarm.files.FileDTO;
+import kr.or.smartfarm.files.FileService;
 
 @Controller
 @RequestMapping("/board")
@@ -26,6 +36,9 @@ public class BoardController {
 
 	@Autowired
 	BoardService boardService;
+	
+	@Autowired
+	FileService fileService;
 
 	@RequestMapping("")
 	public String board(@RequestParam(value = "page", defaultValue = "1") int page, Model model) {
@@ -58,6 +71,10 @@ public class BoardController {
 		model.addAttribute("boardDTO", boardDTO);
 		System.out.println("/one: board_num: "+ board_num);
 		
+		// 파일 목록 가져오기 
+		List<FileDTO> files = fileService.getFiles(board_num);
+		model.addAttribute("files", files); 
+		
 		// 조회수 증가 
 		boardService.updateViewCnt(board_num);
 		
@@ -72,10 +89,25 @@ public class BoardController {
 	}
 	
 	@PostMapping("/write")
-	public String write(BoardDTO boardDTO) {
+	public String write(BoardDTO boardDTO, @RequestParam("files") List<MultipartFile> files) {
 		System.out.println("post /write 실행");
 		
 		boardService.insertBoard(boardDTO);
+		
+		int boardID = boardDTO.getBoard_num();
+		
+		System.out.println("파일 개수: " + files.size());
+		
+		for(MultipartFile file : files){
+		        System.out.println("파일명: " + file.getOriginalFilename());
+		    }
+		
+		for(MultipartFile file : files) {
+			if(!file.isEmpty()) {
+				//파일 저장 로직
+				fileService.save(file, boardID);
+			}
+		}
 		
 		return "redirect:/board";
 	}
@@ -146,6 +178,20 @@ public class BoardController {
 			result.put("status", "error");
 		}
 		return result;
+	}
+	
+	@GetMapping("/file/download")
+	public ResponseEntity<Resource> download(String fileName) throws Exception {
+		
+		String uploadPath = "/resources/upload/";
+		File file = new File(uploadPath + fileName);
+		
+		Resource resource = new InputStreamResource(new FileInputStream(file));
+		
+		return ResponseEntity.ok()
+				.header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileName + "\"")
+				.body(resource);
+		
 	}
 	
 
