@@ -188,6 +188,43 @@
                 reg_date,
                 flow_order
             FROM (
+                /* ── [0] 입출고 이력 (입고: 자재롯+현재롯 / 생산투입출고: 현재롯) ── */
+                SELECT
+                    0                                        AS level_num,
+                    l.lot_code                               AS lot_code,
+                    i.name                                   AS item_name,
+                    i.type                                   AS item_type,
+                    CASE WHEN io.io_type = '입고' THEN '입고'
+                         ELSE '생산투입출고' END             AS gubun,
+                    TO_CHAR(io.io_num)                       AS id_col,
+                    f.facility_name || ' / ' || io.io_qty    AS content_col,
+                    TO_CHAR(io.io_date, 'YYYY-MM-DD')        AS date_col,
+                    io.io_reason                             AS status_col,
+                    e.ename                                  AS worker,
+                    io.io_date                               AS reg_date,
+                    0                                        AS flow_order
+                FROM io io
+                JOIN lot l        ON io.lot_num = l.lot_num
+                JOIN item i       ON l.item_num = i.item_num
+                LEFT JOIN facility f ON io.facility_num = f.facility_num
+                LEFT JOIN emp e      ON io.emp_num = e.emp_num
+                WHERE (
+                        ( io.io_type = '입고'
+                          AND io.lot_num IN (
+                              SELECT #{lot_num} FROM DUAL
+                              UNION
+                              SELECT lot_parent FROM lot_relation
+                               START WITH lot_child = #{lot_num}
+                               CONNECT BY PRIOR lot_parent = lot_child
+                          ) )
+                        OR
+                        ( io.io_type = '출고'
+                          AND io.io_reason = '생산투입'
+                          AND io.lot_num = #{lot_num} )
+                      )
+
+                UNION ALL
+
                 /* ── [1] 원자재 및 이전 공정 단계 종합 (투입된 자재들의 모든 공정 이력) ── */
                 SELECT
                     1                                        AS level_num,
@@ -196,17 +233,19 @@
                     i.type                                   AS item_type,
                     '원자재투입'                             AS gubun,
                     wo.order_id                              AS id_col,
-                    TO_CHAR(p.flow)                          AS content_col,
+                    (SELECT LISTAGG(TO_CHAR(p.flow), '→') WITHIN GROUP (ORDER BY p.flow)
+                       FROM process p
+                      WHERE p.item_num = pp.item_num
+                        AND p.process_status = '사용중') AS content_col,
                     TO_CHAR(wo.order_start, 'YYYY-MM-DD HH24:MI:SS') AS date_col,
                     wo.order_status                          AS status_col,
                     e.ename                                  AS worker,
                     NVL(wo.order_start, l.lot_date)          AS reg_date,
-                    NVL(p.flow, 999)                         AS flow_order
+                    1                                        AS flow_order
                 FROM lot l
                 JOIN item i               ON l.item_num = i.item_num
                 LEFT JOIN work_order wo   ON l.order_num = wo.order_num
                 LEFT JOIN production_plan pp ON wo.plan_num = pp.plan_num
-                LEFT JOIN process p           ON pp.item_num = p.item_num AND p.process_status = '사용중'
                 LEFT JOIN emp e               ON wo.emp_num = e.emp_num
                 WHERE l.lot_num IN (
                     /* 나에게 투입된 상위 부모 롯들을 전부 역추적 */
@@ -223,17 +262,19 @@
                     i.type                                   AS item_type,
                     '완제품생산'                             AS gubun,
                     wo.order_id                              AS id_col,
-                    TO_CHAR(p.flow)                          AS content_col,
+                    (SELECT LISTAGG(TO_CHAR(p.flow), '→') WITHIN GROUP (ORDER BY p.flow)
+                       FROM process p
+                      WHERE p.item_num = pp.item_num
+                        AND p.process_status = '사용중') AS content_col,
                     TO_CHAR(wo.order_start, 'YYYY-MM-DD HH24:MI:SS') AS date_col,
                     wo.order_status                          AS status_col,
                     e.ename                                  AS worker,
                     NVL(wo.order_start, l.lot_date)          AS reg_date,
-                    NVL(p.flow, 999)                         AS flow_order
+                    1                                        AS flow_order
                 FROM lot l
                 JOIN item i               ON l.item_num = i.item_num
                 JOIN work_order wo        ON l.order_num = wo.order_num
                 LEFT JOIN production_plan pp ON wo.plan_num = pp.plan_num
-                LEFT JOIN process p           ON pp.item_num = p.item_num AND p.process_status = '사용중'
                 LEFT JOIN emp e               ON wo.emp_num = e.emp_num
                 WHERE l.lot_num = #{lot_num}
 
@@ -266,8 +307,8 @@
                     SELECT #{lot_num} FROM DUAL
                 )
             )
-            /* 레벨 순서(자재->제품->출하), 시간 순서, 공정 flow 순서로 정렬 */
-            ORDER BY level_num ASC, reg_date ASC, flow_order ASC
+            /* 시간 순서 우선, 동일 시각은 레벨 순서, 공정 flow 순서로 정렬 */
+            ORDER BY reg_date ASC, level_num ASC, flow_order ASC
         )
     </select>
 

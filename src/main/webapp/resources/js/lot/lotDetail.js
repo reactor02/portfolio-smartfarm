@@ -47,6 +47,10 @@ function renderLotHistory(data) {
             badgeClass = 'badge-prod-complete'; // 완제품 생성 순간 강조 클래스
         } else if (r.GUBUN === '출하완료') {
             badgeClass = 'badge-shipment'; // 출하 완료 클래스
+        } else if (r.GUBUN === '입고') {
+            badgeClass = 'badge-io-in';
+        } else if (r.GUBUN === '생산투입출고') {
+            badgeClass = 'badge-io-out';
         }
 
         // [수정] 완제품생산 행(Row)은 현재 화면의 메인 롯이므로 시각적 강조 효과 부여
