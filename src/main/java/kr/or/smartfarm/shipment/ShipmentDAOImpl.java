@@ -140,6 +140,12 @@ public class ShipmentDAOImpl implements ShipmentDAO {
         return sqlSession.selectList("kr.or.smartfarm.shipment.loadEmpList");
     }
 
+    /** 실무자 옵션 목록 (e_level=1, 재직자) */
+    @Override
+    public List loadWorkerList() {
+        return sqlSession.selectList("kr.or.smartfarm.shipment.loadWorkerList");
+    }
+
     /** 분할 자식 LOT 생성 (출하 수량 < 보유 수량일 때, selectKey로 lot_num 채번) */
     @Override
     public int insertSplitLot(Map map) {

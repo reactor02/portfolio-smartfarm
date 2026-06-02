@@ -94,7 +94,9 @@
                 <th>품목명</th>
                 <th>품목분류</th>
                 <th>지시수량</th>
+                <th>생산완료</th>
                 <th>담당자</th>
+                <th>실무자</th>
                 <th>작업일</th>
                 <th>상태</th>
             </tr>
@@ -114,7 +116,9 @@
                                 <c:otherwise>${w.type}</c:otherwise>
                             </c:choose></td>
                             <td>${w.order_qty}</td>
+                            <td>${w.current_qty}</td>
                             <td>${w.ename}</td>
+                            <td>${w.worker_ename}</td>
                             <td><fmt:formatDate value="${w.order_start}" pattern="yyyy-MM-dd"/></td>
                             <td>
                                 <span class="badge <c:choose><c:when test="${w.work_status == '대기'}">badge-wait</c:when><c:when test="${w.work_status == '진행'}">badge-progress</c:when><c:when test="${w.work_status == '완료'}">badge-done</c:when><c:when test="${w.work_status == '취소'}">badge-cancel</c:when></c:choose>">${w.work_status}</span>
@@ -123,7 +127,7 @@
                     </c:forEach>
                 </c:when>
                 <c:otherwise>
-                    <tr><td colspan="9" class="empty-cell">등록된 작업지시가 없습니다.</td></tr>
+                    <tr><td colspan="11" class="empty-cell">등록된 작업지시가 없습니다.</td></tr>
                 </c:otherwise>
             </c:choose>
         </tbody>
@@ -168,6 +172,15 @@
                     <label>담당자</label>
                     <span class="modal-readonly">${sessionScope.loginUser.ename}</span>
                     <input type="hidden" name="emp_num" value="${sessionScope.loginUser.emp_num}">
+                </div>
+                <div class="modal-field">
+                    <label>실무자</label>
+                    <select name="worker_num" class="form-control" required>
+                        <option value="">실무자 선택</option>
+                        <c:forEach var="w" items="${workerList}">
+                            <option value="${w.num}">${w.name}</option>
+                        </c:forEach>
+                    </select>
                 </div>
                 <div class="modal-field">
                     <label>지시수량</label>

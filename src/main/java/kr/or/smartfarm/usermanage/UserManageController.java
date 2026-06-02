@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 
 @Controller
@@ -25,28 +26,36 @@ public class UserManageController {
 	
 	
 	@GetMapping("/usermanage")
-	public String usermanageGet(Model model) { // 💡 데이터를 담을 가방(Model) 주입
-	    System.out.println("usermanageGet 실행");
+	public String usermanageGet(
+	        // 💡 다른 팀원들이 쓰는 규칙에 맞춰 파라미터명을 'page'로 매핑합니다.
+	        @RequestParam(value = "page", required = false, defaultValue = "1") int page, 
+	        Model model) { 
+	    
+	    System.out.println("usermanageGet 실행 - 현재 페이지: " + page);
 
-	    // 1. 서비스에서 전체 회원 목록(List) 조회
-	    List<UserManageDTO> userList = userManageService.getUserManage();
+	    // 1. 5개씩 끊어오도록 PageHelper 세팅 (pageNum 대신 page 변수 사용)
+	    PageHelper.startPage(page, 5);
 	    
-	    // 1-2. 서비스에서 부서명 조회
+	    // 2. 서비스에서 전체 회원 목록(List) 조회
+	    List<UserManageDTO> userList = userManageService.getUserManage(page);
+	    
+	    // 3. 조회된 userList를 PageInfo 객체로 포장
+	    PageInfo<UserManageDTO> pageInfo = new PageInfo(userList);
+	    
+	    // 4. 부서명, 권한 등 공통 드롭다운 목록 조회
 	    List<UserManageDTO> selectd = userManageService.selectd();
-	    
-	    // 1-3. 서비스에서 권한 목록 조회
 	    List<UserManageDTO> selectl = userManageService.selectl();
-	    
-	    // 1-3. 서비스에서 전체 회원 목록(List) 조회
 	    List<UserManageDTO> selectm = userManageService.selectm();
 	    
-	    // 2. 가져온 회원 목록 데이터를 "userList"라는 이름으로 가방에 넣음
-	    model.addAttribute("userList", userList);
+	    // 5. ⭐ 핵심: 다른 팀원들이 쓰는 paging.jsp 내부 변수명인 "pageInfo"로 가방에 넣습니다.
+	    model.addAttribute("pageInfo", pageInfo); 
+	    
+	    // 6. 기존 JSP 화면에서 사용할 데이터들 바인딩
+	    model.addAttribute("userList", pageInfo.getList()); // 딱 5개만 담긴 리스트
 	    model.addAttribute("selectd", selectd);
 	    model.addAttribute("selectl", selectl);
 	    model.addAttribute("selectm", selectm);
 	    
-	    // 3. 타일즈 뷰 리턴 (화면이 그려지면서 데이터가 함께 배달됩니다)
 	    return "content/usermanage.tiles";
 	}
 	
@@ -55,9 +64,6 @@ public class UserManageController {
 			Model model
 			) { // 💡 데이터를 담을 가방(Model) 주입
 		System.out.println("mypageGet 실행");
-		
-		// 1. 서비스에서 전체 회원 목록(List) 조회
-		List<UserManageDTO> userList = userManageService.getUserManage();
 		
 		// 1-2. 서비스에서 부서명 조회
 		List<UserManageDTO> selectd = userManageService.selectd();
@@ -68,11 +74,15 @@ public class UserManageController {
 		// 1-3. 서비스에서 전체 회원 목록(List) 조회
 		List<UserManageDTO> selectm = userManageService.selectm();
 		
+		// 1-3. 서비스에서 전체 회원 목록(List) 조회
+		List<UserManageDTO> selectw = userManageService.selectw();
+		
 		// 2. 가져온 회원 목록 데이터를 "userList"라는 이름으로 가방에 넣음
-		model.addAttribute("userList", userList);
+		
 		model.addAttribute("selectd", selectd);
 		model.addAttribute("selectl", selectl);
 		model.addAttribute("selectm", selectm);
+		model.addAttribute("selectw", selectw);
 		
 		// 3. 타일즈 뷰 리턴 (화면이 그려지면서 데이터가 함께 배달됩니다)
 		return "content/mypage.tiles";

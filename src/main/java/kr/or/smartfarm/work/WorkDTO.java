@@ -31,8 +31,12 @@ public class WorkDTO {
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
 	private Date   order_end;
 
+	// work_order 실무자 컬럼
+	private int    worker_num;
+
 	// JOIN 컬럼
-	private String ename;          // emp
+	private String ename;          // emp (담당자)
+	private String worker_ename;   // emp (실무자)
 	private String item_name;      // item (production_plan 경유)
 	private String code;
 	private String type;

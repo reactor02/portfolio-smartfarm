@@ -80,6 +80,15 @@ public interface ProdDAO {
     public int                   syncPlanStatus();
 
     /**
+     * SUM(current_qty) >= plan_qty 를 달성한 계획을 "완료"로 일괄 업데이트
+     *
+     * - syncPlanStatus 직후 호출되어 실제 생산 완료 계획을 동기화한다.
+     *
+     * @return 영향받은 행 수
+     */
+    public int                   syncCompletePlanStatus();
+
+    /**
      * 특정 생산계획에 속한 작업지시 목록 조회 (페이징)
      *
      * @param params  plan_num, startRow, endRow 를 담은 파라미터 Map

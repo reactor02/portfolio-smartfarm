@@ -334,7 +334,9 @@ background-color: #FFB703;
 			<main class="main-cont">
 				<div class="hdr">
 					<h1>재고 관리</h1>
+					<c:if test="${sessionScope.role >= 2}">
 					<button type="button" class="btn-reg">+ 등록하기</button>
+					</c:if>
 				</div>
 
 				<form name="searchFrm" action="stockList.do" method="get">

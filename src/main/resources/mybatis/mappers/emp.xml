@@ -55,7 +55,8 @@
 		</set>
 		WHERE emp_num = #{emp_num}
 	</update>
-
+	
+	
 	<update id="userLevelUpdate"
 		parameterType="kr.or.smartfarm.usermanage.UserManageDTO">
 		<!-- 사장님용: 부서, 권한을 선택적으로 모두 수정 가능 -->
@@ -172,6 +173,23 @@
 		where emp_num = #{ emp_num
 		}
 	</update>
+	
+	<update id="updatemp" parameterType="kr.or.smartfarm.changepw.ChangepwDTO">
+    UPDATE emp
+    <set>
+        <!-- 💡 이름(ename) 값이 null이 아니고 빈 문자열이 아닐 때만 set에 추가 -->
+        <if test="ename != null and ename != ''">
+            ename = #{ename},
+        </if>
+        
+        <!-- 💡 연락처(tel) 값이 null이 아니고 빈 문자열이 아닐 때만 set에 추가 -->
+        <if test="tel != null and tel != ''">
+            tel = #{tel}
+        </if>
+       
+    </set>
+    WHERE emp_num = #{emp_num}
+</update>
 
 
 

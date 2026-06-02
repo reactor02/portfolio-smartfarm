@@ -182,6 +182,12 @@ response.setContentType("text/html; charset=utf-8");
 						<input type="number" name="request_qty" id="requestQty" min="1" value="1">
 					</div>
 
+					<!-- 상세지시사항 -->
+					<div class="modal-field modal-field-full">
+						<label>상세지시사항</label>
+						<textarea name="content" id="requestContent" rows="4" placeholder="상세지시사항 입력"></textarea>
+					</div>
+
 				</div>
 
 				<input type="hidden" name="vender_seq" id="selectedVenderSeq">

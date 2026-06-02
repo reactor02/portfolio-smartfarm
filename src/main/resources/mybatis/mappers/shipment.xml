@@ -14,10 +14,12 @@
             S.shipment_status,
             S.plan_qty,
             E.ename,
+            W.ename AS worker_ename,
             I.name,
             V.vender_name
         FROM shipment S
         JOIN emp             E  ON S.emp_num              = E.emp_num
+        LEFT JOIN emp        W  ON S.worker_num           = W.emp_num
         JOIN shipment_request SR ON S.shipment_request_num = SR.shipment_request_num
         JOIN vender          V  ON SR.vender_num           = V.vender_num
         JOIN item            I  ON SR.item_num             = I.item_num
@@ -33,10 +35,12 @@
             S.shipment_status,
             S.plan_qty,
             E.ename,
+            W.ename AS worker_ename,
             I.name,
             V.vender_name
         FROM shipment S
         JOIN emp             E  ON S.emp_num              = E.emp_num
+        LEFT JOIN emp        W  ON S.worker_num           = W.emp_num
         JOIN shipment_request SR ON S.shipment_request_num = SR.shipment_request_num
         JOIN vender          V  ON SR.vender_num           = V.vender_num
         JOIN item            I  ON SR.item_num             = I.item_num
@@ -163,11 +167,20 @@
         ORDER BY SR.shipment_request_num DESC
     </select>
 
-    <!-- 담당자 목록 (출하지시 모달용, 재직자만 STATUS = 'N') -->
+    <!-- 담당자 목록 (출하지시 모달용, 재직자만) -->
     <select id="loadEmpList" resultType="hashMap">
         SELECT emp_num, ename
         FROM emp
-        WHERE status = 'N'
+        WHERE status = 'Y'
+        ORDER BY emp_num
+    </select>
+
+    <!-- 실무자 목록 (e_level=1, 재직자만) -->
+    <select id="loadWorkerList" resultType="hashMap">
+        SELECT emp_num, ename
+        FROM emp
+        WHERE e_level = 1
+          AND status = 'Y'
         ORDER BY emp_num
     </select>
 
@@ -182,11 +195,12 @@
             SELECT SHIPMENT_SEQ.NEXTVAL FROM DUAL
         </selectKey>
         INSERT INTO shipment
-            (shipment_num, shipment_id, emp_num, shipment_date, shipment_status, plan_qty, shipment_request_num)
+            (shipment_num, shipment_id, emp_num, worker_num, shipment_date, shipment_status, plan_qty, shipment_request_num)
         VALUES
             (#{shipment_num},
              'SHIP' || LPAD(#{shipment_num}, 4, '0'),
              #{emp_num},
+             #{worker_num},
              NVL(TO_DATE(#{shipment_date}, 'YYYY-MM-DD'), SYSDATE),
              '출하대기',
              #{plan_qty},

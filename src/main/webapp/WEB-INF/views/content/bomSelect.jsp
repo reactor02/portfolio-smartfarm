@@ -294,7 +294,9 @@ select.form-control {
 			<main class="main-cont">
 				<div class="hdr">
 					<h1>BOM 관리</h1>
+					<c:if test="${sessionScope.role >= 2}">
 					<button type="button" class="btn-reg">+ 등록하기</button>
+					</c:if>
 				</div>
 
 				<form name="searchFrm" action="bomList.do" method="get">

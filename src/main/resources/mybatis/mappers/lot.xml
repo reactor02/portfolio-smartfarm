@@ -138,13 +138,14 @@
                l.lot_code                           AS child_lot_code,
                i.name                               AS item_name,
                l.lot_date,
-               b.required_qty * parent_l.init_qty   AS required_qty
+               b.child_qty * parent_l.init_qty / b.required_qty AS required_qty
         FROM lot_relation lr
         JOIN lot  l        ON lr.lot_child  = l.lot_num        -- 소모재료 LOT 정보
         JOIN item i        ON l.item_num    = i.item_num
         JOIN lot  parent_l ON lr.lot_parent = parent_l.lot_num -- 생산LOT (init_qty용)
         LEFT JOIN bom b    ON b.item_num    = parent_l.item_num
                           AND b.item_num2   = l.item_num
+                          AND b.bom_status  = 'Y'
         WHERE lr.lot_parent = #{lot_num}   -- lot_parent = 생산된 LOT
     </select>
 
@@ -160,100 +161,114 @@
         WHERE lr.lot_child = #{lot_num}   -- lot_child = 소모재료 LOT
     </select>
 
-    <!-- 롯이력: 생산공정 + 출하이력 통합 (루트 + 재귀 자식, UNION ALL) -->
-    <select id="getLotHistory" parameterType="int" resultType="hashMap">
-        SELECT depth, lot_code, item_name, item_type, gubun,
-               id_col, content_col, date_col, status_col, worker
+ <select id="getLotHistory" parameterType="int" resultType="hashMap">
+        SELECT
+            ROWNUM AS seq_num,  depth,
+            lot_code,
+            item_name,
+            item_type,
+            gubun,
+            id_col,
+            content_col,
+            date_col,
+            status_col,
+            worker
         FROM (
-            /* ── 루트 롯 — 생산공정 ── */
-            SELECT 0                                        AS depth,
-                   l.lot_code,
-                   i.name                                   AS item_name,
-                   i.type                                   AS item_type,
-                   '생산공정'                               AS gubun,
-                   wo.order_id                              AS id_col,
-                   p.process_content                        AS content_col,
-                   TO_CHAR(wo.order_start, 'YYYY-MM-DD')    AS date_col,
-                   wo.order_status                          AS status_col,
-                   e.ename                                  AS worker
-            FROM lot l
-            JOIN item i               ON l.item_num    = i.item_num
-            LEFT JOIN work_order wo       ON l.order_num   = wo.order_num
-            LEFT JOIN production_plan pp  ON wo.plan_num   = pp.plan_num
-            LEFT JOIN process p           ON pp.item_num   = p.item_num
-            LEFT JOIN emp e               ON wo.emp_num    = e.emp_num
-            WHERE l.lot_num = #{lot_num}
+            SELECT
+                level_num AS depth,
+                lot_code,
+                item_name,
+                item_type,
+                gubun,
+                id_col,
+                content_col,
+                date_col,
+                status_col,
+                worker,
+                reg_date,
+                flow_order
+            FROM (
+                /* ── [1] 원자재 및 이전 공정 단계 종합 (투입된 자재들의 모든 공정 이력) ── */
+                SELECT
+                    1                                        AS level_num,
+                    l.lot_code                               AS lot_code,
+                    i.name                                   AS item_name,
+                    i.type                                   AS item_type,
+                    '원자재투입'                             AS gubun,
+                    wo.order_id                              AS id_col,
+                    TO_CHAR(p.flow)                          AS content_col,
+                    TO_CHAR(wo.order_start, 'YYYY-MM-DD HH24:MI:SS') AS date_col,
+                    wo.order_status                          AS status_col,
+                    e.ename                                  AS worker,
+                    NVL(wo.order_start, l.lot_date)          AS reg_date,
+                    NVL(p.flow, 999)                         AS flow_order
+                FROM lot l
+                JOIN item i               ON l.item_num = i.item_num
+                LEFT JOIN work_order wo   ON l.order_num = wo.order_num
+                LEFT JOIN production_plan pp ON wo.plan_num = pp.plan_num
+                LEFT JOIN process p           ON pp.item_num = p.item_num AND p.process_status = '사용중'
+                LEFT JOIN emp e               ON wo.emp_num = e.emp_num
+                WHERE l.lot_num IN (
+                    /* 나에게 투입된 상위 부모 롯들을 전부 역추적 */
+                    SELECT lot_parent FROM lot_relation START WITH lot_child = #{lot_num} CONNECT BY PRIOR lot_parent = lot_child
+                )
 
-            UNION ALL
+                UNION ALL
 
-            /* ── 루트 롯 — 출하이력 ── */
-            SELECT 0                                        AS depth,
-                   l.lot_code,
-                   i.name                                   AS item_name,
-                   i.type                                   AS item_type,
-                   '출하'                                   AS gubun,
-                   s.shipment_id                            AS id_col,
-                   v.vender_name                            AS content_col,
-                   TO_CHAR(s.shipment_date, 'YYYY-MM-DD')   AS date_col,
-                   s.shipment_status                        AS status_col,
-                   e.ename                                  AS worker
-            FROM lot l
-            JOIN item i               ON l.item_num               = i.item_num
-            JOIN shipment_lot sl       ON sl.lot_num               = l.lot_num
-            JOIN shipment s            ON sl.shipment_num          = s.shipment_num
-            JOIN shipment_request sr   ON s.shipment_request_num   = sr.shipment_request_num
-            JOIN vender v              ON sr.vender_num            = v.vender_num
-            LEFT JOIN emp e            ON s.emp_num                = e.emp_num
-            WHERE l.lot_num = #{lot_num}
+                /* ── [2] 현재 완제품 LOT의 진행 공정 종합 (공정 flow 순서대로 각 공정 단계 표시) ── */
+                SELECT
+                    2                                        AS level_num,
+                    l.lot_code                               AS lot_code,
+                    i.name                                   AS item_name,
+                    i.type                                   AS item_type,
+                    '완제품생산'                             AS gubun,
+                    wo.order_id                              AS id_col,
+                    TO_CHAR(p.flow)                          AS content_col,
+                    TO_CHAR(wo.order_start, 'YYYY-MM-DD HH24:MI:SS') AS date_col,
+                    wo.order_status                          AS status_col,
+                    e.ename                                  AS worker,
+                    NVL(wo.order_start, l.lot_date)          AS reg_date,
+                    NVL(p.flow, 999)                         AS flow_order
+                FROM lot l
+                JOIN item i               ON l.item_num = i.item_num
+                JOIN work_order wo        ON l.order_num = wo.order_num
+                LEFT JOIN production_plan pp ON wo.plan_num = pp.plan_num
+                LEFT JOIN process p           ON pp.item_num = p.item_num AND p.process_status = '사용중'
+                LEFT JOIN emp e               ON wo.emp_num = e.emp_num
+                WHERE l.lot_num = #{lot_num}
 
-            UNION ALL
+                UNION ALL
 
-            /* ── 자식 롯 (재귀) — 생산공정 ── */
-            SELECT LEVEL                                    AS depth,
-                   lc.lot_code,
-                   ic.name                                  AS item_name,
-                   ic.type                                  AS item_type,
-                   '생산공정'                               AS gubun,
-                   woc.order_id                             AS id_col,
-                   pc.process_content                       AS content_col,
-                   TO_CHAR(woc.order_start, 'YYYY-MM-DD')   AS date_col,
-                   woc.order_status                         AS status_col,
-                   ec.ename                                 AS worker
-            FROM lot_relation lr
-            JOIN lot lc                ON lr.lot_child   = lc.lot_num
-            JOIN item ic               ON lc.item_num    = ic.item_num
-            LEFT JOIN work_order woc       ON lc.order_num   = woc.order_num
-            LEFT JOIN production_plan ppc  ON woc.plan_num   = ppc.plan_num
-            LEFT JOIN process pc           ON ppc.item_num   = pc.item_num
-            LEFT JOIN emp ec               ON woc.emp_num    = ec.emp_num
-            START WITH lr.lot_parent = #{lot_num}
-            CONNECT BY NOCYCLE PRIOR lr.lot_child = lr.lot_parent
-
-            UNION ALL
-
-            /* ── 자식 롯 (재귀) — 출하이력 ── */
-            SELECT LEVEL                                    AS depth,
-                   lc.lot_code,
-                   ic.name                                  AS item_name,
-                   ic.type                                  AS item_type,
-                   '출하'                                   AS gubun,
-                   sc.shipment_id                           AS id_col,
-                   vc.vender_name                           AS content_col,
-                   TO_CHAR(sc.shipment_date, 'YYYY-MM-DD')  AS date_col,
-                   sc.shipment_status                       AS status_col,
-                   ec.ename                                 AS worker
-            FROM lot_relation lr
-            JOIN lot lc                ON lr.lot_child              = lc.lot_num
-            JOIN item ic               ON lc.item_num               = ic.item_num
-            JOIN shipment_lot slc      ON slc.lot_num               = lc.lot_num
-            JOIN shipment sc           ON slc.shipment_num          = sc.shipment_num
-            JOIN shipment_request src  ON sc.shipment_request_num   = src.shipment_request_num
-            JOIN vender vc             ON src.vender_num            = vc.vender_num
-            LEFT JOIN emp ec           ON sc.emp_num                = ec.emp_num
-            START WITH lr.lot_parent = #{lot_num}
-            CONNECT BY NOCYCLE PRIOR lr.lot_child = lr.lot_parent
+                /* ── [3] 최종 출하 단계 종합 ── */
+                SELECT
+                    3                                        AS level_num,
+                    l.lot_code                               AS lot_code,
+                    i.name                                   AS item_name,
+                    i.type                                   AS item_type,
+                    '출하완료'                               AS gubun,
+                    s.shipment_id                            AS id_col,
+                    v.vender_name                            AS content_col,
+                    TO_CHAR(s.shipment_date, 'YYYY-MM-DD HH24:MI:SS') AS date_col,
+                    s.shipment_status                        AS status_col,
+                    e.ename                                  AS worker,
+                    s.shipment_date                          AS reg_date,
+                    999                                      AS flow_order
+                FROM lot l
+                JOIN item i               ON l.item_num = i.item_num
+                JOIN shipment_lot sl      ON sl.lot_num = l.lot_num
+                JOIN shipment s           ON sl.shipment_num = s.shipment_num
+                JOIN shipment_request sr  ON s.shipment_request_num = sr.shipment_request_num
+                JOIN vender v             ON sr.vender_num = v.vender_num
+                LEFT JOIN emp e           ON s.emp_num = e.emp_num
+                WHERE l.lot_num IN (
+                    SELECT lot_child FROM lot_relation START WITH lot_parent = #{lot_num} CONNECT BY PRIOR lot_child = lot_parent
+                    UNION
+                    SELECT #{lot_num} FROM DUAL
+                )
+            )
+            /* 레벨 순서(자재->제품->출하), 시간 순서, 공정 flow 순서로 정렬 */
+            ORDER BY level_num ASC, reg_date ASC, flow_order ASC
         )
-        ORDER BY depth, gubun DESC
     </select>
 
     <!-- lotDetail: CONNECT BY 재귀 — 공정이력 다단계 트리 (hashMap 반환, depth 포함) -->
@@ -263,13 +278,14 @@
                lr.lot_child                        AS child_lot_num,
                l.lot_code                          AS child_lot_code,
                i.name                              AS item_name,
-               b.required_qty * parent_l.init_qty  AS required_qty
+               b.child_qty * parent_l.init_qty / b.required_qty  AS required_qty
         FROM lot_relation lr
         JOIN lot  l        ON lr.lot_child  = l.lot_num
         JOIN item i        ON l.item_num    = i.item_num
         JOIN lot  parent_l ON lr.lot_parent = parent_l.lot_num
         LEFT JOIN bom b    ON b.item_num    = parent_l.item_num
                           AND b.item_num2   = l.item_num
+                          AND b.bom_status  = 'Y'
         START WITH lr.lot_parent = #{lot_num}
         CONNECT BY NOCYCLE PRIOR lr.lot_child = lr.lot_parent  <!-- [방어] 순환 시 ORA-01436 방지 -->
     </select>

@@ -15,10 +15,10 @@ public class UserManageServiceImpl implements UserManageService {
 	UserManageDAO userManageDAO;
 
 	@Override
-	public List<UserManageDTO> getUserManage() {
+	public List<UserManageDTO> getUserManage(int pageNum) {
 		// TODO Auto-generated method stub
 
-		List<UserManageDTO> result = userManageDAO.getUserManage();
+		List<UserManageDTO> result = userManageDAO.getUserManage(pageNum);
 
 		return result;
 
@@ -46,6 +46,15 @@ public class UserManageServiceImpl implements UserManageService {
 		// TODO Auto-generated method stub
 		
 		List<UserManageDTO> result = userManageDAO.selectm();
+		
+		return result;
+		
+	}
+	@Override
+	public List<UserManageDTO> selectw() {
+		// TODO Auto-generated method stub
+		
+		List<UserManageDTO> result = userManageDAO.selectw();
 		
 		return result;
 		

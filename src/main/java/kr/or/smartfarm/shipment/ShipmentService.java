@@ -32,6 +32,8 @@ public interface ShipmentService {
     public List loadPendingRequests();
     /** 담당자 옵션 목록 */
     public List loadEmpList();
+    /** 실무자 옵션 목록 (e_level=1, 재직자) */
+    public List loadWorkerList();
 
     /** 출하 담당자 emp_num 조회 (취소/확정 권한 검증용) */
     public String getEmpNum(String shipmentId);

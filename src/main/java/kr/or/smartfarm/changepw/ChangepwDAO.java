@@ -5,6 +5,7 @@ import java.util.List;
 public interface ChangepwDAO {
 	
 	public int changepw(ChangepwDTO changepwDTO);
+	public int updatemp(ChangepwDTO updatempDTO);
 	public ChangepwDTO searchpw(ChangepwDTO changepwDTO);
 
 }

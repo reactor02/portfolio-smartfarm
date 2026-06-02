@@ -20,8 +20,12 @@ public class ShipmentDTO {
 	    private int plan_qty;
 	    private int shipment_request_num;
 
+	    // 실무자 컬럼
+	    private int    worker_num;
+
 	    // emp 테이블
 	    private String ename;
+	    private String worker_ename;
 
 	    // shipment_request 테이블
 	    private int vender_seq;

@@ -85,6 +85,13 @@ public interface WorkService {
     List<SelectOptionDTO> getEmpOptions();
 
     /**
+     * 실무자 선택 옵션 목록을 반환한다. (e_level=1, 재직자만)
+     *
+     * @return 실무자 목록 (num: emp_num, name: ename)
+     */
+    List<SelectOptionDTO> getWorkerOptions();
+
+    /**
      * 생산계획 선택 옵션 목록을 반환한다. (등록 모달 드롭다운용, 취소 제외)
      *
      * @return 생산계획 목록 (num: plan_num, name: plan_id)
