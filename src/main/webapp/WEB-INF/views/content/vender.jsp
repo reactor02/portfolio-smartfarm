@@ -351,8 +351,10 @@ select.form-control {
 
 				<div class="hdr">
 					<h1>거래처 관리</h1>
+					<c:if test="${sessionScope.role >= 2 }">
 					<button type="button" class="btn-reg link-txt"
 						id="btnOpenWorkModal">+ 등록하기</button>
+					</c:if>
 				</div>
 
 				<%-- 검색창 action --%>

@@ -85,7 +85,7 @@ response.setContentType("text/html; charset=utf-8");
 	border: 1px solid #bbb;
 	border-radius: 10px;
 	padding: 25px;
-	margin-bottom: 25px;
+	margin: 20px;
 	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
 }
 
@@ -264,39 +264,77 @@ response.setContentType("text/html; charset=utf-8");
 	color: #222;
 }
 
-.modal-form-grid input[type="radio"] {
-	appearance: none;
-	-webkit-appearance: none;
-	width: 20px;
-	height: 20px;
-	border: 2px solid #ccc;
-	border-radius: 50%;
-	margin: 0;
-	margin-right: 8px;
-	padding: 0;
-	transition: all 0.2s;
-	position: relative;
-	cursor: pointer;
+/* 작업 등록 모달 */
+.modal-overlay {
+	display: none;
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background: rgba(0, 0, 0, 0.5);
+	z-index: 1000;
+	justify-content: center;
+	align-items: center;
 }
 
-.modal-form-grid input[type="radio"]:checked {
-	border-color: #2D6A4F;
+.modal-box {
+	background: #fff;
+	border-radius: 10px;
+	padding: 30px;
+	width: 520px;
+	max-height: 90vh;
+	overflow-y: auto;
+	box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
 }
 
-.modal-form-grid input[type="radio"]:checked::after {
-	content: '';
-	position: absolute;
-	top: 50%;
-	left: 50%;
-	transform: translate(-50%, -50%);
-	width: 10px;
-	height: 10px;
-	background-color: #2D6A4F;
-	border-radius: 50%;
+.modal-title {
+	font-size: 1.2rem;
+	font-weight: bold;
+	color: var(- -m-cl);
+	margin-bottom: 20px;
 }
 
-.modal-form-grid .status-container {
+.modal-grid {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 16px;
+}
+
+.modal-field {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+}
+
+.modal-field label {
+	font-size: 12px;
+	color: #777;
+	font-weight: bold;
+}
+
+.modal-field input, .modal-field select, .modal-field textarea {
+	padding: 8px 10px;
+	border: 1px solid var(- -border-cl);
+	border-radius: 6px;
+	font-size: 13px;
+	font-family: inherit;
+}
+
+.modal-field-full {
 	grid-column: 1/-1;
+}
+
+.modal-btn-wrap {
+	display: flex;
+	justify-content: flex-end;
+	gap: 10px;
+	margin-top: 20px;
+}
+
+.modal-btn-wrap button {
+	padding: 9px 22px;
+	border
 }
 
 .btn-action1 {
@@ -313,7 +351,6 @@ response.setContentType("text/html; charset=utf-8");
 	transition: all 0.2s ease-in-out;
 	text-decoration: none;
 	display: inline-block;
-	margin-left: 475px;
 }
 
 .btn-action1:hover {
@@ -355,6 +392,15 @@ response.setContentType("text/html; charset=utf-8");
 #processDesc {
 	max-height: 200px;
 }
+
+.btn-group {
+    display: flex;
+    gap: 10px; /* 버튼 사이 간격 */
+}
+.mar {
+	display : block;
+	margin-bottom : 20px;
+}
 </style>
 </head>
 <body>
@@ -365,6 +411,8 @@ response.setContentType("text/html; charset=utf-8");
 
 		<div class="hdr">
 			<h1>거래처 페이지 상세</h1>
+			
+			<div class="btn-group">
 			<c:if test="${sessionScope.role >= 2}">
 				<button type="button" class="btn-action1" id="btnOpenWorkModal">수정</button>
 				<button type="button" class="btn-action1" onclick="deleteVender()">삭제</button>
@@ -375,6 +423,7 @@ response.setContentType("text/html; charset=utf-8");
 				</form>
 			</c:if>
 			<a href="/vender" class="btn-list">목록으로</a>
+			</div>
 		</div>
 
 		<!-- 1. 기본 정보 -->
@@ -406,24 +455,59 @@ response.setContentType("text/html; charset=utf-8");
 		</div>
 
 		<!-- 2. 거래처 지도API -->
-		<div class="detail-section">■ 거래처 위치
+		<div class="detail-section"><span class="mar">■ 거래처 위치</span>
 
 		<div id="map" style="width: 100%; height: 350px;"></div>
 		
 		</div>
 
 		<!--  3. 거래처 이력 -->
-		<div class="detail-section">■ 거래처 이력
+		<div class="detail-section"><span class="mar">■ 거래처 이력</span>
 		<div>
-			<table class="data-table">
-				<thead>
-					<tr>
-						<th style="width: 8%;">번호</th>
-
-					</tr>
-				</thead>
-
-			</table>
+			<table class="stk-tbl">
+						<thead>
+							<tr>
+								<th class="col-no">번호</th>
+								<th>요청번호</th>
+								<th>납기일</th>
+								<th>거래처명</th>
+								<th>품목명</th>
+								<th>수량</th>
+								<th>담당자</th>
+								<th>상태</th>
+							</tr>
+						</thead>
+						<tbody id="request-body">
+							<c:choose>
+								<c:when test="${not empty result}">
+									<c:forEach var="item" items="${result}" varStatus="vs">
+										<tr>
+											<td class="num-cell">${vs.count}</td>
+											<td><a href="/requestDetail/${item.REQUEST_ID}" class="link-id">${item.REQUEST_ID}</a></td>
+											<td>${item.DUE_DATE}</td>
+											<td>${item.VENDER_NAME}</td>
+											<td>${item.NAME}</td>
+											<td>${item.REQUEST_QTY}</td>
+											<td>${item.ENAME}</td>
+											<td>
+												<span class="badge
+													<c:choose>
+														<c:when test="${item.REQUEST_STATUS == '접수'}">badge-progress</c:when>
+														<c:when test="${item.REQUEST_STATUS == '출하대기'}">badge-waiting</c:when>
+														<c:when test="${item.REQUEST_STATUS == '출하완료'}">badge-done</c:when>
+														<c:when test="${item.REQUEST_STATUS == '취소'}">badge-cancel</c:when>
+													</c:choose>
+												">${item.REQUEST_STATUS}</span>
+											</td>
+										</tr>
+									</c:forEach>
+								</c:when>
+								<c:otherwise>
+									<tr><td colspan="8" class="empty-cell">등록된 출하 요청이 없습니다.</td></tr>
+								</c:otherwise>
+							</c:choose>
+						</tbody>
+					</table>
 		</div>
 		</div>
 
