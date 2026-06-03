@@ -35,6 +35,9 @@ public class ReportController {
 	        // 설비
 	        List<ReportSummaryDTO> resultEquip = reportService.selectEquip();
 	        model.addAttribute("resultEquip", resultEquip);
+	        // 시설
+	        List<ReportSummaryDTO> resultFM = reportService.selectFM();
+	        model.addAttribute("resultFM", resultFM);
 	        
 	    } catch (Exception e) {
 	        System.out.println("에러 발생 지점: " + e.getMessage());

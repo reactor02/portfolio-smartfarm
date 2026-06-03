@@ -89,16 +89,15 @@
 	</select>
 	
 	
-	<select id="getFacilityList" resultType="kr.or.smartfarm.report.ReportSummaryDTO">
+	<select id="getFMList" resultType="kr.or.smartfarm.report.ReportSummaryDTO">
 		SELECT 
-			i.code,
-			i.name,
-			e.equip_status,
-			e.total_runtime
-		FROM EQUIPMENT_LOG e
-		JOIN item i 
-			ON e.item_num = i.item_num
-		ORDER BY e.MAINTENANCE_DATE DESC
+			f.facility_name,
+			fm.facility_chk,
+			fm.managed_at
+		FROM FACILITY_MANAGEMENT fm
+		JOIN facility f 
+			ON f.facility_num = fm.facility_num
+		ORDER BY fm.managed_at DESC
 	</select>
 	
 	

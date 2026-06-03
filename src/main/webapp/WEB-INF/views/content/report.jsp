@@ -107,6 +107,7 @@ body {
 	grid-template-columns: 1fr 1fr;
 	gap: 18px;
 	margin-bottom: 18px;
+	align-items: stretch;
 }
 
 /* 카드 */
@@ -116,6 +117,14 @@ body {
 	padding: 18px;
 	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
 	transition: 0.2s;
+
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+}
+
+.card > div:last-child {
+	flex: 1;
 }
 
 .card:hover {
@@ -146,6 +155,7 @@ th {
 td {
 	padding: 10px;
 	border-bottom: 1px solid #f1f5f9;
+	white-space: nowrap;
 }
 
 /* 상태 */
@@ -237,15 +247,17 @@ td {
 								<tr>
 									<th>시설명</th>
 									<th>상태</th>
+									<th>점검일</th>
 								</tr>
-								<tr>
-									<td>공장 A</td>
-									<td class="ok">정상</td>
-								</tr>
-								<tr>
-									<td>공장 B</td>
-									<td class="warn">점검중</td>
-								</tr>
+								<c:forEach var="item" items="${resultFM}" begin="0" end="6">
+									<tr>
+										<td>${item.facility_name}</td>
+										<td class="${item.facility_chk eq '점검필요' ? 'warn' : 'ok'}">
+										    ${item.facility_chk}
+										</td>
+										<td>${item.managed_at}</td>
+									</tr>
+								</c:forEach>
 							</table>
 						</div>
 
@@ -261,7 +273,7 @@ td {
 										<th>상태</th>
 										<th>누적시간</th>
 									</tr>
-									<c:forEach var="item" items="${resultEquip}" begin="0" end="4">
+									<c:forEach var="item" items="${resultEquip}" begin="0" end="6">
 										<tr>
 											<td>${item.code} ${item.name}</td>
 											<td>
