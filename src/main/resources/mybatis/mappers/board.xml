@@ -22,11 +22,14 @@
 		where board_num = #{board_num}
 	</select>
 
-	<insert id="insertBoard">
+	<insert id="insertBoard" parameterType="kr.or.smartfarm.board.BoardDTO">
+		<selectKey keyProperty="board_num" resultType="int" order="BEFORE">
+        SELECT board_seq.nextval FROM dual
+    	</selectKey>
 		insert into board (board_num, category, title,
-		content, created_at)
-		values (board_seq.nextval,#{category},#{title},
-		#{content}, sysdate)
+		content, created_at, emp_num)
+		values (#{board_num}, #{category},#{title},
+		#{content}, sysdate, #{emp_num})
 	</insert>
 
 	<select id="findById"

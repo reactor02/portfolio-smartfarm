@@ -19,4 +19,8 @@ public class FileDAO {
 	public List<FileDTO> findByBoardNum(int board_num){
 		return sqlSession.selectList("mapper.file.findByBoardNum", board_num);
 	}
+	
+	public int deleteFile(int files_num) {
+		return sqlSession.delete("mapper.file.deleteFile", files_num);
+	}
 }
