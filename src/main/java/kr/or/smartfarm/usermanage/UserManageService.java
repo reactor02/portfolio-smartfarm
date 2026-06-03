@@ -1,6 +1,7 @@
 package kr.or.smartfarm.usermanage;
 
 import java.util.List;
+import java.util.Map;
 
 public interface UserManageService {
 	
@@ -10,6 +11,7 @@ public interface UserManageService {
 	public List<UserManageDTO> selectl();
 	public List<UserManageDTO> selectm();
 	public List<UserManageDTO> selectw();
+	public List searchAjax(Map map);
 	public int userInsert(UserManageDTO userManageDTO);
 	public int userUpdate(UserManageDTO userManageDTO);
 	public int userRetire(UserManageDTO userManageDTO);

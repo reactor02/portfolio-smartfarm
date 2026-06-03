@@ -1,6 +1,7 @@
 package kr.or.smartfarm.usermanage;
 
 import java.util.List;
+import java.util.Map;
 
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -118,6 +119,15 @@ public class UserManageDAOImpl implements UserManageDAO {
 
 		UserManageDTO result = sqlSession.selectOne(NAMESPACE + "searchpw", changepwDTO);
 
+		return result;
+	}
+	
+	@Override
+	public List searchAjax(Map map) {
+		List result = null;
+		int pageNum = (Integer)map.get("page");
+		PageHelper.startPage(pageNum, 5);
+		result = sqlSession.selectList(NAMESPACE + "searchAjax", map);
 		return result;
 	}
 
