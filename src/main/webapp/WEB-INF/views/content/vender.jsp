@@ -94,7 +94,6 @@ String vender_type = request.getParameter("vender_type");
 .btn-reg:hover {
 	background-color: #B7E4C7;
 }
-
 /* ========== 2. 검색 영역 (입력창, 버튼 높이 및 정렬 완벽화) ========== */
 .sch-wrap {
 	background-color: #fff;

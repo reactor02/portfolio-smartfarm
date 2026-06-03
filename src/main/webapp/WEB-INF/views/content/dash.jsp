@@ -295,7 +295,7 @@ body {
 				<c:forEach var="k" items="${resultKPIPP}">
 				<div class="kpi-card">
 					<div class="kpi-title">총 생산량</div>
-					<div class="kpi-value">${k.plan_qty} 건</div>
+					<div class="kpi-value">${k.current_qty} 건</div>
 				</div>
 				</c:forEach>
 				<c:forEach var="k" items="${resultKPIShip}">

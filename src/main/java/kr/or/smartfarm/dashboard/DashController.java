@@ -75,17 +75,12 @@ public class DashController {
 	@GetMapping("/dashboard2")
 	public String dashboard2(Model model) {
 		try {
-			
 			List<DashDTO> resultB = dashService.selectBoard(); 
 			model.addAttribute("resultB", resultB);
-			
 		} catch (Exception e ) {
 			System.out.println("에러 발생 지점: " + e.getMessage());
 			e.printStackTrace();
 		}
-		
 		return "content/dash2";
 	}
-	
-	
 }

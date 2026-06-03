@@ -302,9 +302,7 @@ body {
 	font-weight: bold;
 }
 </style>
-<script>
-	
-</script>
+
 </head>
 <body>
 	<%-- 제목 --%>
@@ -334,7 +332,7 @@ body {
 	<div class="detail-content">
 		${boardDTO.content}
 
-		<c:if test="${not empty files}">
+		<c:if test="${files.size() > 0}">
 			<div class="detail-content-file">
 				<h3 class="file-header">📂 첨부파일</h3>
 				<ul class="file-list">
@@ -383,6 +381,9 @@ body {
 		</div>
 	</div>
 
+<script>
+    const boardNum = "${boardDTO != null ? boardDTO.board_num : ''}";
+</script>
 
 
 	<script> 
@@ -441,6 +442,7 @@ body {
 			// 부모 댓글만
 			const roots = list.filter(c => !c.parent_cmt);
 
+			// 댓글 리스트 렌더링
 			document.getElementById("commentList").innerHTML =
 				roots.map(renderComment).join("");
 		});
@@ -478,30 +480,32 @@ body {
 	
 	function reply(e, parentId){
 		const form = document.getElementById("commentForm");
-		
-		// 1. form을 해당 댓글 아래로 이동 
 		const targetComment = e.target.closest('.comment');
-		targetComment.appendChild(form);
 		
-		// 2. 부모 댓글 번호 설정 
+		// 댓글 바로 다음으로 이동 
+		targetComment.insertAdjacentElement('afterend',form);
+		
+		//  부모 댓글 번호 설정 
 		document.getElementById("parent_cmt").value = parentId;
 		
-		// 3. 포커스 주기 
+		//  포커스 주기 
 		document.getElementById("content").focus();
 		
 		// reply 함수 마지막에 추가
 		if (!document.getElementById("cancelBtn")) {
 		    const cancelBtn = document.createElement("button");
 		    cancelBtn.id = "cancelBtn";
+		    cancelBtn.type = "button"; 
 		    cancelBtn.innerText = "취소";
 		    cancelBtn.style.marginLeft = "10px";
 		    cancelBtn.onclick = function() {
-		        document.querySelector('.comment-section').appendChild(form);
+		    	// 취소 시 댓글창 원래대로 
+		        document.querySelector('.comment-section').insertBefore(form, document.getElementById("commentList"));
 		        document.getElementById("parent_cmt").value = "";
 		        this.remove(); // 취소 버튼 삭제
 		    };
 		    form.querySelector('.comment-box').appendChild(cancelBtn);
-		};
+		}
 		
 		}
 		
@@ -556,5 +560,7 @@ body {
 	}
 	
 	</script>
+
+
 </body>
 </html>

@@ -18,6 +18,7 @@
 		JOIN emp e ON c.emp_num = e.emp_num
 		WHERE c.board_num =
 		#{board_num}
+		and c.comment_status='N'
 
 		START WITH c.parent_cmt IS NULL
 		CONNECT BY PRIOR
@@ -51,7 +52,6 @@
 		UPDATE cmt
 		SET comment_status = 'D'
 		WHERE comment_num = #{comment_num}
-		OR parent_cmt = #{comment_num}
 	</delete>
 
 
