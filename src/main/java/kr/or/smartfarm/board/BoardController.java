@@ -67,8 +67,22 @@ public class BoardController {
 	}
 	
 	@GetMapping("/one")
-	public String one(int board_num, Model model) {
+	public String one(int board_num, Model model, HttpSession session) {
 		System.out.println("/one 실행");
+		
+		LoginDTO loginUser = (LoginDTO) session.getAttribute("loginUser"); // 로그인 아이디
+		
+		// 조회수 중복 방지 key 
+		String key = "viewed_" + board_num;
+		
+		  if (loginUser != null) {
+		        key = "viewed_" + board_num + "_" + loginUser.toString();
+		    }
+
+		    if (session.getAttribute(key) == null) {
+		        boardService.updateViewCnt(board_num);
+		        session.setAttribute(key, true);
+		    }
 		
 		BoardDTO boardDTO = boardService.getBoard(board_num);
 		model.addAttribute("boardDTO", boardDTO);
@@ -78,8 +92,6 @@ public class BoardController {
 		List<FileDTO> files = fileService.getFiles(board_num);
 		model.addAttribute("files", files); 
 		
-		// 조회수 증가 
-		boardService.updateViewCnt(board_num);
 		
 		return "content/boarddetail.tiles";
 	}

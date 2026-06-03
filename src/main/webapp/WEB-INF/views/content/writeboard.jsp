@@ -129,6 +129,7 @@
 	font-size: 0.95rem;
 	outline: none;
 	transition: border-color 0.2s;
+	margin-bottom : 20px;
 }
 
 .form-control:focus {
