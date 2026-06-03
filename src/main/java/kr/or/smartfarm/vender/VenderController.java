@@ -18,6 +18,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.github.pagehelper.PageInfo;
 
+import kr.or.smartfarm.login.LoginDTO;
+
 @Controller
 @RequestMapping("/vender")
 public class VenderController {
@@ -140,5 +142,7 @@ public class VenderController {
 		return result;
 		
 	}
+	
+
 	
 }

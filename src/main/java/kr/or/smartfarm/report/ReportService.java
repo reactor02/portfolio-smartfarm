@@ -42,4 +42,9 @@ public class ReportService {
 		List result = reportDAO.selectEquip();
 		return result;
 	}
+	
+	public List selectFM() {
+		List result = reportDAO.selectFM();
+		return result;
+	}
 }

@@ -40,4 +40,9 @@ public class ReportDAO {
 		List<ReportSummaryDTO> result = sqlSession.selectList("mapper.report.getEquipList");
 		return result;
 	}
+	
+	public List<ReportSummaryDTO> selectFM(){
+		List<ReportSummaryDTO> result = sqlSession.selectList("mapper.report.getFMList");
+		return result;
+	}
 }

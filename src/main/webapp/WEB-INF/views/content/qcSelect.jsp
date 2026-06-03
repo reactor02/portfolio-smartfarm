@@ -18,7 +18,7 @@ response.setContentType("text/html; charset=utf-8");
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>Insert title here</title>
+<title>품질관리 페이지</title>
 <style>
 /* 1. 부모 컨테이너 설정 */
 .sch-right {
@@ -76,6 +76,16 @@ response.setContentType("text/html; charset=utf-8");
     padding: 4px 7px  ;
 }
 
+
+.link-txt {
+	color: #2D6A4F;
+	text-decoration: none;
+	font-weight: bold;
+}
+
+.link-txt:hover {
+	text-decoration: underline;
+}
 
 </style>
 
@@ -149,7 +159,7 @@ response.setContentType("text/html; charset=utf-8");
 									<c:forEach var="item" items="${result}">
 										<tr>
 											<td>
-												<a href="/qcDetail?io_num=${item.io_num}">
+												<a href="/qcDetail?io_num=${item.io_num}" class="link-txt">
 													${item.lot_code}
 												</a>
 											</td>

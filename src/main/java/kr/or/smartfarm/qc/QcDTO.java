@@ -35,5 +35,6 @@ public class QcDTO {
 	// defective
 	private int defect_qty;
 	
+	private int total_qty;
 
 }

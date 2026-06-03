@@ -13,6 +13,7 @@
 			defective.defect_reason,
 			defective.defect_action,
 			defective.defect_qty,
+			defective.d_date,
 			qc.qc_type,
 			io.io_num,
 			io.io_reason,
@@ -33,7 +34,7 @@
 			ON lot.item_num = item.item_num
 		JOIN qc
 			ON qc.qc_num = io.qc_num
-		ORDER BY io.io_date DESC
+		ORDER BY defective.d_date DESC
 	</select>
 	
 	<select id="selectQcType" resultType="string">
@@ -50,6 +51,7 @@
 			defective.defect_reason,
 			defective.defect_action,
 			defective.defect_qty,
+			defective.d_date,
 			qc.qc_type,
 			io.io_num,
 			io.io_reason,
@@ -75,8 +77,8 @@
 	    
 		<!-- 날짜 조회 -->
 	     <if test="sDate != null and sDate != '' and eDate != null and eDate != ''">
-		    AND io.io_date >= TO_DATE(#{sDate}, 'YYYY-MM-DD')
-		    AND io.io_date &lt; TO_DATE(#{eDate}, 'YYYY-MM-DD') + 1
+		    AND defective.d_date >= TO_DATE(#{sDate}, 'YYYY-MM-DD')
+		    AND defective.d_date &lt; TO_DATE(#{eDate}, 'YYYY-MM-DD') + 1
 		</if>
 		<!-- item_num 검색 -->
 	        <if test="type != null and type != '' and type != 'all'">
@@ -90,7 +92,7 @@
 		         )
 	   	 	</if>
 	    </where>
-	  	ORDER BY io.io_date DESC
+	  	ORDER BY defective.d_date DESC
     </select>
 	
 </mapper>

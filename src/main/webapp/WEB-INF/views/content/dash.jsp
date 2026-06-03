@@ -268,6 +268,13 @@ body {
 	font-weight: bold;
 	color: #555;
 }
+
+.sizing {
+	display: inline-block;
+	min-width: 52px;
+	text-align: center;
+	white-space: nowrap;
+}
 </style>
 </head>
 <body>
@@ -387,7 +394,7 @@ body {
 											<div class="progress-bar" style="width: ${(i.current_qty / i.order_qty) * 100}%;"></div>
 										</div> <span style="font-size: 13px;">${(i.current_qty / i.order_qty) * 100}%</span>
 									</td>
-									<td><span class="badge badge-green">${i.order_status}</span></td>
+									<td><span class="badge badge-green sizing">${i.order_status}</span></td>
 								</tr>
 							</c:forEach>
 						</tbody>

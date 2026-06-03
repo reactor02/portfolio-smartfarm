@@ -17,6 +17,7 @@
 				<li><a href="/selectBom">BOM 관리</a></li>
 				<li><a href="/process">공정 관리</a></li>
 				<li><a href="/facility">시설 관리</a></li>
+				<li><a href="/facilityLog">시설 로그</a></li>
 				<li><a href="/equip">설비 관리</a></li>
 				<li><a href="/vender">거래처 관리</a></li>
 			</ul>

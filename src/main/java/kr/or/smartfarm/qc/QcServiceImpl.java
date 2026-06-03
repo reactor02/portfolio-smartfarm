@@ -53,8 +53,7 @@ public class QcServiceImpl implements QcService{
 	}
 
 	@Override
-	public int insertQc1(QcDTO qcDTO, Integer total_qty) {
-		qcDTO.setIo_qty(total_qty);
+	public int insertQc1(QcDTO qcDTO) {
 		return qcDAO.insertQc1(qcDTO);
 	}
 	@Override

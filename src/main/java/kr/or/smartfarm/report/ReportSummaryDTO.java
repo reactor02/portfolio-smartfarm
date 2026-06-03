@@ -39,4 +39,8 @@ public class ReportSummaryDTO {
 	private String type; 
 	private String process_status;
 	
+	// facility 페이지
+	private String facility_chk;
+	private Date managed_at;
+	
 }
