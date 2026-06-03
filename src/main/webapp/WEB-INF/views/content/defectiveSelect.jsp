@@ -151,7 +151,7 @@ response.setContentType("text/html; charset=utf-8");
 								<td>${item.defect_reason}</td>
 								<td>${item.defect_action}</td>
 								<td>${item.defect_qty}${item.unit}</td>
-								<td>${item.io_date}</td>
+								<td>${item.d_date}</td>
 								<td>${item.ename}</td>
 							</tr>
 						</c:forEach>
@@ -292,7 +292,7 @@ function movePage(pageNum) {
                      <td>\${item.DEFECT_REASON}</td>
                      <td>\${item.DEFECT_ACTION}</td>
                      <td>\${item.DEFECT_QTY}\${item.UNIT}</td>
-                     <td>\${formatDate(item.IO_DATE)}</td>
+                     <td>\${formatDate(item.D_DATE)}</td>
                      <td>\${item.ENAME}</td>
                  </tr>
              `;
