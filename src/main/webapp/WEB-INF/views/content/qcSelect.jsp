@@ -19,6 +19,66 @@ response.setContentType("text/html; charset=utf-8");
 <head>
 <meta charset="UTF-8">
 <title>Insert title here</title>
+<style>
+/* 1. 부모 컨테이너 설정 */
+.sch-right {
+    display: flex  ;
+    align-items: center  ;
+    flex-wrap: wrap  ;     /* 공간이 아주 모자라면 글자가 깨지는 대신 통째로 아래로 내려감 */
+    gap: 5px  ;            /* 요소들 사이의 간격 격차 확보 */
+    white-space: nowrap  ; /* 태그 없는 일반 텍스트(검사단계, ~)가 세로로 쪼개지는 것 절대 방지 */
+}
+
+/* 2. 내부의 모든 자식 요소들 찌러짐 방지 */
+.sch-right > * {
+    flex-shrink: 0  ;      /* 어떤 상황에서도 자식 요소들의 너비가 압축되지 않도록 설정 */
+    white-space: nowrap  ; /* input 박스나 div 안의 텍스트 줄바꿈 방지 */
+}
+
+/* 3. 이미지처럼 한 줄로 정렬하기 위해 <br> 태그 무력화 */
+.sch-right br {
+    display: none  ;       /* HTML에 있는 <br>이 줄바꿈을 유도해 레이아웃 깨는 것 방지 */
+}
+
+/* 4. 버튼 너비 강제 고정 해제 */
+.sch-right .btn-sch, 
+.sch-right .select-reset {
+    width: auto  ;
+    min-width: max-content  ; /* 버튼 안의 글자 길이에 맞게 너비 자동 확장 */
+    padding: 6px 14px;       /* 버튼 글자 좌우 여백 */
+}
+
+
+/* 전체 텍스트 및 버튼 폰트 크기 축소 (기본보다 한 단계 작게) */
+.sch-right, 
+.sch-right input, 
+.sch-right select, 
+.sch-right button,
+.sch-input-box input {
+    font-size: 12px  ;
+}
+
+/* 입력창과 셀렉트 박스 여백 줄이기 */
+.sch-right .form-control,
+.sch-input-box {
+    padding: 4px 5px  ;
+    height: auto  ; /* 부트스트랩 높이 강제 고정 해제 */
+}
+
+/* 검색창 내부 인풋 여백 조정 */
+.sch-input-box input {
+    padding: 2px 3px  ;
+}
+
+/* 버튼 크기(여백) 줄이기 */
+.sch-right .btn-sch, 
+.sch-right .select-reset {
+    padding: 4px 7px  ;
+}
+
+
+</style>
+
 </head>
 <body>
 
@@ -33,7 +93,9 @@ response.setContentType("text/html; charset=utf-8");
 				<!-- 타이틀 & 등록 버튼 -->
 				<div class="hdr">
 				    <h1>품질관리</h1>
-				    <button type="button" id="btnOpenModal" class="btn-reg">+ 등록하기</button>
+<%-- 				    <c:if test="${sessionScope.role >= 2}"> --%>
+			    	<button type="button" id="btnOpenModal" class="btn-reg">+ 등록하기</button>
+<%-- 				    </c:if> --%>
 				</div>
 				
 				<!-- search form -->
@@ -73,7 +135,6 @@ response.setContentType("text/html; charset=utf-8");
 					<table class="tbl">
 						<thead>
 							<tr>
-								<th style="width: 60px;">번호</th>
 								<th>lot코드</th>
 								<th>품목명</th>
 								<th>검사일</th>
@@ -89,7 +150,6 @@ response.setContentType("text/html; charset=utf-8");
 								<c:when test="${not empty result}">
 									<c:forEach var="item" items="${result}">
 										<tr>
-											<td style="font-weight: bold; color: #555;">${item.io_num}</td>
 											<td>
 												<a href="/qcDetail?io_num=${item.io_num}">
 													${item.lot_code}
@@ -230,9 +290,6 @@ function movePage(pageNum) {
                 console.log(item);
                 html += `
                     <tr>
-                        <td style="font-weight: bold; color: #555;">
-                            \${item.IO_NUM}
-                        </td>
                         <td>
 	                        <a href="/qcDetail?io_num=\${item.IO_NUM}">
 	                        	\${item.LOT_CODE}

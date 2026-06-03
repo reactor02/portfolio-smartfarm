@@ -33,6 +33,7 @@
 			ON lot.item_num = item.item_num
 		JOIN qc
 			ON qc.qc_num = io.qc_num
+		ORDER BY io.io_date DESC
 	</select>
 	
 	<select id="selectQcType" resultType="string">
@@ -70,7 +71,6 @@
 			ON lot.item_num = item.item_num
 		JOIN qc
 			ON qc.qc_num = io.qc_num
-		
 	    <where>
 	    
 		<!-- 날짜 조회 -->
@@ -90,7 +90,6 @@
 		         )
 	   	 	</if>
 	    </where>
-	    
 	  	ORDER BY io.io_date DESC
     </select>
 	
