@@ -29,6 +29,12 @@ public class ReportController {
 	        
 	        List<ReportSummaryDTO> resultProc = reportService.selectProc();
 	        model.addAttribute("resultProc", resultProc);
+	        // 불량품
+	        List<ReportSummaryDTO> resultDefective = reportService.selectDefective();
+	        model.addAttribute("resultDefective", resultDefective);
+	        // 설비
+	        List<ReportSummaryDTO> resultEquip = reportService.selectEquip();
+	        model.addAttribute("resultEquip", resultEquip);
 	        
 	    } catch (Exception e) {
 	        System.out.println("에러 발생 지점: " + e.getMessage());

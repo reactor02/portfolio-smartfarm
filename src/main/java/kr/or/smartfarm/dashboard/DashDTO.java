@@ -41,5 +41,8 @@ public class DashDTO {
 	private Integer order_qty;
 	private Integer current_qty;
 	
+	
+	
+	
 }
 

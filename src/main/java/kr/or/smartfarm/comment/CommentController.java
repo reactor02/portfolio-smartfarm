@@ -23,7 +23,7 @@ public class CommentController {
 	
 	@GetMapping("/comment/list")
 	@ResponseBody
-	public List<CommentDTO> list(@RequestParam int board_num){
+	public List<CommentDTO> list(@RequestParam Integer board_num){
 		return commentService.selectList(board_num);
 	}
 	

@@ -32,4 +32,14 @@ public class ReportService {
 		List result = reportDAO.selectProc();
 		return result;
 	}
+	
+	public List selectDefective() {
+		List result = reportDAO.selectDefective();
+		return result;
+	}
+	
+	public List selectEquip() {
+		List result = reportDAO.selectEquip();
+		return result;
+	}
 }

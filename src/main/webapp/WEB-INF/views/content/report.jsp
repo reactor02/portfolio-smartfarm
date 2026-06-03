@@ -1,11 +1,8 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-	pageEncoding="UTF-8"%>
-
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%
 request.setCharacterEncoding("utf-8");
 String vender_type = request.getParameter("vender_type");
 %>
-
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
@@ -14,7 +11,7 @@ String vender_type = request.getParameter("vender_type");
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Insert title here</title>
+<title>리포트 페이지</title>
 
 <style>
 * {
@@ -36,12 +33,12 @@ String vender_type = request.getParameter("vender_type");
 	flex: 1;
 }
 
-/* ========== 1. 상단 타이틀 & 등록 버튼 ========== */
+/* ========== 상단 타이틀 & 등록 버튼 ========== */
 .hdr {
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
-	background-color: #2D6A4F; /* 메인 컬러 배경 */
+	background-color: #2D6A4F; 
 	padding: 15px 25px;
 	border-radius: 8px;
 	margin-bottom: 25px;
@@ -50,27 +47,9 @@ String vender_type = request.getParameter("vender_type");
 
 .hdr h1 {
 	font-size: 1.8rem;
-	color: #ffffff; /* 화이트 통일 */
+	color: #ffffff; 
 	font-weight: bold;
 	letter-spacing: -1px;
-}
-
-.btn-reg {
-	background-color: #fff;
-	color: #2D6A4F; /* 텍스트가 아닌 명확한 버튼 디자인 */
-	padding: 10px 24px;
-	border-radius: 6px;
-	border: 1px solid #2D6A4F;
-	font-weight: bold;
-	font-size: 1.05rem;
-	cursor: pointer;
-	box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 2px 3px
-		rgba(0, 0, 0, 0.2);
-	transition: background-color 0.2s;
-}
-
-.btn-reg:hover {
-	background-color: #B7E4C7;
 }
 
 body {
@@ -90,11 +69,6 @@ body {
 	justify-content: space-between;
 	align-items: center;
 	margin-bottom: 25px;
-}
-
-.report-header h2 {
-	font-size: 22px;
-	font-weight: 600;
 }
 
 /* 검색 */
@@ -127,17 +101,10 @@ body {
 	background: #e2e8f0;
 }
 
-/* 그리드 */
+/* 그리드 (2열로 고정) */
 .grid-2 {
 	display: grid;
 	grid-template-columns: 1fr 1fr;
-	gap: 18px;
-	margin-bottom: 18px;
-}
-
-.grid-3 {
-	display: grid;
-	grid-template-columns: 1fr 1fr 1fr;
 	gap: 18px;
 	margin-bottom: 18px;
 }
@@ -192,11 +159,6 @@ td {
 	font-weight: 600;
 }
 
-.bad {
-	color: #ef4444;
-	font-weight: 600;
-}
-
 .title {
 	font-size: 15px;
 	font-weight: 600;
@@ -204,7 +166,7 @@ td {
 	padding-left: 10px;
 	border-left: 4px solid #22c55e;
 }
-/* 리포트 페이지용 css */
+
 .card-header-wrapper {
 	display: flex;
 	justify-content: space-between;
@@ -232,34 +194,17 @@ td {
 }
 
 /* 상태별 색상 */
-.status-badge.RUNNING {
-    color: #49a47a; /* 녹색 */
-}
-
-.status-badge.ERROR {
-  color: #e63946; /* 빨간색 */
-}
-
-.status-badge.MAINTENANCE {
-   color: #ffb703; /* 노랑/주황색 */
-}
-.status-badge.WAITING {
-	color: #ffb703;
-}
-.status-badge.PASS {
-	 color: #49a47a;
-}
-.status-badge.사용중 {
- 	color: #49a47a;
-}
-.status-badge.미사용 {
-	color: #e63946;
-}
+.status-badge.RUNNING { color: #49a47a; }
+.status-badge.ERROR { color: #e63946; }
+.status-badge.MAINTENANCE { color: #ffb703; }
+.status-badge.WAITING { color: #ffb703; }
+.status-badge.PASS { color: #49a47a; }
+.status-badge.사용중 { color: #49a47a; }
+.status-badge.미사용 { color: #e63946; }
 
 </style>
 </head>
 <body>
-
 
 	<div class="mat-all">
 		<tiles:insertAttribute name="header" ignore="true" />
@@ -269,7 +214,6 @@ td {
 
 				<div class="report-container">
 
-					<!-- 상단 검색 -->
 					<div class="hdr">
 						<h1>리포트</h1>
 					</div>
@@ -283,8 +227,7 @@ td {
 						</div>
 					</div>
 
-					<!-- 1줄 -->
-					<div class="grid-3">
+					<div class="grid-2">
 						<div class="card">
 							<div class="card-header-wrapper">
 								<h3 class="title">시설 현황</h3>
@@ -303,7 +246,6 @@ td {
 									<td>공장 B</td>
 									<td class="warn">점검중</td>
 								</tr>
-								
 							</table>
 						</div>
 
@@ -315,42 +257,19 @@ td {
 							<div>
 								<table>
 									<tr>
-										<th>설비코드</th>
-										<th>설비명</th>
+										<th>설비명(코드)</th>
 										<th>상태</th>
+										<th>누적시간</th>
 									</tr>
-									<c:forEach var="item" items="${result}" begin="0" end="4">
+									<c:forEach var="item" items="${resultEquip}" begin="0" end="4">
 										<tr>
-											<td>${item.code}</td>
-											<td>${item.name}</td>
+											<td>${item.code} ${item.name}</td>
 											<td>
 												<span class="status-badge ${item.equip_status}">
 													${item.equip_status} 
 												</span>
 											</td>
-										</tr>
-									</c:forEach>
-								</table>
-							</div>
-						</div>
-
-						<div class="card">
-							<div class="card-header-wrapper">
-								<h3 class="title">공정</h3>
-								<a href="/plan" class="more-link">더보기 +</a>
-							</div>
-							<div>
-								<table>
-									<tr>
-										<th>공정 품목</th>
-										<th>사용 여부</th>
-									</tr>
-									<c:forEach var="item" items="${resultProc}" begin="0" end="4">
-										<tr>
-											<td>${item.name}</td>
-											<td>
-												<span class="status-badge ${item.process_status}">${item.process_status}</span>
-											</td>
+											<td>${item.total_runtime}</td>
 										</tr>
 									</c:forEach>
 								</table>
@@ -358,7 +277,6 @@ td {
 						</div>
 					</div>
 
-					<!-- 2줄 -->
 					<div class="grid-2">
 						<div class="card">
 							<div class="card-header-wrapper">
@@ -389,23 +307,21 @@ td {
 
 						<div class="card">
 							<div class="card-header-wrapper">
-								<h3 class="title">입출고 관리</h3>
-								<a href="/defect" class="more-link">더보기 +</a>
+								<h3 class="title">불량률 관리</h3>
+								<a href="/defective" class="more-link">더보기 +</a>
 							</div>
 							<div>
 								<table>
 									<tr>
-										<th>자재명</th>
-										<th>입/출고 여부</th>
+										<th>품목명</th>
+										<th>불량품 개수</th>
 										<th>날짜</th>
-										<th>저장위치</th>
 									</tr>
-									<c:forEach var="item" items="${resultIO}" begin="0" end="4">
+									<c:forEach var="item" items="${resultDefective}" begin="0" end="4">
 										<tr>
 											<td>${item.name}</td>
-											<td>${item.io_type}</td>
+											<td>${item.defect_qty}</td>
 											<td>${item.io_date}</td>
-											<td>${item.facility_name}</td>
 										</tr>
 									</c:forEach>
 								</table>
@@ -413,8 +329,7 @@ td {
 						</div>
 					</div>
 
-					<!-- 3줄 -->
-					<div class="grid-3">
+					<div class="grid-2">
 						<div class="card">
 							<div class="card-header-wrapper">
 								<h3 class="title">Lot 관리</h3>
@@ -440,68 +355,44 @@ td {
 
 						<div class="card">
 							<div class="card-header-wrapper">
-								<h3 class="title">재고</h3>
-								<a href="/stock" class="more-link">더보기 +</a>
+								<h3 class="title">입출고 관리</h3>
+								<a href="io" class="more-link">더보기 +</a>
 							</div>
 							<div>
 								<table>
 									<tr>
-										<th>자재코드</th>
 										<th>자재명</th>
-										<th>현재고 수량</th>
+										<th>입/출고</th>
+										<th>날짜</th>
+										<th>저장위치</th>
 									</tr>
-									<c:forEach var="item" items="${result}" begin="0" end="4">
+									<c:forEach var="item" items="${resultIO}" begin="0" end="4">
 										<tr>
-											<td>${item.code}</td>
 											<td>${item.name}</td>
-											<td>${item.stock_qty}</td>
+											<td>${item.io_type}</td>
+											<td>${item.io_date}</td>
+											<td>${item.facility_name}</td>
 										</tr>
 									</c:forEach>
 								</table>
 							</div>
 						</div>
-
-						<div class="card">
-							<div class="card-header-wrapper">
-								<h3 class="title">BOM 관리</h3>
-								<a href="/runtime" class="more-link">더보기 +</a>
-							</div>
-							<table>
-								<tr>
-									<th>BOM 코드</th>
-									<th>품목명</th>
-									<th>상태</th>
-								</tr>
-								<c:forEach var="item" items="${result}" begin="0" end="4">
-									<tr>
-										<td>${item.bom_code}</td>
-										<td>${item.name}</td>
-										<td>${item.bom_status}</td>
-									</tr>
-								</c:forEach>
-							</table>
-						</div>
 					</div>
-
-				</div>
-			</main>
+					</div> </div> </main>
 		</div>
 
 		<tiles:insertAttribute name="footer" ignore="true" />
 	</div>
-
 
 	<script>
 	// 날짜 필터
 	function filterData() {
 	  const start = document.getElementById("startDate").value;
 	  const end = document.getElementById("endDate").value;
-
 	  const rows = document.querySelectorAll("#workTable tr[data-date]");
 
 	  rows.forEach(row => {
 	    const date = row.getAttribute("data-date");
-
 	    if ((!start || date >= start) && (!end || date <= end)) {
 	      row.style.display = "";
 	    } else {
@@ -509,7 +400,6 @@ td {
 	    }
 	  });
 	}
-
 
 	// 엑셀 다운로드 (CSV)
 	function downloadExcel() {
@@ -519,22 +409,18 @@ td {
 	  rows.forEach(row => {
 	    let cols = row.querySelectorAll("td, th");
 	    let data = [];
-
 	    cols.forEach(col => data.push(col.innerText));
-
 	    csv.push(data.join(","));
 	  });
 
 	  const blob = new Blob([csv.join("\n")], { type: "text/csv" });
 	  const url = window.URL.createObjectURL(blob);
-
 	  const a = document.createElement("a");
 	  a.href = url;
 	  a.download = "report.csv";
 	  a.click();
 	}
 	</script>
-
 
 </body>
 </html>

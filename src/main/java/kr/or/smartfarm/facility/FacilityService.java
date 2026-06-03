@@ -14,4 +14,5 @@ public interface FacilityService {
 	public List searchFacility(Map map);
 	public int insertFacility(FacilityDTO dto);
 	public int updateRandom();
+	public int insertFM(FacilityDTO facilityDTO);
 }

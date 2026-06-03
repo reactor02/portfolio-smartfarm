@@ -1,0 +1,262 @@
+3/23
+
+DB에 들어가는 자료들은 다 DAO 에 넣어놓기 
+
+service 목적에 맞는 무언가 실행 / 파일 저장 , 읽기 등등 - 실제로 일하는 친구 
+
+controller  해야할지 말아야할지 결정하는 친구
+
+2가지 역할 하나는 제어 / 포장부서로 보냄 (나중에 JSP로 처리) 
+포장이 다른 servlet 에 있어 > forward , redirect 
+
+getparameter / parameterValues / forward / redirect /  setAttribute / 
+
+DTO data transfer object
+DTO 기본 세팅 
+오른쪽 클릭 source generate getters and setters / generate toString()
+
+map 대신 DTO로 나눠서 한 이유 
+필드, 구조가 정해져 있음 / DTO 클래스는 값만 저장되어 있음 (hashmap)
+
+자유도가 낮은 대신 뭘 넣었는지 정확하게 안다 
+ 
+
+
+인티저 임포트 하라고 나온다고 
+
+ctrl + space + Enter try catch  catch 부분 자동 완성 
+
+8080 톰캣이랑 연결되어 있다 
+
+
+
+ Controller 
+
+get이랑 post 차이 알기 
+
+getparameter
+DB 세팅 
+ 리스트 map 에 넣거나 DTO 에 넣거나 
+map은 get을 이용해서 값을 꺼냄
+list.add(map);
+list.add(todoDTO); 
+
+DAo 로 보내야하는데 DTO 로 패킹해서 보냄 
+sql update 문 실행 
+executeupdate 로 실행 
+
+insert 하는 법 _ 내일 배움 
+
+
+/////////////////////////////
+오늘 복습한 내용 
+이전 코드 복습 
+1. hello 
+웹 요청 오면 hello 출력하고 50% 확률로 랜덤 숫자 보여주는 서블릿 
+
+구조 
+1. import 
+2. 클래스 선언 (서블릿 만들기 )
+3. 생성자 (서버 시작시 실행)
+4. doGet/ doPost (요청 처리) 
+
+
+@Webservlet("/HelloServlet")
+브라우저에서 8080/프로젝트명/HelloServlet 입력하면 이 코드 실행됨 
+
+public class helloservlet extends Httpservlet 
+
+생성자 
+public helloservlet(){
+ super(); 
+System.out.println("HelloServlet 생성자 실행");
+}
+
+protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException{
+PrintWriter out = response.getWriter();
+out.println("<h1>");
+out.println("HelloServlet");
+out.println("</h1>");
+
+for(int i =0; i<10, i++){
+if(Math.random()<0.5){
+out.println(i);
+out.println("<br>");
+}
+}
+
+protected void doPost(HttpServletRequest, HttpServletResponse) throws ServletException, IOException {
+	doGet(request, response);
+}
+}
+
+암기해야 하는 것 
+@WebServlet 
+extends HttpServlet 
+doGet() 
+request / response
+PrintWriter 
+
+
+doGet과 doPost는 HttpServlet 의 메소드를 오버라이딩 한 것으로 접근제어자로 보통 protected를 사용한다 
+Get = > 데이터 조회용  데이터 위치 url 보안 낮음 
+Post => 데이터 전송/ 저장용  Body 보안 높음 
+
+둘 다 데이터 꺼낼 때는 동일 request.getParameter("id");
+
+서버가 객체를 만들어서 매개변수로 넘겨주기 때문에 new 없이 사용한다 
+request  = 이미 만들어진 도구 상자 
+우리는 그냥 꺼내서 쓰는 것 
+
+HttpServletRequest 객체는 서버가 생성하여 전달하므로 개발자가 new로 생성하지 않고 바로 사용할 수 있다 .
+
+
+상속은 클래스 한개를 받고 실제 코드 있음 기능을 물려받는다 
+인터페이스는 이 기능을 반드시 구현해라라는 약속이 있고 여러 개 가능하며 설계(틀) 역할을 한다 
+
+public class HelloServlet extends HttpServlet 
+이건 상속 
+HttpServletRequest request 이건 인터페이스 
+
+인터페이스 쓰는 이유 
+구현을 숨기려고 유연하게 바꾸려고 
+인터페이스는 리모컨 구현 클래스는 TV, 에어컨 
+
+
+request/ response 내부 구조 
+브라우저 요청 
+request/ response 객체 생성
+request 데이터 저장  
+doGet() 실행
+request 값 꺼냄 
+response 결과 작성 
+브라우저 응답 
+
+HttpServletResponse는 클라이언트에게 응답을 보내기 위한 객체이다 
+
+서블릿은 상속 
+request/ response 인터페이스 구조(서버가 구현해서 줌 )
+
+
+암기할 것 
+폼에서 데이터 전송 
+request 객체에 저장 
+getParameter로 값 꺼냄 
+처리 후 response로 응답 
+
+시험 단골 포인트 
+getParameter > String qksghks 
+값이 없으면 null 
+checkbox > getParameterValues 
+request > 사용자데이터 
+response > 응답 데이터 
+
+forward 서버 내부에 위치하며 request 유지 
+데이터 넘길 때 사용 > 로그인 결과 전달 / 게시글 상세 보기 
+
+redirect 흐름 바꿀 때 
+로그인 성공 후 메인 이동/ 새로고침 방지 
+
+form 은 본질적으로 데이터를 어디로, 어떻게 보낼지 정의하는 것 
+
+action만 있으면 어디로는 아는데 어떻게 보낼지 모름 
+
+<form method="get" action="req"> 
+폼을 get 방식으로 req 로 보냄 
+method 생략하면 get 방식으로 감 
+
+<input type="text" name="none" value="1234" style="display:none;">
+<input type="hidden name="hidden" value="hihi">
+
+System.out.println("hihi: " + request.Parameter("hidden"));
+System.out.println("none: " + request.Parameter("none"));
+
+String[] selects = request.getParameterValues("select");
+
+for(String select : selects){
+System.out.println("select: " + select);
+}
+response.getWriter().println("{\"key\": 1234}");
+
+/forward로 온 요청을 another 로 넘기면서 request 데이터를 유지하는 코드 
+
+request.setAtrribute("item", "롱소드"); 
+RequestDispatcher dispatcher = request.getRequestDispatcher("another");
+dispatcher.forward(request, response); 
+
+
+ForwardServlet 
+
+import java.io.IOException; 
+
+@WebServlet("/forward")
+public class ForwardServlet extends HttpServlet {
+	private static final long serialVersionUID = 1L; 
+
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	System.out.println("/forward에 doGet 실행");
+
+	 // 요청의 한글 깨짐 방지 
+	request.setCharacterEncoding("UTF-8");
+	// 응답의 한글 깨짐 방지 
+	response.setContentType("text/html; charset=utf-8;");
+
+	request.setAttribute("item","롱소드");
+	
+	 String text = request.getParameter("text");
+	System.out.println("text: " + text);
+
+	response.getWriter().println("/forward의 응답을 [Get]");
+	
+	RequestDispatcher dispatcher = request.getRequestDispatcher("another");
+	dispatcher.forward(request, response);
+}
+}  
+
+Forward Servlet 
+import java.io.IOException; 
+
+@WebServlet("/forward")
+public class ForwardServlet extends HttpServlet {
+	private static final long serialVersionUID = 1L; 
+
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	System.out.println("/forward 에 doGet 실행");
+
+	request.setCharacterEncoding("UTF-8");
+	response.setContentType("text/html; charset=utf-8;");
+
+	request.setAttribute("item", "롱소드");
+	String text = request.getParameter("text");
+	System.out.println("text: " + text); 
+	
+	response.getWriter().println("/forward 의 응답을 [Get]"); 
+	RequestDispatcher dispatcher = request.getRequestDispatcher("another");
+	dispatcher.forward(request,response);
+
+
+}
+}
+
+AnotherServlet 
+import java.io.IOException; 
+
+@WebServlet("/another")
+public class Another extends HttpServlet {
+private static final long serialVersionUID = 1L; 
+
+	protected void doGet (HttpServletRequest request, HttpServeltResponse response) {
+	
+	request.setCharacterEncoding("utf-8");
+	response.setContentType("text/html; charset=utf-8;");
+
+	String text = request.getParameter("text");
+	System.out.println("text: " + text);
+
+	String item = (String)request.getAttribute("item");
+	System.out.println("item: " + item);
+	
+	response.getWriter().println("/another의 응답 [Get]"); 
+}
+
+}

@@ -30,8 +30,8 @@
 	<select id="selectw" resultType="kr.or.smartfarm.usermanage.TodayWorkDTO">
     SELECT * 
       FROM work_order
-     WHERE emp_num = #{emp_num} and
-     TRUNC(created_at) = TRUNC(SYSDATE)
+     WHERE emp_num = #{emp_num} 
+     and TRUNC(created_at) = TRUNC(SYSDATE)
      ORDER BY created_at DESC
      
 </select>

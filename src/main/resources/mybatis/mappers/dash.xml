@@ -50,27 +50,28 @@
 	<!-- 3. KPI 생산량 -->
 	<select id="getKPIPP"
 		resultType="kr.or.smartfarm.dashboard.DashDTO">
-		select sum(plan_qty) as plan_qty
-		from production_plan
-		where plan_status
-		!= '취소'
+		SELECT NVL(sum(current_qty), 0) as current_qty
+		FROM work_order
+		where
 		<choose>
 			<when test="startDate != null and endDate != null">
-				and plan_start between to_date(#{startDate},
+				created_at between to_date(#{startDate},
 				'yyyy-mm-dd')
 				and to_date(#{endDate}, 'yyyy-mm-dd') + 1
 			</when>
 
 			<when test="period == 'day'">
-				and trunc(plan_start) = trunc(sysdate)
+				trunc(created_at) = trunc(sysdate)
 			</when>
 			<when test="period == 'week'">
-				and trunc(plan_start) >= trunc(sysdate, 'IW')
-				and trunc(plan_start) &lt; trunc(sysdate, 'IW') + 7
+				trunc(created_at) >= trunc(sysdate, 'IW')
+				and
+				trunc(created_at) &lt; trunc(sysdate, 'IW') + 7
 			</when>
 			<when test="period == 'month'">
-				and trunc(plan_start) >= trunc(sysdate, 'MM')
-				and trunc(plan_start) &lt; add_months(trunc(sysdate, 'MM'), 1)
+				trunc(created_at) >= trunc(sysdate, 'MM')
+				and
+				trunc(created_at) &lt; add_months(trunc(sysdate, 'MM'), 1)
 			</when>
 		</choose>
 	</select>
@@ -84,7 +85,8 @@
 		'출하완료'
 		<choose>
 			<when test="startDate != null and endDate != null">
-				and shipment_date between to_date(#{startDate}, 'yyyy-mm-dd')
+				and shipment_date between to_date(#{startDate},
+				'yyyy-mm-dd')
 				and to_date(#{endDate}, 'yyyy-mm-dd') + 1
 			</when>
 
@@ -93,30 +95,33 @@
 			</when>
 			<when test="period == 'week'">
 				and trunc(shipment_date) >= trunc(sysdate, 'IW')
-				and trunc(shipment_date) &lt; trunc(sysdate, 'IW') + 7
+				and
+				trunc(shipment_date) &lt; trunc(sysdate, 'IW') + 7
 			</when>
 			<when test="period == 'month'">
 				and trunc(shipment_date) >= trunc(sysdate, 'MM')
-				and trunc(shipment_date) &lt; add_months(trunc(sysdate, 'MM'), 1)
+				and
+				trunc(shipment_date) &lt; add_months(trunc(sysdate, 'MM'), 1)
 			</when>
 		</choose>
 	</select>
-	
-	
+
+
 	<!-- 5. KPT 불량 개수 -->
-	<select id="getKPIDefect" resultType="kr.or.smartfarm.dashboard.DashDTO"> 
+	<select id="getKPIDefect"
+		resultType="kr.or.smartfarm.dashboard.DashDTO">
 		SELECT count(*) as defect_qty
 		FROM defective
 		JOIN io
-		    ON defective.io_num = io.io_num
+		ON defective.io_num = io.io_num
 		JOIN emp
-		    ON io.emp_num = emp.emp_num
+		ON io.emp_num = emp.emp_num
 		JOIN lot
-			ON io.lot_num = lot.lot_num
+		ON io.lot_num = lot.lot_num
 		JOIN item
-			ON lot.item_num = item.item_num
+		ON lot.item_num = item.item_num
 		JOIN qc
-			ON qc.qc_num = io.qc_num
+		ON qc.qc_num = io.qc_num
 		where
 		<choose>
 			<when test="startDate != null and endDate != null">
@@ -125,54 +130,58 @@
 			</when>
 
 			<when test="period == 'day'">
-				 trunc(io_date) = trunc(sysdate)
+				trunc(io_date) = trunc(sysdate)
 			</when>
 			<when test="period == 'week'">
-				 trunc(io_date) >= trunc(sysdate, 'IW')
-				and trunc(io_date) &lt; trunc(sysdate, 'IW') + 7
+				trunc(io_date) >= trunc(sysdate, 'IW')
+				and trunc(io_date) &lt; trunc(sysdate, 'IW')
+				+ 7
 			</when>
 			<when test="period == 'month'">
-				 trunc(io_date) >= trunc(sysdate, 'MM')
-				and trunc(io_date) &lt; add_months(trunc(sysdate, 'MM'), 1)
+				trunc(io_date) >= trunc(sysdate, 'MM')
+				and trunc(io_date) &lt;
+				add_months(trunc(sysdate, 'MM'), 1)
 			</when>
 		</choose>
 	</select>
 
 	<!-- 6. KPT 시설 개수 -->
-	<select id="getKPIFacility" resultType="Integer"> 
+	<select id="getKPIFacility" resultType="Integer">
 		SELECT count(*)
 		FROM facility
 	</select>
-	
+
 	<!-- 7. 대시보드 생산 계획 -->
-	<select id="getProdList" resultType="kr.or.smartfarm.dashboard.DashDTO"> 
-		SELECT 
-			p.plan_id,
-			p.plan_qty,
-			p.plan_status,
-			i.name,
-			i.unit
+	<select id="getProdList"
+		resultType="kr.or.smartfarm.dashboard.DashDTO">
+		SELECT
+		p.plan_id,
+		p.plan_qty,
+		p.plan_status,
+		i.name,
+		i.unit
 		FROM production_plan p
 		JOIN item i
-			ON p.item_num = i.item_num
+		ON p.item_num = i.item_num
 		WHERE ROWNUM &lt;= 5
 		ORDER BY created_at desc
 	</select>
-	
+
 	<!-- 8. 대시보드 작업 지시 -->
-	<select id="getWorkList" resultType="kr.or.smartfarm.dashboard.DashDTO"> 
-		SELECT 
-			w.order_id,
-			w.order_qty,
-			w.current_qty,
-			w.order_status,
-			i.name,
-			i.unit
+	<select id="getWorkList"
+		resultType="kr.or.smartfarm.dashboard.DashDTO">
+		SELECT
+		w.order_id,
+		w.order_qty,
+		w.current_qty,
+		w.order_status,
+		i.name,
+		i.unit
 		FROM work_order w
 		JOIN production_plan p
-			ON w.plan_num = p.plan_num
+		ON w.plan_num = p.plan_num
 		JOIN item i
-			ON p.item_num = i.item_num
+		ON p.item_num = i.item_num
 		WHERE ROWNUM &lt;= 5
 		ORDER BY w.created_at desc
 	</select>

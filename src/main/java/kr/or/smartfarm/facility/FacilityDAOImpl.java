@@ -85,6 +85,9 @@ public class FacilityDAOImpl implements FacilityDAO{
 		return sqlSession.update("mapper.facility.updateSensorRandomly");
 	}
 
+	public int insertFM(FacilityDTO facilityDTO) {
+		return sqlSession.insert("mapper.facility.insertFM", facilityDTO);
+	}
 
 
 

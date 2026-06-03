@@ -18,6 +18,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 
+import kr.or.smartfarm.login.LoginDTO;
+
 @Controller
 public class UserManageController {
 	
@@ -63,35 +65,45 @@ public class UserManageController {
 	
 	@GetMapping("/mypage")
 	public String mypageGet(
-			  // 1. 세션에서 loginUser 객체를 자동으로 주입받습니다.
-	        @SessionAttribute(value = "loginUser", required = false) UserManageDTO loginUser,
-			Model model
-			) { // 💡 데이터를 담을 가방(Model) 주입
-		System.out.println("mypageGet 실행");
-		
-		// 1-2. 서비스에서 부서명 조회
-		List<UserManageDTO> selectd = userManageService.selectd();
-		
-		// 1-3. 서비스에서 권한 목록 조회
-		List<UserManageDTO> selectl = userManageService.selectl();
-		
-		// 1-3. 서비스에서 전체 회원 목록(List) 조회
-		List<UserManageDTO> selectm = userManageService.selectm();
-		
-		// 1-3. 서비스에서 전체 회원 목록(List) 조회
-		List<UserManageDTO> selectw = userManageService.selectw();
-		
-		// 2. 가져온 회원 목록 데이터를 "userList"라는 이름으로 가방에 넣음
-		
-		model.addAttribute("selectd", selectd);
-		model.addAttribute("selectl", selectl);
-		model.addAttribute("selectm", selectm);
-		model.addAttribute("selectw", selectw);
-		
-		// 3. 타일즈 뷰 리턴 (화면이 그려지면서 데이터가 함께 배달됩니다)
-		return "content/mypage.tiles";
-	}
-	
+	        // 1. 세션에 저장된 실제 타입인 LoginDTO로 변경합니다.
+	        @SessionAttribute(value = "loginUser", required = false) LoginDTO loginUser,
+	        Model model
+	) { 
+	    System.out.println("mypageGet 실행");
+	    
+	    // (선택 사항) 로그인하지 않은 유저가 접근했을 때의 예외 처리
+	    if (loginUser == null) {
+	        return "redirect:/login"; // 로그인 페이지로 리다이렉트
+	        
+	    }
+	    
+	    String emp_num =  loginUser.getEmp_num();
+	    System.out.println("mypage emp_num : "+emp_num);
+	    
+	    // 1-2. 서비스에서 부서명 조회
+	    List<UserManageDTO> selectd = userManageService.selectd();
+	    
+	    // 1-3. 서비스에서 권한 목록 조회
+	    List<UserManageDTO> selectl = userManageService.selectl();
+	    
+	    // 1-3. 서비스에서 전체 회원 목록(List) 조회
+	    List<UserManageDTO> selectm = userManageService.selectm();
+	    
+	    // 1-3. 서비스에서 전체 회원 목록(List) 조회
+	    List<TodayWorkDTO> selectw = userManageService.selectw(emp_num);
+	    
+	    // 2. 가져온 데이터를 Model에 담음
+	    model.addAttribute("selectd", selectd);
+	    model.addAttribute("selectl", selectl);
+	    model.addAttribute("selectm", selectm);
+	    model.addAttribute("selectw", selectw);
+	    
+	    // 2-2. 만약 JSP/타임리프 화면에서 로그인한 유저의 정보(이름 등)를 써야 한다면 Model에 추가로 담아줍니다.
+	    model.addAttribute("loginUser", loginUser);
+	    
+	    // 3. 타일즈 뷰 리턴
+	    return "content/mypage.tiles";
+	}	
 	
 	@PostMapping("/userinsert")
 	public String userinsert(

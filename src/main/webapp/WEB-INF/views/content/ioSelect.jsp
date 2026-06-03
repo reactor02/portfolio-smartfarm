@@ -379,6 +379,56 @@ response.setContentType("text/html; charset=utf-8");
 									<option value="raw">재료</option>
 								</select>
 							</div>
+                <div class="tbl-box">
+                    <table class="stk-tbl">
+                        <thead>
+                            <tr>
+                                <th style="width: 60px;">번호</th>
+                                <th>입고/출고 여부</th>
+                                <th>자재명</th>
+                                <th>수량</th>
+                                <th>LOT번호</th>
+                                <th>자재유형</th>
+                                <th>입고/출고 날짜</th>
+                                <th>저장 위치</th>
+                                <th>비고/사유</th>
+                            </tr>
+                        </thead>
+                        <tbody id="bom-body">
+                            <c:choose>
+                                <c:when test="${not empty result}">
+                                    <c:forEach var="item" items="${result}" varStatus="vs">
+                                        <tr>
+                                            <td style="font-weight: bold; color: #555;">${vs.count}</td>
+                                            <td>${item.IO_TYPE}</td>
+                                            <td>${item.NAME}</td>
+                                            <td>${item.IO_QTY}</td>
+                                            <td>${item.LOT_CODE}</td>
+                                            <td>${item.TYPE}</td>
+                                            <td>${item.IO_DATE}</td>
+                                            <td>${item.FACILITY_NAME}</td>
+                                            <td>${item.IO_REASON}</td>
+                                        </tr>
+                                    </c:forEach>
+                                </c:when>
+                                <c:otherwise>
+                                    <c:forEach var="i" begin="1" end="6">
+                                        <tr>
+                                            <td style="font-weight: bold; color: #888;">${i}</td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                        </tr>
+                                    </c:forEach>
+                                </c:otherwise>
+                            </c:choose>
+                        </tbody>
+                    </table>
+                </div>
 
 							<div class="sch-group-right">
 								<div class="sch-input-box">
@@ -456,8 +506,8 @@ response.setContentType("text/html; charset=utf-8");
 		<div class="modal-box" style="max-width: 650px;">
 			<h3 class="modal-title">입고 등록</h3>
 
-			<form method="POST" action="insertIo" accept-charset="UTF-8"
-				onsubmit="document.charset='UTF-8'" ; id="insert-form">
+
+     	 <form method="POST" action="insertIo" accept-charset="UTF-8" onsubmit="document.charset='UTF-8';" id="insert-form"> 
 
 				<div class="modal-grid">
 					<div class="modal-field">
@@ -688,7 +738,7 @@ response.setContentType("text/html; charset=utf-8");
 							<td>\${item.IO_TYPE}</td>
 							<td>\${item.NAME}</td>
 							<td>\${item.IO_QTY}</td>
-							<td>\${item.LOT_NUM}</td>
+							<td>\${item.LOT_CODE}</td>
 							<td>\${item.TYPE}</td>
 							<td>\${item.IO_DATE}</td>
 							<td>\${item.FACILITY_NAME}</td>
