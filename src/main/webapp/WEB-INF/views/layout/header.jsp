@@ -69,7 +69,7 @@ margin: 0px !important;
 
     /* 패널이 열렸을 때 상태 */
     .dashboard-slide-panel.open {
-        height: 750px; /* 창 높이 30px 줄인 상태 복구 및 유지 */
+        height: 810px; /* 창 높이 30px 줄인 상태 복구 및 유지 */
         border-bottom: 2px solid #2d5a27;
         box-shadow: 0px 8px 16px rgba(0,0,0,0.15);
     }
