@@ -60,14 +60,14 @@
     </filter-mapping>
     
      <!-- 2. 💡 새로 추가할 로그인 체크 필터 (인코딩 필터 바로 밑에 위치) -->
-<!--     <filter> -->
-<!--         <filter-name>loginCheckFilter</filter-name> -->
-<!--         <filter-class>kr.or.smartfarm.filter.LoginCheckFilter</filter-class> -->
-<!--     </filter> -->
+    <filter>
+        <filter-name>loginCheckFilter</filter-name>
+        <filter-class>kr.or.smartfarm.filter.LoginCheckFilter</filter-class>
+    </filter>
     
-<!--     <filter-mapping> -->
-<!--         <filter-name>loginCheckFilter</filter-name> -->
-<!--         <url-pattern>/*</url-pattern> -->
-<!--     </filter-mapping> -->
+    <filter-mapping>
+        <filter-name>loginCheckFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
     
 </web-app>
