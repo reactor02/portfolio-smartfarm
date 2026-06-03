@@ -306,7 +306,8 @@ body {
 </head>
 <body>
 	<%-- 제목 --%>
-
+	
+	<main class="main-cont">
 	<div class="detail-top">
 		<div class="detail-title">
 			<h1>제목: ${boardDTO.title}</h1>
@@ -377,9 +378,10 @@ body {
 		<div class="right">
 			<button type="button" class="btn-reg"
 				onclick="location.href='${pageContext.request.contextPath}/board'">목록</button>
-			<button type="button" class="btn-reg">TOP</button>
+			<button type="button" class="btn-reg" onclick="scrollToTop()">TOP</button>
 		</div>
 	</div>
+	</main>
 
 <script>
     const boardNum = "${boardDTO != null ? boardDTO.board_num : ''}";
@@ -391,6 +393,13 @@ body {
 		loadComments();
 	
 	})
+	
+	function scrollToTop(){
+		window.scrollTo({
+			top: 0, 
+			behavior : "smooth"
+		});
+	}
 
 	
 	function writeComment(event){
@@ -431,23 +440,36 @@ body {
 		return false; // form submit 막기용 
 	}
 	
-	function loadComments(){
-		const boardNum = document.getElementById("board_num").value;
+	function loadComments() {
+	    const boardNum = document.getElementById("board_num").value;
 
-		fetch("/comment/list?board_num=" + boardNum)
-		.then(res => res.json())
-		.then(list => {
-			
-			window.commentListData = list; 
-			// 부모 댓글만
-			const roots = list.filter(c => !c.parent_cmt);
+	    fetch("/comment/list?board_num=" + boardNum)
+	    .then(res => res.json())
+	    .then(list => {
+	        window.commentListData = list; 
+	        const roots = list.filter(c => !c.parent_cmt);
 
-			// 댓글 리스트 렌더링
-			document.getElementById("commentList").innerHTML =
-				roots.map(renderComment).join("");
-		});
+	        // 1. 댓글 리스트 새로 렌더링 (이 과정에서 기존 폼은 사라짐)
+	        document.getElementById("commentList").innerHTML =
+	            roots.map(renderComment).join("");
+
+	        // 2. [핵심] 폼을 원래 위치로 강제 복구
+	        const form = document.getElementById("commentForm");
+	        const commentSection = document.querySelector('.comment-section');
+	        const commentList = document.getElementById("commentList");
+	        
+	        // 폼을 commentList 다음(혹은 원래 위치)에 다시 붙임
+	        commentSection.appendChild(form);
+	        
+	        // 3. 폼 상태 초기화
+	        document.getElementById("parent_cmt").value = "";
+	        document.getElementById("content").value = "";
+	        
+	        // 4. 취소 버튼 삭제
+	        const cancelBtn = document.getElementById("cancelBtn");
+	        if (cancelBtn) cancelBtn.remove();
+	    });
 	}
-
 	function renderComment(c){
 
 	    const children = window.commentListData

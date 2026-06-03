@@ -452,8 +452,9 @@ select.form-control {
 							placeholder="주소">
 					</div>
 					<div class="modal-field">
-						<label>담당 사원</label> <input type="number" name="emp_num"
-							placeholder="사원번호">
+						<label>담당 사원</label> 
+						<input type="text" name="emp_num"
+							placeholder="담당 사원">
 					</div>
 				</div>
 				<div class="modal-btn-wrap">
@@ -503,7 +504,6 @@ select.form-control {
 	    typeSelect.addEventListener("change", () => {
 	        loadData(1);
 	    });
-	    
 	}
 	
 	
@@ -596,6 +596,8 @@ select.form-control {
 	        if (e.target == this) this.style.display = 'none';
 	    });
 	}
+	
+
 
 	// 페이지네이션 함수
 	function renderPagination(pInfo) {
