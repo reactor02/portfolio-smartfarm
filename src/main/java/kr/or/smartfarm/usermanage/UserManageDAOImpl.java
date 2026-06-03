@@ -57,10 +57,10 @@ public class UserManageDAOImpl implements UserManageDAO {
 		return result;
 	}
 	@Override
-	public List<UserManageDTO> selectw() {
+	public List<TodayWorkDTO> selectw(String emp_num) {
 		// TODO Auto-generated method stub
 		
-		List<UserManageDTO> result = sqlSession.selectList(NAMESPACE2 + "selectw");
+		List<TodayWorkDTO> result = sqlSession.selectList(NAMESPACE2 + "selectw", emp_num);
 		
 		return result;
 	}

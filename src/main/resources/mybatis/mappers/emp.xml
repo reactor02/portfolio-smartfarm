@@ -7,7 +7,9 @@
 	<select id="loginCheck"
 		resultType="kr.or.smartfarm.login.LoginDTO">
 		SELECT *
-		FROM emp
+		FROM emp e
+		left outer join dept d 
+		on e.dept_num = d.dept_num
 		where emp_num = #{ emp_num }
 		and pw = #{ pw
 		}

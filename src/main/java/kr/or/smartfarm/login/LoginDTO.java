@@ -14,6 +14,7 @@ public class LoginDTO {
 	String status;
 	String Termination_date;
 	String secret;
+	String dept_name;
 	int dept_num;
 
 }
