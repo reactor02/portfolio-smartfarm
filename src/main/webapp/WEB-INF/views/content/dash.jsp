@@ -97,6 +97,7 @@ body {
 	padding: 20px;
 	border-radius: 8px;
 	box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+	text-decoration : none;
 }
 
 .kpi-title {
@@ -275,6 +276,13 @@ body {
 	text-align: center;
 	white-space: nowrap;
 }
+
+.card_hdr {
+	display: flex; 
+	justify-content : space-between; 
+	align-items : center;
+}
+
 </style>
 </head>
 <body>
@@ -300,13 +308,13 @@ body {
 
 			<div class="kpi-wrapper">
 				<c:forEach var="k" items="${resultKPIPP}">
-				<div class="kpi-card">
+				<a href="/prod" class="kpi-card">
 					<div class="kpi-title">총 생산량</div>
 					<div class="kpi-value">${k.current_qty} 건</div>
-				</div>
+				</a>
 				</c:forEach>
 				<c:forEach var="k" items="${resultKPIShip}">
-				<div class="kpi-card">
+				<a href="/shipment" class="kpi-card">
 					<div class="kpi-title">출하량</div>
 					<c:choose>
 					<c:when test="${not empty k.ship_qty}" > 
@@ -316,10 +324,10 @@ body {
 						<div class="kpi-value">0 건</div>
 					</c:otherwise>
 					</c:choose>
-				</div>
+				</a>
 				</c:forEach>
 				<c:forEach var="k" items="${resultKPIDefect}">
-				<div class="kpi-card">
+				<a href="/defective" class="kpi-card">
 					<div class="kpi-title">불량수</div>
 					<c:choose>
 					<c:when test="${not empty k.defect_qty}">
@@ -329,9 +337,9 @@ body {
 						<div class="kpi-value">0 EA</div>
 					</c:otherwise>
 					</c:choose>
-				</div>
+				</a>
 				</c:forEach>
-				<div class="kpi-card">
+				<a href="/facility" class="kpi-card">
 					<div class="kpi-title">총가동 시설</div>
 					<c:choose>
 					<c:when test="${not empty resultKPIFacility}">
@@ -341,13 +349,16 @@ body {
 						<div class="kpi-value">0 구역</div>
 					</c:otherwise>
 					</c:choose>
-				</div>
+				</a>
 			</div>
 
 			<div class="main-grid">
 
 				<div class="panel">
+					<div class="card_hdr">
 					<h2>생산 계획</h2>
+					<a href="/prod" class="more-link">더보기 +</a>
+					</div>
 					<table class="data-table">
 						<thead>
 							<tr>
@@ -372,7 +383,10 @@ body {
 				</div>
 
 				<div class="panel">
+					<div class="card_hdr">
 					<h2>작업 지시 현황</h2>
+					<a href="/work" class="more-link">더보기 +</a>
+					</div>
 					<table class="data-table">
 						<thead>
 							<tr>

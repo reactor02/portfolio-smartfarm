@@ -3,6 +3,7 @@ package kr.or.smartfarm.vender;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,8 +19,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.github.pagehelper.PageInfo;
 
-import kr.or.smartfarm.login.LoginDTO;
-
 @Controller
 @RequestMapping("/vender")
 public class VenderController {
@@ -31,7 +30,9 @@ public class VenderController {
 	
 	@RequestMapping("")
 	public String vender(@RequestParam(value = "page", defaultValue = "1") int page,Model model) {
+		
 		List result = null;
+
 		result = venderService.getVenderList(page);
 		 
 		PageInfo<Map<String, Object>> pageInfo = new PageInfo<Map<String, Object>>(result);

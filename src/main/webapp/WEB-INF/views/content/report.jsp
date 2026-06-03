@@ -202,6 +202,10 @@ td {
     font-weight: bold;
     text-transform: uppercase;
 }
+button.excel {
+	color : black !important;
+	font-weight: bold;
+}
 
 /* 상태별 색상 */
 .status-badge.RUNNING { color: #49a47a; }
@@ -230,10 +234,10 @@ td {
 
 					<div class="report-header">
 						<div class="search-box">
-							<input type="date" id="startDate"> <span>~</span> <input
+						<!--  	<input type="date" id="startDate"> <span>~</span> <input
 								type="date" id="endDate">
-							<button onclick="filterData()">조회</button>
-							<button onclick="downloadExcel()">엑셀 다운로드</button>
+							<button onclick="filterData()">조회</button>  -->
+							<button onclick="downloadExcel()" class="excel">엑셀 다운로드</button>
 						</div>
 					</div>
 
