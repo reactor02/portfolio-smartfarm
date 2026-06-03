@@ -136,21 +136,21 @@ public class QcController {
 			
 		} else if (crrnt_qty.getIo_qty() == qcDTO.getIo_qty()) {
 			// 불량 X qc 등록
-			
+			qcDTO.setTotal_qty(total_qty);
 			// io 출고 등록
-			qcService.insertQc1(qcDTO, total_qty);
+			qcService.insertQc1(qcDTO);
 			for(int i=0; i<15; i++) {System.out.println("~~delay 적용중~~");}
 			// io 입고 등록
 			qcService.insertQc2(qcDTO);
 			
 		} else if (crrnt_qty.getIo_qty() > qcDTO.getIo_qty()) {
 			// 불량 O qc 등록
-			int defect_qty = crrnt_qty.getIo_qty() - qcDTO.getIo_qty();
+			qcDTO.setTotal_qty(total_qty);
+			int defect_qty = total_qty - qcDTO.getIo_qty();
 			qcDTO.setDefect_qty(defect_qty);
 			qcService.insertDefect(qcDTO);
-			
 			// io 출고 등록
-			qcService.insertQc1(qcDTO, total_qty);
+			qcService.insertQc1(qcDTO);
 			for(int i=0; i<15; i++) {System.out.println("~~delay 적용중~~");}
 			// io 입고 등록
 			qcService.insertQc2(qcDTO);

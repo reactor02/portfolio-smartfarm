@@ -204,7 +204,7 @@
 		VALUES (
 		    io_seq.NEXTVAL,
 		    '출고',
-		    #{io_qty},
+		    #{total_qty},
 		    sysdate,
 		    0,
 		    (SELECT lot_num FROM io WHERE io_num = #{io_num}),
