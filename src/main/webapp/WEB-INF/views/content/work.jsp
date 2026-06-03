@@ -177,7 +177,8 @@
                     <label>실무자</label>
                     <div class="plan-select-wrap">
                         <input type="text" id="workerDisplay" readonly placeholder="실무자 선택 후 표시"
-                               class="plan-display-input">
+                               class="plan-display-input" style="cursor:pointer;"
+                               onclick="openWorkerModal()">
                         <input type="hidden" name="worker_num" id="workerNumInput">
                         <button type="button" onclick="openWorkerModal()"
                                 class="btn-search-sm">검색</button>
@@ -264,12 +265,11 @@
                 <tr>
                     <th>사번</th>
                     <th>이름</th>
-                    <th>부서</th>
                     <th>연락처</th>
                 </tr>
             </thead>
             <tbody id="workerSearchBody">
-                <tr><td colspan="4" class="empty-modal-cell">검색어를 입력하거나 검색 버튼을 누르세요.</td></tr>
+                <tr><td colspan="3" class="empty-modal-cell">검색어를 입력하거나 검색 버튼을 누르세요.</td></tr>
             </tbody>
         </table>
 

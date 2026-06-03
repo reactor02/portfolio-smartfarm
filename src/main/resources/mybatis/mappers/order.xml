@@ -159,7 +159,9 @@
 
     <!-- 품목 드롭다운 옵션 (PRODUCT + SEMIPRODUCT) -->
     <select id="getItemOptions" resultType="SelectOptionDTO">
-        SELECT item_num AS num, name AS name, type AS type
+        SELECT item_num AS num,
+               name || CASE WHEN item_status = 'N' THEN ' (기능중단)' ELSE '' END AS name,
+               type AS type
         FROM item
         WHERE type IN ('PRODUCT', 'SEMIPRODUCT')
         ORDER BY type, name
@@ -183,6 +185,11 @@
     <!-- 작업지시 담당자 emp_num 조회 (취소/완료 권한 검증용) -->
     <select id="getEmpNum" resultType="String" parameterType="String">
         SELECT emp_num FROM work_order WHERE order_id = #{work_order_id}
+    </select>
+
+    <!-- 작업지시 실무자 worker_num 조회 (시작/완료/생산 권한 검증용) -->
+    <select id="getWorkerNum" resultType="String" parameterType="String">
+        SELECT worker_num FROM work_order WHERE order_id = #{work_order_id}
     </select>
 
     <!-- 생산계획 옵션 (취소 제외) -->

@@ -135,4 +135,12 @@ public interface WorkService {
      * @return 담당자 emp_num 문자열
      */
     String getEmpNum(String work_order_id);
+
+    /**
+     * 작업지시 실무자 worker_num 조회 (시작/완료/생산 권한 검증용)
+     *
+     * @param work_order_id 작업지시 ID
+     * @return 실무자 worker_num 문자열
+     */
+    String getWorkerNum(String work_order_id);
 }

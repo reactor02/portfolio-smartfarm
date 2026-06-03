@@ -50,6 +50,7 @@ response.setContentType("text/html; charset=utf-8");
                     <option value="">선택</option>
                     <option value="대기" <c:if test="${param.plan_status == '대기'}">selected</c:if>>대기</option>
                     <option value="진행" <c:if test="${param.plan_status == '진행'}">selected</c:if>>진행</option>
+                    <option value="지연" <c:if test="${param.plan_status == '지연'}">selected</c:if>>지연</option>
                     <option value="취소" <c:if test="${param.plan_status == '취소'}">selected</c:if>>취소</option>
                     <option value="완료" <c:if test="${param.plan_status == '완료'}">selected</c:if>>완료</option>
                 </select>
@@ -139,7 +140,7 @@ response.setContentType("text/html; charset=utf-8");
                                     value="${prod.plan_qty > 0 ? (prod.currentqty / prod.plan_qty * 100 > 100 ? 100 : prod.currentqty / prod.plan_qty * 100) : 0}"
                                     maxFractionDigits="1" />%</td>
                             <td>
-                                <span class="badge <c:choose><c:when test="${prod.plan_status == '대기'}">badge-wait</c:when><c:when test="${prod.plan_status == '진행'}">badge-progress</c:when><c:when test="${prod.plan_status == '완료'}">badge-done</c:when><c:when test="${prod.plan_status == '취소'}">badge-cancel</c:when></c:choose>">${prod.plan_status}</span>
+                                <span class="badge <c:choose><c:when test="${prod.plan_status == '대기'}">badge-wait</c:when><c:when test="${prod.plan_status == '진행'}">badge-progress</c:when><c:when test="${prod.plan_status == '지연'}">badge-delay</c:when><c:when test="${prod.plan_status == '완료'}">badge-done</c:when><c:when test="${prod.plan_status == '취소'}">badge-cancel</c:when></c:choose>">${prod.plan_status}</span>
                             </td>
                             <td>${prod.ename}</td>
                         </tr>

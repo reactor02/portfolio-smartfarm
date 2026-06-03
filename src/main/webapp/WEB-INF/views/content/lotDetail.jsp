@@ -85,10 +85,10 @@
                         <!-- 소모 자재 재귀 트리 -->
                         <li class="tree-group-label">&#8595; 소모 자재 (이 LOT 생산에 투입된 재료)</li>
                         <c:choose>
-                            <c:when test="${not empty recursiveMaterials}">
-                                <c:forEach var="m" items="${recursiveMaterials}">
-                                    <li class="tree-child" style="padding-left:${m.DEPTH * 20}px;">
-                                        |-- ${m.CHILD_LOT_CODE} <span class="tree-item-name">(${m.ITEM_NAME})</span>
+                            <c:when test="${not empty materials}">
+                                <c:forEach var="m" items="${materials}">
+                                    <li class="tree-child">
+                                        |-- ${m.child_lot_code} <span class="tree-item-name">(${m.item_name})</span>
                                     </li>
                                 </c:forEach>
                             </c:when>
@@ -121,7 +121,6 @@
                 <thead>
                     <tr>
                         <th>번호</th>
-                        <th>단계</th>
                         <th>LOT 번호</th>
                         <th>품목명</th>
                         <th>소모 수량</th>
@@ -129,19 +128,18 @@
                 </thead>
                 <tbody>
                     <c:choose>
-                        <c:when test="${not empty recursiveMaterials}">
-                            <c:forEach var="m" items="${recursiveMaterials}" varStatus="s">
+                        <c:when test="${not empty materials}">
+                            <c:forEach var="m" items="${materials}" varStatus="s">
                                 <tr>
                                     <td>${s.index + 1}</td>
-                                    <td>${m.DEPTH}</td>
-                                    <td>${m.CHILD_LOT_CODE}</td>
-                                    <td>${m.ITEM_NAME}</td>
-                                    <td>${m.REQUIRED_QTY > 0 ? m.REQUIRED_QTY : '-'}</td>
+                                    <td>${m.child_lot_code}</td>
+                                    <td>${m.item_name}</td>
+                                    <td>${m.required_qty > 0 ? m.required_qty : '-'}</td>
                                 </tr>
                             </c:forEach>
                         </c:when>
                         <c:otherwise>
-                            <tr><td colspan="5" class="empty-cell">등록된 소모 자재가 없습니다.</td></tr>
+                            <tr><td colspan="4" class="empty-cell">등록된 소모 자재가 없습니다.</td></tr>
                         </c:otherwise>
                     </c:choose>
                 </tbody>

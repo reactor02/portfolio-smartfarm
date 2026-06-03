@@ -112,14 +112,20 @@ public class WorkController {
         }
 
         // 취소 권한: e_level >= 3(사장) 또는 담당자 본인
+        // 작업 권한(시작/완료/생산): 담당자 또는 실무자 본인
         LoginDTO loginUser = (LoginDTO) session.getAttribute("loginUser");
         boolean canCancel = false;
+        boolean canWork   = false;
         if (loginUser != null) {
-            String recordEmpNum = workService.getEmpNum(work_order_id);
+            String me = loginUser.getEmp_num();
+            String recordEmpNum    = workService.getEmpNum(work_order_id);    // 담당자
+            String recordWorkerNum = workService.getWorkerNum(work_order_id); // 실무자
             canCancel = loginUser.getE_level() >= 3
-                     || loginUser.getEmp_num().equals(recordEmpNum);
+                     || me.equals(recordEmpNum);
+            canWork   = me.equals(recordEmpNum) || me.equals(recordWorkerNum);
         }
         model.addAttribute("canCancel", canCancel);
+        model.addAttribute("canWork",  canWork);
         model.addAttribute("workDTO",     workDTO);
         model.addAttribute("processList", workService.getProcessesByItem(workDTO.getItem_num()));
         return "content/workDetail.tiles";
@@ -191,11 +197,10 @@ public class WorkController {
     @RequestMapping(value = "/{work_order_id}/start", method = RequestMethod.POST)
     @ResponseBody
     public String start(@PathVariable String work_order_id, HttpSession session) {
-        // [권한] 담당자 본인만 작업시작 가능
+        // [권한] 담당자 또는 실무자 본인만 작업시작 가능
         LoginDTO loginUser = (LoginDTO) session.getAttribute("loginUser");
         if (loginUser == null) return "unauthorized";
-        String recordEmpNum = workService.getEmpNum(work_order_id);
-        if (!loginUser.getEmp_num().equals(recordEmpNum)) return "forbidden";
+        if (!isEmpOrWorker(loginUser, work_order_id)) return "forbidden";
         WorkDTO dto = workService.selectOne(work_order_id);
         if (dto == null || dto.getOrder_start() == null) return "error";
         java.time.LocalDate today      = java.time.LocalDate.now();
@@ -217,11 +222,10 @@ public class WorkController {
     @RequestMapping(value = "/{work_order_id}/complete", method = RequestMethod.POST)
     @ResponseBody
     public String complete(@PathVariable String work_order_id, HttpSession session) {
-        // [권한] 담당자 본인만 작업완료 가능
+        // [권한] 담당자 또는 실무자 본인만 작업완료 가능
         LoginDTO loginUser = (LoginDTO) session.getAttribute("loginUser");
         if (loginUser == null) return "unauthorized";
-        String recordEmpNum = workService.getEmpNum(work_order_id);
-        if (!loginUser.getEmp_num().equals(recordEmpNum)) return "forbidden";
+        if (!isEmpOrWorker(loginUser, work_order_id)) return "forbidden";
         workService.complete(work_order_id);
         return "ok";
     }
@@ -245,11 +249,10 @@ public class WorkController {
     @RequestMapping(value = "/{work_order_id}/produce", method = RequestMethod.POST)
     @ResponseBody
     public String produce(@PathVariable String work_order_id, HttpSession session) {
-        // [권한] 담당자 본인만 생산완료 가능
+        // [권한] 담당자 또는 실무자 본인만 생산완료 가능
         LoginDTO loginUser = (LoginDTO) session.getAttribute("loginUser");
         if (loginUser == null) return "unauthorized";
-        String recordEmpNum = workService.getEmpNum(work_order_id);
-        if (!loginUser.getEmp_num().equals(recordEmpNum)) return "forbidden";
+        if (!isEmpOrWorker(loginUser, work_order_id)) return "forbidden";
         try {
             workService.produce(work_order_id);
             return "ok";
@@ -292,5 +295,16 @@ public class WorkController {
             @org.springframework.web.bind.annotation.RequestParam(defaultValue = "") String keyword,
             @org.springframework.web.bind.annotation.RequestParam(defaultValue = "1") int page) {
         return workService.searchWorkers(keyword, page);
+    }
+
+    /**
+     * 로그인 사용자가 해당 작업지시의 담당자(emp_num) 또는 실무자(worker_num) 본인인지 검사한다.
+     * 작업시작/작업완료/생산완료 권한 검증에 사용된다.
+     */
+    private boolean isEmpOrWorker(LoginDTO loginUser, String work_order_id) {
+        String me        = loginUser.getEmp_num();
+        String empNum    = workService.getEmpNum(work_order_id);     // 담당자
+        String workerNum = workService.getWorkerNum(work_order_id);  // 실무자
+        return me != null && (me.equals(empNum) || me.equals(workerNum));
     }
 }

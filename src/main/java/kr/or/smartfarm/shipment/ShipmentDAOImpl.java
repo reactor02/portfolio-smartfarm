@@ -169,4 +169,10 @@ public class ShipmentDAOImpl implements ShipmentDAO {
     public String getEmpNum(String shipmentId) {
         return sqlSession.selectOne("kr.or.smartfarm.shipment.getEmpNum", shipmentId);
     }
+
+    /** 출하 실무자 worker_num 조회 (출하확정 권한 검증용) */
+    @Override
+    public String getWorkerNum(String shipmentId) {
+        return sqlSession.selectOne("kr.or.smartfarm.shipment.getWorkerNum", shipmentId);
+    }
 }

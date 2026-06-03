@@ -250,4 +250,10 @@ public class ShipmentServiceImpl implements ShipmentService {
     public String getEmpNum(String shipmentId) {
         return shipmentDAO.getEmpNum(shipmentId);
     }
+
+    /** 출하 실무자 worker_num 조회 (출하확정 권한 검증용) */
+    @Override
+    public String getWorkerNum(String shipmentId) {
+        return shipmentDAO.getWorkerNum(shipmentId);
+    }
 }

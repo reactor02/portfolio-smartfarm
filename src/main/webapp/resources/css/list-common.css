@@ -120,6 +120,7 @@ select.form-control { flex: 1 !important; width: auto !important; }
 .badge-progress { background: #FFF3CD; color: #856404; }
 .badge-done     { background: #D1E7DD; color: #0A3622; }
 .badge-cancel   { background: #F8D7DA; color: #842029; }
+.badge-delay    { background: #FDE2E2; color: #C92A2A; }
 .badge-available { background: #D1E7DD; color: #0A3622; }
 .badge-used      { background: #E9ECEF; color: #6C757D; }
 .badge-expired   { background: #FFE5D0; color: #923D00; }

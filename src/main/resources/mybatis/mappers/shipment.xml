@@ -189,6 +189,11 @@
         SELECT emp_num FROM shipment WHERE shipment_id = #{shipmentId}
     </select>
 
+    <!-- 출하 실무자 worker_num 조회 (출하확정 권한 검증용) -->
+    <select id="getWorkerNum" resultType="String" parameterType="String">
+        SELECT worker_num FROM shipment WHERE shipment_id = #{shipmentId}
+    </select>
+
     <!-- 출하 등록 (shipment_date 파라미터 사용, 없으면 SYSDATE) -->
     <insert id="insertShipment" parameterType="map">
         <selectKey keyProperty="shipment_num" resultType="int" order="BEFORE">

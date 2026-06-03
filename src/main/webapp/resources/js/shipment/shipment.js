@@ -136,6 +136,8 @@ function resetShipModal() {
 	/* empNum은 로그인 사용자 hidden input — 세션값 유지, 초기화 불필요 */
 	document.getElementById('shipmentDate').value       = '';
 	document.getElementById('planQty').value            = '';
+	document.getElementById('workerNum').value          = '';
+	document.getElementById('workerDisplay').value      = '';
 	setSelectedOrderCard(null);
 }
 
@@ -250,11 +252,109 @@ if (btnInsertShipment) {
 		var requestNum   = document.getElementById('selectedRequestNum').value;
 		var shipmentDate = document.getElementById('shipmentDate').value;
 		var planQty      = document.getElementById('planQty').value;
+		var workerNum    = document.getElementById('workerNum').value;
 
 		if (!requestNum)             { alert('주문을 선택해주세요.');     return; }
+		if (!workerNum)              { alert('실무자를 선택해주세요.');   return; }
 		if (!shipmentDate)           { alert('출하일을 입력해주세요.');   return; }
 		if (!planQty || planQty < 1) { alert('계획수량을 입력해주세요.'); return; }
 
 		document.getElementById('shipInsertForm').submit();
 	});
+}
+
+/* ════════════════════════════════
+   실무자 검색 서브모달 (부서 3·5 재직자, /work/workers 재사용)
+   ════════════════════════════════ */
+function openWorkerModal() {
+	document.getElementById('workerSearchInput').value = '';
+	searchWorkers(1);
+	document.getElementById('workerSearchModal').style.display = 'flex';
+}
+
+var btnOpenWorkerModal = document.getElementById('btnOpenWorkerModal');
+if (btnOpenWorkerModal) {
+	btnOpenWorkerModal.addEventListener('click', openWorkerModal);
+}
+
+/* 표시 인풋창 클릭으로도 실무자 검색 모달 열기 */
+var workerDisplayInput = document.getElementById('workerDisplay');
+if (workerDisplayInput) {
+	workerDisplayInput.addEventListener('click', openWorkerModal);
+}
+
+var btnCloseWorkerModal = document.getElementById('btnCloseWorkerModal');
+if (btnCloseWorkerModal) {
+	btnCloseWorkerModal.addEventListener('click', function() {
+		document.getElementById('workerSearchModal').style.display = 'none';
+	});
+}
+
+var workerSearchModalEl = document.getElementById('workerSearchModal');
+if (workerSearchModalEl) {
+	workerSearchModalEl.addEventListener('click', function(e) {
+		if (e.target === this) this.style.display = 'none';
+	});
+}
+
+var workerSearchInput = document.getElementById('workerSearchInput');
+if (workerSearchInput) {
+	workerSearchInput.addEventListener('keydown', function(e) {
+		if (e.key === 'Enter') searchWorkers(1);
+	});
+}
+
+/* 실무자 검색 AJAX — work 모듈의 /work/workers 엔드포인트 재사용(부서 3·5 재직자) */
+function searchWorkers(page) {
+	var keyword = document.getElementById('workerSearchInput').value;
+	fetch('/work/workers?keyword=' + encodeURIComponent(keyword) + '&page=' + page)
+		.then(function(r) { return r.json(); })
+		.then(function(data) {
+			renderWorkerTable(data.list);
+			renderWorkerPaging(data.currentPage, data.totalPages);
+		})
+		.catch(function(err) { console.error('실무자 검색 오류:', err); });
+}
+
+function renderWorkerTable(list) {
+	var tbody = document.getElementById('workerSearchBody');
+	if (!list || list.length === 0) {
+		tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;padding:20px;color:#888;">검색 결과가 없습니다.</td></tr>';
+		return;
+	}
+	var html = '';
+	list.forEach(function(w) {
+		var empNum = w.EMP_NUM   || '';
+		var ename  = w.ENAME     || '';
+		var tel    = w.TEL       || '';
+		html += '<tr style="cursor:pointer;" onclick="selectWorker(\'' + esc(String(empNum)) + '\',\'' + esc(ename) + '\')">'
+		      + '<td style="text-align:center;">' + empNum + '</td>'
+		      + '<td style="text-align:center;">' + ename  + '</td>'
+		      + '<td style="text-align:center;">' + tel    + '</td>'
+		      + '</tr>';
+	});
+	tbody.innerHTML = html;
+}
+
+function renderWorkerPaging(cur, total) {
+	var wrap = document.getElementById('workerPagination');
+	var html = '';
+	if (cur > 1) {
+		html += '<a href="#" class="pg-btn" onclick="searchWorkers(' + (cur - 1) + ');return false;">이전</a>';
+	}
+	for (var p = 1; p <= total; p++) {
+		html += p === cur
+			? '<a href="#" class="pg-btn pg-active">' + p + '</a>'
+			: '<a href="#" class="pg-btn" onclick="searchWorkers(' + p + ');return false;">' + p + '</a>';
+	}
+	if (cur < total) {
+		html += '<a href="#" class="pg-btn" onclick="searchWorkers(' + (cur + 1) + ');return false;">다음</a>';
+	}
+	wrap.innerHTML = html;
+}
+
+function selectWorker(empNum, ename) {
+	document.getElementById('workerNum').value     = empNum;
+	document.getElementById('workerDisplay').value = ename + ' (' + empNum + ')';
+	document.getElementById('workerSearchModal').style.display = 'none';
 }

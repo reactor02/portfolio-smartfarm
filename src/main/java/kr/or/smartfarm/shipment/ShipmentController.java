@@ -119,14 +119,20 @@ public class ShipmentController {
         }
 
         // 취소 권한: e_level >= 3(사장) 또는 담당자 본인
+        // 출하확정 권한: 담당자 또는 실무자 본인
         LoginDTO loginUser = (LoginDTO) session.getAttribute("loginUser");
-        boolean canCancel = false;
+        boolean canCancel  = false;
+        boolean canConfirm = false;
         if (loginUser != null) {
-            String recordEmpNum = shipmentService.getEmpNum(shipmentId);
-            canCancel = loginUser.getE_level() >= 3
-                     || loginUser.getEmp_num().equals(recordEmpNum);
+            String me = loginUser.getEmp_num();
+            String recordEmpNum    = shipmentService.getEmpNum(shipmentId);    // 담당자
+            String recordWorkerNum = shipmentService.getWorkerNum(shipmentId); // 실무자
+            canCancel  = loginUser.getE_level() >= 3
+                      || (me != null && me.equals(recordEmpNum));
+            canConfirm = me != null && (me.equals(recordEmpNum) || me.equals(recordWorkerNum));
         }
-        model.addAttribute("canCancel", canCancel);
+        model.addAttribute("canCancel",  canCancel);
+        model.addAttribute("canConfirm", canConfirm);
 
         return "content/shipmentDetail.tiles";
     }
@@ -184,9 +190,11 @@ public class ShipmentController {
         LoginDTO loginUser = (LoginDTO) session.getAttribute("loginUser");
         if (loginUser == null) return "redirect:/login";
 
-        // [권한] 담당자 본인만 출하확정 가능
-        String recordEmpNum = shipmentService.getEmpNum(shipmentId);
-        if (!loginUser.getEmp_num().equals(recordEmpNum)) {
+        // [권한] 담당자 또는 실무자 본인만 출하확정 가능
+        String me              = loginUser.getEmp_num();
+        String recordEmpNum    = shipmentService.getEmpNum(shipmentId);    // 담당자
+        String recordWorkerNum = shipmentService.getWorkerNum(shipmentId); // 실무자
+        if (me == null || !(me.equals(recordEmpNum) || me.equals(recordWorkerNum))) {
             return "redirect:/shipmentDetail/" + shipmentId + "?error=forbidden";
         }
 

@@ -282,4 +282,10 @@ public class WorkServiceImpl implements WorkService {
     public String getEmpNum(String work_order_id) {
         return dao.getEmpNum(work_order_id);
     }
+
+    /** 작업지시 실무자 worker_num 조회 (시작/완료/생산 권한 검증용) */
+    @Override
+    public String getWorkerNum(String work_order_id) {
+        return dao.getWorkerNum(work_order_id);
+    }
 }

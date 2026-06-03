@@ -163,19 +163,17 @@ function searchWorkers(page) {
 function renderWorkerTable(list) {
     var tbody = document.getElementById('workerSearchBody');
     if (!list || list.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:20px;color:#888;">검색 결과가 없습니다.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;padding:20px;color:#888;">검색 결과가 없습니다.</td></tr>';
         return;
     }
     var html = '';
     list.forEach(function(w) {
         var empNum = w.EMP_NUM   || '';
         var ename  = w.ENAME     || '';
-        var dept   = w.DEPT_NAME || '';
         var tel    = w.TEL       || '';
         html += '<tr style="cursor:pointer;" onclick="selectWorker(\'' + empNum + '\',\'' + ename + '\')">'
               + '<td style="text-align:center;">' + empNum + '</td>'
               + '<td style="text-align:center;">' + ename  + '</td>'
-              + '<td style="text-align:center;">' + dept   + '</td>'
               + '<td style="text-align:center;">' + tel    + '</td>'
               + '</tr>';
     });

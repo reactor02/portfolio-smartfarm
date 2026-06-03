@@ -37,7 +37,7 @@
         <div class="section-title">■ 기본 정보</div>
         <div class="info-grid">
             <div class="info-item"><span class="info-label">계획번호</span><span class="info-value">${prodDTO.plan_id}</span></div>
-            <div class="info-item"><span class="info-label">상태</span><span class="badge <c:choose><c:when test="${prodDTO.plan_status == '대기'}">badge-wait</c:when><c:when test="${prodDTO.plan_status == '진행'}">badge-progress</c:when><c:when test="${prodDTO.plan_status == '완료'}">badge-done</c:when><c:when test="${prodDTO.plan_status == '취소'}">badge-cancel</c:when></c:choose>">${prodDTO.plan_status}</span></div>
+            <div class="info-item"><span class="info-label">상태</span><span class="badge <c:choose><c:when test="${prodDTO.plan_status == '대기'}">badge-wait</c:when><c:when test="${prodDTO.plan_status == '진행'}">badge-progress</c:when><c:when test="${prodDTO.plan_status == '지연'}">badge-delay</c:when><c:when test="${prodDTO.plan_status == '완료'}">badge-done</c:when><c:when test="${prodDTO.plan_status == '취소'}">badge-cancel</c:when></c:choose>">${prodDTO.plan_status}</span></div>
             <div class="info-item"><span class="info-label">품목명</span><span class="info-value">${prodDTO.item_name}</span></div>
             <div class="info-item"><span class="info-label">품목 코드</span><span class="info-value">${prodDTO.code}</span></div>
             <div class="info-item"><span class="info-label">품목 유형</span><span class="info-value">${prodDTO.type}</span></div>
