@@ -190,11 +190,6 @@ div .pwd-msg-box {
             <span id="work-sub-title" style="font-size: 0.85rem !important; color: #666 !important; font-weight: 500; margin-left: 5px;">(오늘 등록된 지시 기준)</span>
         </div>
         
-        <!-- 💡 기획하신 "검색 버튼" 배치 공간 확보 -->
-        <div style="display: flex; gap: 5px;">
-            <button id="btn-show-today" type="button" class="select-reset" style="margin: 0; padding: 5px 10px; font-size: 0.8rem; background-color: #f4f6f4; border: 1px solid #aaa; border-radius: 4px; cursor: pointer; display: none;">오늘 전체</button>
-            <button id="btn-show-recent" type="button" class="btn-reg" style="margin: 0; padding: 5px 10px; font-size: 0.8rem; background-color: #2D6A4F; color: #fff; border: 1px solid #2D6A4F; border-radius: 4px; cursor: pointer;">최근 5개 보기</button>
-        </div>
     </div>
 
     <!-- 스크롤 가능한 테이블 영역 -->
@@ -213,7 +208,7 @@ div .pwd-msg-box {
             <tbody id="work-tbody">
                 <c:choose>
                     <c:when test="${not empty selectw}">
-                        <c:forEach var="w" items="${selectw}" varStatus="status">
+                        <c:forEach var="w" items="${selectw}" varStatus="status" end="4">
                             <tr style="border-bottom: 1px solid #eee !important; height: 38px !important; transition: all 0.2s;" onmouseover="this.style.backgroundColor='#f9fffb'" onmouseout="this.style.backgroundColor='transparent'">
                                 <td style="padding: 8px !important; font-weight: 600; color: #333;"><a class="link-txt" href="/work/${w.order_id}">${w.order_id}</a></td>
                                 <td style="padding: 8px !important; color: #444;">${w.order_qty}개</td>
