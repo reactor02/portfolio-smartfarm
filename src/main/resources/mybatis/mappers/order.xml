@@ -127,18 +127,20 @@
         WHERE wo.order_id = #{work_order_id}
     </select>
 
-    <!-- 등록 (order_id: plan_id + '-' + 순번 자동 생성) -->
+    <!-- 등록 (order_id: WO-PP0001-001 형식 자동 채번) -->
     <insert id="insert" parameterType="WorkDTO">
         <selectKey keyProperty="work_order_id" resultType="String" order="BEFORE">
-            SELECT pp.plan_id || '-' || (
-                SELECT NVL(MAX(
-                    CASE WHEN REGEXP_LIKE(wo.order_id, pp.plan_id || '-[0-9]+')
-                         THEN TO_NUMBER(SUBSTR(wo.order_id, LENGTH(pp.plan_id)+2))
-                         ELSE 0 END
-                ), 0) + 1
-                FROM work_order wo
-                WHERE wo.plan_num = #{plan_num}
-            )
+            SELECT 'WO-' || REPLACE(pp.plan_id, '-', '') || '-' ||
+                LPAD(
+                    (SELECT NVL(MAX(
+                        CASE WHEN REGEXP_LIKE(wo.order_id, '^WO-' || REPLACE(pp.plan_id, '-', '') || '-[0-9]+$')
+                             THEN TO_NUMBER(REGEXP_SUBSTR(wo.order_id, '[0-9]+$'))
+                             ELSE 0 END
+                    ), 0) + 1
+                    FROM work_order wo
+                    WHERE wo.plan_num = #{plan_num}),
+                    3, '0'
+                )
             FROM production_plan pp
             WHERE pp.plan_num = #{plan_num}
         </selectKey>
@@ -235,9 +237,9 @@
     </select>
 
     <!-- 재료 출고 io 기록 -->
-    <insert id="insertIo" parameterType="map">
-        INSERT INTO io (io_num, io_type, io_qty, io_date, qc_num, lot_num, plan_num, io_reason)
-        VALUES (IO_SEQ.NEXTVAL, #{ioType}, #{ioQty}, SYSDATE, #{qcNum}, #{lotNum}, #{planNum}, #{ioReason})
+     <insert id="insertIo" parameterType="map">
+        INSERT INTO io (io_num, io_type, io_qty, io_date, qc_num, lot_num, io_reason)
+        VALUES (IO_SEQ.NEXTVAL, #{ioType}, #{ioQty}, SYSDATE, #{qcNum}, #{lotNum}, #{ioReason})
     </insert>
 
     <!-- 작업지시 상세용: 품목별 공정 목록 (작업순서 오름차순) -->
