@@ -51,5 +51,18 @@ public class DashDAO {
 		return result;
 	}
 	
+	public Integer selectKPIFacility(){
+		return sqlSession.selectOne("mapper.dash.getKPIFacility");
+	}
+	
+//	생산관리 데이터
+	public List<DashDTO> selectProd(){
+		return sqlSession.selectList("mapper.dash.getProdList");
+	}
+//	생산관리 데이터
+	public List<DashDTO> selectWork(){
+		return sqlSession.selectList("mapper.dash.getWorkList");
+	}
+	
 	
 }

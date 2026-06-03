@@ -168,6 +168,12 @@
 	<select id="qcList" resultType="QcDTO">
 		SELECT * from qc
 	</select>
+ 
+ 	<select id="selectEmp" resultType="QcDTO">
+		SELECT emp_num, ename from emp
+		where dept_num = 5
+		AND status = 'Y'
+	</select>
 	
 	<select id="qcChk" resultType="QcDTO" parameterType="int">
 		SELECT qc_pass from qc

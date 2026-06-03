@@ -50,7 +50,7 @@ public class QcController {
 		List qc = qcService.selectAllQc();
 		model.addAttribute("qc", qc);
 		
-		List emp = equipService.selectEmp();
+		List emp = qcService.selectEmp();
 		model.addAttribute("emp", emp);
 		
 		
@@ -138,6 +138,11 @@ public class QcController {
 			
 			// io 출고 등록
 			qcService.insertQc1(qcDTO);
+			
+			for(int i=0; i<15; i++) {
+				System.out.println("~~delay 적용중~~");
+			}
+			
 			// io 입고 등록
 			qcService.insertQc2(qcDTO);
 		} else if (crrnt_qty.getIo_qty() > qcDTO.getIo_qty()) {
@@ -148,6 +153,11 @@ public class QcController {
 			
 			// io 출고 등록
 			qcService.insertQc1(qcDTO);
+			
+			for(int i=0; i<15; i++) {
+				System.out.println("~~delay 적용중~~");
+			}
+			
 			// io 입고 등록
 			qcService.insertQc2(qcDTO);
 		}
