@@ -15,10 +15,10 @@ public class CodeManageServiceImpl implements CodeManageService {
 	CodeManageDAO CodeManageDAO;
 
 	@Override
-	public List<CodeManageDTO> getCodeManage() {
+	public List<CodeManageDTO> getCodeManage(int page) {
 		// TODO Auto-generated method stub
 
-		List<CodeManageDTO> result = CodeManageDAO.getCodeManage();
+		List<CodeManageDTO> result = CodeManageDAO.getCodeManage(page);
 
 		return result;
 

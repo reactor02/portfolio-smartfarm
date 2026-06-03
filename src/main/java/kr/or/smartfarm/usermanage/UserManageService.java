@@ -10,8 +10,9 @@ public interface UserManageService {
 	public List<UserManageDTO> selectd();
 	public List<UserManageDTO> selectl();
 	public List<UserManageDTO> selectm();
-	public List<UserManageDTO> selectw();
+	public List<TodayWorkDTO> selectw(String emp_num);
 	public List searchAjax(Map map);
+	public List codesearch(Map map);
 	public int userInsert(UserManageDTO userManageDTO);
 	public int userUpdate(UserManageDTO userManageDTO);
 	public int userRetire(UserManageDTO userManageDTO);
