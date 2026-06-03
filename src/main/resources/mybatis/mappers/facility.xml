@@ -122,9 +122,41 @@
 			ename
 		FROM emp
 		WHERE status = 'Y'
+		AND dept_num IN (3,5)
 	</select>
 	
-
+	<insert id="insertFM" parameterType="FacilityDTO">
+		INSERT INTO facility_management (
+		    facility_management_num, 
+		    temperature, 
+		    humidity,
+		    soil_ec,
+		    soil_ph,
+		    illuminance,
+		    managed_at,
+		    facility_chk,
+		    facility_num,
+		    emp_num
+		)
+		SELECT 
+		    fm_seq.NEXTVAL, 
+		    c.c_temperature, 
+		    c.c_humidity,
+		    c.c_soil_ec,
+		    c.c_soil_ph,
+		    c.c_illuminance,
+		    CAST(SYSTIMESTAMP AT TIME ZONE 'Asia/Seoul' AS DATE),
+		    CASE 
+		        WHEN ABS(c.c_temperature - f.m_temperature) >= ABS(f.m_temperature * 0.1)
+		        THEN '점검필요'
+		        ELSE '정상'
+		    END,
+		    c.censor_num,
+		    #{emp_num}
+		FROM censor c
+		JOIN facility f 
+		    ON c.censor_num = f.facility_num
+	</insert>
 
 
 

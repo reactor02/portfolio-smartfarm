@@ -144,13 +144,13 @@ div .pwd-msg-box {
 							style="flex: 1 !important; width: 100% !important; height: 38px !important; padding: 0 10px !important; background-color: #f9f9f9 !important; color: #555 !important; border: 3px solid #aaa !important; border-radius: 4px !important; font-size: .95rem !important; cursor: default !important; transition: all 0.2s;" />
 					</div>
 
-					<!-- 🔒 부서코드: 깔끔하게 div로 고정 -->
+					<!-- 🔒 부서명: 깔끔하게 div로 고정 -->
 					<div class="mp-form-group"
 						style="display: flex !important; align-items: center !important; height: 38px !important;">
 						<label
-							style="width: 85px !important; flex-shrink: 0 !important; font-size: .95rem !important; font-weight: 700 !important; color: #333 !important;">부서코드</label>
+							style="width: 85px !important; flex-shrink: 0 !important; font-size: .95rem !important; font-weight: 700 !important; color: #333 !important;">부서명</label>
 						<div
-							style="flex: 1 !important; padding-left: 10px !important; font-size: .95rem !important; color: #666 !important; height: 35px !important; border: 1px solid #aaa !important; border-radius: 4px !important; font-size: .95rem !important; cursor: default !important;">${loginUser.dept_num}</div>
+							style="flex: 1 !important; padding-left: 10px !important; font-size: .95rem !important; color: #666 !important; height: 35px !important; border: 1px solid #aaa !important; border-radius: 4px !important; font-size: .95rem !important; cursor: default !important;">${loginUser.dept_name}</div>
 					</div>
 
 					<!-- 🔒 입사일: 깔끔하게 div로 고정 -->
@@ -215,7 +215,7 @@ div .pwd-msg-box {
                     <c:when test="${not empty selectw}">
                         <c:forEach var="w" items="${selectw}" varStatus="status">
                             <tr style="border-bottom: 1px solid #eee !important; height: 38px !important; transition: all 0.2s;" onmouseover="this.style.backgroundColor='#f9fffb'" onmouseout="this.style.backgroundColor='transparent'">
-                                <td style="padding: 8px !important; font-weight: 600; color: #333;">${w.order_id}</td>
+                                <td style="padding: 8px !important; font-weight: 600; color: #333;"><a class="link-txt" href="/work/${w.order_id}">${w.order_id}</a></td>
                                 <td style="padding: 8px !important; color: #444;">${w.order_qty}개</td>
                                 <td style="padding: 8px !important; color: #2D6A4F; font-weight: 600;">${w.current_qty}개</td>
                                 <td style="padding: 8px !important;">

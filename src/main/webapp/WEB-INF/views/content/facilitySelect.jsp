@@ -35,15 +35,19 @@ response.setContentType("text/html; charset=utf-8");
 			<!-- 타이틀 & 등록 버튼 -->
 			<div class="hdr">
 			    <h1>시설관리</h1>
-<!--                 <div class="modal-field"> -->
+                <div class="modal-field">
+                
 <!--                     <label>확인자</label> -->
-<!--                     <select name="emp_num"> -->
-<!--                         <option value="">선택</option> -->
-<%--                         <c:forEach var="e" items="${emp}"> --%>
-<%--                             <option value="${e.emp_num}">${e.ename}</option> --%>
-<%--                         </c:forEach> --%>
-<!--                     </select> -->
-<!--                 </div> -->
+                    <form action="insertFM" method="GET">
+	                    <select name="emp_num">
+	                        <option value="">선택</option>
+	                        <c:forEach var="e" items="${emp}">
+	                            <option value="${e.emp_num}">${e.ename}</option>
+	                        </c:forEach>
+	                    </select>
+						<input id="insertFM" type="submit" value="등록하기">
+	                </form>
+                </div>
 			</div>
 			
 			 <!-- 상단 상태 -->

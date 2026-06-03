@@ -15,13 +15,12 @@
 	
 	<select id="getReportList" resultType="kr.or.smartfarm.report.ReportSummaryDTO">
 		select 
-			i.item_num, i.code, i.name, s.stock_qty,
-			b.bom_code, b.bom_status, e.start_date, e.equip_status, l.lot_code, l.lot_date
-		<include refid="BaseTableJoin" />
-		where 1=1
-		<if test="startDate != null and endDate != null"> 
-			and e.start_date between #{startDate} and #{endDate}
-		</if>
+			i.name, 
+			l.lot_code, 
+			l.lot_date
+		FROM lot l
+		JOIN item i
+			ON l.item_num = i.item_num
 	</select>
 	
 	<select id="getQcList" resultType="kr.or.smartfarm.report.ReportSummaryDTO">
@@ -63,6 +62,34 @@
         WHERE i.TYPE IN ('PRODUCT', 'SEMIPRODUCT') 
          ORDER BY i.item_num DESC
 	</select>
+	
+	
+	<select id="getDefectList" resultType="kr.or.smartfarm.report.ReportSummaryDTO">
+		SELECT 
+	        i.name, 
+	        d.defect_qty,
+	        io.io_date
+        FROM defective d
+        JOIN io ON d.io_num = io.io_num
+        JOIN lot l ON io.lot_num = l.lot_num
+        JOIN item i ON l.item_num = i.item_num
+        ORDER BY io.io_date DESC
+	</select>
+	
+	<select id="getEquipList" resultType="kr.or.smartfarm.report.ReportSummaryDTO">
+		SELECT 
+			i.code,
+			i.name,
+			e.equip_status,
+			e.total_runtime
+		FROM EQUIPMENT_LOG e
+		JOIN item i 
+			ON e.item_num = i.item_num
+		ORDER BY e.MAINTENANCE_DATE DESC
+	</select>
+	
+	
+	
 </mapper>
 
 

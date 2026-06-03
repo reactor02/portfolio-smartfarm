@@ -133,7 +133,7 @@ select.form-control { width: 110px; }
 										value="${param.keyword}" placeholder=" 제품명 / 코드명">
 								</div>
 								<!-- 💡 함수 연결을 위해 onclick 속성 부여 -->
-								<button type="button" class="btn-sch" onclick="doSearch()">검색</button>
+								<button type="button" class="btn-sch">검색</button>
 								<button type="button" class="select-reset"
 									onclick="resetSearch()">검색 초기화</button>
 							</div>
@@ -146,8 +146,8 @@ select.form-control { width: 110px; }
 						<thead>
 							<tr>
 								<th style="width: 60px;">번호</th>
-								<th>시퀀스</th>
 								<th>코드명</th>
+								<th>제품명</th>
 								<th>유형</th>
 								<th>단위</th>
 								<th>가격</th>
@@ -171,7 +171,7 @@ select.form-control { width: 110px; }
 											<td>${a.item_status}</td>
 											<td>${a.safe}</td>
 											<td>
-											<c:if test="${a.item_status eq 'A'}">
+											<c:if test="${a.item_status eq 'Y'}">
 													<button type="button" class="btn-disable"
 														onclick="disableItem('${a.item_num}')"
 														style="padding: 4px 8px; background-color: #ff4d4d; color: white; border: none; border-radius: 4px; cursor: pointer;">
@@ -203,6 +203,18 @@ select.form-control { width: 110px; }
 						</tbody>
 					</table>
 				</div>
+				
+				<div class="table-responsive"></div>
+				<div id="paging-area">
+					<jsp:include page="/WEB-INF/views/common/paging.jsp" />
+				</div>
+			</main>
+		</div>
+				
+				
+				
+				
+				
 				<!-- 코드 등록 -->
 				<div id="regModal" class="modal-overlay" style="display: none;">
 					<div class="modal-box">
@@ -258,16 +270,9 @@ select.form-control { width: 110px; }
 
 								</div>
 								<!-- emp_num 영역 (우측 세트 내부에서 오른쪽 반 차지) -->
-								<div class="modal-field"
-									style="width: 47% !important; display: flex !important; flex-direction: column !important; gap: 6px !important;">
-									<label for="lType-e">담당자</label> <select id="lType-n"
-										class="form-control" name="emp_num"
-										style="width: 100% !important; min-width: 100% !important; height: 38px !important; box-sizing: border-box !important;">
-										<option value="all">선택</option>
-										<c:forEach var="b" items="${ selectm }">
-											<option value="${b.emp_num}">${ b.ename }</option>
-										</c:forEach>
-									</select>
+								<div class="modal-field">
+									<label for="quantity">담당자</label> <input type="text"
+										name="safe" id="safe" readonly="readonly" value="${ loginUser.ename }">
 								</div>
 
 							</div>
@@ -324,23 +329,80 @@ select.form-control { width: 110px; }
     // ==========================================
     // 3. 🔍 검색 실행 및 초기화 기능 (type, unit 구조 맞춤)
     // ==========================================
-    // [검색 실행]
-    function doSearch() {
-        const form = document.searchFrm;
-        const type = document.getElementById("dType").value;
-        const unit = document.getElementById("lType").value;
-        const keyword = document.getElementById("keyword").value.trim();
+ ////////////////////////
+		// 종한 로직
+// 		검색 버튼 클릭시 아작스
+		const btn_sch = document.querySelector(".btn-sch");
+		btn_sch.addEventListener('click', ()=>{
+			movePage(1)
+		})
+		
+		//페이징 관련 함수
+		function movePage(pageNum) {
+	    
+	    const type = document.getElementById("dType").value;
+	    const level = document.getElementById("lType").value;
+	    const keyword = document.getElementById("keyword").value.trim();
 
-        // 아무 조건도 선택/입력하지 않고 검색을 누른 경우 차단
-        if (!type && !unit && !keyword) {
-            alert("검색 조건을 하나 이상 선택하거나 입력해주세요.");
-            return;
-        }
-
-        // 공백 제거 키워드 재세팅 후 폼 서브밋
-        document.getElementById("keyword").value = keyword;
-        form.submit();
-    }
+	    const params = new URLSearchParams();
+	    params.append("page", pageNum); // 누른 페이지 번호를 전달
+	    params.append("type", type);
+	    params.append("level", level);
+	    params.append("keyword", keyword);
+	    
+	   // 변경할 코드 (안전한 문자열 결합 방식)
+	    		fetch('/codesearch?' + params.toString())
+	    .then(response => response.json())
+	    .then(data => {
+	    	if(data.searchResult.length == 0){
+	    		 let tbody = document.querySelector("#stock-body");
+	    	    tbody.innerHTML = "<tr><td colspan='8'>조회된 결과가 없습니다.</td></tr>";
+	    	    renderPagination(data.pageInfo); // 페이지 정보도 갱신하여 페이징 버튼도 사라지게 처리
+	    	    return;
+	    	}
+	        if(data.status === "good"){
+	            // 1. 테이블 데이터 갱신
+	            let tbody = document.querySelector("#stock-body");
+	            tbody.innerHTML = "";
+	            
+	            let html = "";
+	            for(let i = 0; i < data.searchResult.length; i++) {
+	                let item = data.searchResult[i];
+	                html += `<tr>
+	                    <td style='font-weight: bold; color: #555;'>\${i + 1 + (data.pageInfo.pageNum - 1) * 5}</td>
+	                    <td>\${item.item_num}</td>
+	                    <td><a class='link-txt'>\${item.code}</a></td>
+	                    <td>\${item.name}</td>
+	                    <td>\${item.type}</td>
+	                    <td>\${item.unit}</td>
+	                    <td>\${item.price}</td>
+	                    <td>\${item.item_status}</td>
+	                    <td>\${item.safe}</td>
+	                </tr>`;
+	                
+// 	                html += `<tr>
+// 	                    <td style='font-weight: bold; color: #555;'>\${i + 1 + (data.pageInfo.pageNum - 1) * 5}</td>
+// 	                    <td>\${item.ITEM_NUM}</td>
+// 	                    <td><a class='link-txt'>\${item.CODE}</a></td>
+// 	                    <td>\${item.NAME}</td>
+// 	                    <td>\${item.TYPE}</td>
+// 	                    <td>\${item.UNIT}</td>
+// 	                    <td>\${item.PRICE}</td>
+// 	                    <td>\${item.ITEM_STATUS}</td>
+// 	                    <td>\${item.SAFE}</td>
+// 	                </tr>`;
+	            }
+	            tbody.innerHTML = html;
+	            
+	            renderPagination(data.pageInfo);
+	
+	         // 수정 코드 (&level=\${level} 추가)
+	            const newUrl = window.location.pathname + `?page=\${pageNum}&type=\${type}&level=\${level}&keyword=\${keyword}`;
+	            window.history.pushState({path: newUrl}, '', newUrl);
+	        }
+	    });
+	}
+		
 
     // [검색 초기화]
     function resetSearch() {

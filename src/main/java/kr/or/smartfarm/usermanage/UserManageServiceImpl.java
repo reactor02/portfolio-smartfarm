@@ -52,10 +52,10 @@ public class UserManageServiceImpl implements UserManageService {
 		
 	}
 	@Override
-	public List<UserManageDTO> selectw() {
+	public List<TodayWorkDTO> selectw(String emp_num) {
 		// TODO Auto-generated method stub
 		
-		List<UserManageDTO> result = userManageDAO.selectw();
+		List<TodayWorkDTO> result = userManageDAO.selectw(emp_num);
 		
 		return result;
 		
@@ -133,6 +133,10 @@ public class UserManageServiceImpl implements UserManageService {
 	@Override
 	public List searchAjax(Map map) {
 		return userManageDAO.searchAjax(map);
+	}
+	@Override
+	public List codesearch(Map map) {
+		return userManageDAO.codesearch(map);
 	}
 
 }

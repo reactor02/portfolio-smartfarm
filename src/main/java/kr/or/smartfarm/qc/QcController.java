@@ -126,6 +126,7 @@ public class QcController {
 		
 		// 총량 확인
 		QcDTO crrnt_qty = qcService.crrnt_qty(qcDTO);
+		Integer total_qty = crrnt_qty.getIo_qty();
 		// lot_num 조사
 		if(		   qcDTO.getIo_qty() < 0 
 				|| crrnt_qty.getIo_qty() < qcDTO.getIo_qty()) {
@@ -137,14 +138,11 @@ public class QcController {
 			// 불량 X qc 등록
 			
 			// io 출고 등록
-			qcService.insertQc1(qcDTO);
-			
-			for(int i=0; i<15; i++) {
-				System.out.println("~~delay 적용중~~");
-			}
-			
+			qcService.insertQc1(qcDTO, total_qty);
+			for(int i=0; i<15; i++) {System.out.println("~~delay 적용중~~");}
 			// io 입고 등록
 			qcService.insertQc2(qcDTO);
+			
 		} else if (crrnt_qty.getIo_qty() > qcDTO.getIo_qty()) {
 			// 불량 O qc 등록
 			int defect_qty = crrnt_qty.getIo_qty() - qcDTO.getIo_qty();
@@ -152,12 +150,8 @@ public class QcController {
 			qcService.insertDefect(qcDTO);
 			
 			// io 출고 등록
-			qcService.insertQc1(qcDTO);
-			
-			for(int i=0; i<15; i++) {
-				System.out.println("~~delay 적용중~~");
-			}
-			
+			qcService.insertQc1(qcDTO, total_qty);
+			for(int i=0; i<15; i++) {System.out.println("~~delay 적용중~~");}
 			// io 입고 등록
 			qcService.insertQc2(qcDTO);
 		}

@@ -57,10 +57,10 @@ public class UserManageDAOImpl implements UserManageDAO {
 		return result;
 	}
 	@Override
-	public List<UserManageDTO> selectw() {
+	public List<TodayWorkDTO> selectw(String emp_num) {
 		// TODO Auto-generated method stub
 		
-		List<UserManageDTO> result = sqlSession.selectList(NAMESPACE2 + "selectw");
+		List<TodayWorkDTO> result = sqlSession.selectList(NAMESPACE2 + "selectw", emp_num);
 		
 		return result;
 	}
@@ -128,6 +128,14 @@ public class UserManageDAOImpl implements UserManageDAO {
 		int pageNum = (Integer)map.get("page");
 		PageHelper.startPage(pageNum, 5);
 		result = sqlSession.selectList(NAMESPACE + "searchAjax", map);
+		return result;
+	}
+	@Override
+	public List codesearch(Map map) {
+		List result = null;
+		int pageNum = (Integer)map.get("page");
+		PageHelper.startPage(pageNum, 5);
+		result = sqlSession.selectList(NAMESPACE2 + "CodeSearch", map);
 		return result;
 	}
 
