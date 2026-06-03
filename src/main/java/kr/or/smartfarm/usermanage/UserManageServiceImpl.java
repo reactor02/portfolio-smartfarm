@@ -134,5 +134,9 @@ public class UserManageServiceImpl implements UserManageService {
 	public List searchAjax(Map map) {
 		return userManageDAO.searchAjax(map);
 	}
+	@Override
+	public List codesearch(Map map) {
+		return userManageDAO.codesearch(map);
+	}
 
 }

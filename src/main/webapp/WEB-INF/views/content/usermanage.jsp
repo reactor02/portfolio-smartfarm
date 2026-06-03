@@ -150,8 +150,8 @@ select.form-control{width:110px}
 								<th>이름</th>
 								<th>권한</th>
 								<th>부서</th>
-								<th>부서번호</th>
 								<th>입사일</th>
+								<th>퇴사일</th>
 								<th>재직여부</th>
 							</tr>
 						</thead>
@@ -166,8 +166,8 @@ select.form-control{width:110px}
 											<td><span class="link-txt">${a.ename}</span></td>
 											<td>${a.e_level}</td>
 											<td>${a.dept_name}</td>
-											<td>${a.dept_num}</td>
 											<td>${a.hire_date}</td>
+											<td>${not empty a.termination_date ? a.termination_date : "-"}</td>
 											<td>${a.status}</td>
 										</tr>
 									</c:forEach>
@@ -403,17 +403,22 @@ function formatDate(value) {
 	            let tbody = document.querySelector("#stock-body");
 	            tbody.innerHTML = "";
 	            
+	            
 	            let html = "";
 	            for(let i = 0; i < data.searchResult.length; i++) {
 	                let item = data.searchResult[i];
+	                
+	            // 퇴사일 데이터 유무 처리를 위한 자바스크립트 변수 정의
+                let termDate = item.TERMINATION_DATE ? item.TERMINATION_DATE : "-";
+	            
 	                html += `<tr>
 	                    <td style='font-weight: bold; color: #555;'>\${i + 1 + (data.pageInfo.pageNum - 1) * 5}</td>
 	                    <td>\${item.EMP_NUM}</td>
 	                    <td><a href='/userdetail?emp_num=\${item.EMP_NUM}' class='link-txt'>\${item.ENAME}</a></td>
 	                    <td>\${item.E_LEVEL}</td>
 	                    <td>\${item.DEPT_NAME}</td>
-	                    <td>\${item.DEPT_NUM}</td>
 	                    <td>\${formatDate(item.HIRE_DATE)}</td>
+	                    <td>\${termDate}</td> <!-- 수정 완료 -->
 	                    <td>\${item.STATUS}</td>
 	                </tr>`;
 	            }
@@ -421,7 +426,7 @@ function formatDate(value) {
 	            
 	            renderPagination(data.pageInfo);
 	
-	            const newUrl = window.location.pathname + `?page=\${pageNum}&type=\${type}&keyword=\${keyword}`;
+	            const newUrl = window.location.pathname + `?page=\${pageNum}&type=\${type}&level=\${level}&keyword=\${keyword}`;
 	            window.history.pushState({path: newUrl}, '', newUrl);
 	        }
 	    });

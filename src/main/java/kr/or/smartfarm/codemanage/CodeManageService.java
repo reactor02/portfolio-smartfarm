@@ -4,7 +4,7 @@ import java.util.List;
 
 public interface CodeManageService {
 	
-	public List<CodeManageDTO> getCodeManage();
+	public List<CodeManageDTO> getCodeManage(int page);
 	public List<CodeManageDTO> getCodeSearch(CodeManageDTO searchDTO);
 	public List<CodeManageDTO> selectd();
 	public List<CodeManageDTO> selectl();

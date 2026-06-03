@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.SessionAttribute;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.github.pagehelper.PageHelper;
@@ -62,6 +63,8 @@ public class UserManageController {
 	
 	@GetMapping("/mypage")
 	public String mypageGet(
+			  // 1. 세션에서 loginUser 객체를 자동으로 주입받습니다.
+	        @SessionAttribute(value = "loginUser", required = false) UserManageDTO loginUser,
 			Model model
 			) { // 💡 데이터를 담을 가방(Model) 주입
 		System.out.println("mypageGet 실행");
@@ -288,6 +291,46 @@ public class UserManageController {
 		    List<UserManageDTO> selectm = userManageService.selectm();
 		    
 	        List searchResult = userManageService.searchAjax(searchMap);
+	        result.put("searchResult", searchResult);
+
+	        result.put("status", "good");
+	        if(searchResult != null) {
+	        	PageInfo<Map<String, Object>> pageInfo = new PageInfo<Map<String, Object>>(searchResult);
+	        	result.put("pageInfo", pageInfo);
+	        }else {
+	        	PageInfo pageInfo = new PageInfo();
+	        	result.put("pageInfo", pageInfo);
+	        }
+	        
+	    } catch(Exception e) {
+	        e.printStackTrace();
+	        result.put("status", "error");
+	    }
+	    
+	    return result;
+	}
+	
+	@RequestMapping("/codesearch")
+	@ResponseBody
+	public Map codesearch(
+			  @RequestParam(value = "page", defaultValue = "1") int page,
+		        // String으로 변경하고, 값이 없을 때를 대비해 required=false와 기본값(빈값)을 설정합니다.
+		        @RequestParam(value = "type", required = false, defaultValue = "") String type,
+		        @RequestParam(value = "level", required = false, defaultValue = "") String level,
+		        @RequestParam(value = "keyword", required = false, defaultValue = "") String keyword
+	        ) {
+
+	    Map result = new HashMap();
+	    
+	    try {
+	        Map searchMap = new HashMap();
+	        searchMap.put("page", page);
+	        searchMap.put("type", type);
+	        searchMap.put("level", level);
+	        searchMap.put("keyword", keyword );
+	        System.out.println(searchMap);
+		    
+	        List searchResult = userManageService.codesearch(searchMap);
 	        result.put("searchResult", searchResult);
 
 	        result.put("status", "good");

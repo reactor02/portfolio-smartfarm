@@ -6,6 +6,8 @@ import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import com.github.pagehelper.PageHelper;
+
 @Repository
 public class CodeManageDAOImpl implements CodeManageDAO {
 
@@ -16,8 +18,12 @@ public class CodeManageDAOImpl implements CodeManageDAO {
 	private static final String NAMESPACE = "kr.or.smartfarm.codemanage.CodeManageDAO.";
 
 	@Override
-	public List<CodeManageDTO> getCodeManage() {
+	public List<CodeManageDTO> getCodeManage(int page) {
 		// TODO Auto-generated method stub
+		
+		// 1. ⭐ 핵심: 회원 목록 조회 직전에 딱 5개씩만 가져오도록 PageHelper 세팅
+	    // (현재페이지번호, 한 페이지에 보여줄 데이터 개수)
+	    PageHelper.startPage(page, 5);
 
 		List<CodeManageDTO> result = sqlSession.selectList(NAMESPACE + "getCodes");
 

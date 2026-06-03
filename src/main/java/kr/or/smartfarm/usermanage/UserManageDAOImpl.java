@@ -130,5 +130,13 @@ public class UserManageDAOImpl implements UserManageDAO {
 		result = sqlSession.selectList(NAMESPACE + "searchAjax", map);
 		return result;
 	}
+	@Override
+	public List codesearch(Map map) {
+		List result = null;
+		int pageNum = (Integer)map.get("page");
+		PageHelper.startPage(pageNum, 5);
+		result = sqlSession.selectList(NAMESPACE2 + "CodeSearch", map);
+		return result;
+	}
 
 }

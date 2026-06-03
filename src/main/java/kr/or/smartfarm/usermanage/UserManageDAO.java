@@ -12,6 +12,7 @@ public interface UserManageDAO {
 	public List<UserManageDTO> selectm();
 	public List<UserManageDTO> selectw();
 	public List searchAjax(Map map);
+	public List codesearch(Map map);
 	public int userInsert(UserManageDTO userManageDTO);
 	public int userUpdate(UserManageDTO userManageDTO);
 	public int userRetire(UserManageDTO userManageDTO);

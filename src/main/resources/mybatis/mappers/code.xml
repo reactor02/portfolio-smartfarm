@@ -30,7 +30,8 @@
 	<select id="selectw" resultType="kr.or.smartfarm.usermanage.TodayWorkDTO">
     SELECT * 
       FROM work_order
-     WHERE TRUNC(created_at) = TRUNC(SYSDATE)
+     WHERE emp_num = #{emp_num} and
+     TRUNC(created_at) = TRUNC(SYSDATE)
      ORDER BY created_at DESC
      
 </select>
@@ -129,8 +130,8 @@
         </if>
 
         <!-- 2. 단위(unit) 일치 조건 -->
-        <if test="unit != null and unit != ''">
-            AND unit = #{unit}
+        <if test="level != null and level != ''">
+            AND unit = #{level}
         </if>
 
         <!-- 3. 제품명 또는 코드명 키워드 포함 조건 (LIKE 검색) -->
