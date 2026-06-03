@@ -270,7 +270,6 @@ response.setContentType("text/html; charset=utf-8");
 									<th>수량</th>
 									<th>입고일</th>
 									<th>유통기한</th>
-									<th>담당자</th>
 								</tr>
 							</thead>
 							<tbody>
@@ -283,7 +282,6 @@ response.setContentType("text/html; charset=utf-8");
 												<td>${history.STOCK_QTY}</td>
 												<td><fmt:formatDate value="${history.LOT_DATE}" pattern="yyyy-MM-dd" /></td>
 												<td><fmt:formatDate value="${history.EXPIRY_DATE}" pattern="yyyy-MM-dd" /></td>
-												<td>하드코딩</td>
 											</tr>
 										</c:forEach>
 									</c:when>

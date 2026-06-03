@@ -9,5 +9,6 @@ public interface IoDAO {
 	public List facility2();
 	public List modalSearch2(String keyword);
 	public void insertData2(IoDTO ioDTO);
-	
+	public List outModal2();
+	public int outModalInsert2(IoDTO ioDTO);
 }

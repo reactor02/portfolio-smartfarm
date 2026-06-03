@@ -48,4 +48,18 @@ public class IoServiceImpl implements IoService{
 		 ioDAO.insertData2(ioDTO);
 		return;
 	}
+	
+	@Override
+	public List outModal() {
+		List result = null;
+		result = ioDAO.outModal2();
+		return result;
+	}
+
+	@Override
+	public int outModalInsert(IoDTO ioDTO) {
+		int result = 0;
+		result = ioDAO.outModalInsert2(ioDTO);
+		return result;
+	}
 }
