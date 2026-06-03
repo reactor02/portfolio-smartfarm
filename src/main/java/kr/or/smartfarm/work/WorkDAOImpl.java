@@ -91,6 +91,12 @@ public class WorkDAOImpl implements WorkDAO {
         return session.selectList("kr.or.smartfarm.work.searchPlans", params);
     }
 
+    /** 실무자 검색 (작업지시 등록 시 실무자 선택용, 부서 3·5 재직자, 페이징) */
+    @Override
+    public List<Map<String, Object>> searchWorkers(Map<String, Object> params) {
+        return session.selectList("kr.or.smartfarm.work.searchWorkers", params);
+    }
+
     /** 품목의 BOM(소요 자재) 목록 조회 — 생산 시 자재 차감 기준 */
     @Override
     public List<BomDTO> getMaterialsByItem(int item_num) {
@@ -103,6 +109,18 @@ public class WorkDAOImpl implements WorkDAO {
         session.insert("kr.or.smartfarm.work.insertIo", params);
     }
 
+    /** 생산 완료 LOT 입고(io) 기록 — 생산입고 + 검사대기 QC 연결 */
+    @Override
+    public void insertProduceIo(Map<String, Object> params) {
+        session.insert("kr.or.smartfarm.work.insertProduceIo", params);
+    }
+
+    /** stock 재고 수량 가감 — 생산투입 차감 / 생산입고 증가 (기존 행 있을 때만) */
+    @Override
+    public void adjustStock(Map<String, Object> params) {
+        session.update("kr.or.smartfarm.work.adjustStock", params);
+    }
+
     /** 품목별 공정 목록 조회 (작업순서 오름차순) */
     @Override
     public List<Map<String, Object>> getProcessesByItem(int item_num) {
@@ -113,5 +131,11 @@ public class WorkDAOImpl implements WorkDAO {
     @Override
     public String getEmpNum(String work_order_id) {
         return session.selectOne("kr.or.smartfarm.work.getEmpNum", work_order_id);
+    }
+
+    /** 작업지시 실무자 worker_num 조회 (시작/완료/생산 권한 검증용) */
+    @Override
+    public String getWorkerNum(String work_order_id) {
+        return session.selectOne("kr.or.smartfarm.work.getWorkerNum", work_order_id);
     }
 }

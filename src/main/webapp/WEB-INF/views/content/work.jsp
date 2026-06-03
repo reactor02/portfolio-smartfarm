@@ -175,12 +175,14 @@
                 </div>
                 <div class="modal-field">
                     <label>실무자</label>
-                    <select name="worker_num" class="form-control" required>
-                        <option value="">실무자 선택</option>
-                        <c:forEach var="w" items="${workerList}">
-                            <option value="${w.num}">${w.name}</option>
-                        </c:forEach>
-                    </select>
+                    <div class="plan-select-wrap">
+                        <input type="text" id="workerDisplay" readonly placeholder="실무자 선택 후 표시"
+                               class="plan-display-input" style="cursor:pointer;"
+                               onclick="openWorkerModal()">
+                        <input type="hidden" name="worker_num" id="workerNumInput">
+                        <button type="button" onclick="openWorkerModal()"
+                                class="btn-search-sm">검색</button>
+                    </div>
                 </div>
                 <div class="modal-field">
                     <label>지시수량</label>
@@ -240,6 +242,43 @@
         <div class="modal-btn-wrap modal-btn-wrap-mt">
             <button type="button" class="btn-cancel"
                     onclick="document.getElementById('planSearchModal').style.display='none'">닫기</button>
+        </div>
+    </div>
+</div>
+
+<!-- ===== 실무자 검색 모달 (부서 3·5 재직자) ===== -->
+<div id="workerSearchModal" class="modal-overlay modal-overlay-top" style="display:none;">
+    <div class="modal-box modal-box-lg">
+        <h3 class="modal-title">실무자 검색</h3>
+
+        <!-- 검색 입력 -->
+        <div class="modal-search-bar">
+            <input type="text" id="workerKeyword" placeholder="사번 / 이름"
+                   class="modal-search-input">
+            <button type="button" onclick="searchWorkers(1)"
+                    class="btn-modal-search">검색</button>
+        </div>
+
+        <!-- 결과 테이블 -->
+        <table class="stk-tbl plan-tbl">
+            <thead>
+                <tr>
+                    <th>사번</th>
+                    <th>이름</th>
+                    <th>연락처</th>
+                </tr>
+            </thead>
+            <tbody id="workerSearchBody">
+                <tr><td colspan="3" class="empty-modal-cell">검색어를 입력하거나 검색 버튼을 누르세요.</td></tr>
+            </tbody>
+        </table>
+
+        <!-- 페이지네이션 -->
+        <div class="pg-wrap plan-pagination" id="workerPagination"></div>
+
+        <div class="modal-btn-wrap modal-btn-wrap-mt">
+            <button type="button" class="btn-cancel"
+                    onclick="document.getElementById('workerSearchModal').style.display='none'">닫기</button>
         </div>
     </div>
 </div>

@@ -13,7 +13,7 @@
         FROM process p
         JOIN item i ON p.item_num = i.item_num
         WHERE i.TYPE IN ('PRODUCT', 'SEMIPRODUCT') 
-         ORDER BY i.item_num DESC
+         ORDER BY p.process_num DESC
     </select>
 
 

@@ -1,5 +1,6 @@
 package kr.or.smartfarm.lot;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -128,16 +129,34 @@ public class LotServiceImpl implements LotService {
     }
 
     /**
-     * 롯이력 통합 조회 — lot.xml의 getLotHistory 쿼리를 호출합니다.
+     * 분할 자식 LOT의 원본 LOT 번호를 조회합니다.
+     * lot_split 테이블에서 split_lot_num = lot_num 조건으로 origin_lot_num을 반환합니다.
      *
-     * <p>이 메서드는 비즈니스 로직 없이 DAO로 위임만 합니다.
-     * 실제 UNION ALL + CONNECT BY 복잡 쿼리는 lot.xml에 구현되어 있습니다.</p>
+     * @param lot_num  조회 대상 LOT의 내부 PK
+     * @return         원본 LOT의 lot_num, 분할 LOT이 아니면 null
+     */
+    @Override
+    public Integer getOriginLotNum(int lot_num) {
+        return relationDao.getOriginLotNum(lot_num);
+    }
+
+    /**
+     * 롯이력 통합 조회 — 분할 LOT이면 원본 LOT 기준으로 생산이력을 해석합니다.
+     *
+     * <p>분할 LOT(lot_split에 split_lot_num으로 등록된 경우): prodLot = origin_lot_num</p>
+     * <p>일반 LOT: prodLot = lot_num</p>
+     * <p>출하 블록([3])은 항상 selfLot(= lot_num) 기준으로 조회됩니다.</p>
      *
      * @param lot_num  조회 시작 루트 LOT의 내부 PK
      * @return         롯이력 행 목록 (JSON으로 응답됨)
      */
     @Override
     public List<Map<String, Object>> getLotHistory(int lot_num) {
-        return relationDao.getLotHistory(lot_num);
+        Integer origin = relationDao.getOriginLotNum(lot_num);
+        int prodLot = (origin != null) ? origin : lot_num;
+        Map<String, Object> param = new HashMap<>();
+        param.put("prodLot", prodLot);
+        param.put("selfLot", lot_num);
+        return relationDao.getLotHistory(param);
     }
 }

@@ -101,14 +101,17 @@ public class LotController {
             return null;
         }
         model.addAttribute("lotCode", lot_code );
-        
+
         model.addAttribute("lotDTO",             lotDTO);
+        // 분할 LOT이면 원본 LOT 기준으로 생산/소재 이력을 조회
+        Integer originLot = lotService.getOriginLotNum(lotDTO.getLot_num());
+        int prodLot = (originLot != null) ? originLot : lotDTO.getLot_num();
         // 이 LOT 생산에 사용된 소모재료 LOT (직접 1단계)
-        model.addAttribute("materials",          lotService.getMaterialsByChildLot(lotDTO.getLot_num()));
+        model.addAttribute("materials",          lotService.getMaterialsByChildLot(prodLot));
         // 이 LOT이 재료로 투입된 상위 생산 LOT
-        model.addAttribute("usedIn",             lotService.getParentsByLot(lotDTO.getLot_num()));
+        model.addAttribute("usedIn",             lotService.getParentsByLot(prodLot));
         // CONNECT BY 재귀로 모든 단계의 소모재료 트리 조회
-        model.addAttribute("recursiveMaterials", lotService.getRecursiveMaterials(lotDTO.getLot_num()));
+        model.addAttribute("recursiveMaterials", lotService.getRecursiveMaterials(prodLot));
         return "content/lotDetail.tiles";
     }
 

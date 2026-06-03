@@ -15,8 +15,9 @@
                 SELECT pp.plan_num, pp.plan_id, pp.plan_qty,
                        CASE
                            WHEN pp.plan_status IN ('취소', '완료') THEN pp.plan_status
-                           WHEN pp.plan_status = '진행'            THEN '진행'
-                           WHEN SYSDATE >= pp.plan_start           THEN '진행'
+                           WHEN TRUNC(SYSDATE) BETWEEN TRUNC(pp.plan_start) AND TRUNC(pp.plan_end) THEN '진행'
+                           WHEN TRUNC(SYSDATE) > TRUNC(pp.plan_end)        THEN '지연'
+                           WHEN pp.plan_status = '진행'                    THEN '진행'
                            ELSE '대기'
                        END AS plan_status,
                        pp.plan_start, pp.plan_end,
@@ -60,8 +61,9 @@
                     <if test="plan_status != null and plan_status != ''">
                         AND CASE
                                 WHEN pp.plan_status IN ('취소', '완료') THEN pp.plan_status
-                                WHEN pp.plan_status = '진행'            THEN '진행'
-                                WHEN SYSDATE >= pp.plan_start           THEN '진행'
+                                WHEN TRUNC(SYSDATE) BETWEEN TRUNC(pp.plan_start) AND TRUNC(pp.plan_end) THEN '진행'
+                                WHEN TRUNC(SYSDATE) > TRUNC(pp.plan_end)        THEN '지연'
+                                WHEN pp.plan_status = '진행'                    THEN '진행'
                                 ELSE '대기'
                             END = #{plan_status}
                     </if>
@@ -136,7 +138,9 @@
 
     <!-- 제품 드롭다운 옵션 조회 (PRODUCT + SEMIPRODUCT) -->
     <select id="getItemOptions" resultType="SelectOptionDTO">
-        SELECT item_num AS num, name AS name, type AS type
+        SELECT item_num AS num,
+               name || CASE WHEN item_status = 'N' THEN ' (기능중단)' ELSE '' END AS name,
+               type AS type
         FROM item
         WHERE type IN ('PRODUCT', 'SEMIPRODUCT')
         ORDER BY type, name
@@ -147,7 +151,8 @@
         SELECT pp.plan_num, pp.plan_id, pp.plan_qty,
                CASE
                    WHEN pp.plan_status IN ('취소', '완료') THEN pp.plan_status
-                   WHEN SYSDATE >= pp.plan_start           THEN '진행'
+                   WHEN TRUNC(SYSDATE) BETWEEN TRUNC(pp.plan_start) AND TRUNC(pp.plan_end) THEN '진행'
+                   WHEN TRUNC(SYSDATE) > TRUNC(pp.plan_end)        THEN '지연'
                    ELSE '대기'
                END AS plan_status,
                pp.plan_start, pp.plan_end,
@@ -196,7 +201,11 @@
             PROD_SEQ.NEXTVAL,
             #{plan_id},
             #{plan_qty},
-            '대기',
+            CASE
+                WHEN TRUNC(SYSDATE) BETWEEN TRUNC(#{plan_start}) AND TRUNC(#{plan_end}) THEN '진행'
+                WHEN TRUNC(SYSDATE) > TRUNC(#{plan_end})                                THEN '지연'
+                ELSE '대기'
+            END,
             #{plan_start},
             #{plan_end},
             #{emp_num},

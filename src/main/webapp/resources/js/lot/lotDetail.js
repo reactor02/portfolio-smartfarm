@@ -1,6 +1,6 @@
 /*
  * lotDetail.js — LOT 상세 화면 스크립트
- *   탭 전환 + 공정이력 지연 로드 + QR 코드 초기화.
+ *   탭 전환 + 롯이력 지연 로드 + QR 코드 초기화.
  *   lotCode 전역변수는 JSP가 주입한다.
  */
 
@@ -22,11 +22,17 @@ function switchTab(name, btn) {
     btn.style.borderBottom = '2px solid #fff';
     document.getElementById('tab-' + name).style.display = 'block';
 
+    // 롯이력 탭에서는 QR코드 숨김
+    var qrBox = document.querySelector('.qr-box');
+    if (qrBox) {
+        qrBox.style.display = (name === 'lothistory') ? 'none' : 'flex';
+    }
+
     if (name === 'lothistory' && !lotHistoryLoaded) {
         fetch('/lot/' + lotCode + '/lotHistory')
             .then(function(r) { return r.json(); })
             .then(renderLotHistory)
-            .catch(function(err) { console.error('공정이력 로드 오류:', err); });
+            .catch(function(err) { console.error('롯이력 로드 오류:', err); });
         lotHistoryLoaded = true;
     }
 }
@@ -34,7 +40,7 @@ function switchTab(name, btn) {
 function renderLotHistory(data) {
     var tbody = document.getElementById('lothistory-body');
     if (!data || data.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="10" class="empty-cell">공정이력이 없습니다.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="10" class="empty-cell">롯이력이 없습니다.</td></tr>';
         return;
     }
     var html = '';
@@ -43,18 +49,20 @@ function renderLotHistory(data) {
         var badgeClass = 'badge-prod'; // 기본값 (생산공정 등)
         if (r.GUBUN === '원자재투입') {
             badgeClass = 'badge-material'; // 원자재 전용 디자인 클래스 (css에서 설정 가능)
-        } else if (r.GUBUN === '완제품생산') {
-            badgeClass = 'badge-prod-complete'; // 완제품 생성 순간 강조 클래스
+        } else if (r.GUBUN === '제품생산') {
+            badgeClass = 'badge-prod-complete'; // 제품 생성 순간 강조 클래스
         } else if (r.GUBUN === '출하완료') {
             badgeClass = 'badge-shipment'; // 출하 완료 클래스
         } else if (r.GUBUN === '입고') {
             badgeClass = 'badge-io-in';
-        } else if (r.GUBUN === '생산투입출고') {
+        } else if (r.GUBUN === '출고') {
+            badgeClass = 'badge-io-out';
+        } else if (r.GUBUN === '생산투입') {
             badgeClass = 'badge-io-out';
         }
 
-        // [수정] 완제품생산 행(Row)은 현재 화면의 메인 롯이므로 시각적 강조 효과 부여
-        var rowStyle = (r.GUBUN === '완제품생산') ? ' style="background-color: #f0f7ff; font-weight: bold;"' : '';
+        // [수정] 제품생산 행(Row)은 현재 화면의 메인 롯이므로 시각적 강조 효과 부여
+        var rowStyle = (r.GUBUN === '제품생산') ? ' style="background-color: #f0f7ff; font-weight: bold;"' : '';
 
         html += '<tr' + rowStyle + '>'
             // 1. 단계 (기존 r.DEPTH 대신 1, 2, 3으로 순서대로 떨어지는 r.SEQ_NUM 적용)
@@ -75,3 +83,22 @@ function renderLotHistory(data) {
 }
 
 new QRCode(document.getElementById('qrcode'), 'http://localhost:8080/lot/' + lotCode);
+
+// QR코드 이미지 다운로드
+function downloadQr() {
+    var box = document.getElementById('qrcode');
+    var canvas = box.querySelector('canvas');
+    var img = box.querySelector('img');
+    var dataUrl = canvas ? canvas.toDataURL('image/png')
+                         : (img ? img.src : null);
+    if (!dataUrl) {
+        alert('QR코드가 아직 생성되지 않았습니다.');
+        return;
+    }
+    var a = document.createElement('a');
+    a.href = dataUrl;
+    a.download = 'LOT_' + lotCode + '_QR.png';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+}

@@ -181,12 +181,12 @@ response.setContentType("text/html; charset=utf-8");
 				</div>
 				<div class="modal-field">
 					<label>실무자</label>
-					<select name="workerNum" class="form-control" required>
-						<option value="">실무자 선택</option>
-						<c:forEach var="w" items="${workerList}">
-							<option value="${w.EMP_NUM}">${w.ENAME}</option>
-						</c:forEach>
-					</select>
+					<div class="worker-pick-row">
+						<input type="text" id="workerDisplay" class="modal-input" readonly
+						       placeholder="실무자 검색 후 선택" style="cursor:pointer;">
+						<input type="hidden" id="workerNum" name="workerNum">
+						<button type="button" class="btn-pick-order" id="btnOpenWorkerModal">&#128269; 검색</button>
+					</div>
 				</div>
 				<div class="modal-field">
 					<label>출하일 <span class="required-mark">*</span></label>
@@ -238,6 +238,41 @@ response.setContentType("text/html; charset=utf-8");
 
 		<div class="modal-btn-wrap">
 			<button type="button" class="btn-cancel" id="btnCloseOrderModal">닫기</button>
+		</div>
+	</div>
+</div>
+
+<!-- ===== 실무자 검색 모달 (부서 3·5 재직자) — work.jsp 기준 외형 ===== -->
+<div id="workerSearchModal" class="modal-overlay modal-overlay-top" style="display:none;">
+	<div class="modal-box modal-box-lg">
+		<h3 class="modal-title">실무자 검색</h3>
+
+		<!-- 검색 입력 -->
+		<div class="modal-search-bar">
+			<input type="text" id="workerSearchInput" class="modal-search-input"
+			       placeholder="사번 / 이름">
+			<button type="button" class="btn-modal-search" onclick="searchWorkers(1)">검색</button>
+		</div>
+
+		<!-- 결과 테이블 -->
+		<table class="stk-tbl plan-tbl">
+			<thead>
+				<tr>
+					<th>사번</th>
+					<th>이름</th>
+					<th>연락처</th>
+				</tr>
+			</thead>
+			<tbody id="workerSearchBody">
+				<tr><td colspan="3" class="empty-modal-cell">검색어를 입력하거나 검색 버튼을 누르세요.</td></tr>
+			</tbody>
+		</table>
+
+		<!-- 페이지네이션 -->
+		<div class="pg-wrap plan-pagination" id="workerPagination"></div>
+
+		<div class="modal-btn-wrap modal-btn-wrap-mt">
+			<button type="button" class="btn-cancel" id="btnCloseWorkerModal">닫기</button>
 		</div>
 	</div>
 </div>

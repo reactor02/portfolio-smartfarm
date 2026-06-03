@@ -159,7 +159,9 @@
 
     <!-- 품목 드롭다운 옵션 (PRODUCT + SEMIPRODUCT) -->
     <select id="getItemOptions" resultType="SelectOptionDTO">
-        SELECT item_num AS num, name AS name, type AS type
+        SELECT item_num AS num,
+               name || CASE WHEN item_status = 'N' THEN ' (기능중단)' ELSE '' END AS name,
+               type AS type
         FROM item
         WHERE type IN ('PRODUCT', 'SEMIPRODUCT')
         ORDER BY type, name
@@ -183,6 +185,11 @@
     <!-- 작업지시 담당자 emp_num 조회 (취소/완료 권한 검증용) -->
     <select id="getEmpNum" resultType="String" parameterType="String">
         SELECT emp_num FROM work_order WHERE order_id = #{work_order_id}
+    </select>
+
+    <!-- 작업지시 실무자 worker_num 조회 (시작/완료/생산 권한 검증용) -->
+    <select id="getWorkerNum" resultType="String" parameterType="String">
+        SELECT worker_num FROM work_order WHERE order_id = #{work_order_id}
     </select>
 
     <!-- 생산계획 옵션 (취소 제외) -->
@@ -242,6 +249,38 @@
         VALUES (IO_SEQ.NEXTVAL, #{ioType}, #{ioQty}, SYSDATE, #{qcNum}, #{lotNum}, #{ioReason})
     </insert>
 
+    <!-- 생산 완료 LOT 입고 io 기록 (생산입고, 해당 품목 type의 검사대기 QC 자동 연결) -->
+    <insert id="insertProduceIo" parameterType="map">
+        INSERT INTO io (
+            io_num, io_type, io_qty, io_date, qc_num,
+            lot_num, io_reason, facility_num, emp_num, qc_chked
+        ) VALUES (
+            IO_SEQ.NEXTVAL,
+            '입고',
+            #{ioQty},
+            SYSDATE,
+            (
+                SELECT MIN(qc_num)
+                FROM qc
+                WHERE qc_type = #{itemType}
+                  AND qc_pass = 'WAITING'
+            ),
+            #{lotNum},
+            '생산입고',
+            3,
+            #{empNum},
+            'N'
+        )
+    </insert>
+
+    <!-- stock 재고 수량 가감 (생산투입 차감 / 생산입고 증가). 해당 item_num 행이 있을 때만 반영.
+         음수 방지: 0 미만으로 내려가지 않도록 GREATEST(...,0)로 가드, 기존 NULL은 0으로 처리 -->
+    <update id="adjustStock" parameterType="map">
+        UPDATE stock
+        SET stock_qty = GREATEST(NVL(stock_qty, 0) + #{qty}, 0)
+        WHERE item_num = #{itemNum}
+    </update>
+
     <!-- 작업지시 상세용: 품목별 공정 목록 (작업순서 오름차순) -->
     <select id="getProcessesByItem" parameterType="int" resultType="hashMap">
         SELECT process_num     AS PROCESS_NUM,
@@ -284,6 +323,33 @@
                       OR i.name     LIKE '%' || #{keyword} || '%')
                 </if>
                 ORDER BY pp.plan_num DESC
+            ) inner_q
+            WHERE ROWNUM &lt;= #{endRow}
+        )
+        WHERE rn &gt;= #{startRow}
+    </select>
+
+    <!-- 실무자 검색 (AJAX 모달용, 부서 3·5 재직자만) -->
+    <select id="searchWorkers" parameterType="map" resultType="hashMap">
+        SELECT EMP_NUM, ENAME, DEPT_NAME, E_LEVEL, TEL, total_count
+        FROM (
+            SELECT inner_q.*, ROWNUM AS rn
+            FROM (
+                SELECT e.emp_num   AS EMP_NUM,
+                       e.ename     AS ENAME,
+                       d.dept_name AS DEPT_NAME,
+                       e.e_level   AS E_LEVEL,
+                       e.tel       AS TEL,
+                       COUNT(*) OVER() AS total_count
+                FROM emp e
+                LEFT JOIN dept d ON e.dept_num = d.dept_num
+                WHERE e.dept_num IN (3, 5)
+                  AND e.status = 'Y'
+                <if test="keyword != null and keyword != ''">
+                    AND (e.ename   LIKE '%' || #{keyword} || '%'
+                      OR e.emp_num LIKE '%' || #{keyword} || '%')
+                </if>
+                ORDER BY e.dept_num, e.emp_num
             ) inner_q
             WHERE ROWNUM &lt;= #{endRow}
         )

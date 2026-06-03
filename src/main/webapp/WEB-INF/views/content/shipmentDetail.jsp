@@ -27,7 +27,8 @@ response.setContentType("text/html; charset=utf-8");
     <div class="hdr">
         <h1>출하 상세</h1>
         <div class="hdr-right">
-            <c:if test="${detail.SHIPMENT_STATUS == '출하대기'}">
+            <%-- 출하확정: 담당자 또는 실무자 본인만 노출 --%>
+            <c:if test="${canConfirm and detail.SHIPMENT_STATUS == '출하대기'}">
                 <form method="POST" action="/confirmShipment" style="display:inline;">
                     <input type="hidden" name="shipmentNum"        value="${detail.SHIPMENT_NUM}">
                     <input type="hidden" name="shipmentId"         value="${detail.SHIPMENT_ID}">

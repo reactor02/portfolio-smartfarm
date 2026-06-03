@@ -66,6 +66,24 @@
     box-sizing: border-box;
 }
 
+/* 실무자 검색 필드 (표시 input + 검색 버튼) */
+.worker-pick-row { display: flex; gap: 8px; align-items: stretch; }
+.worker-pick-row .modal-input { flex: 1; }
+.worker-pick-row .btn-pick-order { margin-bottom: 0; white-space: nowrap; }
+
+/* ══════════════════════════════════════════
+   실무자 검색 모달 — work.jsp 기준 외형 이식 (work.css 전용 클래스)
+   ══════════════════════════════════════════ */
+.modal-overlay-top  { z-index: 10000; }
+.modal-box-lg       { width: 700px; max-width: 95vw; }
+.modal-search-bar   { display: flex; gap: 8px; margin-bottom: 14px; }
+.modal-search-input { flex: 1; padding: 7px 10px; border: 1px solid #CCC; border-radius: 4px; }
+.btn-modal-search   { padding: 7px 16px; background: #2D6A4F; color: #FFF; border: none; border-radius: 4px; cursor: pointer; }
+.plan-tbl           { font-size: 13px; }
+.empty-modal-cell   { text-align: center; padding: 20px; color: #888; }
+.plan-pagination    { margin-top: 10px; }
+.modal-btn-wrap-mt  { margin-top: 14px; }
+
 /* ══════════════════════════════════════════
    주문 검색 서브모달
    ══════════════════════════════════════════ */

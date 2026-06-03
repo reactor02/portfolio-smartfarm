@@ -3,8 +3,8 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%--
     lotDetail.jsp — LOT 상세 화면
-    LOT 기본정보 + 소모자재(상위) 관계 + 공정이력 추적 트리(재귀 조회 결과)를 표시한다.
-    공정이력/소모자재 데이터는 LotController가 getRecursiveMaterials/getLotHistory로 조회.
+    LOT 기본정보 + 소모자재(상위) 관계 + 롯이력 추적 트리(재귀 조회 결과)를 표시한다.
+    롯이력/소모자재 데이터는 LotController가 getRecursiveMaterials/getLotHistory로 조회.
 --%>
 <!DOCTYPE html>
 <html>
@@ -68,7 +68,7 @@
             연관관계 · 소모자재
         </button>
         <button class="tab-btn" onclick="switchTab('lothistory', this)">
-            공정이력
+            롯이력
         </button>
     </div>
 
@@ -85,10 +85,10 @@
                         <!-- 소모 자재 재귀 트리 -->
                         <li class="tree-group-label">&#8595; 소모 자재 (이 LOT 생산에 투입된 재료)</li>
                         <c:choose>
-                            <c:when test="${not empty recursiveMaterials}">
-                                <c:forEach var="m" items="${recursiveMaterials}">
-                                    <li class="tree-child" style="padding-left:${m.DEPTH * 20}px;">
-                                        |-- ${m.CHILD_LOT_CODE} <span class="tree-item-name">(${m.ITEM_NAME})</span>
+                            <c:when test="${not empty materials}">
+                                <c:forEach var="m" items="${materials}">
+                                    <li class="tree-child">
+                                        |-- ${m.child_lot_code} <span class="tree-item-name">(${m.item_name})</span>
                                     </li>
                                 </c:forEach>
                             </c:when>
@@ -121,7 +121,6 @@
                 <thead>
                     <tr>
                         <th>번호</th>
-                        <th>단계</th>
                         <th>LOT 번호</th>
                         <th>품목명</th>
                         <th>소모 수량</th>
@@ -129,19 +128,18 @@
                 </thead>
                 <tbody>
                     <c:choose>
-                        <c:when test="${not empty recursiveMaterials}">
-                            <c:forEach var="m" items="${recursiveMaterials}" varStatus="s">
+                        <c:when test="${not empty materials}">
+                            <c:forEach var="m" items="${materials}" varStatus="s">
                                 <tr>
                                     <td>${s.index + 1}</td>
-                                    <td>${m.DEPTH}</td>
-                                    <td>${m.CHILD_LOT_CODE}</td>
-                                    <td>${m.ITEM_NAME}</td>
-                                    <td>${m.REQUIRED_QTY > 0 ? m.REQUIRED_QTY : '-'}</td>
+                                    <td>${m.child_lot_code}</td>
+                                    <td>${m.item_name}</td>
+                                    <td>${m.required_qty > 0 ? m.required_qty : '-'}</td>
                                 </tr>
                             </c:forEach>
                         </c:when>
                         <c:otherwise>
-                            <tr><td colspan="5" class="empty-cell">등록된 소모 자재가 없습니다.</td></tr>
+                            <tr><td colspan="4" class="empty-cell">등록된 소모 자재가 없습니다.</td></tr>
                         </c:otherwise>
                     </c:choose>
                 </tbody>
@@ -151,7 +149,7 @@
     </div>
     </div><!-- /tab-relation -->
 
-    <!-- 탭 2: 공정이력 -->
+    <!-- 탭 2: 롯이력 -->
     <div id="tab-lothistory" class="tab-panel" style="display:none;">
         <div class="section-box" style="padding:16px 0;">
             <table class="data-table">
@@ -162,23 +160,27 @@
                         <th>품목명</th>
                         <th>유형</th>
                         <th>구분</th>
-                        <th>작업지시번호</th>
-                        <th>공정Flow/거래처</th>
+                        <th>코드번호</th>
+                        <th>위치/수량</th>
                         <th>날짜</th>
                         <th>상태</th>
                         <th>담당자</th>
                     </tr>
                 </thead>
                 <tbody id="lothistory-body">
-                    <tr><td colspan="10" class="empty-cell">공정이력 탭을 클릭하면 로드됩니다.</td></tr>
+                    <tr><td colspan="10" class="empty-cell">롯이력 탭을 클릭하면 로드됩니다.</td></tr>
                 </tbody>
             </table>
         </div>
     </div><!-- /tab-lothistory -->
     
 <!--     qr코드 -->
-    <div id="qrcode"></div>
-    
+    <div class="qr-box">
+        <div class="qr-title">&#9632; 해당 LOT QR코드</div>
+        <div id="qrcode"></div>
+        <button type="button" class="btn-action qr-download" onclick="downloadQr()">QR코드 다운로드</button>
+    </div>
+
 
 </main>
 

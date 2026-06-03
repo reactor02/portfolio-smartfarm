@@ -37,7 +37,7 @@ function startWork() {
     fetch('/work/' + WORK_ORDER_ID + '/start', { method: 'POST' })
         .then(function(r) { return r.text(); })
         .then(function(result) {
-            if (result === 'forbidden')    { alert('담당자가 아닙니다.'); return; }
+            if (result === 'forbidden')    { alert('담당자 또는 실무자만 가능합니다.'); return; }
             if (result === 'unauthorized') { location.href = '/login'; return; }
             if (result === 'date_error')   { showDateErr(); return; }
             if (result === 'error')        { alert('처리할 수 없는 작업입니다.'); return; }
@@ -52,7 +52,7 @@ function completeWork() {
     fetch('/work/' + WORK_ORDER_ID + '/complete', { method: 'POST' })
         .then(function(r) { return r.text(); })
         .then(function(result) {
-            if (result === 'forbidden')    { alert('담당자가 아닙니다.'); return; }
+            if (result === 'forbidden')    { alert('담당자 또는 실무자만 가능합니다.'); return; }
             if (result === 'unauthorized') { location.href = '/login'; return; }
             location.reload();
         })
@@ -65,7 +65,7 @@ function produceWork() {
     fetch('/work/' + WORK_ORDER_ID + '/produce', { method: 'POST' })
         .then(function(r) { return r.text(); })
         .then(function(result) {
-            if (result === 'forbidden')    { alert('담당자가 아닙니다.'); return; }
+            if (result === 'forbidden')    { alert('담당자 또는 실무자만 가능합니다.'); return; }
             if (result === 'unauthorized') { location.href = '/login'; return; }
             if (result === 'stock_error') {
                 alert('원재료 재고가 부족합니다.\nBOM 기준 재고를 확인해주세요.');

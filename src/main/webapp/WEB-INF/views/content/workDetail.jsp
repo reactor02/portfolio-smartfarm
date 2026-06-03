@@ -27,10 +27,11 @@
         <div class="hdr">
             <h1>작업지시 상세</h1>
             <div class="hdr-right">
-                <c:if test="${workDTO.work_status == '대기'}">
+                <%-- 작업시작/완료: 담당자 또는 실무자 본인만 노출 --%>
+                <c:if test="${canWork and workDTO.work_status == '대기'}">
                     <button type="button" class="btn-action" onclick="startWork()">작업시작</button>
                 </c:if>
-                <c:if test="${workDTO.work_status == '진행'}">
+                <c:if test="${canWork and workDTO.work_status == '진행'}">
                     <button type="button" class="btn-action" onclick="produceWork()">작업완료</button>
                 </c:if>
                 <%-- 취소버튼: e_level >= 3(사장) 또는 담당자 본인 + 진행 가능 상태 --%>
