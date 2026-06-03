@@ -303,6 +303,7 @@ td {
 									<td>공장 B</td>
 									<td class="warn">점검중</td>
 								</tr>
+								
 							</table>
 						</div>
 

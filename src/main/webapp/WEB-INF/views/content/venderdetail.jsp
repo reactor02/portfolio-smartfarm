@@ -1,15 +1,15 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
-	<%
+<%
 request.setCharacterEncoding("utf-8");
 response.setContentType("text/html; charset=utf-8");
 %>
-	 
-    <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-    <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
-    <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
-    <%@ taglib prefix="tiles" uri="http://tiles.apache.org/tags-tiles"%>
-    
+
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+<%@ taglib prefix="tiles" uri="http://tiles.apache.org/tags-tiles"%>
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -17,384 +17,148 @@ response.setContentType("text/html; charset=utf-8");
 <title>Insert title here</title>
 
 <style>
-:root {
-    --m-cl: #2D6A4F;
-    --s-cl: #49A47A;
-    --p-cl: #B7E4C7;
-    --bg: #F8F9FA;
-    --txt: #333;
-    --warning-cl: #FFB703;
-    --danger-cl: #E63946;
-    --border-cl: #E9ECEF;
-}
-
 * {
 	box-sizing: border-box;
 	margin: 0;
 	padding: 0;
-}
-
-body {
 	font-family: 'Malgun Gothic', sans-serif;
-	color: var(--txt);
-	background-color: var(--bg);
 }
 
 .mat-all {
 	display: flex;
 	flex-direction: column;
 	min-height: 100vh;
+	background-color: #f4f7f6;
+}
+
+.mat-body {
+	display: flex;
+	flex: 1;
+}
+
+.main-cont {
+	flex: 1;
+	padding: 2rem 2.5rem;
+	min-width: 0;
 }
 
 .hdr {
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
-	background-color: var(--m-cl);
-	color: #FFF;
-	padding: 0 20px;
-	height: 60px;
-	box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+	background-color: #2D6A4F;
+	padding: 15px 25px;
+	border-radius: 8px;
+	margin-bottom: 25px;
+	box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-.hdr-logo-area {
-	display: flex;
-	align-items: center;
-	text-decoration: none;
-	color: #FFF;
-}
-
-.hdr-logo-img {
-	height: 40px;
-	width: auto;
-	margin-right: 10px;
-}
-
-.hdr-logo-txt {
-	font-size: 1.4rem;
+.hdr h1 {
+	font-size: 1.8rem;
+	color: #ffffff;
 	font-weight: bold;
 	letter-spacing: -1px;
 }
 
-.hdr-user {
-	font-size: 0.9rem;
-}
-
-.hdr-user a {
-	color: var(--p-cl);
-	text-decoration: none;
-	margin-left: 10px;
-}
-
-.wrap {
-	display: flex;
-	flex: 1;
-}
-
-.side {
-	width: 240px;
-	background-color: #FFF;
-	border-right: 1px solid #DDD;
-}
-
-.nav-list {
-	list-style: none;
-}
-
-.nav-item {
-	border-bottom: 1px solid #EEE;
-}
-
-.nav-btn {
-	display: block;
-	padding: 1rem 1.5rem;
-	cursor: pointer;
-	font-weight: bold;
-	color: var(--m-cl);
-	transition: background 0.3s;
-	text-decoration: none;
-	user-select: none;
-}
-
-.nav-btn:hover {
-	background-color: var(--p-cl);
-}
-
-.sub-nav {
-	list-style: none;
-	display: none;
-	background-color: #F9FDFB;
-}
-
-.sub-nav.on {
-	display: block;
-}
-
-.sub-nav a {
-	display: block;
-	padding: 0.7rem 1.5rem 0.7rem 2.5rem;
-	font-size: 0.9rem;
-	color: #555;
-	text-decoration: none;
-}
-
-.sub-nav a:hover {
-	color: var(--m-cl);
-	font-weight: bold;
-	text-decoration: underline;
-	text-underline-offset: 4px;
-}
-
-.cont {
-	flex: 1;
-	padding: 2rem;
-	background-color: #FFF;
-}
-
-.ftr {
-	text-align: center;
-	padding: 1rem 0;
-	background-color: #EEE;
-	font-size: 0.8rem;
-	color: #777;
-	margin-top: auto;
-}
-
-.page-header {
-	display: flex;
-	flex-direction: column;
-	margin-bottom: 2rem;
-	padding-bottom: 1rem;
-	border-bottom: 2px solid var(--m-cl);
-}
-
-.page-title {
-	font-size: 1.5rem;
-	font-weight: bold;
-	color: var(--txt);
-}
-
-.btn-row {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	margin-bottom: 0.75rem;
-}
-
-.btn-row button {
-	padding: 8px 18px;
+.btn-list {
+	background-color: #fff;
+	color: #2D6A4F;
+	padding: 10px 24px;
 	border-radius: 6px;
-	border: 1px solid var(--border-cl);
-	background: #FFF;
-	cursor: pointer;
+	border: 1px solid #2D6A4F;
 	font-weight: bold;
-	font-size: 13px;
-	transition: background 0.2s;
+	font-size: 1.05rem;
+	cursor: pointer;
+	box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 2px 3px
+		rgba(0, 0, 0, 0.2);
+	transition: background-color 0.2s;
+	text-decoration: none;
+	display: inline-block;
 }
 
-.btn-row .btn-back {
-	background-color: var(--m-cl);
-	color: #FFF;
-	border: none;
+.btn-list:hover {
+	background-color: #B7E4C7;
 }
 
-.btn-row .btn-back:hover {
-	background-color: var(--s-cl);
-}
-
-.btn-row .btn-reg {
-	background-color: var(--s-cl);
-	color: #FFF;
-	border: none;
-}
-
-.btn-row .btn-reg:hover {
-	background-color: var(- -m-cl);
-}
-
-.btn-row .btn-cancel {
-	background-color: #DC3545;
-	color: #FFF;
-	border: none;
-}
-
-.btn-row .btn-cancel:active {
-	background-color: #C82333;
+.detail-section {
+	background-color: #fff;
+	border: 1px solid #bbb;
+	border-radius: 10px;
+	padding: 25px;
+	margin-bottom: 25px;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
 }
 
 .section-title {
-	font-size: 1.1rem;
+	font-size: 1.15rem;
 	font-weight: bold;
-	margin: 2rem 0 1rem 0;
-	color: var(--m-cl);
+	color: #333;
+	margin-bottom: 15px;
+	padding-bottom: 10px;
+	border-bottom: 2px solid #2D6A4F;
+	display: inline-block;
 }
 
 .info-grid {
 	display: grid;
 	grid-template-columns: repeat(3, 1fr);
-	gap: 20px;
-	background-color: var(--bg);
-	padding: 20px;
-	border: 1px solid var(--border-cl);
-	border-radius: 8px;
+	row-gap: 25px;
+	column-gap: 20px;
+	width: 100%;
 }
 
 .info-item {
 	display: flex;
 	flex-direction: column;
-	gap: 6px;
+	gap: 8px;
 }
 
 .info-label {
-	font-size: 12px;
+	font-size: 0.9rem;
 	color: #777;
 	font-weight: bold;
 }
 
 .info-value {
-	font-size: 14px;
+	font-size: 1.1rem;
+	color: #222;
 	font-weight: bold;
 }
 
-.badge {
-	background-color: var(--p-cl);
-	color: var(--m-cl);
-	padding: 3px 10px;
-	border-radius: 12px;
-	font-size: 11px;
-	font-weight: bold;
-	width: fit-content;
-}
-
-.status-grid {
-	display: grid;
-	grid-template-columns: repeat(3, 1fr);
-	gap: 15px;
-	margin-bottom: 1.5rem;
-	text-align: center;
-}
-
-.status-card {
-	background-color: #FFF;
-	border: 1px solid var(--border-cl);
-	padding: 16px;
-	border-radius: 8px;
-}
-
-.status-num {
-	font-size: 1.3rem;
-	font-weight: bold;
-	margin-top: 6px;
-}
-
-.progress-box {
-	background-color: var(--bg);
-	border: 1px solid var(--border-cl);
-	padding: 20px;
-	border-radius: 8px;
-}
-
-.progress-bar-bg {
-	background-color: #E9ECEF;
-	height: 12px;
-	border-radius: 6px;
-	overflow: hidden;
-	margin-top: 8px;
-}
-
-.progress-bar-fill {
-	background-color: var(--s-cl);
-	height: 100%;
-	width: 0%;
-	transition: width 0.3s ease;
-}
-
-.progress-text {
+.desc-container {
 	display: flex;
-	justify-content: flex-end;
-	font-size: 13px;
-	font-weight: bold;
-	color: var(--s-cl);
-	margin-top: 6px;
+	gap: 20px;
+	height: 350px;
 }
 
-.data-table {
+.desc-image-area {
+	flex: 1;
+	border: 1px solid #ccc;
+	border-radius: 8px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	overflow: hidden;
+	background-color: #f9f9f9;
+}
+
+.desc-image-area img {
 	width: 100%;
-	border-collapse: collapse;
-	margin-top: 0.5rem;
+	height: 100%;
+	object-fit: contain;
 }
 
-.data-table th {
-	background-color: var(--bg);
-	border-bottom: 2px solid var(--s-cl);
-	color: var(--txt);
-	font-weight: bold;
-	padding: 12px;
-	text-align: center;
-	font-size: 13px;
+.desc-content-area {
+	flex: 1;
+	border: 1px solid #ccc;
+	border-radius: 8px;
+	padding: 15px;
+	overflow-y: auto;
+	font-size: 0.95rem;
+	line-height: 1.6;
+	color: #333;
 }
 
-.data-table td {
-	padding: 12px;
-	border-bottom: 1px solid var(--border-cl);
-	text-align: center;
-	color: #555;
-}
-
-.data-table tbody tr:hover {
-	background-color: rgba(183, 228, 199, 0.15);
-}
-
-.link-text {
-	color: var(--s-cl);
-	font-weight: bold;
-	text-decoration: none;
-}
-
-.link-text:hover {
-	text-decoration: underline;
-}
-
-.instruction-box {
-	background-color: var(--bg);
-	padding: 18px;
-	border-left: 4px solid var(--s-cl);
-	margin-top: 15px;
-	border-top: 1px solid var(--border-cl);
-	border-right: 1px solid var(--border-cl);
-	border-bottom: 1px solid var(--border-cl);
-	border-radius: 0 8px 8px 0;
-}
-
-/* 페이징 */
-.wo-paging {
-	text-align: center;
-	margin-top: 1rem;
-}
-
-.wo-paging a {
-	display: inline-block;
-	padding: 5px 11px;
-	margin: 0 2px;
-	border: 1px solid var(--border-cl);
-	border-radius: 4px;
-	text-decoration: none;
-	color: var(--txt);
-	font-size: 13px;
-	cursor: pointer;
-}
-
-.wo-paging a:hover {
-	background: var(--p-cl);
-}
-
-.wo-paging .current {
-	background: var(--m-cl);
-	color: #FFF;
-	border-color: var(--m-cl);
-}
-
-/* 작업 등록 모달 */
 .modal-overlay {
 	display: none;
 	position: fixed;
@@ -403,93 +167,219 @@ body {
 	width: 100%;
 	height: 100%;
 	background: rgba(0, 0, 0, 0.5);
-	z-index: 1000;
+	z-index: 999;
 	justify-content: center;
 	align-items: center;
 }
 
-.modal-box {
+.modal-content {
 	background: #fff;
+	width: 800px;
 	border-radius: 10px;
 	padding: 30px;
-	width: 520px;
-	max-height: 90vh;
-	overflow-y: auto;
-	box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+	box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
-.modal-title {
-	font-size: 1.2rem;
+.modal-content h2 {
+	margin-bottom: 20px;
+	font-size: 1.5rem;
+	color: #2D6A4F;
+	border-bottom: 2px solid #2D6A4F;
+	padding-bottom: 10px;
+}
+
+.modal-section-title {
+	font-size: 1.1rem;
 	font-weight: bold;
-	color: var(--m-cl);
+	color: #2D6A4F;
+	margin: 20px 0 10px 0;
+}
+
+.modal-form-grid {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 15px;
 	margin-bottom: 20px;
 }
 
-.modal-grid {
-	display: grid;
-	grid-template-columns: 1fr 1fr;
-	gap: 16px;
+.modal-form-grid input {
+	padding: 8px;
+	border: 1px solid #ccc;
+	border-radius: 4px;
+	width: 100%;
 }
 
-.modal-field {
+.modal-input-qty {
+	width: 80px;
+	padding: 5px;
+	text-align: right;
+}
+
+.modal-btns {
 	display: flex;
-	flex-direction: column;
-	gap: 6px;
+	justify-content: center;
+	gap: 10px;
+	margin-top: 30px;
 }
 
-.modal-field label {
-	font-size: 12px;
-	color: #777;
+.modal-btns button {
+	padding: 10px 30px;
+	font-size: 1.1rem;
 	font-weight: bold;
-}
-
-.modal-field input, .modal-field select, .modal-field textarea {
-	padding: 8px 10px;
-	border: 1px solid var(--border-cl);
 	border-radius: 6px;
-	font-size: 13px;
-	font-family: inherit;
+	cursor: pointer;
+	border: 1px solid #999;
 }
 
-.modal-field-full {
+.btn-save {
+	background-color: #2D6A4F;
+	color: #fff;
+	border-color: #2D6A4F;
+}
+
+.btn-cancel {
+	background-color: #fff;
+	color: #555;
+}
+
+.btn-save:hover {
+	background-color: #1b4332;
+}
+
+.btn-cancel:hover {
+	background-color: #f1f1f1;
+}
+
+.radio-group {
+	display: flex;
+	gap: 20px;
+	margin-top: 10px;
+}
+
+.radio-label {
+	display: flex;
+	align-items: center;
+	cursor: pointer;
+	font-size: 0.95rem;
+	color: #222;
+}
+
+.modal-form-grid input[type="radio"] {
+	appearance: none;
+	-webkit-appearance: none;
+	width: 20px;
+	height: 20px;
+	border: 2px solid #ccc;
+	border-radius: 50%;
+	margin: 0;
+	margin-right: 8px;
+	padding: 0;
+	transition: all 0.2s;
+	position: relative;
+	cursor: pointer;
+}
+
+.modal-form-grid input[type="radio"]:checked {
+	border-color: #2D6A4F;
+}
+
+.modal-form-grid input[type="radio"]:checked::after {
+	content: '';
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	width: 10px;
+	height: 10px;
+	background-color: #2D6A4F;
+	border-radius: 50%;
+}
+
+.modal-form-grid .status-container {
 	grid-column: 1/-1;
 }
 
-.modal-btn-wrap {
-	display: flex;
-	justify-content: flex-end;
-	gap: 10px;
-	margin-top: 20px;
+.btn-action1 {
+	background-color: #fff;
+	color: #2D6A4F;
+	padding: 10px 24px;
+	border-radius: 6px;
+	border: 1px solid #2D6A4F;
+	font-weight: bold;
+	font-size: 1.05rem;
+	cursor: pointer;
+	box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 2px 3px
+		rgba(0, 0, 0, 0.2);
+	transition: all 0.2s ease-in-out;
+	text-decoration: none;
+	display: inline-block;
+	margin-left: 475px;
 }
 
-.modal-btn-wrap button {
-	padding: 9px 22px;
-	border
+.btn-action1:hover {
+	background-color: #B7E4C7;
+	color: #1b4332;
+	border-color: #B7E4C7;
+}
+
+.btn-del {
+	color: #dc3545;
+	border-color: #dc3545;
+}
+
+.btn-del:hover {
+	background-color: #dc3545;
+	color: #fff;
+	border-color: #dc3545;
+}
+
+#processDesc {
+	max-height: 200px;
+}
+
+.textarea-desc {
+	width: 100%;
+	border: 1px solid #aaa;
+	border-radius: 4px;
+	padding: 10px;
+	font-size: 0.95rem;
+	font-family: 'Malgun Gothic', sans-serif;
+	outline: none;
+	resize: vertical;
+}
+
+.textarea-desc:focus {
+	border-color: #2D6A4F;
+}
+
+#processDesc {
+	max-height: 200px;
 }
 </style>
 </head>
 <body>
 
 
-	<main class="cont">
+	<main class="main-cont">
 		<!--  페이지 헤더 -->
-		<div class="page-header">
-			<div class="btn-row">
-				<button class="btn-back" onclick="location.href='/vender'">목록으로</button>
-				<div>
-					<button class="btn_reg" id="btnOpenWorkModal">수정</button>
-					<button class="btn_reg" onclick="deleteVender()">삭제</button>
-					
-					<form id="deleteForm" action="/vender/delete" method="post"> 
-						<input type="hidden" name="vender_num" value="${venderDTO.vender_num}">
-					</form>
-				</div>
-			</div>
-			<h1 class=page-title">거래처 페이지 상세</h1>
+
+		<div class="hdr">
+			<h1>거래처 페이지 상세</h1>
+			<c:if test="${sessionScope.role >= 2}">
+				<button type="button" class="btn-action1" id="btnOpenWorkModal">수정</button>
+				<button type="button" class="btn-action1" onclick="deleteVender()">삭제</button>
+
+				<form id="deleteForm" action="/vender/delete" method="post">
+					<input type="hidden" name="vender_num"
+						value="${venderDTO.vender_num}">
+				</form>
+			</c:if>
+			<a href="/vender" class="btn-list">목록으로</a>
 		</div>
 
 		<!-- 1. 기본 정보 -->
-		<div class="section-title">■ 기본 정보</div>
+		<div class="detail-section">
+		
 		<div class="info-grid">
 			<div class="info-item">
 				<span class="info-label">거래처명</span><span class="info-value">${venderDTO.vender_name}</span>
@@ -513,14 +403,17 @@ body {
 				<span class="info-label">담당 사원</span><span class="info-value">${venderDTO.ename}</span>
 			</div>
 		</div>
+		</div>
 
 		<!-- 2. 거래처 지도API -->
-		<div class="section-title">■ 거래처 위치</div>
+		<div class="detail-section">■ 거래처 위치
 
 		<div id="map" style="width: 100%; height: 350px;"></div>
+		
+		</div>
 
 		<!--  3. 거래처 이력 -->
-		<div class="section-title">■ 거래처 이력</div>
+		<div class="detail-section">■ 거래처 이력
 		<div>
 			<table class="data-table">
 				<thead>
@@ -532,6 +425,7 @@ body {
 
 			</table>
 		</div>
+		</div>
 
 
 		<input type="hidden" id="addr" value="${venderDTO.vender_addr}">
@@ -540,43 +434,37 @@ body {
 		<div id="workModal" class="modal-overlay">
 			<div class="modal-box">
 				<h3 class="modal-title">거래처 수정</h3>
-				<form id="venRegForm" action="/vender/update" method="post" accept-charset="UTF-8" >
+				<form id="venRegForm" action="/vender/update" method="post"
+					accept-charset="UTF-8">
 					<input type="hidden" name="vender_num"
 						value="${venderDTO.vender_num}">
 					<div class="modal-grid">
 						<div class="modal-field">
-							<label>거래처명</label> 
-							<input type="text" name="vender_name"
+							<label>거래처명</label> <input type="text" name="vender_name"
 								placeholder="거래처명" value="${venderDTO.vender_name}">
 						</div>
 						<div class="modal-field">
-							<label>대표자명</label> 
-							<input type="text" name="ven_ename"
+							<label>대표자명</label> <input type="text" name="ven_ename"
 								placeholder="대표자명" value="${venderDTO.ven_ename}">
 						</div>
 						<div class="modal-field">
-							<label>사업자등록번호</label>
-							<input type="text" name="biz_no"
+							<label>사업자등록번호</label> <input type="text" name="biz_no"
 								placeholder="사업자 등록번호" value="${venderDTO.biz_no}">
 						</div>
 						<div class="modal-field">
-							<label>거래처 타입</label>
-							<input type="text" name="vender_type"
+							<label>거래처 타입</label> <input type="text" name="vender_type"
 								placeholder="거래처 타입" value="${venderDTO.vender_type}">
 						</div>
 						<div class="modal-field">
-							<label>연락처</label>
-							<input type="number" name="vender_phone"
+							<label>연락처</label> <input type="number" name="vender_phone"
 								placeholder="연락처" value="${venderDTO.vender_phone}">
 						</div>
 						<div class="modal-field">
-							<label>주소</label>
-							<input type="text" name="vender_addr"
+							<label>주소</label> <input type="text" name="vender_addr"
 								placeholder="주소" value="${venderDTO.vender_addr}">
 						</div>
 						<div class="modal-field">
-							<label>담당 사원</label>
-							<input type="text" name="emp_num"
+							<label>담당 사원</label> <input type="text" name="emp_num"
 								placeholder="사원번호" value="${venderDTO.emp_num}">
 						</div>
 					</div>
@@ -653,9 +541,9 @@ body {
 					});
 
 		});
-		
-		function deleteVender(){
-			if(confirm("삭제하시겠습니까?")){
+
+		function deleteVender() {
+			if (confirm("삭제하시겠습니까?")) {
 				document.getElementById("deleteForm").submit();
 			}
 		}

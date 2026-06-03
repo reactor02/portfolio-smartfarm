@@ -23,7 +23,10 @@ public class FileService {
 			String savedName = System.currentTimeMillis() + "_" + originalName; 
 			
 			// 3. 저장 경로
-			String uploadPath = "C:/upload/";
+			String uploadPath = "D:" + File.separator + "workspace" + File.separator + "workspace_java" 
+	                  + File.separator + "Zmartfarm" + File.separator + "src" + File.separator 
+	                  + "main" + File.separator + "webapp" + File.separator + "resources" 
+	                  + File.separator + "upload" + File.separator;
 			
 			File dest = new File(uploadPath + savedName);
 			
@@ -45,6 +48,10 @@ public class FileService {
 	// 게시글별 파일 조회 
 	public List<FileDTO> getFiles(int board_num){
 		return fileDAO.findByBoardNum(board_num);
+	}
+	
+	public int deleteFile(int files_num) {
+		return fileDAO.deleteFile(files_num);
 	}
 	
 }

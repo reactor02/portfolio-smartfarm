@@ -5,7 +5,7 @@ import lombok.Data;
 @Data
 public class FileDTO {
 
-		private int files_num;
+		private Integer files_num;
 		private String file_name; 
 		private int board_num; 
 		private String uploaded_at; 

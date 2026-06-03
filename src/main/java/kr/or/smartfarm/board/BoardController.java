@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpSession;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +29,7 @@ import com.github.pagehelper.PageInfo;
 
 import kr.or.smartfarm.files.FileDTO;
 import kr.or.smartfarm.files.FileService;
+import kr.or.smartfarm.login.LoginDTO;
 
 @Controller
 @RequestMapping("/board")
@@ -89,9 +92,21 @@ public class BoardController {
 	}
 	
 	@PostMapping("/write")
-	public String write(BoardDTO boardDTO, @RequestParam("files") List<MultipartFile> files) {
+	public String write(BoardDTO boardDTO, 
+						@RequestParam("files") List<MultipartFile> files,
+						HttpSession session) {
 		System.out.println("post /write 실행");
 		
+		// 로그인사용자
+		LoginDTO loginUser = (LoginDTO) session.getAttribute("loginUser");
+		
+		// DTO에 사번넣기 
+		if (loginUser != null) {
+			boardDTO.setEmp_num(Integer.parseInt(loginUser.getEmp_num()));
+			System.out.println("설정된 작성자 사번 : " + boardDTO.getEmp_num());
+		}
+		
+		// DTO를 서비스에 전달 
 		boardService.insertBoard(boardDTO);
 		
 		int boardID = boardDTO.getBoard_num();
@@ -109,6 +124,8 @@ public class BoardController {
 			}
 		}
 		
+		
+		
 		return "redirect:/board";
 	}
 	
@@ -118,21 +135,39 @@ public class BoardController {
 		
 		BoardDTO board = boardService.findById(board_num);
 		
+		List<FileDTO> files = fileService.getFiles(board_num);
+		
 		model.addAttribute("board", board);
+		model.addAttribute("files", files);
 		model.addAttribute("mode","modify");
 		
 		return "content/writeboard";
 	}
 	
 	@PostMapping("/modify")
-	public String updateBoard(BoardDTO boardDTO, Model model) {
+	public String updateBoard(BoardDTO boardDTO, Model model,
+								@RequestParam(value="deleteFileIds", required=false) List<Integer> deleteFileIds,
+								@RequestParam("files") List<MultipartFile> files) {
+		
 		System.out.println("/update 실행");
 		logger.info("boardDTO :" + boardDTO);
 		
+		// 내용 수정 
 		int result = boardService.updateBoard(boardDTO);
 		
+		// 삭제 체크된 파일이 있다면 삭제
+	    if (deleteFileIds != null) {
+	        for (Integer fileNum : deleteFileIds) {
+	            fileService.deleteFile(fileNum); // 서비스에 삭제 메서드 필요
+	        }
+	    }
+	    
+	    for (MultipartFile file : files) {
+	        if (!file.isEmpty()) {
+	            fileService.save(file, boardDTO.getBoard_num());
+	        }
+	    }
 		return "redirect:/board";
-		
 	}
 	
 	@RequestMapping("/delete")
@@ -183,7 +218,11 @@ public class BoardController {
 	@GetMapping("/file/download")
 	public ResponseEntity<Resource> download(String fileName) throws Exception {
 		
-		String uploadPath = "/resources/upload/";
+		// 추천: File.separator를 사용하여 OS 독립적으로 작성
+		String uploadPath = "D:" + File.separator + "workspace" + File.separator + "workspace_java" 
+		                  + File.separator + "Zmartfarm" + File.separator + "src" + File.separator 
+		                  + "main" + File.separator + "webapp" + File.separator + "resources" 
+		                  + File.separator + "upload" + File.separator;
 		File file = new File(uploadPath + fileName);
 		
 		Resource resource = new InputStreamResource(new FileInputStream(file));
