@@ -221,4 +221,29 @@ AND i.TYPE IN ('PRODUCT', 'SEMIPRODUCT')
             'N'
         )
     </insert>
+    
+    
+<!--     출고 모달 셀렉트 -->
+<select id="outModal" resultType="hashMap">
+	SELECT l.lot_num, i.item_num, l.current_qty, l.expiry_date, i.name, l.current_qty
+	FROM lot l
+	JOIN ITEM i ON I.ITEM_NUM = L.ITEM_NUM
+	WHERE l.current_qty > 0
+</select>
+
+
+
+<update id="updateIo99" parameterType="kr.or.smartfarm.io.IoDTO">
+UPDATE LOT
+SET CURRENT_QTY = CURRENT_QTY - #{io_qty}
+WHERE LOT_NUM = #{lot_num}
+
+</update>
+
+
+
+<insert id="insertIo99" parameterType="kr.or.smartfarm.io.IoDTO">
+INSERT INTO IO(io_num, io_type, io_qty, io_date, qc_num, lot_num, io_reason, facility_num, emp_num, qc_chked)
+VALUES(io_seq.nextval, '출고',#{io_qty} , #{io_date}, null, #{lot_num}, #{io_reason}, #{facility_num}, #{emp_num}, 'Y')
+</insert>
 </mapper>

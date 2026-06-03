@@ -95,4 +95,20 @@ public class IoController {
 			
 			return "redirect:io";
 		}
+		
+		@RequestMapping("/outModalSelect")
+		@ResponseBody
+		public List outModalSelect(IoDTO ioDTO) {
+			List result = null;
+			result = ioService.outModal();
+			return result;
+		}
+		
+		
+		@RequestMapping("/insertOutbound")
+		public String insertOut(IoDTO ioDTO) {
+			
+			int result = ioService.outModalInsert(ioDTO);
+			return "redirect:/io";
+		}
 }

@@ -89,6 +89,18 @@
 	</select>
 	
 	
+	<select id="getFMList" resultType="kr.or.smartfarm.report.ReportSummaryDTO">
+		SELECT 
+			f.facility_name,
+			fm.facility_chk,
+			fm.managed_at
+		FROM FACILITY_MANAGEMENT fm
+		JOIN facility f 
+			ON f.facility_num = fm.facility_num
+		ORDER BY fm.managed_at DESC
+	</select>
+	
+	
 	
 </mapper>
 

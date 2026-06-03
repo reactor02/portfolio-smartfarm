@@ -16,4 +16,5 @@ public class IoDTO {
 	private int facility_num;
 	private String io_reason;
 	private int lot_num;
+	private int emp_num;
 }

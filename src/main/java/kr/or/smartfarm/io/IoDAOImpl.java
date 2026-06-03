@@ -10,48 +10,62 @@ import org.springframework.stereotype.Repository;
 import com.github.pagehelper.PageHelper;
 
 @Repository
-public class IoDAOImpl implements IoDAO{
+public class IoDAOImpl implements IoDAO {
 	@Autowired
 	SqlSession sqlSession;
-	
+
 	@Override
 	public List selectAll2(int pageNum) {
 		List result = null;
-		
+
 		PageHelper.startPage(pageNum, 5);
 		result = sqlSession.selectList("kr.or.io.loadIo");
 		return result;
 	}
-	
-	//목록페이지 검색
+
+	// 목록페이지 검색
 	@Override
 	public List searchIo2(Map map) {
 		List result = null;
-		int pageNum = (Integer)map.get("page");
+		int pageNum = (Integer) map.get("page");
 		PageHelper.startPage(pageNum, 5);
 		result = sqlSession.selectList("kr.or.io.searchIo", map);
 		return result;
 	}
-	
+
 	@Override
 	public List facility2() {
 		List facility2 = null;
 		facility2 = sqlSession.selectList("kr.or.io.facility");
 		return facility2;
 	}
-	
+
 	@Override
-	public List modalSearch2(String keyword){
+	public List modalSearch2(String keyword) {
 		List result = null;
 		result = sqlSession.selectList("kr.or.io.ioModalSearch", keyword);
-		
+
 		return result;
 	}
-	
+
 	public void insertData2(IoDTO ioDTO) {
-		
+
 		sqlSession.insert("kr.or.io.insertLot22", ioDTO);
-	    sqlSession.insert("kr.or.io.insertIo", ioDTO);
-		return ;
+		sqlSession.insert("kr.or.io.insertIo", ioDTO);
+		return;
+	}
+
+	@Override
+	public List outModal2() {
+		List result = null;
+		result = sqlSession.selectList("kr.or.io.outModal");
+		return result;
+	}
+
+	public int outModalInsert2(IoDTO ioDTO) {
+		int result = 0;
+		result = sqlSession.update("kr.or.io.updateIo99", ioDTO);
+		int result2 =   sqlSession.insert("kr.or.io.insertIo99", ioDTO);
+		return result;
 	}
 }

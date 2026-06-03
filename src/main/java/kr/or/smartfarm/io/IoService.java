@@ -9,4 +9,6 @@ public interface IoService {
 	public List facility();
 	public List modalSearch(String keyword);
 	public void insertData(IoDTO ioDTO);
+	public List outModal();
+	public int outModalInsert(IoDTO ioDTO);
 }

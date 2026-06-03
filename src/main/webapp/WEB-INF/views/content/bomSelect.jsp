@@ -349,7 +349,6 @@ select.form-control {
 								<th>기준 생산 수량</th>
 								<th>상태</th>
 								<th>등록일</th>
-								<th>담당자</th>
 							</tr>
 						</thead>
 						<tbody id="bom-body">
@@ -364,7 +363,6 @@ select.form-control {
 											<td>${item.REQUIRED_QTY}</td>
 											<td>${item.BOM_STATUS}</td>
 											<td>${item.CREATED_AT}</td>
-											<td>하드코딩</td>
 										</tr>
 									</c:forEach>
 								</c:when>
