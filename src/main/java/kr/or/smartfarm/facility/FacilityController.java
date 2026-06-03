@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.github.pagehelper.PageInfo;
 
 import kr.or.smartfarm.prod.ProdDTO;
+import kr.or.smartfarm.qc.QcDTO;
 
 @Controller
 public class FacilityController {
@@ -115,5 +116,14 @@ public class FacilityController {
 		    }
 		    
 		    return result;
+		}
+		
+		@RequestMapping("/insertFM")
+		//상세페이지 들어가는 로직
+		public String insertFM(FacilityDTO facilityDTO, Model model) {
+			
+			facilityService.insertFM(facilityDTO);
+			
+			return "redirect:/facilityLog";
 		}
 }

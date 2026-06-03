@@ -93,42 +93,40 @@ response.setContentType("text/html; charset=utf-8");
 				<!-- 타이틀 & 등록 버튼 -->
 				<div class="hdr">
 				    <h1>품질관리</h1>
-<%-- 				    <c:if test="${sessionScope.role >= 2}"> --%>
-			    	<button type="button" id="btnOpenModal" class="btn-reg">+ 등록하기</button>
-<%-- 				    </c:if> --%>
+				    <c:if test="${sessionScope.role >= 2}">
+			    		<button type="button" id="btnOpenModal" class="btn-reg">+ 등록하기</button>
+				    </c:if>
 				</div>
 				
 				<!-- search form -->
-				<form name="searchFrm" action="" method="get">
-					<div class="sch-wrap">
-						<div class="sch-row">
-						
-							<div class="sch-right">
-								<span class="label">▶ 조회날짜</span> 
-									<input type="date" id="sDate" class="form-control">
-									~
-									<input type="date" id="eDate" class="form-control">
-									
-									타입 
-									<select id="mType" class="form-control">
-										<option value="all">선택</option>
-										<option value="PASS">PASS</option>
-										<option value="FAILED">FAILED</option>
-										<option value="WAITING">WAITING</option>
-									</select>
-									
-									<div class="sch-input-box">
-										<span style="color: #888;">&#128269;</span> 
-										<input type="text" id="keyword" value="" placeholder="품목명 검색">
-									</div>
-									
-								<button type="button" class="btn-sch">검색</button>
-								<button type="button" class="select-reset">검색 초기화</button>
-							</div>
-							
+				<div class="sch-wrap">
+					<div class="sch-row">
+					
+						<div class="sch-right">
+							<span class="label">▶ 조회 날짜</span> 
+								<input type="date" id="sDate" class="form-control">
+								~
+								<input type="date" id="eDate" class="form-control">
+								
+								검사 단계 
+								<select id="mType" class="form-control">
+									<option value="all">선택</option>
+									<option value="PASS">PASS</option>
+									<option value="FAILED">FAILED</option>
+									<option value="WAITING">WAITING</option>
+								</select>
+								
+								<div class="sch-input-box">
+									<span style="color: #888;">&#128269;</span> 
+									<input type="text" id="keyword" value="" placeholder="품목명 검색">
+								</div>
+								
+							<button type="button" class="btn-sch">검색</button>
+							<button type="button" class="select-reset">검색 초기화</button>
 						</div>
+						
 					</div>
-				</form>
+				</div>
 								          
 				<!-- table -->
 				<div class="tbl-box">

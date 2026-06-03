@@ -18,6 +18,7 @@ public class ReportSummaryDTO {
 	
 	// equip 페이지 
 	private String equip_status; 
+	private Integer total_runtime; 
 	
 	// lot 페이지 
 	private String lot_code;  
@@ -27,6 +28,8 @@ public class ReportSummaryDTO {
 	private String qc_type; 
 	private String qc_pass;
 	private Date io_date; 
+	// defective
+	private Integer defect_qty; 
 	
 	// io 페이지 
 	private String io_type; 

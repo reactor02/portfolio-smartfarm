@@ -67,6 +67,10 @@ public class FacilityServiceImpl implements FacilityService{
 		// 랜덤 트래픽
 		return facilityDAO.randomSensor();
 	}
+	
+	public int insertFM(FacilityDTO facilityDTO) {
+		return facilityDAO.insertFM(facilityDTO);
+	}
 
 
 }

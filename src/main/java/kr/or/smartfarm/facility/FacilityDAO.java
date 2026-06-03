@@ -15,6 +15,7 @@ public interface FacilityDAO {
 	
 	public List selectItemFacility(); 
 	public List selectEmp(); 
+	public int insertFM(FacilityDTO facilityDTO); 
 	public List searchFacility(Map map);
 	public int insertFacility(FacilityDTO dto);
 	
