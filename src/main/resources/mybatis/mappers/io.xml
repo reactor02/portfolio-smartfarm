@@ -8,7 +8,7 @@
         SELECT 
         i.io_type, i.io_num, i.io_qty,
         ii.name,
-        l.lot_num,
+        l.lot_code,
         ii.type,
         f.facility_name,
         TO_CHAR(i.io_date, 'YYYY-MM-DD') AS io_date,
@@ -27,10 +27,10 @@
 <!-- 검색 조건에 맞게 검색하는 로직 -->
 	<select id="searchIo" resultType="hashMap" parameterType="map">
     SELECT
-        i.io_type, 
+        i.io_type,
         i.io_num,
         ii.name,
-        l.lot_num,
+        l.lot_code,
         ii.type,
         f.facility_name,
         TO_CHAR(i.io_date, 'YYYY-MM-DD') AS io_date,
@@ -62,7 +62,7 @@
             AND (
                 upper(ii.name) LIKE '%' || upper(#{keyword}) || '%'
                 OR
-                upper(l.lot_num) LIKE '%' || upper(#{keyword}) || '%'
+                upper(l.lot_code) LIKE '%' || upper(#{keyword}) || '%'
             )
         </if>
         

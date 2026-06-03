@@ -411,7 +411,7 @@ response.setContentType("text/html; charset=utf-8");
                                             <td>${item.IO_TYPE}</td>
                                             <td>${item.NAME}</td>
                                             <td>${item.IO_QTY}</td>
-                                            <td>${item.LOT_NUM}</td>
+                                            <td>${item.LOT_CODE}</td>
                                             <td>${item.TYPE}</td>
                                             <td>${item.IO_DATE}</td>
                                             <td>${item.FACILITY_NAME}</td>
@@ -450,7 +450,7 @@ response.setContentType("text/html; charset=utf-8");
 	<div id="regModal" class="modal-overlay" style="display: none;">
     <div class="modal-box" style="max-width: 650px;"> <h3 class="modal-title">입고/출고 등록</h3>
 
-        <form method="POST" action="insertIo" accept-charset="UTF-8" onsubmit="document.charset='UTF-8'; id="insert-form">
+        <form method="POST" action="insertIo" accept-charset="UTF-8" onsubmit="document.charset='UTF-8';" id="insert-form">
 
             <div class="modal-grid">
                 <div class="modal-field">
@@ -607,7 +607,7 @@ response.setContentType("text/html; charset=utf-8");
 							<td>\${item.IO_TYPE}</td>
 							<td>\${item.NAME}</td>
 							<td>\${item.IO_QTY}</td>
-							<td>\${item.LOT_NUM}</td>
+							<td>\${item.LOT_CODE}</td>
 							<td>\${item.TYPE}</td>
 							<td>\${item.IO_DATE}</td>
 							<td>\${item.FACILITY_NAME}</td>
