@@ -345,7 +345,7 @@ td {
 						<div class="card">
 							<div class="card-header-wrapper">
 								<h3 class="title">Lot 관리</h3>
-								<a href="/shipment" class="more-link">더보기 +</a>
+								<a href="/lot" class="more-link">더보기 +</a>
 							</div>
 							<div>
 								<table>
