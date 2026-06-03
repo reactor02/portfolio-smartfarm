@@ -30,10 +30,23 @@
 	<select id="selectw" resultType="kr.or.smartfarm.usermanage.TodayWorkDTO">
     SELECT * 
       FROM work_order
-     WHERE worker_num = #{emp_num} 
-     and TRUNC(created_at) = TRUNC(SYSDATE)
+     WHERE 1=1
+       <!-- 1. e_level이 2 이상일 때: 날짜 조건 무시하고 emp_num으로 전체 조회 -->
+       <if test="e_level >= 2">
+         AND emp_num = #{emp_num}
+       </if>
+       
+       <!-- 2. e_level이 1일 때: 오늘 날짜 데이터만 worker_num으로 조회 -->
+       <if test="e_level == 1">
+         AND worker_num = #{emp_num}
+         AND TRUNC(created_at) = TRUNC(SYSDATE)
+       </if>
+       
+       <!-- 🚨 안전장치: 권한이 1 또는 2가 아니면 무조건 조회 결과가 0건이 되도록 제어 -->
+       <if test="e_level == null or (e_level != 1 and e_level &lt; 2 and e_level &lt; 3)">
+         AND 1 = 2
+       </if>
      ORDER BY created_at DESC
-     
 </select>
 
 	

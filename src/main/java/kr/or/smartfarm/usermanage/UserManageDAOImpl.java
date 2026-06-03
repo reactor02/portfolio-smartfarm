@@ -9,6 +9,8 @@ import org.springframework.stereotype.Repository;
 
 import com.github.pagehelper.PageHelper;
 
+import kr.or.smartfarm.login.LoginDTO;
+
 @Repository
 public class UserManageDAOImpl implements UserManageDAO {
 
@@ -57,10 +59,10 @@ public class UserManageDAOImpl implements UserManageDAO {
 		return result;
 	}
 	@Override
-	public List<TodayWorkDTO> selectw(String emp_num) {
+	public List<TodayWorkDTO> selectw(LoginDTO loginUser) {
 		// TODO Auto-generated method stub
 		
-		List<TodayWorkDTO> result = sqlSession.selectList(NAMESPACE2 + "selectw", emp_num);
+		List<TodayWorkDTO> result = sqlSession.selectList(NAMESPACE2 + "selectw", loginUser);
 		
 		return result;
 	}

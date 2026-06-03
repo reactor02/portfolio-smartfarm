@@ -52,10 +52,10 @@ public class UserManageServiceImpl implements UserManageService {
 		
 	}
 	@Override
-	public List<TodayWorkDTO> selectw(String emp_num) {
+	public List<TodayWorkDTO> selectw(LoginDTO loginUser) {
 		// TODO Auto-generated method stub
 		
-		List<TodayWorkDTO> result = userManageDAO.selectw(emp_num);
+		List<TodayWorkDTO> result = userManageDAO.selectw(loginUser);
 		
 		return result;
 		
