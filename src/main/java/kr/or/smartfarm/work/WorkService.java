@@ -115,6 +115,16 @@ public interface WorkService {
      */
     Map<String, Object> searchPlans(String keyword, int page);
 
+    /**
+     * 등록 모달에서 사용하는 실무자 AJAX 검색 결과를 반환한다.
+     * 부서 3·5(순화·조직배양) 소속 재직자만 검색 대상이다.
+     *
+     * @param keyword  검색어 (사번 또는 이름 부분 일치)
+     * @param page     요청 페이지 번호 (1부터 시작)
+     * @return Map { list, currentPage, totalPages, totalCount }
+     */
+    Map<String, Object> searchWorkers(String keyword, int page);
+
     /** 품목별 공정 목록 조회 (작업순서 오름차순, 작업지시 상세 페이지용) */
     List<Map<String, Object>> getProcessesByItem(int item_num);
 

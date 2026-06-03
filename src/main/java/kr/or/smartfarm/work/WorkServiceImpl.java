@@ -139,6 +139,22 @@ public class WorkServiceImpl implements WorkService {
         lotDao.insertLot(newLot);
         int newLotNum = newLot.getLot_num();
 
+        // [4-1] 생산 결과 LOT 입고 처리 (생산입고) — LOT 생성 직후 바로 입고 기록
+        //       io_type='입고', io_reason='생산입고', 해당 품목 type의 검사대기 QC 자동 연결,
+        //       보관 설비 facility_num=3, 담당자 emp_num=작업지시 실무자, qc_chked='N'
+        Map<String, Object> inMap = new HashMap<String, Object>();
+        inMap.put("ioQty",    orderQty);
+        inMap.put("lotNum",   newLotNum);
+        inMap.put("itemType", type);
+        inMap.put("empNum",   work.getWorker_num());
+        dao.insertProduceIo(inMap);
+
+        // [4-2] 생산된 품목 stock 증가 (stock 행이 있을 때만 반영, 신규 행 생성 안 함)
+        Map<String, Object> stockInMap = new HashMap<String, Object>();
+        stockInMap.put("itemNum", itemNum);
+        stockInMap.put("qty",     orderQty);
+        dao.adjustStock(stockInMap);
+
         // [5] 재료별 FIFO 차감 + io 출고 기록 + lot_relation 기록
         for (BomDTO mat : materials) {
             int totalNeeded = mat.getRequired_qty() * orderQty;
@@ -169,6 +185,13 @@ public class WorkServiceImpl implements WorkService {
 
                 totalNeeded -= deduct;
             }
+
+            // 자재 stock 차감 (stock 행이 있을 때만 반영, 신규 행 생성 안 함)
+            // 내부 루프에서 totalNeeded가 0이 되므로 총 소모량은 다시 계산
+            Map<String, Object> stockOutMap = new HashMap<String, Object>();
+            stockOutMap.put("itemNum", mat.getItem_num2());
+            stockOutMap.put("qty",     -(mat.getRequired_qty() * orderQty));
+            dao.adjustStock(stockOutMap);
         }
 
         // [6] work_order 완료 처리
@@ -217,6 +240,33 @@ public class WorkServiceImpl implements WorkService {
 
         List<ProdDTO> list       = dao.searchPlans(params);
         int totalCount = (list != null && !list.isEmpty()) ? list.get(0).getTotal_count() : 0;
+        int totalPages = (totalCount == 0) ? 1 : (int) Math.ceil((double) totalCount / size);
+
+        Map<String, Object> result = new HashMap<String, Object>();
+        result.put("list",        list);
+        result.put("currentPage", page);
+        result.put("totalPages",  totalPages);
+        result.put("totalCount",  totalCount);
+        return result;
+    }
+
+    @Override
+    public Map<String, Object> searchWorkers(String keyword, int page) {
+        int size     = 5;
+        int startRow = (page - 1) * size + 1;
+        int endRow   = page * size;
+
+        Map<String, Object> params = new HashMap<String, Object>();
+        params.put("keyword",  keyword);
+        params.put("startRow", startRow);
+        params.put("endRow",   endRow);
+
+        List<Map<String, Object>> list = dao.searchWorkers(params);
+        int totalCount = 0;
+        if (list != null && !list.isEmpty()) {
+            Object tc = list.get(0).get("TOTAL_COUNT");
+            if (tc != null) totalCount = ((Number) tc).intValue();
+        }
         int totalPages = (totalCount == 0) ? 1 : (int) Math.ceil((double) totalCount / size);
 
         Map<String, Object> result = new HashMap<String, Object>();

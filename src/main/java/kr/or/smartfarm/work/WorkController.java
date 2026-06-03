@@ -276,4 +276,21 @@ public class WorkController {
             @org.springframework.web.bind.annotation.RequestParam(defaultValue = "1") int page) {
         return workService.searchPlans(keyword, page);
     }
+
+    /* ── 실무자 검색 AJAX (등록 모달용, 부서 3·5 재직자) ── */
+    /**
+     * GET /work/workers - 등록 모달에서 사용하는 실무자 AJAX 검색.
+     * 부서 3·5(순화·조직배양) 소속 재직자만 대상으로, 페이징(5건/페이지) 처리하여 반환한다.
+     *
+     * @param keyword 검색어 (사번 또는 이름 부분 일치; 없으면 전체)
+     * @param page    요청 페이지 번호 (기본값 1)
+     * @return Map { list, currentPage, totalPages, totalCount }
+     */
+    @RequestMapping(value = "/workers", method = RequestMethod.GET)
+    @ResponseBody
+    public java.util.Map<String, Object> searchWorkers(
+            @org.springframework.web.bind.annotation.RequestParam(defaultValue = "") String keyword,
+            @org.springframework.web.bind.annotation.RequestParam(defaultValue = "1") int page) {
+        return workService.searchWorkers(keyword, page);
+    }
 }

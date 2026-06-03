@@ -116,6 +116,15 @@ public interface WorkDAO {
     List<ProdDTO> searchPlans(Map<String, Object> params);
 
     /**
+     * 등록 모달 AJAX 검색용 실무자 목록을 조회한다. (부서 3·5 재직자만, 페이징 적용)
+     * SQL: kr.or.smartfarm.work.searchWorkers
+     *
+     * @param params Map { keyword, startRow, endRow }
+     * @return 실무자 목록 (EMP_NUM, ENAME, DEPT_NAME, E_LEVEL, TEL, total_count)
+     */
+    List<Map<String, Object>> searchWorkers(Map<String, Object> params);
+
+    /**
      * 완성품 item_num을 기준으로 BOM(Bill of Materials) 재료 목록을 조회한다.
      * SQL: kr.or.smartfarm.work.getMaterialsByItem
      * bom_status = 'Y' (유효한 BOM 항목만 조회)
@@ -138,6 +147,31 @@ public interface WorkDAO {
      *               - ioReason: 출고 사유 (예: "생산투입")
      */
     void insertIo(Map<String, Object> params);
+
+    /**
+     * 생산 완료된 LOT의 입고 내역을 io 테이블에 INSERT 한다. (io_type='입고', io_reason='생산입고')
+     * SQL: kr.or.smartfarm.work.insertProduceIo
+     * 해당 품목 type의 검사대기(qc_pass='WAITING') QC가 있으면 qc_num에 자동 연결한다.
+     *
+     * @param params Map { ioQty, lotNum, itemType, empNum }
+     *               - ioQty: 입고 수량 (= 생산 수량)
+     *               - lotNum: 생산 결과 LOT 번호
+     *               - itemType: 생산 품목 type (PRODUCT/SEMIPRODUCT, 검사대기 QC 매칭용)
+     *               - empNum: 작업지시 실무자 worker_num
+     */
+    void insertProduceIo(Map<String, Object> params);
+
+    /**
+     * stock 테이블의 재고 수량(stock_qty)을 가감한다. (생산투입 차감 / 생산입고 증가)
+     * SQL: kr.or.smartfarm.work.adjustStock
+     * 해당 item_num의 stock 행이 있을 때만 갱신되며(없으면 0건 영향), 새 행은 생성하지 않는다.
+     * 음수 방지 가드: 결과가 0 미만이면 0으로 클램프된다(GREATEST(...,0)).
+     *
+     * @param params Map { itemNum, qty }
+     *               - itemNum: 대상 품목 번호
+     *               - qty: 가감할 수량 (양수=증가, 음수=차감)
+     */
+    void adjustStock(Map<String, Object> params);
 
     /** 품목별 공정 목록 조회 (작업순서 오름차순, 작업지시 상세 페이지용) */
     List<Map<String, Object>> getProcessesByItem(int item_num);
