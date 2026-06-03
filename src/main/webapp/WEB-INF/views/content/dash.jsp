@@ -325,8 +325,15 @@ body {
 				</div>
 				</c:forEach>
 				<div class="kpi-card">
-					<div class="kpi-title">불량수</div>
-					<div class="kpi-value">8 건</div>
+					<div class="kpi-title">총가동 시설</div>
+					<c:choose>
+					<c:when test="${not empty resultKPIFacility}">
+					<div class="kpi-value">${resultKPIFacility} 구역</div>
+					</c:when>
+					<c:otherwise>
+						<div class="kpi-value">0 구역</div>
+					</c:otherwise>
+					</c:choose>
 				</div>
 			</div>
 
@@ -337,47 +344,22 @@ body {
 					<table class="data-table">
 						<thead>
 							<tr>
-								<th>생산 계획명</th>
+								<th>생산계획 아이디</th>
 								<th>제품명</th>
 								<th>계획 수량</th>
-								<th>진행률</th>
 								<th>상태</th>
 							</tr>
 						</thead>
 						<tbody>
+							<c:forEach var="i" items="${resultDash.resultProd}">
+							
 							<tr>
-								<td>6월 1주차 생산계획</td>
-								<td>제품 A</td>
-								<td>5,000 EA</td>
-								<td>
-									<div class="progress-container">
-										<div class="progress-bar" style="width: 75%;"></div>
-									</div> <span style="font-size: 13px;">75%</span>
-								</td>
-								<td><span class="badge badge-green">진행중</span></td>
+								<td>${i.plan_id}</td>
+								<td>${i.name}</td>
+								<td>${i.plan_qty}${i.unit}</td>
+								<td><span class="badge badge-green">${i.plan_status}</span></td>
 							</tr>
-							<tr>
-								<td>6월 2주차 생산계획</td>
-								<td>제품 B</td>
-								<td>6,000 EA</td>
-								<td>
-									<div class="progress-container">
-										<div class="progress-bar" style="width: 30%;"></div>
-									</div> <span style="font-size: 13px;">30%</span>
-								</td>
-								<td><span class="badge badge-green">진행중</span></td>
-							</tr>
-							<tr>
-								<td>6월 3주차 생산계획</td>
-								<td>제품 C</td>
-								<td>4,000 EA</td>
-								<td>
-									<div class="progress-container">
-										<div class="progress-bar" style="width: 0%;"></div>
-									</div> <span style="font-size: 13px;">0%</span>
-								</td>
-								<td><span class="badge badge-gray">대기</span></td>
-							</tr>
+							</c:forEach>
 						</tbody>
 					</table>
 				</div>
@@ -395,39 +377,19 @@ body {
 							</tr>
 						</thead>
 						<tbody>
-							<tr>
-								<td>WO-250604-001</td>
-								<td>제품 A</td>
-								<td>1,000 EA</td>
-								<td>
-									<div class="progress-container">
-										<div class="progress-bar" style="width: 60%;"></div>
-									</div> <span style="font-size: 13px;">60%</span>
-								</td>
-								<td><span class="badge badge-green">진행중</span></td>
-							</tr>
-							<tr>
-								<td>WO-250604-002</td>
-								<td>제품 B</td>
-								<td>1,500 EA</td>
-								<td>
-									<div class="progress-container">
-										<div class="progress-bar" style="width: 40%;"></div>
-									</div> <span style="font-size: 13px;">40%</span>
-								</td>
-								<td><span class="badge badge-green">진행중</span></td>
-							</tr>
-							<tr>
-								<td>WO-250603-003</td>
-								<td>제품 C</td>
-								<td>800 EA</td>
-								<td>
-									<div class="progress-container">
-										<div class="progress-bar" style="width: 100%;"></div>
-									</div> <span style="font-size: 13px;">100%</span>
-								</td>
-								<td><span class="badge badge-blue">완료</span></td>
-							</tr>
+							<c:forEach var="i" items="${resultDash.resultOrder}">
+								<tr>
+									<td>${i.order_id}</td>
+									<td>${i.name}</td>
+									<td>${i.order_qty}</td>
+									<td>
+										<div class="progress-container">
+											<div class="progress-bar" style="width: ${(i.current_qty / i.order_qty) * 100}%;"></div>
+										</div> <span style="font-size: 13px;">${(i.current_qty / i.order_qty) * 100}%</span>
+									</td>
+									<td><span class="badge badge-green">${i.order_status}</span></td>
+								</tr>
+							</c:forEach>
 						</tbody>
 					</table>
 				</div>

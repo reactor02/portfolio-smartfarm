@@ -9,6 +9,7 @@ public interface QcDAO {
 	
 	public List selectAll(int pageNum); 
 	public List selectItem(); 
+	public List selectEmp(); 
 	public List selectWaiting(); 
 	public List selectAllQc(); 
 	public List searchQc(Map map);

@@ -45,3 +45,11 @@
     background-color: #007bff; /* 파란색: 최종 출하 완료 */
     color: #fff;
 }
+.history-badge.badge-io-in {
+    background-color: #0050b3; /* 짙은 파란색: 입고 */
+    color: #fff;
+}
+.history-badge.badge-io-out {
+    background-color: #d4380d; /* 주황-빨강: 생산투입출고 */
+    color: #fff;
+}

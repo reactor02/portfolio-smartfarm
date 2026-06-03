@@ -1,6 +1,8 @@
 package kr.or.smartfarm.dashboard;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -33,6 +35,11 @@ public class DashController {
 				
 			}
 			
+			
+			// 생산계획, 작업지시 대시보드 위젯
+			Map resultDash = dashService.resultDashBoard();
+			model.addAttribute("resultDash", resultDash);
+			
 			// 공지
 			List<DashDTO> resultB = dashService.selectBoard(); 
 			model.addAttribute("resultB", resultB);
@@ -50,11 +57,12 @@ public class DashController {
 			model.addAttribute("resultKPIShip", resultKPIShip);
 			List<DashDTO> resultKPIDefect = dashService.selectKPIDefect(period, startDate, endDate);
 			model.addAttribute("resultKPIDefect", resultKPIDefect);
+			Integer resultKPIFacility = dashService.selectKPIFacility();
+			model.addAttribute("resultKPIFacility", resultKPIFacility);
+			//
 			model.addAttribute("period", period);
 			model.addAttribute("startDate", startDate);
 			model.addAttribute("endDate", endDate);
-			
-		
 			
 		} catch (Exception e ) {
 			System.out.println("에러 발생 지점: " + e.getMessage());

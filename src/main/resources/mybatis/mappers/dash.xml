@@ -138,7 +138,44 @@
 		</choose>
 	</select>
 
-
+	<!-- 6. KPT 시설 개수 -->
+	<select id="getKPIFacility" resultType="Integer"> 
+		SELECT count(*)
+		FROM facility
+	</select>
+	
+	<!-- 7. 대시보드 생산 계획 -->
+	<select id="getProdList" resultType="kr.or.smartfarm.dashboard.DashDTO"> 
+		SELECT 
+			p.plan_id,
+			p.plan_qty,
+			p.plan_status,
+			i.name,
+			i.unit
+		FROM production_plan p
+		JOIN item i
+			ON p.item_num = i.item_num
+		WHERE ROWNUM &lt;= 5
+		ORDER BY created_at desc
+	</select>
+	
+	<!-- 8. 대시보드 작업 지시 -->
+	<select id="getWorkList" resultType="kr.or.smartfarm.dashboard.DashDTO"> 
+		SELECT 
+			w.order_id,
+			w.order_qty,
+			w.current_qty,
+			w.order_status,
+			i.name,
+			i.unit
+		FROM work_order w
+		JOIN production_plan p
+			ON w.plan_num = p.plan_num
+		JOIN item i
+			ON p.item_num = i.item_num
+		WHERE ROWNUM &lt;= 5
+		ORDER BY w.created_at desc
+	</select>
 
 
 

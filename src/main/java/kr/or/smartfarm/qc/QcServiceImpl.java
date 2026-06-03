@@ -75,5 +75,9 @@ public class QcServiceImpl implements QcService{
 	public int insertDefect(QcDTO qcDTO) {
 		return qcDAO.insertDefect(qcDTO);
 	}
+	@Override
+	public List selectEmp() {
+		return qcDAO.selectEmp();
+	}
 
 }
