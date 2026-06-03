@@ -131,6 +131,11 @@
         VALUES (LOT_RELATION_SEQ.NEXTVAL, #{parent_lot_num}, #{child_lot_num})
     </insert>
 
+    <!-- 분할 자식 LOT의 원본 LOT 조회 (분할이 아니면 결과 없음) -->
+    <select id="getOriginLotNum" parameterType="int" resultType="java.lang.Integer">
+        SELECT origin_lot_num FROM lot_split WHERE split_lot_num = #{lot_num}
+    </select>
+
     <!-- lotDetail: 이 LOT 생산에 직접 소모된 재료 LOT 목록 + BOM 기반 소모 수량 (소모자재 테이블용) -->
     <select id="getMaterialsByChildLot" parameterType="int" resultType="LotRelationDTO">
         SELECT lr.lot_parent                        AS parent_lot_num,
@@ -161,7 +166,7 @@
         WHERE lr.lot_child = #{lot_num}   -- lot_child = 소모재료 LOT
     </select>
 
- <select id="getLotHistory" parameterType="int" resultType="hashMap">
+ <select id="getLotHistory" parameterType="map" resultType="hashMap">
         SELECT
             ROWNUM AS seq_num,  depth,
             lot_code,
@@ -186,7 +191,8 @@
                 status_col,
                 worker,
                 reg_date,
-                flow_order
+                flow_order,
+                ord_seq
             FROM (
                 /* ── [0] 입출고 이력 (입고: 자재롯+현재롯 / 생산투입출고: 현재롯) ── */
                 SELECT
@@ -195,14 +201,15 @@
                     i.name                                   AS item_name,
                     i.type                                   AS item_type,
                     CASE WHEN io.io_type = '입고' THEN '입고'
-                         ELSE '생산투입출고' END             AS gubun,
+                         ELSE '출고' END                     AS gubun,
                     TO_CHAR(io.io_num)                       AS id_col,
                     f.facility_name || ' / ' || io.io_qty    AS content_col,
                     TO_CHAR(io.io_date, 'YYYY-MM-DD')        AS date_col,
                     io.io_reason                             AS status_col,
                     e.ename                                  AS worker,
                     io.io_date                               AS reg_date,
-                    0                                        AS flow_order
+                    0                                        AS flow_order,
+                    io.io_num                                AS ord_seq
                 FROM io io
                 JOIN lot l        ON io.lot_num = l.lot_num
                 JOIN item i       ON l.item_num = i.item_num
@@ -211,16 +218,15 @@
                 WHERE (
                         ( io.io_type = '입고'
                           AND io.lot_num IN (
-                              SELECT #{lot_num} FROM DUAL
+                              SELECT #{prodLot} FROM DUAL
                               UNION
                               SELECT lot_parent FROM lot_relation
-                               START WITH lot_child = #{lot_num}
+                               START WITH lot_child = #{prodLot}
                                CONNECT BY PRIOR lot_parent = lot_child
                           ) )
                         OR
                         ( io.io_type = '출고'
-                          AND io.io_reason = '생산투입'
-                          AND io.lot_num = #{lot_num} )
+                          AND io.lot_num = #{prodLot} )
                       )
 
                 UNION ALL
@@ -233,15 +239,24 @@
                     i.type                                   AS item_type,
                     '원자재투입'                             AS gubun,
                     wo.order_id                              AS id_col,
-                    (SELECT LISTAGG(TO_CHAR(p.flow), '→') WITHIN GROUP (ORDER BY p.flow)
-                       FROM process p
-                      WHERE p.item_num = pp.item_num
-                        AND p.process_status = '사용중') AS content_col,
+                    /* 위치(시설) / 수량(LOT 초기수량) */
+                    (SELECT f.facility_name
+                       FROM (
+                            SELECT item_num, facility_num,
+                                   ROW_NUMBER() OVER (PARTITION BY item_num ORDER BY flow) AS rn
+                              FROM process
+                             WHERE facility_num IS NOT NULL
+                       ) pr
+                       JOIN facility f ON pr.facility_num = f.facility_num
+                      WHERE pr.item_num = pp.item_num
+                        AND pr.rn = 1)
+                    || ' / ' || l.init_qty                   AS content_col,
                     TO_CHAR(wo.order_start, 'YYYY-MM-DD HH24:MI:SS') AS date_col,
                     wo.order_status                          AS status_col,
                     e.ename                                  AS worker,
                     NVL(wo.order_start, l.lot_date)          AS reg_date,
-                    1                                        AS flow_order
+                    1                                        AS flow_order,
+                    0                                        AS ord_seq
                 FROM lot l
                 JOIN item i               ON l.item_num = i.item_num
                 LEFT JOIN work_order wo   ON l.order_num = wo.order_num
@@ -249,7 +264,7 @@
                 LEFT JOIN emp e               ON wo.emp_num = e.emp_num
                 WHERE l.lot_num IN (
                     /* 나에게 투입된 상위 부모 롯들을 전부 역추적 */
-                    SELECT lot_parent FROM lot_relation START WITH lot_child = #{lot_num} CONNECT BY PRIOR lot_parent = lot_child
+                    SELECT lot_parent FROM lot_relation START WITH lot_child = #{prodLot} CONNECT BY PRIOR lot_parent = lot_child
                 )
 
                 UNION ALL
@@ -262,21 +277,30 @@
                     i.type                                   AS item_type,
                     '완제품생산'                             AS gubun,
                     wo.order_id                              AS id_col,
-                    (SELECT LISTAGG(TO_CHAR(p.flow), '→') WITHIN GROUP (ORDER BY p.flow)
-                       FROM process p
-                      WHERE p.item_num = pp.item_num
-                        AND p.process_status = '사용중') AS content_col,
+                    /* 위치(시설) / 수량(LOT 초기수량) */
+                    (SELECT f.facility_name
+                       FROM (
+                            SELECT item_num, facility_num,
+                                   ROW_NUMBER() OVER (PARTITION BY item_num ORDER BY flow) AS rn
+                              FROM process
+                             WHERE facility_num IS NOT NULL
+                       ) pr
+                       JOIN facility f ON pr.facility_num = f.facility_num
+                      WHERE pr.item_num = pp.item_num
+                        AND pr.rn = 1)
+                    || ' / ' || l.init_qty                   AS content_col,
                     TO_CHAR(wo.order_start, 'YYYY-MM-DD HH24:MI:SS') AS date_col,
                     wo.order_status                          AS status_col,
                     e.ename                                  AS worker,
                     NVL(wo.order_start, l.lot_date)          AS reg_date,
-                    1                                        AS flow_order
+                    1                                        AS flow_order,
+                    0                                        AS ord_seq
                 FROM lot l
                 JOIN item i               ON l.item_num = i.item_num
                 JOIN work_order wo        ON l.order_num = wo.order_num
                 LEFT JOIN production_plan pp ON wo.plan_num = pp.plan_num
                 LEFT JOIN emp e               ON wo.emp_num = e.emp_num
-                WHERE l.lot_num = #{lot_num}
+                WHERE l.lot_num = #{prodLot}
 
                 UNION ALL
 
@@ -288,12 +312,14 @@
                     i.type                                   AS item_type,
                     '출하완료'                               AS gubun,
                     s.shipment_id                            AS id_col,
-                    v.vender_name                            AS content_col,
+                    /* 위치(거래처) / 수량(출하수량) */
+                    v.vender_name || ' / ' || sl.qty         AS content_col,
                     TO_CHAR(s.shipment_date, 'YYYY-MM-DD HH24:MI:SS') AS date_col,
                     s.shipment_status                        AS status_col,
                     e.ename                                  AS worker,
                     s.shipment_date                          AS reg_date,
-                    999                                      AS flow_order
+                    999                                      AS flow_order,
+                    0                                        AS ord_seq
                 FROM lot l
                 JOIN item i               ON l.item_num = i.item_num
                 JOIN shipment_lot sl      ON sl.lot_num = l.lot_num
@@ -302,13 +328,15 @@
                 JOIN vender v             ON sr.vender_num = v.vender_num
                 LEFT JOIN emp e           ON s.emp_num = e.emp_num
                 WHERE l.lot_num IN (
-                    SELECT lot_child FROM lot_relation START WITH lot_parent = #{lot_num} CONNECT BY PRIOR lot_child = lot_parent
+                    SELECT split_lot_num FROM lot_split
+                      START WITH origin_lot_num = #{selfLot}
+                      CONNECT BY PRIOR split_lot_num = origin_lot_num
                     UNION
-                    SELECT #{lot_num} FROM DUAL
+                    SELECT #{selfLot} FROM DUAL
                 )
             )
-            /* 시간 순서 우선, 동일 시각은 레벨 순서, 공정 flow 순서로 정렬 */
-            ORDER BY reg_date ASC, level_num ASC, flow_order ASC
+            /* 시간 순서 우선, 동일 시각은 레벨 순서, 공정 flow 순서, 생성 순서로 정렬 */
+            ORDER BY reg_date ASC, level_num ASC, flow_order ASC, ord_seq ASC
         )
     </select>
 

@@ -152,10 +152,10 @@ public class ShipmentDAOImpl implements ShipmentDAO {
         return sqlSession.insert("kr.or.smartfarm.shipment.insertSplitLot", map);
     }
 
-    /** lot_relation 등록 — 부모 LOT → 분할 자식 LOT (롯이력 추적) */
+    /** lot_split 등록 — 원본 LOT → 분할 신규 LOT (롯이력 추적) */
     @Override
-    public int insertLotRelationForShipment(Map map) {
-        return sqlSession.insert("kr.or.smartfarm.shipment.insertLotRelationForShipment", map);
+    public int insertLotSplit(Map map) {
+        return sqlSession.insert("kr.or.smartfarm.shipment.insertLotSplit", map);
     }
 
     /** shipment_lot의 배정 LOT 참조를 부모 → 자식으로 교체 */

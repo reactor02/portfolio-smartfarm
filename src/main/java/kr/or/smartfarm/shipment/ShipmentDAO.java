@@ -33,7 +33,7 @@ public interface ShipmentDAO {
 
     // 출하확정 분할
     public int insertSplitLot(Map map);
-    public int insertLotRelationForShipment(Map map);
+    public int insertLotSplit(Map map);
     public int updateShipmentLotRef(Map map);
 
     /** 출하 담당자 emp_num 조회 (취소/확정 권한 검증용) */

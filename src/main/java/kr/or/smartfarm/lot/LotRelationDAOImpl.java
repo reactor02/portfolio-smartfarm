@@ -50,9 +50,15 @@ public class LotRelationDAOImpl implements LotRelationDAO {
         return session.selectList("kr.or.smartfarm.lot.getRecursiveMaterials", lot_num);
     }
 
-    /** 롯이력 통합 조회 (입고/생산/출하 등 전 이력, UNION ALL + CONNECT BY) */
+    /** 분할 자식 LOT의 원본 LOT 번호 조회 (lot_split 테이블, 분할이 아니면 null) */
     @Override
-    public List<Map<String, Object>> getLotHistory(int lot_num) {
-        return session.selectList("kr.or.smartfarm.lot.getLotHistory", lot_num);
+    public Integer getOriginLotNum(int lot_num) {
+        return session.selectOne("kr.or.smartfarm.lot.getOriginLotNum", lot_num);
+    }
+
+    /** 롯이력 통합 조회 (입고/생산/출하 등 전 이력, UNION ALL + CONNECT BY) — map 키: prodLot, selfLot */
+    @Override
+    public List<Map<String, Object>> getLotHistory(java.util.Map<String,Object> param) {
+        return session.selectList("kr.or.smartfarm.lot.getLotHistory", param);
     }
 }

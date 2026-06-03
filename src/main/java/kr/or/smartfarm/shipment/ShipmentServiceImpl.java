@@ -124,11 +124,11 @@ public class ShipmentServiceImpl implements ShipmentService {
                 shipmentDAO.insertSplitLot(childMap);
                 int childLotNum = ((Number) childMap.get("lot_num")).intValue();
 
-                // ② lot_relation: 부모 → 자식
+                // ② lot_split: 원본 → 분할 신규
                 Map relMap = new HashMap();
-                relMap.put("parent_lot_num", lotNum);
-                relMap.put("child_lot_num",  childLotNum);
-                shipmentDAO.insertLotRelationForShipment(relMap);
+                relMap.put("origin_lot_num", lotNum);
+                relMap.put("split_lot_num",  childLotNum);
+                shipmentDAO.insertLotSplit(relMap);
 
                 // ③ 부모 LOT: IO 출고 (분할)
                 Map parentIo = new HashMap();

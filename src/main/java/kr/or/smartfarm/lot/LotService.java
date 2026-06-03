@@ -77,10 +77,20 @@ public interface LotService {
     List<Map<String, Object>>     getRecursiveMaterials(int lot_num);
 
     /**
+     * 분할 자식 LOT의 원본 LOT 번호를 조회합니다.
+     * lot_split 테이블에서 split_lot_num = lot_num 조건으로 origin_lot_num을 반환합니다.
+     *
+     * @param lot_num  조회 대상 LOT의 내부 PK
+     * @return         원본 LOT의 lot_num, 분할 LOT이 아니면 null
+     */
+    Integer                       getOriginLotNum(int lot_num);
+
+    /**
      * 롯이력 통합 조회 — 생산공정과 출하이력을 하나의 테이블에 통합하여 반환합니다.
      *
      * <p>조회 범위: 루트 LOT + CONNECT BY 재귀로 탐색한 모든 자식 LOT</p>
      * <p>각 행은 Map으로 반환되며 컨트롤러에서 JSON으로 직렬화됩니다.</p>
+     * <p>분할 LOT의 경우 origin LOT 기준으로 생산이력을 해석합니다.</p>
      * <p>상세 쿼리 로직은 lot.xml의 getLotHistory 쿼리 주석을 참고하세요.</p>
      *
      * @param lot_num  조회 시작점인 루트 LOT의 내부 PK

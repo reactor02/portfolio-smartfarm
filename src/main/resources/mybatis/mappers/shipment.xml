@@ -318,10 +318,10 @@
                 #{expiry_date,jdbcType=DATE})
     </insert>
 
-    <!-- 출하확정 분할: lot_relation 등록 (parent → child) -->
-    <insert id="insertLotRelationForShipment" parameterType="map">
-        INSERT INTO lot_relation (lot_relation_num, lot_parent, lot_child)
-        VALUES (LOT_RELATION_SEQ.NEXTVAL, #{parent_lot_num}, #{child_lot_num})
+    <!-- 출하확정 분할: lot_split 등록 (origin → split) -->
+    <insert id="insertLotSplit" parameterType="map">
+        INSERT INTO lot_split (lot_split_num, origin_lot_num, split_lot_num, split_date)
+        VALUES (LOT_SPLIT_SEQ.NEXTVAL, #{origin_lot_num}, #{split_lot_num}, SYSDATE)
     </insert>
 
     <!-- 출하확정 분할: shipment_lot.lot_num → 자식 LOT으로 교체 -->

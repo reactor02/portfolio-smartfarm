@@ -17,6 +17,8 @@ public interface LotRelationDAO {
     List<LotRelationDTO>         getParentsByLot(int lot_num);
     /** CONNECT BY 재귀로 다단계 소모 자재 트리 조회 */
     List<Map<String, Object>>    getRecursiveMaterials(int lot_num);
-    /** 롯이력 통합 조회 (전 이력) */
-    List<Map<String, Object>>    getLotHistory(int lot_num);
+    /** 분할 자식 LOT의 원본 LOT 번호 조회 (분할이 아니면 null) */
+    Integer                      getOriginLotNum(int lot_num);
+    /** 롯이력 통합 조회 (전 이력) — map 키: prodLot, selfLot */
+    List<Map<String, Object>>    getLotHistory(java.util.Map<String,Object> param);
 }
