@@ -68,15 +68,17 @@ public class WorkController {
      */
     @RequestMapping
     public String list(@ModelAttribute WorkPageDTO pageDTO, Model model) {
-        List<WorkDTO>         list     = workService.getList(pageDTO);
-        List<SelectOptionDTO> empList  = workService.getEmpOptions();
-        List<SelectOptionDTO> planList = workService.getPlanOptions();
-        List<SelectOptionDTO> itemList = workService.getItemOptions();
-        model.addAttribute("list",     list);
-        model.addAttribute("page",     pageDTO);
-        model.addAttribute("empList",  empList);
-        model.addAttribute("planList", planList);
-        model.addAttribute("itemList", itemList);
+        List<WorkDTO>         list       = workService.getList(pageDTO);
+        List<SelectOptionDTO> empList    = workService.getEmpOptions();
+        List<SelectOptionDTO> planList   = workService.getPlanOptions();
+        List<SelectOptionDTO> itemList   = workService.getItemOptions();
+        List<SelectOptionDTO> workerList = workService.getWorkerOptions();
+        model.addAttribute("list",       list);
+        model.addAttribute("page",       pageDTO);
+        model.addAttribute("empList",    empList);
+        model.addAttribute("planList",   planList);
+        model.addAttribute("itemList",   itemList);
+        model.addAttribute("workerList", workerList);
         return "content/work.tiles";
     }
 

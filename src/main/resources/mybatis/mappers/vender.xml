@@ -11,6 +11,7 @@
 		JOIN emp e
 		ON v.emp_num =
 		e.emp_num
+		order by v.vender_num DESC
 	</select>
 
 	<select id="selectOneVender"
@@ -67,23 +68,25 @@
 		emp_num = #{emp_num}
 		WHERE vender_num = #{vender_num}
 	</update>
-	
-	<delete id="deleteVender" parameterType="kr.or.smartfarm.vender.VenderDTO"> 
-		delete from vender where vender_num = #{vender_num}	
+
+	<delete id="deleteVender"
+		parameterType="kr.or.smartfarm.vender.VenderDTO">
+		delete from vender where vender_num = #{vender_num}
 	</delete>
-	
-	<select id="searchVender" parameterType = "kr.or.smartfarm.vender.VenderDTO"
-	resultType="kr.or.smartfarm.vender.VenderDTO">
-		select v.*,e.ename from vender v 
+
+	<select id="searchVender"
+		parameterType="kr.or.smartfarm.vender.VenderDTO"
+		resultType="kr.or.smartfarm.vender.VenderDTO">
+		select v.*,e.ename from vender v
 		left join emp e on v.emp_num = e.emp_num
-		where 1=1 
+		where 1=1
 		<if test="type != null and type != ''">
 			and v.vender_type= #{type}
 		</if>
 		<if test="keyword != null and keyword != ''">
-			and ( 
-				v.vender_name like ('%' || #{keyword} || '%')
-				or e.ename like ('%' || #{keyword} || '%')
+			and (
+			v.vender_name like ('%' || #{keyword} || '%')
+			or e.ename like ('%' || #{keyword} || '%')
 			)
 		</if>
 	</select>

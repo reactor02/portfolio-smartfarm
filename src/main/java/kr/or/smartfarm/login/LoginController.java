@@ -75,7 +75,7 @@ public class LoginController {
 	        
 	        // 💡 자바스크립트 .then(data => { ... }) 쪽으로 성공 신호를 보냅니다.
 	        response.setSuccess(true);
-	        response.setMessage("로그인에 성공했습니다!");
+	        response.setMessage(login.getEname() + " 님, 환영합니다!");
 	        
 	    } else {
 	        // 💡 자바스크립트 쪽으로 실패 신호와 메시지를 보냅니다.

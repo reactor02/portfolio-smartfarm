@@ -133,7 +133,8 @@ select.form-control{width:110px}
 					<input type="text" id="keyword" name="keyword" value="${param.keyword}" placeholder=" 사원번호 / 이름">
 				</div>
 				<!-- 💡 함수 연결을 위해 onclick 속성 부여 -->
-				<button type="button" class="btn-sch" onclick="doSearch()">검색</button>
+				<button type="button" class="btn-sch" >검색</button>
+				<!-- onclick="doSearch()"-->
 				<button type="button" class="select-reset" onclick="resetSearch()">검색 초기화</button>
 			</div>
 		</div>
@@ -149,8 +150,8 @@ select.form-control{width:110px}
 								<th>이름</th>
 								<th>권한</th>
 								<th>부서</th>
-								<th>부서번호</th>
 								<th>입사일</th>
+								<th>퇴사일</th>
 								<th>재직여부</th>
 							</tr>
 						</thead>
@@ -165,8 +166,8 @@ select.form-control{width:110px}
 											<td><span class="link-txt">${a.ename}</span></td>
 											<td>${a.e_level}</td>
 											<td>${a.dept_name}</td>
-											<td>${a.dept_num}</td>
 											<td>${a.hire_date}</td>
+											<td>${not empty a.termination_date ? a.termination_date : "-"}</td>
 											<td>${a.status}</td>
 										</tr>
 									</c:forEach>
@@ -325,24 +326,116 @@ select.form-control{width:110px}
 		
 		
 		// 🔍 검색 실행 함수
-		function doSearch() {
-		    const form = document.searchFrm;
-		    const dept = document.getElementById("dType").value;
-		    const level = document.getElementById("lType").value;
-		    const keyword = document.getElementById("keyword").value.trim();
+// 		function doSearch() {
+// 		    const form = document.searchFrm;
+// 		    const dept = document.getElementById("dType").value;
+// 		    const level = document.getElementById("lType").value;
+// 		    const keyword = document.getElementById("keyword").value.trim();
 
-		    // [선택 사항] 아무 조건도 선택/입력하지 않고 검색을 누른 경우 차단 로직
-		    if (!dept && !level && !keyword) {
-		        alert("검색 조건을 하나 이상 선택하거나 입력해주세요.");
-		        return;
-		    }
+// 		    // [선택 사항] 아무 조건도 선택/입력하지 않고 검색을 누른 경우 차단 로직
+// 		    if (!dept && !level && !keyword) {
+// 		        alert("검색 조건을 하나 이상 선택하거나 입력해주세요.");
+// 		        return;
+// 		    }
 
-		    // 앞뒤 불필요한 공백을 제거한 키워드를 다시 세팅
-		    document.getElementById("keyword").value = keyword;
+// 		    // 앞뒤 불필요한 공백을 제거한 키워드를 다시 세팅
+// 		    document.getElementById("keyword").value = keyword;
 
-		    // 폼 전송 실행
-		    form.submit();
-		}
+// 		    // 폼 전송 실행
+// 		    form.submit();
+// 		}
+		
+		
+// date format (YYYY-MM-DD HH:mm:ss)
+function formatDate(value) {
+    if (!value) return "--";
+
+    // 서버에서 넘어오는 값이 타임스탬프(숫자)인지 날짜 문자열인지 판별
+    const date = new Date(isNaN(Number(value)) ? value : Number(value));
+
+    if (isNaN(date.getTime())) return "--";
+
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    
+    // 시, 분, 초 추가 및 2자리 패딩 처리
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const seconds = String(date.getSeconds()).padStart(2, '0');
+
+    // JSP 파일 내부이므로 $ 앞에 반드시 백슬래시(\)를 붙여야 에러가 나지 않습니다.
+    return `\${year}-\${month}-\${day} \${hours}:\${minutes}:\${seconds}`;
+}
+
+		////////////////////////
+		// 종한 로직
+// 		검색 버튼 클릭시 아작스
+		const btn_sch = document.querySelector(".btn-sch");
+		btn_sch.addEventListener('click', ()=>{
+			movePage(1)
+		})
+		
+		//페이징 관련 함수
+		function movePage(pageNum) {
+	    
+	    const type = document.getElementById("dType").value;
+	    const level = document.getElementById("lType").value;
+	    const keyword = document.getElementById("keyword").value.trim();
+
+	    const params = new URLSearchParams();
+	    params.append("page", pageNum); // 누른 페이지 번호를 전달
+	    params.append("type", type);
+	    params.append("level", level);
+	    params.append("keyword", keyword);
+	    
+	    fetch(`/usersearch?\${params.toString()}`)
+	    .then(response => response.json())
+	    .then(data => {
+	    	if(data.searchResult.length == 0){
+	    		 let tbody = document.querySelector("#stock-body");
+	    	    tbody.innerHTML = "<tr><td colspan='8'>조회된 결과가 없습니다.</td></tr>";
+	    	    renderPagination(data.pageInfo); // 페이지 정보도 갱신하여 페이징 버튼도 사라지게 처리
+	    	    return;
+	    	}
+	        if(data.status === "good"){
+	            // 1. 테이블 데이터 갱신
+	            let tbody = document.querySelector("#stock-body");
+	            tbody.innerHTML = "";
+	            
+	            
+	            let html = "";
+	            for(let i = 0; i < data.searchResult.length; i++) {
+	                let item = data.searchResult[i];
+	                
+	            // 퇴사일 데이터 유무 처리를 위한 자바스크립트 변수 정의
+                let termDate = item.TERMINATION_DATE ? item.TERMINATION_DATE : "-";
+	            
+	                html += `<tr>
+	                    <td style='font-weight: bold; color: #555;'>\${i + 1 + (data.pageInfo.pageNum - 1) * 5}</td>
+	                    <td>\${item.EMP_NUM}</td>
+	                    <td><a href='/userdetail?emp_num=\${item.EMP_NUM}' class='link-txt'>\${item.ENAME}</a></td>
+	                    <td>\${item.E_LEVEL}</td>
+	                    <td>\${item.DEPT_NAME}</td>
+	                    <td>\${formatDate(item.HIRE_DATE)}</td>
+	                    <td>\${termDate}</td> <!-- 수정 완료 -->
+	                    <td>\${item.STATUS}</td>
+	                </tr>`;
+	            }
+	            tbody.innerHTML = html;
+	            
+	            renderPagination(data.pageInfo);
+	
+	            const newUrl = window.location.pathname + `?page=\${pageNum}&type=\${type}&level=\${level}&keyword=\${keyword}`;
+	            window.history.pushState({path: newUrl}, '', newUrl);
+	        }
+	    });
+	}
+		
+		
+		/////////////////////////////////
+		//////////////////////////////////
+		
 
 		// 🔄 검색 초기화 함수
 		function resetSearch() {
@@ -360,58 +453,11 @@ select.form-control{width:110px}
 		document.getElementById("keyword").addEventListener("keyup", function(event) {
 		    if (event.key === "Enter") {
 		        event.preventDefault(); // 엔터키 본래의 서브밋 기능 일시 중단
-		        doSearch(); // 작성한 커스텀 검색 함수 실행
+// 		        doSearch(); // 작성한 커스텀 검색 함수 실행
 		    }
 		});
-		
-		
-		//페이징 관련 함수
-	function movePage(pageNum) {
-    let type = document.querySelector("#mType").value;
-    let keyword = document.querySelector("#keyword").value;
-    
-    const params = new URLSearchParams();
-    params.append("page", pageNum); // 누른 페이지 번호를 전달
-    params.append("type", type);
-    params.append("keyword", keyword);
-    
-    fetch(`/searchStock?\${params.toString()}`)
-    .then(response => response.json())
-    .then(data => {
-    	if(data.searchResult.length == 0){
-    		 let tbody = document.querySelector("#stock-body");
-    	    tbody.innerHTML = "<tr><td colspan='8'>조회된 결과가 없습니다.</td></tr>";
-    	    renderPagination(data.pageInfo); // 페이지 정보도 갱신하여 페이징 버튼도 사라지게 처리
-    	    return;
-    	}
-        if(data.status === "good"){
-            // 1. 테이블 데이터 갱신
-            let tbody = document.querySelector("#stock-body");
-            tbody.innerHTML = "";
-            
-            let html = "";
-            for(let i = 0; i < data.searchResult.length; i++) {
-                let item = data.searchResult[i];
-                html += `<tr>
-                    <td style='font-weight: bold; color: #555;'>\${i + 1 + (data.pageInfo.pageNum - 1) * 5}</td>
-                    <td>\${item.CODE}</td>
-                    <td><a href='/stockDetail?stock_id=\${item.STOCK_ID}' class='link-txt'>\${item.NAME}</a></td>
-                    <td>\${item.TYPE}</td>
-                    <td>\${item.STOCK_QTY}</td>
-                    <td>\${item.SAFE}</td>
-                    <td>\${item.UNIT}</td>
-                    <td>\${item.FACILITY_NAME}</td>
-                </tr>`;
-            }
-            tbody.innerHTML = html;
-            
-            renderPagination(data.pageInfo);
+			
 
-            const newUrl = window.location.pathname + `?page=\${pageNum}&type=\${type}&keyword=\${keyword}`;
-            window.history.pushState({path: newUrl}, '', newUrl);
-        }
-    });
-}
 		
 		
 		

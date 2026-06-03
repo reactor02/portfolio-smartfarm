@@ -31,3 +31,25 @@
 .lot-tree .tree-child        { font-size: 13px; color: #444; padding: 3px 0; }
 .lot-tree .tree-item-name    { color: #888; font-weight: normal; }
 .lot-tree .tree-empty        { font-size: 13px; color: #bbb; font-style: italic; padding: 2px 0; }
+
+/* 롯이력 전용 세분화 배지 스타일 */
+.history-badge.badge-material {
+    background-color: #6c757d; /* 회색: 원자재 */
+    color: #fff;
+}
+.history-badge.badge-prod-complete {
+    background-color: #28a745; /* 초록색: 완제품 생산 순간 */
+    color: #fff;
+}
+.history-badge.badge-shipment {
+    background-color: #007bff; /* 파란색: 최종 출하 완료 */
+    color: #fff;
+}
+.history-badge.badge-io-in {
+    background-color: #0050b3; /* 짙은 파란색: 입고 */
+    color: #fff;
+}
+.history-badge.badge-io-out {
+    background-color: #d4380d; /* 주황-빨강: 생산투입출고 */
+    color: #fff;
+}

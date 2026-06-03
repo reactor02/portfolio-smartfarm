@@ -3,8 +3,8 @@
 	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="mapper.dash">
- 
 
+	<!-- 1. 게시판 공지만 나오게 -->
 	<select id="getBoardList"
 		resultType="kr.or.smartfarm.dashboard.DashDTO">
 		SELECT b.*, e.ename
@@ -14,7 +14,168 @@
 		where b.category = '공지'
 	</select>
 
+	<!-- 2. 생산/출하 그래프 -->
+	<select id="getPPShipmentList"
+		resultType="kr.or.smartfarm.dashboard.DashDTO">
+		SELECT
+		DT,
+		nvl(SUM(PLAN_QTY),0) AS PLAN_QTY,
+		nvl(SUM(SHIP_QTY),0) AS SHIP_QTY
+		FROM (
+		SELECT
+		TO_CHAR(PLAN_START,
+		'YYYY-MM-DD') AS DT,
+		SUM(PLAN_QTY) AS PLAN_QTY,
+		0 AS SHIP_QTY
+		FROM
+		production_plan
+		WHERE PLAN_STATUS != '취소'
+		GROUP BY TO_CHAR(PLAN_START,
+		'YYYY-MM-DD')
+		UNION ALL
+		SELECT
+		TO_CHAR(SHIPMENT_DATE, 'YYYY-MM-DD') AS
+		DT,
+		0 AS PLAN_QTY,
+		SUM(PLAN_QTY) AS SHIP_QTY
+		FROM shipment
+		WHERE
+		SHIPMENT_STATUS = '출하완료'
+		GROUP BY TO_CHAR(SHIPMENT_DATE, 'YYYY-MM-DD')
+		)
+		GROUP BY DT
+		ORDER BY DT
+	</select>
+
+	<!-- 3. KPI 생산량 -->
+	<select id="getKPIPP"
+		resultType="kr.or.smartfarm.dashboard.DashDTO">
+		select sum(plan_qty) as plan_qty
+		from production_plan
+		where plan_status
+		!= '취소'
+		<choose>
+			<when test="startDate != null and endDate != null">
+				and plan_start between to_date(#{startDate},
+				'yyyy-mm-dd')
+				and to_date(#{endDate}, 'yyyy-mm-dd') + 1
+			</when>
+
+			<when test="period == 'day'">
+				and trunc(plan_start) = trunc(sysdate)
+			</when>
+			<when test="period == 'week'">
+				and trunc(plan_start) >= trunc(sysdate, 'IW')
+				and trunc(plan_start) &lt; trunc(sysdate, 'IW') + 7
+			</when>
+			<when test="period == 'month'">
+				and trunc(plan_start) >= trunc(sysdate, 'MM')
+				and trunc(plan_start) &lt; add_months(trunc(sysdate, 'MM'), 1)
+			</when>
+		</choose>
+	</select>
+
+	<!-- 4. KPI 출하량 -->
+	<select id="getKPIShip"
+		resultType="kr.or.smartfarm.dashboard.DashDTO">
+		select sum(plan_qty) as ship_qty
+		from shipment
+		where shipment_status =
+		'출하완료'
+		<choose>
+			<when test="startDate != null and endDate != null">
+				and shipment_date between to_date(#{startDate}, 'yyyy-mm-dd')
+				and to_date(#{endDate}, 'yyyy-mm-dd') + 1
+			</when>
+
+			<when test="period == 'day'">
+				and trunc(shipment_date) = trunc(sysdate)
+			</when>
+			<when test="period == 'week'">
+				and trunc(shipment_date) >= trunc(sysdate, 'IW')
+				and trunc(shipment_date) &lt; trunc(sysdate, 'IW') + 7
+			</when>
+			<when test="period == 'month'">
+				and trunc(shipment_date) >= trunc(sysdate, 'MM')
+				and trunc(shipment_date) &lt; add_months(trunc(sysdate, 'MM'), 1)
+			</when>
+		</choose>
+	</select>
 	
+	
+	<!-- 5. KPT 불량 개수 -->
+	<select id="getKPIDefect" resultType="kr.or.smartfarm.dashboard.DashDTO"> 
+		SELECT count(*) as defect_qty
+		FROM defective
+		JOIN io
+		    ON defective.io_num = io.io_num
+		JOIN emp
+		    ON io.emp_num = emp.emp_num
+		JOIN lot
+			ON io.lot_num = lot.lot_num
+		JOIN item
+			ON lot.item_num = item.item_num
+		JOIN qc
+			ON qc.qc_num = io.qc_num
+		where
+		<choose>
+			<when test="startDate != null and endDate != null">
+				io_date between to_date(#{startDate}, 'yyyy-mm-dd')
+				and to_date(#{endDate}, 'yyyy-mm-dd') + 1
+			</when>
+
+			<when test="period == 'day'">
+				 trunc(io_date) = trunc(sysdate)
+			</when>
+			<when test="period == 'week'">
+				 trunc(io_date) >= trunc(sysdate, 'IW')
+				and trunc(io_date) &lt; trunc(sysdate, 'IW') + 7
+			</when>
+			<when test="period == 'month'">
+				 trunc(io_date) >= trunc(sysdate, 'MM')
+				and trunc(io_date) &lt; add_months(trunc(sysdate, 'MM'), 1)
+			</when>
+		</choose>
+	</select>
+
+	<!-- 6. KPT 시설 개수 -->
+	<select id="getKPIFacility" resultType="Integer"> 
+		SELECT count(*)
+		FROM facility
+	</select>
+	
+	<!-- 7. 대시보드 생산 계획 -->
+	<select id="getProdList" resultType="kr.or.smartfarm.dashboard.DashDTO"> 
+		SELECT 
+			p.plan_id,
+			p.plan_qty,
+			p.plan_status,
+			i.name,
+			i.unit
+		FROM production_plan p
+		JOIN item i
+			ON p.item_num = i.item_num
+		WHERE ROWNUM &lt;= 5
+		ORDER BY created_at desc
+	</select>
+	
+	<!-- 8. 대시보드 작업 지시 -->
+	<select id="getWorkList" resultType="kr.or.smartfarm.dashboard.DashDTO"> 
+		SELECT 
+			w.order_id,
+			w.order_qty,
+			w.current_qty,
+			w.order_status,
+			i.name,
+			i.unit
+		FROM work_order w
+		JOIN production_plan p
+			ON w.plan_num = p.plan_num
+		JOIN item i
+			ON p.item_num = i.item_num
+		WHERE ROWNUM &lt;= 5
+		ORDER BY w.created_at desc
+	</select>
 
 
 

@@ -55,7 +55,8 @@
 		</set>
 		WHERE emp_num = #{emp_num}
 	</update>
-
+	
+	
 	<update id="userLevelUpdate"
 		parameterType="kr.or.smartfarm.usermanage.UserManageDTO">
 		<!-- 사장님용: 부서, 권한을 선택적으로 모두 수정 가능 -->
@@ -156,6 +157,46 @@
 		ORDER BY e.emp_num DESC
 	</select>
 
+<!-- /Ajax 방법 -->
+
+<select id="searchAjax" resultType="hashMap" parameterType="map">
+		SELECT
+		e.emp_num,
+		e.ename,
+		e.pw,
+		e.e_level,
+		e.tel,
+		e.hire_date,
+		e.status,
+		e.termination_date,
+		e.secret,
+		e.dept_num,
+		d.dept_name
+		FROM emp e
+		LEFT OUTER JOIN dept d ON e.dept_num = d.dept_num
+		<where>
+			<!-- 1. 부서 일치 조건 (부서번호가 담겨왔을 때만) -->
+			<if test="type != null and type != ''">
+				AND e.dept_num = #{type}
+			</if>
+
+			<!-- 2. 권한 일치 조건 (권한이 담겨왔을 때만) -->
+			<if test="level != null and level != ''">
+				AND e.e_level = #{level}
+			</if>
+
+			<!-- 3. 사원번호 또는 이름 키워드 포함 조건 (LIKE 검색) -->
+			<if test="keyword != null and keyword != ''">
+				AND (
+				e.emp_num LIKE '%' || #{keyword} || '%'
+				OR e.ename LIKE '%' || #{keyword} || '%'
+				)
+			</if>
+		</where>
+		ORDER BY e.emp_num DESC
+	</select>
+
+<!-- / -->
 
 	<select id="searchpw"
 		resultType="kr.or.smartfarm.changepw.ChangepwDTO">
@@ -172,6 +213,23 @@
 		where emp_num = #{ emp_num
 		}
 	</update>
+	
+	<update id="updatemp" parameterType="kr.or.smartfarm.changepw.ChangepwDTO">
+    UPDATE emp
+    <set>
+        <!-- 💡 이름(ename) 값이 null이 아니고 빈 문자열이 아닐 때만 set에 추가 -->
+        <if test="ename != null and ename != ''">
+            ename = #{ename},
+        </if>
+        
+        <!-- 💡 연락처(tel) 값이 null이 아니고 빈 문자열이 아닐 때만 set에 추가 -->
+        <if test="tel != null and tel != ''">
+            tel = #{tel}
+        </if>
+       
+    </set>
+    WHERE emp_num = #{emp_num}
+</update>
 
 
 

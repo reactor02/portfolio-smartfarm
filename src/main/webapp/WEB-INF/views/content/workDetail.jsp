@@ -73,8 +73,12 @@
                 <span class="info-value"><fmt:formatDate value="${workDTO.order_end}" pattern="yyyy-MM-dd"/></span>
             </div>
             <div class="info-item">
-                <span class="info-label">작업자</span>
+                <span class="info-label">담당자</span>
                 <span class="info-value">${workDTO.ename}</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">실무자</span>
+                <span class="info-value">${workDTO.worker_ename}</span>
             </div>
             <div class="info-item">
                 <span class="info-label">등록일시</span>
@@ -163,12 +167,16 @@
 <!-- 작업일 오류 알림 모달 -->
 <div id="dateErrModal">
     <div class="date-err-box">
-        <div class="date-err-icon">📅</div>
-        <div class="date-err-title">작업일이 아닙니다</div>
+        <div class="date-err-icon">⚠️</div>
+        
+        <div class="date-err-title">작업 시작 불가</div>
+        
         <div class="date-err-msg">
-            작업시작일: <strong id="dateErrDate" class="date-err-date"></strong>
+            지정된 작업 시작일은 <span id="dateErrDate" class="date-err-date"></span>입니다.<br>
+            작업 시작일 당일에만 작업을 개시할 수 있습니다.
         </div>
-        <button class="date-err-btn" onclick="closeDateErrModal()">확인</button>
+        
+        <button type="button" class="date-err-btn" onclick="closeDateErrModal()">확인</button>
     </div>
 </div>
 

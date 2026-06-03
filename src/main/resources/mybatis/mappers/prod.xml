@@ -179,24 +179,15 @@
         WHERE pp.plan_id = #{plan_id}
     </select>
 
-    <!-- 등록 (plan_id 자동 채번)
-         단일 알파벳(A~Z, 최대 26건) 구간에서는 MAX(ASCII)+1 방식으로 증가한다.
-         26건을 모두 소진하면(MAX 단일 문자 = 'Z') 2글자 형식 'A1', 'A2', ... 로 전환한다.
-           - CASE 1: 단일 알파벳이 없거나 MAX < 'Z' → CHR(MAX+1)  (A, B, … Y, Z)
-           - CASE 2: 단일 알파벳이 모두 찼음(MAX = 90, 'Z') →
-                     'A' || TO_CHAR(기존 2글자 최대 번호 + 1)  (A1, A2, …)
-         삭제 후 재삽입 시에도 MAX 기준이므로 중복이 생기지 않는다. -->
+    <!-- 등록 (plan_id 자동 채번: PP-0001, PP-0002, ...) -->
     <insert id="insert" parameterType="ProdDTO">
         <selectKey keyProperty="plan_id" resultType="String" order="BEFORE">
-            SELECT
-                CASE
-                    WHEN NVL(MAX(CASE WHEN LENGTH(plan_id) = 1 THEN ASCII(plan_id) END), 64) &lt; 90
-                    THEN CHR(NVL(MAX(CASE WHEN LENGTH(plan_id) = 1 THEN ASCII(plan_id) END), 64) + 1)
-                    ELSE 'A' || TO_CHAR(
-                             NVL(MAX(CASE WHEN LENGTH(plan_id) > 1
-                                     THEN TO_NUMBER(SUBSTR(plan_id, 2)) END), 0) + 1)
-                END
+            SELECT 'PP-' || LPAD(
+                NVL(MAX(TO_NUMBER(REGEXP_SUBSTR(plan_id, '[0-9]+'))), 0) + 1,
+                4, '0'
+            )
             FROM production_plan
+            WHERE REGEXP_LIKE(plan_id, '^PP-[0-9]+$')
         </selectKey>
         INSERT INTO production_plan
             (plan_num, plan_id, plan_qty, plan_status, plan_start, plan_end,

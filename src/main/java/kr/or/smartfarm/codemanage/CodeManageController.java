@@ -13,7 +13,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+
+import kr.or.smartfarm.usermanage.UserManageDTO;
 
 @Controller
 public class CodeManageController {
@@ -25,11 +28,22 @@ public class CodeManageController {
 	
 	
 	@GetMapping("/codemanage")
-	public String CodemanageGet(Model model) { // 💡 데이터를 담을 가방(Model) 주입
+	public String CodemanageGet(
+			  // 💡 다른 팀원들이 쓰는 규칙에 맞춰 파라미터명을 'page'로 매핑합니다.
+	        @RequestParam(value = "page", required = false, defaultValue = "1") int page, 
+	        Model model) { // 💡 데이터를 담을 가방(Model) 주입
 	    System.out.println("codemanageGet 실행");
+	    
+
+	    // 1. 5개씩 끊어오도록 PageHelper 세팅 (pageNum 대신 page 변수 사용)
+	    PageHelper.startPage(page, 5);
+	    
 
 	    // 1. 서비스에서 전체 회원 목록(List) 조회
-	    List<CodeManageDTO> CodeList = codeManageService.getCodeManage();
+	    List<CodeManageDTO> CodeList = codeManageService.getCodeManage(page);
+	    
+	 // 3. 조회된 userList를 PageInfo 객체로 포장
+	    PageInfo<CodeManageDTO> pageInfo = new PageInfo(CodeList);
 	    
 	    // 1-2. 서비스에서 type명 조회
 	    List<CodeManageDTO> selectd = codeManageService.selectd();
@@ -40,8 +54,11 @@ public class CodeManageController {
 	    // 1-3. 서비스에서 담당자 조회
 	    List<CodeManageDTO> selectm = codeManageService.selectm();
 	    
-	    // 2. 가져온 회원 목록 데이터를 "CodeList"라는 이름으로 가방에 넣음
-	    model.addAttribute("CodeList", CodeList);
+	    // 5. ⭐ 핵심: 다른 팀원들이 쓰는 paging.jsp 내부 변수명인 "pageInfo"로 가방에 넣습니다.
+	    model.addAttribute("pageInfo", pageInfo); 
+	    
+	 // 6. 기존 JSP 화면에서 사용할 데이터들 바인딩
+	    model.addAttribute("CodeList", pageInfo.getList()); // 딱 5개만 담긴 리스트
 	    model.addAttribute("selectd", selectd);
 	    model.addAttribute("selectl", selectl);
 	    model.addAttribute("selectm", selectm);
@@ -179,37 +196,37 @@ public class CodeManageController {
 		return "content/codemanage";
 	}
 	
-	@GetMapping("/codesearch")
-	public String CodemanageGet(
-	        CodeManageDTO searchDTO,
-	        Model model
-	        ) { 
-	    System.out.println("codemanageGet 실행 - 검색 조건 진입");
-	    System.out.println("검색 부서: " + searchDTO.getType());
-	    System.out.println("검색 권한: " + searchDTO.getUnit());
-	    System.out.println("검색 키워=드: " + searchDTO.getKeyword());
-
-	    // 1. 서비스에 검색 조건 객체(DTO)를 넘겨 필터링된 결과 조회
-	    List<CodeManageDTO> CodeList = codeManageService.getCodeSearch(searchDTO);
-	    
-	    // 2. 셀렉트 박스들을 채우기 위한 고정 목록 조회
-	    List<CodeManageDTO> selectd = codeManageService.selectd();
-	    List<CodeManageDTO> selectl = codeManageService.selectl();
-	    List<CodeManageDTO> selectm = codeManageService.selectm();
-	    
-	    // 3. 화면에서 검색창에 선택했던 값이 그대로 유지되도록 검색 조건을 다시 뷰로 전달
-	    model.addAttribute("search", searchDTO);
-	    
-	    // 4. 💡 [오타 교정] HTML JSTL 문법(${CodeList})에 맞춰 가방 이름을 대문자로 변경합니다!
-	    model.addAttribute("CodeList", CodeList); 
-	    
-	    model.addAttribute("selectd", selectd);
-	    model.addAttribute("selectl", selectl);
-	    model.addAttribute("selectm", selectm);
-	    
-	    // 5. 타일즈 뷰 리턴
-	    return "content/codemanage.tiles";
-	}
+//	@GetMapping("/codesearch")
+//	public String CodemanageGet(
+//	        CodeManageDTO searchDTO,
+//	        Model model
+//	        ) { 
+//	    System.out.println("codemanageGet 실행 - 검색 조건 진입");
+//	    System.out.println("검색 부서: " + searchDTO.getType());
+//	    System.out.println("검색 권한: " + searchDTO.getUnit());
+//	    System.out.println("검색 키워=드: " + searchDTO.getKeyword());
+//
+//	    // 1. 서비스에 검색 조건 객체(DTO)를 넘겨 필터링된 결과 조회
+//	    List<CodeManageDTO> CodeList = codeManageService.getCodeSearch(searchDTO);
+//	    
+//	    // 2. 셀렉트 박스들을 채우기 위한 고정 목록 조회
+//	    List<CodeManageDTO> selectd = codeManageService.selectd();
+//	    List<CodeManageDTO> selectl = codeManageService.selectl();
+//	    List<CodeManageDTO> selectm = codeManageService.selectm();
+//	    
+//	    // 3. 화면에서 검색창에 선택했던 값이 그대로 유지되도록 검색 조건을 다시 뷰로 전달
+//	    model.addAttribute("search", searchDTO);
+//	    
+//	    // 4. 💡 [오타 교정] HTML JSTL 문법(${CodeList})에 맞춰 가방 이름을 대문자로 변경합니다!
+//	    model.addAttribute("CodeList", CodeList); 
+//	    
+//	    model.addAttribute("selectd", selectd);
+//	    model.addAttribute("selectl", selectl);
+//	    model.addAttribute("selectm", selectm);
+//	    
+//	    // 5. 타일즈 뷰 리턴
+//	    return "content/codemanage.tiles";
+//	}
 	
 	@GetMapping("/codeDisable")
     public String codeDisable(

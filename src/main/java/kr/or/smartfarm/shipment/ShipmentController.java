@@ -47,8 +47,9 @@ public class ShipmentController {
         PageInfo<Map<String, Object>> pageInfo = new PageInfo<Map<String, Object>>(result);
         model.addAttribute("pageInfo", pageInfo);
 
-        model.addAttribute("itemList", shipmentService.loadItems());
-        model.addAttribute("empList",  shipmentService.loadEmpList());
+        model.addAttribute("itemList",    shipmentService.loadItems());
+        model.addAttribute("empList",     shipmentService.loadEmpList());
+        model.addAttribute("workerList",  shipmentService.loadWorkerList());
 
         return "content/shipment.tiles";
     }
@@ -65,6 +66,7 @@ public class ShipmentController {
             @RequestParam("itemNum")            int    itemNum,
             @RequestParam("shipmentDate")       String shipmentDate,
             @RequestParam("planQty")            int    planQty,
+            @RequestParam(value = "workerNum", defaultValue = "0") int workerNum,
             HttpSession session) {
 
         // [권한] e_level 2 이상(팀장·사장)만 등록 가능
@@ -91,6 +93,7 @@ public class ShipmentController {
         map.put("item_num",      itemNum);
         map.put("plan_qty",      planQty);
         map.put("emp_num",       empNum);
+        map.put("worker_num",    workerNum > 0 ? workerNum : null);
         map.put("shipment_date", shipmentDate);
 
         shipmentService.dispatchShipment(map);

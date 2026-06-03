@@ -67,6 +67,12 @@ public class WorkDAOImpl implements WorkDAO {
         return session.selectList("kr.or.smartfarm.work.getEmpOptions");
     }
 
+    /** 등록 모달 실무자 드롭다운 옵션 (e_level=1, 재직자) */
+    @Override
+    public List<SelectOptionDTO> getWorkerOptions() {
+        return session.selectList("kr.or.smartfarm.work.getWorkerOptions");
+    }
+
     /** 등록 모달 생산계획 드롭다운 옵션 */
     @Override
     public List<SelectOptionDTO> getPlanOptions() {

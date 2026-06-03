@@ -95,7 +95,7 @@ margin: 0px !important;
 </style>
 
 <header class="hdr" style="margin-bottom: 0 !important;">
-    <a href="/main" class="hdr-logo-area">
+    <a href="/dashboard" class="hdr-logo-area">
         <img src="<c:url value='/resources/img/logo.png'/>" alt="Logo" class="hdr-logo-img" onerror="this.style.display='none'">
         <span class="hdr-logo-txt">NodeFarm MES</span>
     </a>

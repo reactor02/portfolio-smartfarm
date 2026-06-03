@@ -25,6 +25,15 @@ public class ChangepwServiceImpl implements ChangepwService {
 		return result;
 
 	}
+	@Override
+	public int updatemp(ChangepwDTO updatempDTO) {
+		// TODO Auto-generated method stub
+		
+		int result = changepwDAO.updatemp(updatempDTO);
+		
+		return result;
+		
+	}
 
 	@Override
 	public ChangepwDTO searchpw(ChangepwDTO changepwDTO) {

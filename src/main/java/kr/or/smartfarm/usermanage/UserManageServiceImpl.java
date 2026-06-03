@@ -1,6 +1,7 @@
 package kr.or.smartfarm.usermanage;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,10 +16,10 @@ public class UserManageServiceImpl implements UserManageService {
 	UserManageDAO userManageDAO;
 
 	@Override
-	public List<UserManageDTO> getUserManage() {
+	public List<UserManageDTO> getUserManage(int pageNum) {
 		// TODO Auto-generated method stub
 
-		List<UserManageDTO> result = userManageDAO.getUserManage();
+		List<UserManageDTO> result = userManageDAO.getUserManage(pageNum);
 
 		return result;
 
@@ -46,6 +47,15 @@ public class UserManageServiceImpl implements UserManageService {
 		// TODO Auto-generated method stub
 		
 		List<UserManageDTO> result = userManageDAO.selectm();
+		
+		return result;
+		
+	}
+	@Override
+	public List<UserManageDTO> selectw() {
+		// TODO Auto-generated method stub
+		
+		List<UserManageDTO> result = userManageDAO.selectw();
 		
 		return result;
 		
@@ -119,6 +129,14 @@ public class UserManageServiceImpl implements UserManageService {
 		}		
 		
 		return null;
+	}
+	@Override
+	public List searchAjax(Map map) {
+		return userManageDAO.searchAjax(map);
+	}
+	@Override
+	public List codesearch(Map map) {
+		return userManageDAO.codesearch(map);
 	}
 
 }

@@ -27,6 +27,7 @@ public class DefectiveDTO {
 	// io
 	private int io_num;
 	private int io_qty;
+	private int defect_qty;
 	private Date io_date;
 	
 	// lot_num

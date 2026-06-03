@@ -90,7 +90,7 @@ response.setContentType("text/html; charset=utf-8");
 								<td>${item.qc_type}</td>
 								<td>${item.defect_reason}</td>
 								<td>${item.defect_action}</td>
-								<td>${item.io_qty}${item.unit}</td>
+								<td>${item.defect_qty}${item.unit}</td>
 								<td>${item.io_date}</td>
 								<td>${item.ename}</td>
 							</tr>

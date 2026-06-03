@@ -184,6 +184,11 @@ public class WorkServiceImpl implements WorkService {
     }
 
     @Override
+    public List<SelectOptionDTO> getWorkerOptions() {
+        return dao.getWorkerOptions();
+    }
+
+    @Override
     public List<SelectOptionDTO> getPlanOptions() {
         return dao.getPlanOptions();
     }

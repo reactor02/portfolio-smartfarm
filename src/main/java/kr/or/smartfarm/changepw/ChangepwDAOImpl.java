@@ -23,6 +23,15 @@ public class ChangepwDAOImpl implements ChangepwDAO {
 
 		return result;
 	}
+	
+	@Override
+	public int updatemp(ChangepwDTO updatempDTO) {
+		// TODO Auto-generated method stub
+		
+		int result = sqlSession.update(NAMESPACE + "updatemp", updatempDTO);
+		
+		return result;
+	}
 
 	@Override
 	public ChangepwDTO searchpw(ChangepwDTO changepwDTO) {

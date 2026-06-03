@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+	
+<mapper namespace="mapper.facility">
+
+<!-- modelConfig.xml 에서 세팅해서 별칭 만들었음 -->
+
+
+
+<!-- SELECT ALL -->
+	<select id="selectAllFacility" resultType="FacilityDTO">
+		SELECT
+			c.*,
+			f.*
+		FROM censor c
+		JOIN facility f
+			ON c.facility_num = f.facility_num
+		
+	</select>
+	
+<!-- SELECT ALL -->
+	<select id="countAll" resultType="Integer">
+		SELECT 
+			count(*)
+		FROM facility
+	</select>
+	
+	<!-- FM LOG SELECT ALL -->
+	<select id="selectLog" resultType="FacilityDTO">
+		SELECT 
+			fm.*,
+			f.facility_name,
+			e.ename
+		FROM facility_management fm
+		JOIN facility f
+			ON fm.facility_num = f.facility_num
+		JOIN emp e
+			ON fm.emp_num = e.emp_num 
+		ORDER BY fm.managed_at DESC
+	</select>
+	
+	<!-- 검색 조건에 맞게 검색 -->
+	<select id="searchFM" resultType="hashMap" parameterType="map">
+		SELECT 
+			fm.*,
+			f.facility_name,
+			e.ename
+		FROM facility_management fm
+		JOIN facility f
+			ON fm.facility_num = f.facility_num
+		JOIN emp e
+			ON fm.emp_num = e.emp_num 
+		
+	    <where>
+	    
+		<!-- 날짜 조회 -->
+	     <if test="sDate != null and sDate != '' and eDate != null and eDate != ''">
+		    AND fm.managed_at >= TO_DATE(#{sDate}, 'YYYY-MM-DD')
+		    AND fm.managed_at &lt; TO_DATE(#{eDate}, 'YYYY-MM-DD') + 1
+		</if>
+		<!-- 시설 검색 -->
+	        <if test="type != null and type != '' and type != 'all'">
+				AND f.facility_name = #{type}
+			</if>
+	    </where>
+	    
+	  	ORDER BY fm.managed_at DESC
+    </select>
+    
+    <update id="updateSensorRandomly">
+		MERGE INTO censor c
+		USING facility f
+		ON (c.censor_num = f.facility_num)
+		WHEN MATCHED THEN
+		UPDATE SET 
+		    c.c_temperature = ROUND(
+		        LEAST(
+		            GREATEST(c.c_temperature + (c.c_temperature * 0.01 * DBMS_RANDOM.VALUE(-1, 1)), f.m_temperature * 0.84), 
+		            f.m_temperature * 1.17
+		        ), 1
+		    ),
+		    
+		    c_humidity = ROUND(
+		        LEAST(
+		            GREATEST(c_humidity + (c_humidity * 0.01 * DBMS_RANDOM.VALUE(-1, 1)), f.m_humidity * 0.84), 
+		            f.m_humidity * 1.17
+		        ), 1
+		    ),
+		    
+		    c_soil_ec = ROUND(
+		        LEAST(
+		            GREATEST(c_soil_ec + (c_soil_ec * 0.01 * DBMS_RANDOM.VALUE(-1, 1)), f.m_soil_ec * 0.84), 
+		            f.m_soil_ec * 1.17
+		        ), 1
+		    ),
+		    
+		    c_soil_ph = ROUND(
+		        LEAST(
+		            GREATEST(c_soil_ph + (c_soil_ph * 0.01 * DBMS_RANDOM.VALUE(-1, 1)), f.m_soil_ph * 0.84), 
+		            f.m_soil_ph * 1.17
+		        ), 1
+		    ),
+		    
+		    c_illuminance = ROUND(
+		        LEAST(
+		            GREATEST(c_illuminance + (c_illuminance * 0.01 * DBMS_RANDOM.VALUE(-1, 1)), f.m_illuminance * 0.84), 
+		            f.m_illuminance * 1.17
+		        ), 1
+		    )
+		WHERE 
+		    c.c_temperature IS NOT NULL
+</update>
+	
+<!-- 	========================================================    -->
+	
+	<!-- Select Emp -->
+	<select id="selectEmp" resultType="FacilityDTO">
+		SELECT 
+			emp_num,
+			ename
+		FROM emp
+		WHERE status = 'Y'
+	</select>
+	
+
+
+
+
+</mapper>
+
+
+
+

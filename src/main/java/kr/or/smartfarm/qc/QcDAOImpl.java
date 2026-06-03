@@ -89,5 +89,10 @@ public class QcDAOImpl implements QcDAO{
 	public QcDTO crrnt_qty(QcDTO dto) {
 		return sqlSession.selectOne("mapper.qc.crrnt_qty", dto);
 	}
+
+	@Override
+	public List selectEmp() {
+		return sqlSession.selectList("mapper.qc.selectEmp");
+	}
 	
 }

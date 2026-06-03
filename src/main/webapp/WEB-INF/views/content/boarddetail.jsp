@@ -12,9 +12,8 @@
 <meta charset="UTF-8">
 <title>Insert title here</title>
 <style>
-<style>
-/* --- 공통 스타일 --- */
-* {
+<
+style> /* --- 공통 스타일 --- */ * {
 	box-sizing: border-box;
 	margin: 0;
 	padding: 0;
@@ -93,7 +92,6 @@ body {
 	margin-top: 30px;
 }
 
-
 /* =========================================================================
    ======================= [새로운 댓글 스타일 (Gemini)] =========================
    ========================================================================= */
@@ -126,12 +124,12 @@ body {
 
 /* 3. 댓글 카드 (독립된 카드 형태) */
 .comment {
-    background: #fff;
-    border: 1px solid #eef1f3;
-    border-radius: 8px; /* 모서리 곡률 약간 축소 */
-    padding: 12px 15px; /* 내부 여백 대폭 축소 */
-    box-shadow: 0 1px 3px rgba(0,0,0,0.05); /* 그림자도 가볍게 */
-    margin-bottom: 8px; /* 댓글 사이 간격 축소 */
+	background: #fff;
+	border: 1px solid #eef1f3;
+	border-radius: 8px; /* 모서리 곡률 약간 축소 */
+	padding: 12px 15px; /* 내부 여백 대폭 축소 */
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05); /* 그림자도 가볍게 */
+	margin-bottom: 8px; /* 댓글 사이 간격 축소 */
 }
 
 .comment:hover {
@@ -140,12 +138,12 @@ body {
 
 /* 4. 댓글 헤더 (작성자, 날짜) */
 .comment-header {
-    margin-bottom: 6px;
-    font-size: 0.85rem;
+	margin-bottom: 6px;
+	font-size: 0.85rem;
 }
 
 .comment-header b {
-    font-size: 0.9rem;
+	font-size: 0.9rem;
 }
 
 .comment-header .cmt-date {
@@ -155,40 +153,40 @@ body {
 
 /* 5. 댓글 내용 */
 .comment-body {
-    font-size: 0.9rem; /* 폰트 사이즈 살짝 축소 */
-    line-height: 1.5;
-    margin-bottom: 6px;
+	font-size: 0.9rem; /* 폰트 사이즈 살짝 축소 */
+	line-height: 1.5;
+	margin-bottom: 6px;
 }
 
 /* 6. 댓글 액션 버튼 (답글, 삭제) */
 .comment-actions {
-    display: flex;       /* 가로 배치 */
-    gap: 12px;           /* 버튼 사이의 간격 */
-    margin-top: 5px;     /* 댓글 본문과의 거리 */
+	display: flex; /* 가로 배치 */
+	gap: 12px; /* 버튼 사이의 간격 */
+	margin-top: 5px; /* 댓글 본문과의 거리 */
 }
 
 .comment-actions button {
-    background: none;    /* 배경색 제거 */
-    border: none;        /* 테두리 제거 */
-    font-size: 0.75rem;  /* 작은 폰트 크기 */
-    color: #888;         /* 은은한 회색 */
-    cursor: pointer;
-    padding: 0;
-    transition: color 0.2s; /* 마우스 올렸을 때 부드럽게 색상 변경 */
+	background: none; /* 배경색 제거 */
+	border: none; /* 테두리 제거 */
+	font-size: 0.75rem; /* 작은 폰트 크기 */
+	color: #888; /* 은은한 회색 */
+	cursor: pointer;
+	padding: 0;
+	transition: color 0.2s; /* 마우스 올렸을 때 부드럽게 색상 변경 */
 }
 
 /* 3. 마우스 올렸을 때 효과 */
 .comment-actions button:hover {
-    color: #2D6A4F;      /* 마우스를 올리면 NodeFarm 그린 색상으로 */
-    text-decoration: underline; /* 밑줄 추가 */
+	color: #2D6A4F; /* 마우스를 올리면 NodeFarm 그린 색상으로 */
+	text-decoration: underline; /* 밑줄 추가 */
 }
 
 /* 7. 대댓글(답글) 영역 */
 .reply-box {
-    margin-left: 15px; /* 들여쓰기 폭 조절 */
-    margin-top: 8px;
-    padding-left: 12px;
-    border-left: 2px solid #ddd;
+	margin-left: 15px; /* 들여쓰기 폭 조절 */
+	margin-top: 8px;
+	padding-left: 12px;
+	border-left: 2px solid #ddd;
 }
 
 /* 8. 댓글 입력창 영역 */
@@ -208,13 +206,13 @@ body {
 
 /* 9. 입력창 (textarea) */
 .detail-cmt {
-    flex: 1;           /* 남은 공간 모두 차지 */
-    height: 60px;      /* 높이 고정 */
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    resize: none;      /* 사이즈 조절 방지 */
-    font-size: 0.9rem;
+	flex: 1; /* 남은 공간 모두 차지 */
+	height: 60px; /* 높이 고정 */
+	padding: 10px;
+	border: 1px solid #ccc;
+	border-radius: 8px;
+	resize: none; /* 사이즈 조절 방지 */
+	font-size: 0.9rem;
 }
 
 .detail-cmt:focus {
@@ -224,34 +222,85 @@ body {
 }
 
 /* 10. 댓글 등록 버튼 */
-
 .cmt-submit {
-    width: 80px;       /* 가로 고정 */
-    height: 60px;      /* textarea와 높이 맞춤 */
-    padding: 0;
-    margin-top: 0;
-    flex-shrink: 0;    /* 버튼 크기 안 줄어들게 */
+	width: 80px; /* 가로 고정 */
+	height: 60px; /* textarea와 높이 맞춤 */
+	padding: 0;
+	margin-top: 0;
+	flex-shrink: 0; /* 버튼 크기 안 줄어들게 */
 }
-
 
 /* 댓글 입력 폼 컨테이너 */
 .comment-box {
-    display: flex; /* 가로 정렬 */
-    gap: 10px;      /* 입력창과 버튼 사이 간격 */
-    align-items: flex-start; /* 상단 정렬 */
-    margin-top: 15px;
+	display: flex; /* 가로 정렬 */
+	gap: 10px; /* 입력창과 버튼 사이 간격 */
+	align-items: flex-start; /* 상단 정렬 */
+	margin-top: 15px;
 }
 
 /* 답글 클릭 시 폼이 이동했을 때 스타일 */
-.comment > #commentForm {
-    margin-top: 15px;
-    padding: 10px;
-    background: #f0f0f0; /* 답글 작성 중임을 알기 쉽게 배경색 변경 */
-    border-radius: 8px;
+.comment>#commentForm {
+	margin-top: 15px;
+	padding: 10px;
+	background: #f0f0f0; /* 답글 작성 중임을 알기 쉽게 배경색 변경 */
+	border-radius: 8px;
 }
 
+/* 첨부파일 영역 전체 */
+.detail-content-file {
+	margin-top: 40px;
+	padding: 20px;
+	border: 1px solid #e1e1e1;
+	border-radius: 10px;
+	background-color: #fcfcfc;
+}
 
+.file-header {
+	font-size: 1.1rem;
+	margin-bottom: 15px;
+	color: #2D6A4F;
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
 
+/* 목록 스타일 */
+.file-list {
+	list-style: none;
+	padding: 0;
+}
+
+.file-item {
+	display: flex;
+	align-items: center;
+	padding: 8px 10px;
+	border-bottom: 1px dashed #eee;
+	transition: background 0.2s;
+}
+
+.file-item:hover {
+	background-color: #f0fdf4; /* 마우스 올렸을 때 연한 녹색 */
+	border-radius: 5px;
+}
+
+/* 파일 아이콘 스타일 */
+.file-icon {
+	margin-right: 10px;
+	font-size: 1.2rem;
+}
+
+/* 링크 스타일 */
+.file-link {
+	text-decoration: none;
+	color: #555;
+	font-size: 0.95rem;
+}
+
+.file-link:hover {
+	color: #2D6A4F;
+	text-decoration: underline;
+	font-weight: bold;
+}
 </style>
 <script>
 	
@@ -282,7 +331,22 @@ body {
 
 
 	<%-- 내용 --%>
-	<div class="detail-content">${boardDTO.content}</div>
+	<div class="detail-content">
+		${boardDTO.content}
+
+		<c:if test="${not empty files}">
+			<div class="detail-content-file">
+				<h3 class="file-header">📂 첨부파일</h3>
+				<ul class="file-list">
+					<c:forEach var="file" items="${files}">
+						<li class="file-item"><span class="file-icon">📄</span> <a
+							href="/file/download?fileName=${file.file_name}"
+							class="file-link"> ${file.file_name} </a></li>
+					</c:forEach>
+				</ul>
+			</div>
+		</c:if>
+	</div>
 
 
 	<div class="comment-section">
@@ -290,10 +354,11 @@ body {
 		<div id="commentList" class="comment-wrap"></div>
 
 		<%-- 댓글 쓰기 --%>
-		<form onsubmit="return writeComment(event);" id="commentForm" class="comment-box-area" >
-		
+		<form onsubmit="return writeComment(event);" id="commentForm"
+			class="comment-box-area">
+
 			<input type="hidden" id="board_num" value="${boardDTO.board_num}">
-			<input type="hidden" id="parent_cmt" value=""> 
+			<input type="hidden" id="parent_cmt" value="">
 
 			<div class="comment-box">
 				<textarea class="detail-cmt" id="content" placeholder="댓글을 입력하세요"
