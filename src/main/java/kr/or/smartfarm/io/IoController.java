@@ -27,7 +27,7 @@ public class IoController {
         List facilityList = ioService.facility();
         model.addAttribute("facilityList", facilityList);
 		model.addAttribute("result" , result);
-		
+		System.out.println("ioQTY=======" + result);
 		 PageInfo<Map<String, Object>> pageInfo = new PageInfo<Map<String, Object>>(result);
 		 model.addAttribute("pageInfo", pageInfo);
 		return "content/ioSelect.tiles";

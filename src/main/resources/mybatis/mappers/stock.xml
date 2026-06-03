@@ -99,11 +99,11 @@ VALUES(STOCK_SEQ.NEXTVAL, #{stock_qty}, #{item_num})
         l.lot_code,
         l.expiry_date,
         l.lot_date
-        FROM stock s
-        JOIN item i ON s.item_num = i.item_num
-        JOIN facility f ON f.facility_num = s.facility_num
-        JOIN LOT l ON l.item_num = i.item_num
-        where i.item_status = 'A'
-        AND s.stock_id = #{stock_id}
+   FROM stock s
+  		 JOIN item i ON s.item_num = i.item_num
+  		 JOIN facility f ON f.facility_num = s.facility_num
+  		 JOIN LOT l ON l.item_num = i.item_num
+   where i.item_status in ('A', 'Y')
+       AND s.stock_id = #{stock_id}
 </select>
 </mapper>

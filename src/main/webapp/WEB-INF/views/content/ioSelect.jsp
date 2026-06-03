@@ -1,5 +1,4 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-	pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%
 request.setCharacterEncoding("utf-8");
 response.setContentType("text/html; charset=utf-8");
@@ -70,8 +69,7 @@ response.setContentType("text/html; charset=utf-8");
 	font-weight: bold;
 	font-size: 1.05rem;
 	cursor: pointer;
-	box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 2px 3px
-		rgba(0, 0, 0, 0.2);
+	box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 2px 3px rgba(0, 0, 0, 0.2);
 	transition: background-color 0.2s;
 }
 
@@ -79,7 +77,6 @@ response.setContentType("text/html; charset=utf-8");
 	background-color: #B7E4C7;
 }
 
-/* --- 검색 영역 CSS 전면 수정 및 정렬 보정 --- */
 .sch-wrap {
 	background-color: #fff;
 	border: 1px solid #bbb;
@@ -89,10 +86,9 @@ response.setContentType("text/html; charset=utf-8");
 	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
 	display: flex;
 	flex-direction: column;
-	gap: 15px; /* 줄 간격 고정 */
+	gap: 15px;
 }
 
-/* 가로 정렬을 위한 기본 행 설정 */
 .sch-row {
 	display: flex;
 	align-items: center;
@@ -106,7 +102,6 @@ response.setContentType("text/html; charset=utf-8");
 	gap: 10px;
 }
 
-/* 2번째 줄 우측 요소(검색창, 버튼들)를 오른쪽 끝으로 밀어주는 그룹 */
 .sch-group-right {
 	display: flex;
 	align-items: center;
@@ -187,7 +182,6 @@ response.setContentType("text/html; charset=utf-8");
 	border-color: #FFB703;
 }
 
-/* 라디오 버튼 커스텀 스타일 스타일링 추가 */
 .sch-radio-group {
 	display: flex;
 	align-items: center;
@@ -234,7 +228,6 @@ response.setContentType("text/html; charset=utf-8");
 	border-radius: 50%;
 }
 
-/* 테이블 영역 */
 .tbl-box {
 	background: #fff;
 	border-radius: 8px;
@@ -271,7 +264,6 @@ response.setContentType("text/html; charset=utf-8");
 	background-color: #f1f8f5;
 }
 
-/* 모달 영역 */
 .modal-box {
 	max-width: 800px !important;
 	width: 90% !important;
@@ -349,29 +341,29 @@ response.setContentType("text/html; charset=utf-8");
 					<div class="sch-wrap">
 						<div class="sch-row">
 							<div class="sch-group">
-								<span class="label">▶ 입고/출고 날짜</span> <input type="date"
-									id="sDate" class="form-control date-input"
-									onchange="validateDate()"> <span
-									style="font-weight: bold; padding: 0 5px;">~</span> <input
-									type="date" id="eDate" class="form-control date-input"
-									onchange="validateDate()">
+								<span class="label">▶ 입고/출고 날짜</span> 
+								<input type="date" id="sDate" class="form-control date-input" onchange="validateDate()"> 
+								<span style="font-weight: bold; padding: 0 5px;">~</span> 
+								<input type="date" id="eDate" class="form-control date-input" onchange="validateDate()">
 							</div>
 
 							<div class="sch-radio-group">
-								<label class="radio-label"> <input type="radio"
-									name="io_type" value="all" checked> 전체
-								</label> <label class="radio-label"> <input type="radio"
-									name="io_type" value="in"> 입고
-								</label> <label class="radio-label"> <input type="radio"
-									name="io_type" value="out"> 출고
+								<label class="radio-label"> 
+									<input type="radio" name="io_type" value="all" checked> 전체
+								</label> 
+								<label class="radio-label"> 
+									<input type="radio" name="io_type" value="in"> 입고
+								</label> 
+								<label class="radio-label"> 
+									<input type="radio" name="io_type" value="out"> 출고
 								</label>
 							</div>
 						</div>
 
 						<div class="sch-row">
 							<div class="sch-group">
-								<span class="label">▶ 자재유형</span> <select id="type"
-									class="form-control select-input">
+								<span class="label">▶ 자재유형</span> 
+								<select id="type" class="form-control select-input">
 									<option value="all" selected>전체</option>
 									<option value="product">완제품</option>
 									<option value="semiproduct">반제품</option>
@@ -379,61 +371,11 @@ response.setContentType("text/html; charset=utf-8");
 									<option value="raw">재료</option>
 								</select>
 							</div>
-                <div class="tbl-box">
-                    <table class="stk-tbl">
-                        <thead>
-                            <tr>
-                                <th style="width: 60px;">번호</th>
-                                <th>입고/출고 여부</th>
-                                <th>자재명</th>
-                                <th>수량</th>
-                                <th>LOT번호</th>
-                                <th>자재유형</th>
-                                <th>입고/출고 날짜</th>
-                                <th>저장 위치</th>
-                                <th>비고/사유</th>
-                            </tr>
-                        </thead>
-                        <tbody id="bom-body">
-                            <c:choose>
-                                <c:when test="${not empty result}">
-                                    <c:forEach var="item" items="${result}" varStatus="vs">
-                                        <tr>
-                                            <td style="font-weight: bold; color: #555;">${vs.count}</td>
-                                            <td>${item.IO_TYPE}</td>
-                                            <td>${item.NAME}</td>
-                                            <td>${item.IO_QTY}</td>
-                                            <td>${item.LOT_CODE}</td>
-                                            <td>${item.TYPE}</td>
-                                            <td>${item.IO_DATE}</td>
-                                            <td>${item.FACILITY_NAME}</td>
-                                            <td>${item.IO_REASON}</td>
-                                        </tr>
-                                    </c:forEach>
-                                </c:when>
-                                <c:otherwise>
-                                    <c:forEach var="i" begin="1" end="6">
-                                        <tr>
-                                            <td style="font-weight: bold; color: #888;">${i}</td>
-                                            <td></td>
-                                            <td></td>
-                                            <td></td>
-                                            <td></td>
-                                            <td></td>
-                                            <td></td>
-                                            <td></td>
-                                        </tr>
-                                    </c:forEach>
-                                </c:otherwise>
-                            </c:choose>
-                        </tbody>
-                    </table>
-                </div>
 
 							<div class="sch-group-right">
 								<div class="sch-input-box">
-									<span style="color: #888;">&#128269;</span> <input type="text"
-										id="keyword" value="" placeholder="자재명 혹은 LOT번호 검색">
+									<span style="color: #888;">&#128269;</span> 
+									<input type="text" id="keyword" value="" placeholder="자재명 혹은 LOT번호 검색">
 								</div>
 								<button type="button" class="btn-sch">검색</button>
 								<button type="button" class="select-reset">검색 초기화</button>
@@ -466,7 +408,7 @@ response.setContentType("text/html; charset=utf-8");
 											<td>${item.IO_TYPE}</td>
 											<td>${item.NAME}</td>
 											<td>${item.IO_QTY}</td>
-											<td>${item.LOT_NUM}</td>
+											<td>${item.LOT_CODE}</td>
 											<td>${item.TYPE}</td>
 											<td>${item.IO_DATE}</td>
 											<td>${item.FACILITY_NAME}</td>
@@ -478,6 +420,7 @@ response.setContentType("text/html; charset=utf-8");
 									<c:forEach var="i" begin="1" end="6">
 										<tr>
 											<td style="font-weight: bold; color: #888;">${i}</td>
+											<td></td>
 											<td></td>
 											<td></td>
 											<td></td>
@@ -505,52 +448,43 @@ response.setContentType("text/html; charset=utf-8");
 	<div id="regModal" class="modal-overlay" style="display: none;">
 		<div class="modal-box" style="max-width: 650px;">
 			<h3 class="modal-title">입고 등록</h3>
-
-
-     	 <form method="POST" action="insertIo" accept-charset="UTF-8" onsubmit="document.charset='UTF-8';" id="insert-form"> 
-
+			<form method="POST" action="insertIo" accept-charset="UTF-8" onsubmit="document.charset='UTF-8';" id="insert-form"> 
 				<div class="modal-grid">
 					<div class="modal-field">
-						<label for="ioDate">입출고 날짜</label> <input type="date"
-							name="io_date" id="ioDate" required>
+						<label for="ioDate">입출고 날짜</label> 
+						<input type="date" name="io_date" id="ioDate" required>
 					</div>
 
 					<div class="modal-field">
-						<label for="itemSearch">자재 검색 (완제품 제외)</label> <input type="text"
-							id="itemSearch" placeholder="자재명 또는 자재코드 입력">
+						<label for="itemSearch">자재 검색 (완제품 제외)</label> 
+						<input type="text" id="itemSearch" placeholder="자재명 또는 자재코드 입력">
 					</div>
 
 					<div class="modal-field">
-						<label for="ioQty">수량</label> <input type="number" name="io_qty"
-							id="ioQty" min="1" placeholder="수량 입력" required>
+						<label for="ioQty">수량</label> 
+						<input type="number" name="io_qty" id="ioQty" min="1" placeholder="수량 입력" required>
 					</div>
 
-					<div class="modal-field modal-field-full"
-						id="selectedItemContainer" style="display: none; margin-top: 5px;">
-						<span
-							style="display: inline-block; padding: 6px 12px; background-color: #e6f7ff; color: #1890ff; border: 1px solid #91d5ff; border-radius: 4px; font-weight: bold; font-size: 14px;">
+					<div class="modal-field modal-field-full" id="selectedItemContainer" style="display: none; margin-top: 5px;">
+						<span style="display: inline-block; padding: 6px 12px; background-color: #e6f7ff; color: #1890ff; border: 1px solid #91d5ff; border-radius: 4px; font-weight: bold; font-size: 14px;">
 							📌 선택된 자재: <span id="selectedItemName" style="color: #0050b3;">-</span>
-							<span
-							style="margin-left: 10px; font-weight: normal; color: #666;">
+							<span style="margin-left: 10px; font-weight: normal; color: #666;">
 								[타입: <span id="selectedItemType">-</span>]
-						</span>
+							</span>
 						</span>
 					</div>
 
 					<div class="modal-field modal-field-full" style="margin-top: 5px;">
 						<label>검색 결과 (클릭하여 자재를 선택하세요)</label>
-						<div id="searchResultArea"
-							style="width: 100%; height: 150px; border: 1px solid #ccc; background: #fff; overflow-y: scroll; border-radius: 4px;">
-							<table
-								style="width: 100%; border-collapse: collapse; text-align: left; font-size: 14px; table-layout: fixed;">
+						<div id="searchResultArea" style="width: 100%; height: 150px; border: 1px solid #ccc; background: #fff; overflow-y: scroll; border-radius: 4px;">
+							<table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 14px; table-layout: fixed;">
 								<colgroup>
 									<col style="width: 12%;">
 									<col style="width: 28%;">
 									<col style="width: 35%;">
 									<col style="width: 25%;">
 								</colgroup>
-								<thead
-									style="background: #f5f5f5; position: sticky; top: 0; border-bottom: 1px solid #ddd; z-index: 10;">
+								<thead style="background: #f5f5f5; position: sticky; top: 0; border-bottom: 1px solid #ddd; z-index: 10;">
 									<tr>
 										<th style="padding: 8px; text-align: center;">선택</th>
 										<th style="padding: 8px;">자재코드</th>
@@ -560,8 +494,7 @@ response.setContentType("text/html; charset=utf-8");
 								</thead>
 								<tbody id="suggestList">
 									<tr id="emptyMessage">
-										<td colspan="4"
-											style="padding: 30px 10px; text-align: center; color: #999;">
+										<td colspan="4" style="padding: 30px 10px; text-align: center; color: #999;">
 											자재명을 입력하면 완제품을 제외한 항목이 표시됩니다.</td>
 									</tr>
 								</tbody>
@@ -570,11 +503,8 @@ response.setContentType("text/html; charset=utf-8");
 					</div>
 
 					<div class="modal-field modal-field-full">
-
-						<label for="facilityNum">위치 (창고/시설)</label> <select
-							name="facility_num" id="facilityNum"
-							style="width: 100%; height: 40px; border: 1px solid #ccc; border-radius: 4px; padding: 0 10px;"
-							required>
+						<label for="facilityNum">위치 (창고/시설)</label> 
+						<select name="facility_num" id="facilityNum" style="width: 100%; height: 40px; border: 1px solid #ccc; border-radius: 4px; padding: 0 10px;" required>
 							<c:forEach var="f" items="${facilityList}">
 								<option value="${f.FACILITY_NUM}">${f.FACILITY_NAME}</option>
 							</c:forEach>
@@ -582,9 +512,8 @@ response.setContentType("text/html; charset=utf-8");
 					</div>
 
 					<div class="modal-field modal-field-full">
-						<label for="ioReason">사유 / 비고</label> <input type="text"
-							name="io_reason" id="ioReason"
-							placeholder="예: 생산투입, 고객출고, 초기재고입고 등">
+						<label for="ioReason">사유 / 비고</label> 
+						<input type="text" name="io_reason" id="ioReason" placeholder="예: 생산투입, 고객출고, 초기재고입고 등">
 					</div>
 				</div>
 
@@ -596,27 +525,20 @@ response.setContentType("text/html; charset=utf-8");
 		</div>
 	</div>
 
-
-
-
 	<div id="outModal" class="modal-overlay" style="display: none;">
 		<div class="modal-box" style="max-width: 750px;">
 			<h3 class="modal-title">출고 등록</h3>
-
-			<form method="POST" action="/insertOutbound" accept-charset="UTF-8"
-				id="outbound-form">
+			<form method="POST" action="/insertOutbound" accept-charset="UTF-8" id="outbound-form">
 				<input type="hidden" name="emp_num" value="${sessionScope.loginUser.emp_num}">
 
 				<div class="modal-grid">
 					<div class="modal-field">
-						<label for="outDate">출고 날짜</label> <input type="date"
-							name="io_date" id="outDate" required>
+						<label for="outDate">출고 날짜</label> 
+						<input type="date" name="io_date" id="outDate" required>
 					</div>
 					<div class="modal-field">
-						<label for="outFacility">출고 대상 시설/창고</label> <select
-							name="facility_num" id="outFacility"
-							style="width: 100%; height: 40px; border: 1px solid #ccc; border-radius: 4px; padding: 0 10px;"
-							required>
+						<label for="outFacility">출고 대상 시설/창고</label> 
+						<select name="facility_num" id="outFacility" style="width: 100%; height: 40px; border: 1px solid #ccc; border-radius: 4px; padding: 0 10px;" required>
 							<c:forEach var="f" items="${facilityList}">
 								<option value="${f.FACILITY_NUM}">${f.FACILITY_NAME}</option>
 							</c:forEach>
@@ -625,12 +547,9 @@ response.setContentType("text/html; charset=utf-8");
 
 					<div class="modal-field modal-field-full" style="margin-top: 15px;">
 						<label>출고 대상 LOT (현재 재고가 있는 제품만 표시됩니다)</label>
-						<div
-							style="width: 100%; height: 200px; border: 1px solid #ccc; background: #fff; overflow-y: scroll; border-radius: 4px;">
-							<table
-								style="width: 100%; border-collapse: collapse; text-align: center; font-size: 14px;">
-								<thead
-									style="background: #f5f5f5; position: sticky; top: 0; border-bottom: 1px solid #ddd; z-index: 10;">
+						<div style="width: 100%; height: 200px; border: 1px solid #ccc; background: #fff; overflow-y: scroll; border-radius: 4px;">
+							<table style="width: 100%; border-collapse: collapse; text-align: center; font-size: 14px;">
+								<thead style="background: #f5f5f5; position: sticky; top: 0; border-bottom: 1px solid #ddd; z-index: 10;">
 									<tr>
 										<th style="padding: 8px;">선택</th>
 										<th style="padding: 8px;">LOT 번호</th>
@@ -641,8 +560,7 @@ response.setContentType("text/html; charset=utf-8");
 									</tr>
 								</thead>
 								<tbody id="lotListBody">
-
-								</tbody>
+									</tbody>
 							</table>
 						</div>
 					</div>
@@ -650,18 +568,14 @@ response.setContentType("text/html; charset=utf-8");
 					<div class="modal-field">
 						<label for="outQty">출고 수량</label>
 						<div style="display: flex; align-items: center; gap: 10px;">
-							<input type="number" name="io_qty" id="outQty" min="1"
-								placeholder="수량 입력" required disabled> <span
-								id="maxQtyGuide"
-								style="color: #e63946; font-size: 13px; font-weight: bold;">LOT를
-								먼저 선택해주세요.</span>
+							<input type="number" name="io_qty" id="outQty" min="1" placeholder="수량 입력" required disabled> 
+							<span id="maxQtyGuide" style="color: #e63946; font-size: 13px; font-weight: bold;">LOT를 먼저 선택해주세요.</span>
 						</div>
 					</div>
 
 					<div class="modal-field modal-field-full">
-						<label for="outReason">사유 / 비고</label> <input type="text"
-							name="io_reason" id="outReason"
-							placeholder="예: 생산 라인 투입, 불량 폐기 등">
+						<label for="outReason">사유 / 비고</label> 
+						<input type="text" name="io_reason" id="outReason" placeholder="예: 생산 라인 투입, 불량 폐기 등">
 					</div>
 				</div>
 
@@ -705,7 +619,7 @@ response.setContentType("text/html; charset=utf-8");
 		function movePage(pageNum) {
 			let sDate = document.querySelector("#sDate").value;
 			let eDate = document.querySelector("#eDate").value;
-			let type = document.querySelector("#type").value; //자재유형
+			let type = document.querySelector("#type").value;
 			let keyword = document.querySelector("#keyword").value;
 			let io_type = document.querySelector('input[name="io_type"]:checked').value;
 			
@@ -722,7 +636,7 @@ response.setContentType("text/html; charset=utf-8");
 			.then(data => {
 				if(data.searchResult.length == 0){
 					 let tbody = document.querySelector("#bom-body");
-					 tbody.innerHTML = "<tr><td colspan='8'>조회된 결과가 없습니다.</td></tr>";
+					 tbody.innerHTML = "<tr><td colspan='9'>조회된 결과가 없습니다.</td></tr>";
 					 renderPagination(data.pageInfo);
 					 return;
 				}
@@ -790,14 +704,13 @@ response.setContentType("text/html; charset=utf-8");
 		}
 		
 		const itemSearch = document.querySelector("#itemSearch");
-		//등록 모달에서 자재 검색
 		itemSearch.addEventListener('input', ()=>{
 			const query = itemSearch.value.trim();
 			if(query === ""){
 				document.querySelector("#suggestList").innerHTML = `
 					<tr id="emptyMessage">
-						<td colspan="5" style="padding: 50px 10px; text-align: center; color: #999;">
-							품목명을 입력하면 조건에 맞는 기준관리 항목이 여기에 표시됩니다.
+						<td colspan="4" style="padding: 30px 10px; text-align: center; color: #999;">
+							자재명을 입력하면 완제품을 제외한 항목이 표시됩니다.
 						</td>
 					</tr>
 				`;
@@ -813,7 +726,7 @@ response.setContentType("text/html; charset=utf-8");
 				console.log("등록모달 검색 에러 났음", error);
 			});
 		})
-			//함수 분리
+
 		function uploadData(data){
 			const suggestList = document.getElementById('suggestList');
 			const Message = document.getElementById('emptyMessage');
@@ -831,7 +744,7 @@ response.setContentType("text/html; charset=utf-8");
 				let html = "";
 				itemList.forEach(item =>{
 					html += `<tr>
-						<td style="text-align:center;"><input type="radio" name="item_num"  value="\${item.ITEM_NUM || ''}"></td>
+						<td style="text-align:center;"><input type="radio" name="item_num" value="\${item.ITEM_NUM || ''}"></td>
 						<td>\${item.CODE || ''}</td>
 						<td>\${item.NAME || ''}</td>
 						<td>\${item.TYPE || ''}</td>
@@ -845,137 +758,105 @@ response.setContentType("text/html; charset=utf-8");
 			}
 		}	
 		
-		
-		
-		
-		
-			
-		
-			
-		//등록 버튼 눌렀을 때
 		const insertForm = document.querySelector("#insert-form");
+		insertForm.addEventListener('submit', function(e) {
+			const checkedRadio = document.querySelector('input[name="item_num"]:checked');
+			if (!checkedRadio) {
+				alert("등록하실 자재를 검색 후 선택해주세요.");
+				e.preventDefault();
+				return false;
+			}
+			
+			const ioQty = document.querySelector("#ioQty").value;
+			if (!ioQty || ioQty < 1) {
+				alert("수량을 1개 이상 입력해주세요.");
+				e.preventDefault();
+				return false;
+			}
+		});
 
-insertForm.addEventListener('submit', function(e) {
-    // 1. 선택된 자재 라디오 버튼이 있는지 검사
-    const checkedRadio = document.querySelector('input[name="item_num"]:checked');
-    
-    if (!checkedRadio) {
-        alert("등록하실 자재를 검색 후 선택해주세요.");
-        e.preventDefault(); // 서브밋 중단
-        return false;
-    }
-    
-    // 2. 수량 검사
-    const ioQty = document.querySelector("#ioQty").value;
-    if (!ioQty || ioQty < 1) {
-        alert("수량을 1개 이상 입력해주세요.");
-        e.preventDefault(); // 서브밋 중단
-        return false;
-    }
-    
-    // 모든 조건 만족 시 정상적으로 submit 진행됨
-});
+		const out_btn = document.querySelector(".btn-out");
+		const outModal = document.querySelector("#outModal");
+		const closeOutModal = document.querySelector("#closeOutModal");
 
+		out_btn.addEventListener('click', () => {
+			outModal.style.display = "flex";
+			document.querySelector("#outDate").value = new Date().toISOString().substring(0, 10);
+			document.querySelector("#outQty").value = "";
+			document.querySelector("#outQty").disabled = true;
+			document.querySelector("#maxQtyGuide").innerText = "LOT를 먼저 선택해주세요.";
+			
+			fetch('/outModalSelect')
+				.then(response => response.json())
+				.then(data => {
+					const tbody = document.querySelector("#lotListBody");
+					tbody.innerHTML = "";
+					
+					if(data.length === 0) {
+						tbody.innerHTML = `<tr><td colspan="6" style="padding: 20px; color:#999;">현재 출고 가능한 재고(LOT)가 없습니다.</td></tr>`;
+						return;
+					}
 
+					let html = "";
+					data.forEach(lot => {
+						let expiryDate = lot.EXPIRY_DATE ? String(lot.EXPIRY_DATE).substring(0, 10) : '-';
+						html += `
+							<tr style="border-bottom: 1px solid #eee;">
+								<td style="padding: 8px;">
+									<input type="radio" name="lot_num" value="\${lot.LOT_NUM}" data-max-qty="\${lot.CURRENT_QTY}" onchange="selectLot(this)">
+								</td>
+								<td style="padding: 8px; font-weight: bold;">\${lot.LOT_NUM}</td>
+								<td style="padding: 8px;">\${lot.ITEM_NUM}</td>
+								<td style="padding: 8px;">\${lot.NAME}</td>
+								<td style="padding: 8px; color: #2D6A4F; font-weight: bold;">\${lot.CURRENT_QTY}</td>
+								<td style="padding: 8px;">\th{expiryDate}</td>
+							</tr>
+						`;
+					});
+					tbody.innerHTML = html;
+				})
+				.catch(err => console.error("LOT 목록 조회 실패:", err));
+		});
 
+		closeOutModal.addEventListener('click', () => {
+			outModal.style.display = "none";
+		});
 
+		let selectedMaxQty = 0;
+		function selectLot(radioElem) {
+			selectedMaxQty = parseInt(radioElem.getAttribute('data-max-qty'));
+			const qtyInput = document.querySelector("#outQty");
+			const guide = document.querySelector("#maxQtyGuide");
+			
+			qtyInput.disabled = false;
+			qtyInput.max = selectedMaxQty;
+			guide.innerText = `(최대 출고 가능 수량: \${selectedMaxQty}개)`;
+			guide.style.color = "#2D6A4F";
+		}
 
+		const outboundForm = document.querySelector("#outbound-form");
+		outboundForm.addEventListener('submit', function(e) {
+			const checkedLot = document.querySelector('input[name="lot_num"]:checked');
+			const inputQty = parseInt(document.querySelector("#outQty").value);
 
-const out_btn = document.querySelector(".btn-out");
-const outModal = document.querySelector("#outModal");
-const closeOutModal = document.querySelector("#closeOutModal");
+			if (!checkedLot) {
+				alert("출고할 LOT를 선택해주세요.");
+				e.preventDefault();
+				return;
+			}
 
-// 1. 출고 등록 버튼 클릭 시 모달 열기 + LOT 목록 불러오기
-out_btn.addEventListener('click', () => {
-    outModal.style.display = "flex";
-    
-    // 오늘 날짜 기본 세팅
-    document.querySelector("#outDate").value = new Date().toISOString().substring(0, 10);
-    
-    // 모달 초기화
-    document.querySelector("#outQty").value = "";
-    document.querySelector("#outQty").disabled = true;
-    document.querySelector("#maxQtyGuide").innerText = "LOT를 먼저 선택해주세요.";
-    
-    // LOT 목록 가져오기 (Ajax)
-    fetch('/outModalSelect')
-        .then(response => response.json())
-        .then(data => {
-            const tbody = document.querySelector("#lotListBody");
-            tbody.innerHTML = "";
-            
-            if(data.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" style="padding: 20px; color:#999;">현재 출고 가능한 재고(LOT)가 없습니다.</td></tr>`;
-                return;
-            }
+			if (!inputQty || inputQty < 1) {
+				alert("출고 수량을 1개 이상 입력해주세요.");
+				e.preventDefault();
+				return;
+			}
 
-            let html = "";
-            console.log("data ===", data);
-            data.forEach(lot => {
-                // 유통기한 날짜 포맷 (필요시)
-                let expiryDate = lot.EXPIRY_DATE ? String(lot.EXPIRY_DATE).substring(0, 10) : '-';
-                
-                html += `
-                    <tr style="border-bottom: 1px solid #eee;">
-                        <td style="padding: 8px;">
-                            <input type="radio" name="lot_num" value="\${lot.LOT_NUM}" data-max-qty="\${lot.CURRENT_QTY}" onchange="selectLot(this)">
-                        </td>
-                        <td style="padding: 8px; font-weight: bold;">\${lot.LOT_NUM}</td>
-                        <td style="padding: 8px;">\${lot.ITEM_NUM}</td>
-                        <td style="padding: 8px;">\${lot.NAME}</td>
-                        <td style="padding: 8px; color: #2D6A4F; font-weight: bold;">\${lot.CURRENT_QTY}</td>
-                        <td style="padding: 8px;">\${expiryDate}</td>
-                    </tr>
-                `;
-            });
-            tbody.innerHTML = html;
-        })
-        .catch(err => console.error("LOT 목록 조회 실패:", err));
-});
-
-// 출고 모달 닫기
-closeOutModal.addEventListener('click', () => {
-    outModal.style.display = "none";
-});
-
-// 2. 라디오 버튼(LOT) 선택 시 수량 입력 활성화 및 최대 수량 세팅
-let selectedMaxQty = 0;
-function selectLot(radioElem) {
-    selectedMaxQty = parseInt(radioElem.getAttribute('data-max-qty'));
-    const qtyInput = document.querySelector("#outQty");
-    const guide = document.querySelector("#maxQtyGuide");
-    
-    qtyInput.disabled = false;
-    qtyInput.max = selectedMaxQty;
-    guide.innerText = `(최대 출고 가능 수량: ${selectedMaxQty}개)`;
-    guide.style.color = "#2D6A4F";
-}
-
-// 3. 서브밋(등록) 유효성 검사
-const outboundForm = document.querySelector("#outbound-form");
-outboundForm.addEventListener('submit', function(e) {
-    const checkedLot = document.querySelector('input[name="lot_num"]:checked');
-    const inputQty = parseInt(document.querySelector("#outQty").value);
-
-    if (!checkedLot) {
-        alert("출고할 LOT를 선택해주세요.");
-        e.preventDefault();
-        return;
-    }
-
-    if (!inputQty || inputQty < 1) {
-        alert("출고 수량을 1개 이상 입력해주세요.");
-        e.preventDefault();
-        return;
-    }
-
-    // 백엔드에도 검증 로직이 있겠지만, 프론트에서도 현재 수량 초과를 1차로 막음
-    if (inputQty > selectedMaxQty) {
-        alert(`출고 수량은 현재 재고 수량(${selectedMaxQty}개)을 초과할 수 없습니다.`);
-        e.preventDefault();
-        return;
-    }
-});
+			if (inputQty > selectedMaxQty) {
+				alert(`출고 수량은 현재 재고 수량(\${selectedMaxQty}개)을 초과할 수 없습니다.`);
+				e.preventDefault();
+				return;
+			}
+		});
 	</script>
 </body>
 </html>

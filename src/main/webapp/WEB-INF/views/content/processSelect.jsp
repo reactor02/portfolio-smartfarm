@@ -329,6 +329,7 @@ select.form-control {
     max-width: 90%;      /* 화면이 작아질 경우를 대비 */
     overflow-y: auto;    /* 내용이 길어지면 내부 스크롤 */
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+	width:750px;
 }
 .modal-overlay {
     position: fixed; /* 화면 기준 고정 */
@@ -345,6 +346,7 @@ select.form-control {
     
     z-index: 1000; /* 다른 요소보다 위에 표시 */
 }
+
 </style>
 </head>
 <body>
@@ -453,8 +455,8 @@ select.form-control {
 		<tiles:insertAttribute name="footer" ignore="true" />
 	</div>
 
-	<div id="regModal" class="modal-overlay" style="display: none;">
-		<div class="modal-box" style="width: 600px;">
+	<div id="regModal3" class="modal-overlay" style="display: none;">
+		<div class="modal-box" style="width: 755px;">
 			<h3 class="modal-title">공정 등록</h3>
 
 			<form method="POST" accept-charset="UTF-8" action="/PinsertController" id="insert-form"
@@ -485,7 +487,7 @@ select.form-control {
 						</span>
 					</div>
 
-					<div class="modal-field modal-field-full" style="margin-top: 15px;">
+					<div  class="modal-field modal-field-full" style="margin-top: 15px;">
 						<label>선택 가능한 품목 리스트 (아래 행을 클릭하여 선택하세요)</label>
 
 						<div id="searchResultArea"

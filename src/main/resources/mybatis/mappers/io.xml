@@ -29,6 +29,7 @@
     SELECT
         i.io_type,
         i.io_num,
+        i.io_qty,
         ii.name,
         l.lot_code,
         ii.type,
