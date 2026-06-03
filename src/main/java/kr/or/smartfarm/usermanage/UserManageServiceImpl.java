@@ -1,6 +1,7 @@
 package kr.or.smartfarm.usermanage;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -128,6 +129,10 @@ public class UserManageServiceImpl implements UserManageService {
 		}		
 		
 		return null;
+	}
+	@Override
+	public List searchAjax(Map map) {
+		return userManageDAO.searchAjax(map);
 	}
 
 }

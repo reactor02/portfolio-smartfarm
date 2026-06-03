@@ -1,5 +1,6 @@
 package kr.or.smartfarm.usermanage;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -231,39 +232,80 @@ public class UserManageController {
 		return "content/stockSelect";
 	}
 	
-	@GetMapping("/usersearch")
-	public String usermanageGet(
-			UserManageDTO searchDTO,
-			Model model
-			) { 
-	    System.out.println("usermanageGet 실행 - 검색 조건 진입");
-	    System.out.println("검색 부서: " + searchDTO.getDept_num());
-	    System.out.println("검색 권한: " + searchDTO.getE_level());
-	    System.out.println("검색 키워드: " + searchDTO.getKeyword());
+//	@GetMapping("/usersearch")
+//	public String usermanageGet(
+//			UserManageDTO searchDTO,
+//			Model model
+//			) { 
+//	    System.out.println("usermanageGet 실행 - 검색 조건 진입");
+//	    System.out.println("검색 부서: " + searchDTO.getDept_num());
+//	    System.out.println("검색 권한: " + searchDTO.getE_level());
+//	    System.out.println("검색 키워드: " + searchDTO.getKeyword());
+//
+//	    // 1. 서비스에 검색 조건 객체(DTO)를 넘겨 필터링된 결과 조회
+//	    // 💡 (중요) 기존 getUserManage() 메서드에 searchDTO를 매개변수로 넘기도록 서비스 코드를 수정해야 합니다.
+//	    List<UserManageDTO> userList = userManageService.getUserSearch(searchDTO);
+//	    
+//	    // 2. 셀렉트 박스(부서/권한 등)를 채우기 위한 고정 목록 조회
+//	    List<UserManageDTO> selectd = userManageService.selectd();
+//	    List<UserManageDTO> selectl = userManageService.selectl();
+//	    List<UserManageDTO> selectm = userManageService.selectm();
+//	    
+//	    // 3. 화면에서 검색창에 선택했던 값이 그대로 유지되도록 검색 조건을 다시 뷰로 전달
+//	    model.addAttribute("search", searchDTO);
+//	    
+//	    // 4. 조회된 데이터들을 가방(Model)에 적재
+//	    model.addAttribute("userList", userList);
+//	    model.addAttribute("selectd", selectd);
+//	    model.addAttribute("selectl", selectl);
+//	    model.addAttribute("selectm", selectm);
+//	    
+//	    // 5. 타일즈 뷰 리턴
+//	    return "content/usermanage.tiles";
+//	}
+	
+	@RequestMapping("/usersearch")
+	@ResponseBody
+	public Map searchStocks(
+	        @RequestParam(value = "page", defaultValue = "1") int page,
+	        @RequestParam(value = "type") Integer type,
+	        @RequestParam(value = "level") Integer level,
+	        @RequestParam(value = "keyword") String keyword
+	        ) {
 
-	    // 1. 서비스에 검색 조건 객체(DTO)를 넘겨 필터링된 결과 조회
-	    // 💡 (중요) 기존 getUserManage() 메서드에 searchDTO를 매개변수로 넘기도록 서비스 코드를 수정해야 합니다.
-	    List<UserManageDTO> userList = userManageService.getUserSearch(searchDTO);
+	    Map result = new HashMap();
 	    
-	    // 2. 셀렉트 박스(부서/권한 등)를 채우기 위한 고정 목록 조회
-	    List<UserManageDTO> selectd = userManageService.selectd();
-	    List<UserManageDTO> selectl = userManageService.selectl();
-	    List<UserManageDTO> selectm = userManageService.selectm();
+	    try {
+	        Map searchMap = new HashMap();
+	        searchMap.put("page", page);
+	        searchMap.put("type", type);
+	        searchMap.put("level", level);
+	        searchMap.put("keyword", keyword );
+	        System.out.println(searchMap);
+	        
+	        List<UserManageDTO> selectd = userManageService.selectd();
+		    List<UserManageDTO> selectl = userManageService.selectl();
+		    List<UserManageDTO> selectm = userManageService.selectm();
+		    
+	        List searchResult = userManageService.searchAjax(searchMap);
+	        result.put("searchResult", searchResult);
+
+	        result.put("status", "good");
+	        if(searchResult != null) {
+	        	PageInfo<Map<String, Object>> pageInfo = new PageInfo<Map<String, Object>>(searchResult);
+	        	result.put("pageInfo", pageInfo);
+	        }else {
+	        	PageInfo pageInfo = new PageInfo();
+	        	result.put("pageInfo", pageInfo);
+	        }
+	        
+	    } catch(Exception e) {
+	        e.printStackTrace();
+	        result.put("status", "error");
+	    }
 	    
-	    // 3. 화면에서 검색창에 선택했던 값이 그대로 유지되도록 검색 조건을 다시 뷰로 전달
-	    model.addAttribute("search", searchDTO);
-	    
-	    // 4. 조회된 데이터들을 가방(Model)에 적재
-	    model.addAttribute("userList", userList);
-	    model.addAttribute("selectd", selectd);
-	    model.addAttribute("selectl", selectl);
-	    model.addAttribute("selectm", selectm);
-	    
-	    // 5. 타일즈 뷰 리턴
-	    return "content/usermanage.tiles";
+	    return result;
 	}
-	
-	
 
 
 }
