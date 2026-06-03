@@ -115,24 +115,24 @@ margin: 0px !important;
     </div>
 </header>
 
-<div class="dashboard-wrapper">
+<!-- <div class="dashboard-wrapper"> -->
     
-    <div class="dashboard-toggle-bar">
-        <button id="dashboardToggleBtn" onclick="toggleDashboard()">▼</button>
-    </div>
+<!--     <div class="dashboard-toggle-bar"> -->
+<!--         <button id="dashboardToggleBtn" onclick="toggleDashboard()">▼</button> -->
+<!--     </div> -->
 
-    <div id="dashboardContainer" class="dashboard-slide-panel">
+<!--     <div id="dashboardContainer" class="dashboard-slide-panel"> -->
         
-        <div class="dashboard-content-wrapper">
-        <c:import url="/dashboard2" />
-            </div>
+<!--         <div class="dashboard-content-wrapper"> -->
+<%--         <c:import url="/dashboard2" /> --%>
+<!--             </div> -->
         
-        <div class="dashboard-close-bar">
-            <button onclick="toggleDashboard()">▲</button>
-        </div>
+<!--         <div class="dashboard-close-bar"> -->
+<!--             <button onclick="toggleDashboard()">▲</button> -->
+<!--         </div> -->
         
-    </div>
-</div>
+<!--     </div> -->
+<!-- </div> -->
 
 <script>
     function toggleDashboard() {
