@@ -231,7 +231,7 @@ td {
 						<div class="card">
 							<div class="card-header-wrapper">
 								<h3 class="title">시설 현황</h3>
-								<a href="/equip" class="more-link">더보기 +</a>
+								<a href="facilityLog" class="more-link">더보기 +</a>
 							</div>
 							<table>
 								<tr>

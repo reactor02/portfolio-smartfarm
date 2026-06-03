@@ -89,6 +89,19 @@
 	</select>
 	
 	
+	<select id="getFacilityList" resultType="kr.or.smartfarm.report.ReportSummaryDTO">
+		SELECT 
+			i.code,
+			i.name,
+			e.equip_status,
+			e.total_runtime
+		FROM EQUIPMENT_LOG e
+		JOIN item i 
+			ON e.item_num = i.item_num
+		ORDER BY e.MAINTENANCE_DATE DESC
+	</select>
+	
+	
 	
 </mapper>
 
