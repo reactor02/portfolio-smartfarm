@@ -15,8 +15,8 @@
 
     /* 컨테이너 및 섹션 */
     .login-container { width: 400px; padding: 30px 20px; background: #FFF; border: 1px solid #DDD; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
-    .section-title { text-align: center; font-size: 13px; font-weight: bold; color: var(--s-cl); margin-bottom: 15px; }
-    .sns-login-section { margin-bottom: 25px; }
+    .section-title { text-align: center; font-size: 25px; font-weight: bold; color: var(--s-cl); margin-bottom: 15px; }
+    .sns-login-section { margin-bottom: 20px; height: 0px;}
     .sns-buttons { display: flex; justify-content: center; gap: 12px; }
     
     /* 버튼 및 입력창 공통 크기 설정 */
@@ -38,19 +38,17 @@
 </style>
 
 <div class="login-container">
-    <!-- 1. SNS 로그인 -->
+
     <div class="sns-login-section">
-        <p class="section-title">SNS 계정 간편 로그인</p>
-        <div class="sns-buttons">
-            <button type="button" class="sns-btn" title="네이버"></button>
-            <button type="button" class="sns-btn" title="카카오"></button>
-            <button type="button" class="sns-btn" title="구글"></button>
-        </div>
+        
+    </div>
+    <div class="login-form">
+        <h3 class="section-title">사원 로그인</h3>
+    <div class="sns-login-section">
+        
     </div>
 
     <!-- 2. 로그인 입력 폼 -->
-    <div class="login-form">
-        <p class="section-title">사원 로그인</p>
         <!-- 1. 사원번호 입력창 -->
    <!-- 1. 사원번호 입력창: 1글자 이상 입력 조건 -->
     <input type="text" 
