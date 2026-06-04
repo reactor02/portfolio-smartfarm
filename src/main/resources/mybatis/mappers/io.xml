@@ -177,26 +177,30 @@ AND i.TYPE IN ('PRODUCT', 'SEMIPRODUCT')
 
 <!-- insert -->
 <insert id="insertLot22" parameterType="kr.or.smartfarm.io.IoDTO">
-        <selectKey keyProperty="lot_num" resultType="int" order="BEFORE">
-            SELECT lot_seq.NEXTVAL FROM DUAL
-        </selectKey>
-        
-        INSERT INTO lot (
-            lot_num,
-            lot_code,
-            expiry_date,
-            item_num,
-            lot_date,
-            init_qty,
-            current_qty,
-            order_num
-        ) VALUES (
-            #{lot_num},                                  'LOT' || TO_CHAR(SYSDATE, 'YYYYMMDD'),       ADD_MONTHS(SYSDATE, 36),                     #{item_num},
-            SYSDATE,
-            #{io_qty},
-            #{io_qty},
-            NULL                                         )
-    </insert>
+    <selectKey keyProperty="lot_num" resultType="int" order="BEFORE">
+        SELECT lot_seq.NEXTVAL FROM DUAL
+    </selectKey>
+    
+    INSERT INTO lot (
+        lot_num,
+        lot_code,
+        expiry_date,
+        item_num,
+        lot_date,
+        init_qty,
+        current_qty,
+        order_num
+    ) VALUES (
+        #{lot_num},
+        'LOT' || TO_CHAR(SYSDATE, 'YYYYMMDD') || '_' || #{lot_num},
+        ADD_MONTHS(SYSDATE, 36),
+        #{item_num},
+        SYSDATE,
+        #{io_qty},
+        #{io_qty},
+        NULL                                         
+    )
+</insert>
 
 
     <!-- [수정] plan_num 제거, qc_chked NOT NULL 추가(생산투입=N) -->

@@ -491,7 +491,6 @@ response.setContentType("text/html; charset=utf-8");
 										<th style="padding: 8px;">자재명</th>
 										<th style="padding: 8px;">자재유형</th>
 									</tr>
-								</thead>
 								<tbody id="suggestList">
 									<tr id="emptyMessage">
 										<td colspan="4" style="padding: 30px 10px; text-align: center; color: #999;">

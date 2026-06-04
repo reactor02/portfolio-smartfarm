@@ -38,7 +38,6 @@
         JOIN item i ON s.item_num = i.item_num
         JOIN facility f ON f.facility_num = s.facility_num 
 
-
         <where>
 
         <if test="type != null and type != 'all'">
@@ -80,8 +79,8 @@ WHERE UPPER(NAME) LIKE  '%' || UPPER(#{_parameter}) || '%'
 
 
 <insert id="insert"  parameterType="kr.or.smartfarm.stock.StockDTO">
-INSERT INTO STOCK(STOCK_ID,STOCK_QTY,ITEM_NUM)
-VALUES(STOCK_SEQ.NEXTVAL, #{stock_qty}, #{item_num})
+INSERT INTO STOCK(STOCK_ID,STOCK_QTY,ITEM_NUM, FACILITY_NUM)
+VALUES(STOCK_SEQ.NEXTVAL, #{stock_qty}, #{item_num}, 3)
 </insert>
 
 <!-- 디테일 셀렉트 -->

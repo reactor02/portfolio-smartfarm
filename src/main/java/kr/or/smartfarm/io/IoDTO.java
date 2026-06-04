@@ -8,7 +8,7 @@ import lombok.Data;
 public class IoDTO {
 	
 	private int io_num; //시퀀스
-	private String io_type; //구분
+	private String io_type = "입고"; //구분
 	private String io_date;  //입출고 날짜
 	private int item_num;
 	private String keyword;

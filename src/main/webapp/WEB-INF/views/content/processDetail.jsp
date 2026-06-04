@@ -314,7 +314,7 @@ response.setContentType("text/html; charset=utf-8");
 	transition: all 0.2s ease-in-out;
 	text-decoration: none;
 	display: inline-block;
-	margin-left: 475px;
+	margin-left: 790px;
 }
 
 .btn-action1:hover {
