@@ -14,7 +14,7 @@
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
     /* 컨테이너 및 섹션 */
-    .login-container { width: 600px; height : 400px; padding: 30px 20px; background: #FFF; border: 1px solid #DDD; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+    .login-container { width: 600px; height : 400px; padding: 30px 20px; background: #FFF; border: 1px solid #DDD; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); margin-left : -70px;}
     .section-title { text-align: center; font-size: 25px; font-weight: bold; color: var(--s-cl); margin-bottom: 15px; }
     .sns-login-section { margin-bottom: 20px; height: 0px;}
     .sns-buttons { display: flex; justify-content: center; gap: 12px; }
