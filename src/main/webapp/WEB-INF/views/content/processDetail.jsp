@@ -446,7 +446,7 @@ response.setContentType("text/html; charset=utf-8");
 						<label class="info-label">상태 변경</label>
 						<div class="radio-group">
 							<label class="radio-label"> <input type="radio"
-								name="process_status" value="사용"
+								name="process_status" value="사용중"
 								${resultList[0].PROCESS_STATUS == '사용' || resultList[0].PROCESS_STATUS == '사용중' ? 'checked' : ''}>사용
 							</label> <label class="radio-label"> <input type="radio"
 								name="process_status" value="미사용"

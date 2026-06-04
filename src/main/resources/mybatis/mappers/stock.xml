@@ -102,7 +102,6 @@ VALUES(STOCK_SEQ.NEXTVAL, #{stock_qty}, #{item_num}, 3)
   		 JOIN item i ON s.item_num = i.item_num
   		 JOIN facility f ON f.facility_num = s.facility_num
   		 JOIN LOT l ON l.item_num = i.item_num
-   where i.item_status in ('A', 'Y')
-       AND s.stock_id = #{stock_id}
+   where s.stock_id = #{stock_id}
 </select>
 </mapper>
