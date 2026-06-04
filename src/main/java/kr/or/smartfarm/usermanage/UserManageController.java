@@ -90,7 +90,7 @@ public class UserManageController {
 	    List<UserManageDTO> selectm = userManageService.selectm();
 	    
 	    // 1-3. 서비스에서 전체 회원 목록(List) 조회
-	    List<TodayWorkDTO> selectw = userManageService.selectw(emp_num);
+	    List<TodayWorkDTO> selectw = userManageService.selectw(loginUser);
 	    
 	    // 2. 가져온 데이터를 Model에 담음
 	    model.addAttribute("selectd", selectd);
