@@ -128,6 +128,10 @@ public class WorkController {
         model.addAttribute("canWork",  canWork);
         model.addAttribute("workDTO",     workDTO);
         model.addAttribute("processList", workService.getProcessesByItem(workDTO.getItem_num()));
+        // 소모자재/재고 부족분/투입·생산 가능 수량 (생산투입 모달 + 자재 테이블 표시용)
+        model.addAttribute("produceInfo", workService.getProduceInfo(work_order_id));
+        // 이 작업지시에 투입(출고)된 LOT 목록
+        model.addAttribute("orderLots",   workService.getOrderLots(workDTO.getOrder_num()));
         return "content/workDetail.tiles";
     }
 
@@ -241,15 +245,42 @@ public class WorkController {
      *  4. 생산된 품목의 신규 LOT 생성
      *  5. work_order 완료 처리 + 생산계획 완료 여부 체크
      *
-     * 재고 부족 시 RuntimeException("stock_error")이 발생하며 "stock_error"를 반환한다.
+     * 입력 수량이 투입 가능 수량(재고·미투입 잔여)을 초과하면 "qty_error"를 반환한다.
      *
-     * @param work_order_id 생산실적을 처리할 작업지시 ID
-     * @return "ok" | "stock_error" | "error"
+     * @param work_order_id 작업지시 ID
+     * @param qty           이번에 투입(출고)할 생산 수량
+     * @return "ok" | "qty_error" | "forbidden" | "unauthorized" | "error"
+     */
+    @RequestMapping(value = "/{work_order_id}/input", method = RequestMethod.POST)
+    @ResponseBody
+    public String input(@PathVariable String work_order_id,
+                        @org.springframework.web.bind.annotation.RequestParam int qty,
+                        HttpSession session) {
+        // [권한] 담당자 또는 실무자 본인만 생산투입 가능
+        LoginDTO loginUser = (LoginDTO) session.getAttribute("loginUser");
+        if (loginUser == null) return "unauthorized";
+        if (!isEmpOrWorker(loginUser, work_order_id)) return "forbidden";
+        try {
+            workService.input(work_order_id, qty);
+            return "ok";
+        } catch (RuntimeException e) {
+            if ("qty_error".equals(e.getMessage())) return "qty_error";
+            return "error";
+        }
+    }
+
+    /**
+     * POST /work/{work_order_id}/produce - 작업완료(생산). (AJAX)
+     * 이미 투입된 분량(input_qty − current_qty)만큼 완제품 LOT을 생성하고 완료 처리한다.
+     * 투입된 미생산 분량이 없으면 "nothing"을 반환한다.
+     *
+     * @param work_order_id 작업지시 ID
+     * @return "ok" | "nothing" | "forbidden" | "unauthorized" | "error"
      */
     @RequestMapping(value = "/{work_order_id}/produce", method = RequestMethod.POST)
     @ResponseBody
     public String produce(@PathVariable String work_order_id, HttpSession session) {
-        // [권한] 담당자 또는 실무자 본인만 생산완료 가능
+        // [권한] 담당자 또는 실무자 본인만 작업완료 가능
         LoginDTO loginUser = (LoginDTO) session.getAttribute("loginUser");
         if (loginUser == null) return "unauthorized";
         if (!isEmpOrWorker(loginUser, work_order_id)) return "forbidden";
@@ -257,8 +288,29 @@ public class WorkController {
             workService.produce(work_order_id);
             return "ok";
         } catch (RuntimeException e) {
-            // 재고 부족 시 "stock_error" 반환하여 클라이언트에서 사용자에게 안내
-            if ("stock_error".equals(e.getMessage())) return "stock_error";
+            if ("nothing".equals(e.getMessage())) return "nothing";
+            return "error";
+        }
+    }
+
+    /**
+     * POST /work/{work_order_id}/input-cancel - 투입취소. (AJAX)
+     * 아직 생산되지 않은(남은) 투입 자재만 LOT/재고로 환원하고 order_lot을 정리한다.
+     *
+     * @param work_order_id 작업지시 ID
+     * @return "ok" | "forbidden" | "unauthorized" | "error"
+     */
+    @RequestMapping(value = "/{work_order_id}/input-cancel", method = RequestMethod.POST)
+    @ResponseBody
+    public String cancelInput(@PathVariable String work_order_id, HttpSession session) {
+        // [권한] 담당자 또는 실무자 본인만 투입취소 가능
+        LoginDTO loginUser = (LoginDTO) session.getAttribute("loginUser");
+        if (loginUser == null) return "unauthorized";
+        if (!isEmpOrWorker(loginUser, work_order_id)) return "forbidden";
+        try {
+            workService.cancelInput(work_order_id);
+            return "ok";
+        } catch (RuntimeException e) {
             return "error";
         }
     }

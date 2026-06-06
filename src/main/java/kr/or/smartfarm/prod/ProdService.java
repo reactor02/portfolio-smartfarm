@@ -57,6 +57,13 @@ public interface ProdService {
     List<SelectOptionDTO> getItemOptions();
 
     /**
+     * 활성 품목 드롭다운 옵션 목록 조회 (등록 모달용, item_status = 'Y' 만 포함)
+     *
+     * @return num(item_num), name(item 이름), type(품목 유형) 을 담은 SelectOptionDTO 목록
+     */
+    List<SelectOptionDTO> getActiveItemOptions();
+
+    /**
      * 생산계획 상태 변경
      *
      * @param plan_id  상태를 변경할 생산계획 식별자

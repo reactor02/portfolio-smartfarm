@@ -1,5 +1,6 @@
 package kr.or.smartfarm.shipment;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -50,12 +51,6 @@ public class ShipmentDAOImpl implements ShipmentDAO {
         return sqlSession.selectList("kr.or.smartfarm.shipment.loadShipmentLots", shipmentNum);
     }
 
-    /** 출하 배정 가능한 LOT을 FIFO로 조회 (dispatch 시 배정 대상) */
-    @Override
-    public List getAvailableLots(int itemNum) {
-        return sqlSession.selectList("kr.or.smartfarm.shipment.getAvailableLotsForShipment", itemNum);
-    }
-
     /** SHIPMENT 신규 등록 (selectKey로 shipment_num 채번) */
     @Override
     public int insertShipment(Map map) {
@@ -72,12 +67,6 @@ public class ShipmentDAOImpl implements ShipmentDAO {
     @Override
     public int updateRequestStatusToDispatch(String shipmentRequestNum) {
         return sqlSession.update("kr.or.smartfarm.shipment.updateRequestStatusToDispatch", shipmentRequestNum);
-    }
-
-    /** 확정 처리 대상 — 출하에 배정된 LOT + 보유 수량(current_qty) 조회 */
-    @Override
-    public List getShipmentLots(int shipmentNum) {
-        return sqlSession.selectList("kr.or.smartfarm.shipment.getShipmentLots", shipmentNum);
     }
 
     /** LOT 수량 차감 — [방어] 보유 수량 이상 차감 불가(영향 행 0이면 재고 부족) */
@@ -174,5 +163,41 @@ public class ShipmentDAOImpl implements ShipmentDAO {
     @Override
     public String getWorkerNum(String shipmentId) {
         return sqlSession.selectOne("kr.or.smartfarm.shipment.getWorkerNum", shipmentId);
+    }
+
+    /** 선택한 LOT의 유통기한(expiry_date) 조회 */
+    @Override
+    public Date getLotExpiry(int lotNum) {
+        return sqlSession.selectOne("kr.or.smartfarm.shipment.getLotExpiry", lotNum);
+    }
+
+    /** 출하에 배정된 LOT들의 유통기한(expiry_date) 목록 조회 */
+    @Override
+    public List<Date> getShipmentLotExpiries(int shipmentNum) {
+        return sqlSession.selectList("kr.or.smartfarm.shipment.getShipmentLotExpiries", shipmentNum);
+    }
+
+    /** 해당 LOT이 속한 품목의 타입(item.type) 조회 */
+    @Override
+    public String getLotItemType(int lotNum) {
+        return sqlSession.selectOne("kr.or.smartfarm.shipment.getLotItemType", lotNum);
+    }
+
+    /** 해당 lot_num이 shipment_lot에 배정된 건수 조회 (중복 배정 검증용) */
+    @Override
+    public int countShipmentLotByLotNum(int lotNum) {
+        return sqlSession.selectOne("kr.or.smartfarm.shipment.countShipmentLotByLotNum", lotNum);
+    }
+
+    /** 해당 품목의 출하 가능 후보 LOT 목록(FIFO) 조회 */
+    @Override
+    public List<ShippableLotDTO> selectShippableLots(int itemNum) {
+        return sqlSession.selectList("kr.or.smartfarm.shipment.selectShippableLots", itemNum);
+    }
+
+    /** 확정 시 분할 판단용 — 단건 LOT의 current_qty/item_num/expiry_date 조회 */
+    @Override
+    public Map selectLotForConfirm(int lotNum) {
+        return sqlSession.selectOne("kr.or.smartfarm.shipment.selectLotForConfirm", lotNum);
     }
 }

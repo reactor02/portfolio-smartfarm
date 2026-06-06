@@ -97,4 +97,16 @@ public interface LotService {
      * @return         롯이력 행 목록 (DEPTH, GUBUN, ID_COL, CONTENT_COL, DATE_COL, STATUS_COL, WORKER 포함)
      */
     List<Map<String, Object>>     getLotHistory(int lot_num);
+
+    /**
+     * 공정 라우트(Routing) 흐름도 데이터 조회.
+     *
+     * <p>품목의 공정 단계를 flow 순으로, 각 공정에 투입되는 자재를 묶어 반환합니다.
+     * bom.process_num 으로 자재-공정을 연결하며, 공정 미지정 자재(process_num IS NULL)는
+     * 마지막에 "공정 미지정" 가상 단계(process_num=0)로 묶입니다.</p>
+     *
+     * @param item_num  LOT 품목의 내부 PK
+     * @return          공정 단계 목록(각 단계에 투입 자재 목록 포함), 공정 없으면 빈 리스트
+     */
+    List<LotRouteStepDTO>         getRoute(int item_num);
 }

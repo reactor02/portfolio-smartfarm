@@ -296,6 +296,43 @@
         )
     </select>
 
+    <!-- ════════════════════════════════════════════════════════════════════
+         공정 라우트(Routing) 흐름도 — 품목의 공정 단계(flow 순) + 각 공정 투입 자재
+         · process 기준 LEFT JOIN bom(process_num) → 공정 노드 1개에 자재 N개 합류
+         · 자재가 없는 공정은 material_num 등이 NULL 로 1행 반환(빈 노드)
+         ════════════════════════════════════════════════════════════════════ -->
+    <select id="getRouteByItem" parameterType="int" resultType="hashMap">
+        SELECT p.process_num     AS process_num,
+               p.flow            AS flow,
+               p.process_content AS process_content,
+               p.head_count      AS head_count,
+               f.facility_name   AS facility_name,
+               b.item_num2       AS material_num,
+               im.name           AS material_name,
+               b.required_qty    AS required_qty
+        FROM process p
+        LEFT JOIN facility f ON p.facility_num = f.facility_num
+        LEFT JOIN bom b      ON b.process_num  = p.process_num
+                            AND b.bom_status   = 'Y'
+        LEFT JOIN item im    ON b.item_num2    = im.item_num
+        WHERE p.item_num      = #{item_num}
+          AND p.process_status = '사용중'
+        ORDER BY p.flow ASC, p.process_num ASC, b.bom_num ASC
+    </select>
+
+    <!-- 공정 미지정(process_num IS NULL) 자재 — 흐름도 "공정 미지정" 묶음용 -->
+    <select id="getUnassignedMaterials" parameterType="int" resultType="hashMap">
+        SELECT b.item_num2    AS material_num,
+               im.name        AS material_name,
+               b.required_qty AS required_qty
+        FROM bom b
+        LEFT JOIN item im ON b.item_num2 = im.item_num
+        WHERE b.item_num   = #{item_num}
+          AND b.bom_status = 'Y'
+          AND b.process_num IS NULL
+        ORDER BY b.bom_num ASC
+    </select>
+
     <!-- lotDetail: CONNECT BY 재귀 — 공정이력 다단계 트리 (hashMap 반환, depth 포함) -->
     <select id="getRecursiveMaterials" parameterType="int" resultType="hashMap">
         SELECT LEVEL                               AS depth,

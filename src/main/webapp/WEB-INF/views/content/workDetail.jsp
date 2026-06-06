@@ -27,12 +27,18 @@
         <div class="hdr">
             <h1>작업지시 상세</h1>
             <div class="hdr-right">
-                <%-- 작업시작/완료: 담당자 또는 실무자 본인만 노출 --%>
+                <%-- 작업시작: 담당자 또는 실무자 본인만 노출 --%>
                 <c:if test="${canWork and workDTO.work_status == '대기'}">
                     <button type="button" class="btn-action" onclick="startWork()">작업시작</button>
                 </c:if>
-                <c:if test="${canWork and workDTO.work_status == '진행'}">
+                <%-- 생산투입: 진행 + 더 투입할 여지(order_qty > input_qty) --%>
+                <c:if test="${canWork and workDTO.work_status == '진행' and workDTO.order_qty > workDTO.input_qty}">
+                    <button type="button" class="btn-action" onclick="openInputModal()">생산투입</button>
+                </c:if>
+                <%-- 작업완료/투입취소: 진행 + 미생산 투입분 존재(input_qty > current_qty) --%>
+                <c:if test="${canWork and workDTO.work_status == '진행' and workDTO.input_qty > workDTO.current_qty}">
                     <button type="button" class="btn-action" onclick="produceWork()">작업완료</button>
+                    <button type="button" class="btn-action btn-del" onclick="cancelInput()">투입취소</button>
                 </c:if>
                 <%-- 취소버튼: e_level >= 3(사장) 또는 담당자 본인 + 진행 가능 상태 --%>
                 <c:if test="${canCancel and workDTO.work_status != '완료' and workDTO.work_status != '취소'}">
@@ -115,6 +121,86 @@
             <div class="progress-text" id="progressText"></div>
         </div>
 
+        <!-- 2-1. 소모 자재 / 재고 -->
+        <div class="section-title">■ 소모 자재 / 재고</div>
+        <div class="mat-summary">
+            투입수량 <span class="mat-max-num">${produceInfo.input_qty}</span> /
+            지시수량 ${workDTO.order_qty}
+            &nbsp;|&nbsp; 미생산 투입분 : <span class="mat-max-num">${produceInfo.pendingProduce}</span>
+            &nbsp;|&nbsp; 재고부족에 따른 <strong>최대 투입 가능 수량</strong> :
+            <span class="mat-max-num">${produceInfo.maxInput}</span>
+            <c:if test="${produceInfo.maxInput < produceInfo.inputtable}">
+                <span class="mat-short">(미투입 잔여 ${produceInfo.inputtable} 중 재고 부족으로 제한됨)</span>
+            </c:if>
+        </div>
+        <div class="tbl-box">
+            <table class="stk-tbl">
+                <thead>
+                    <tr>
+                        <th>자재명</th>
+                        <th>코드</th>
+                        <th>단위 소요량</th>
+                        <th>필요수량(잔여기준)</th>
+                        <th>현재고</th>
+                        <th>부족분</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <c:choose>
+                        <c:when test="${not empty produceInfo.materials}">
+                            <c:forEach var="m" items="${produceInfo.materials}">
+                                <tr>
+                                    <td>${m.name}</td>
+                                    <td>${m.code}</td>
+                                    <td>${m.unitQty}</td>
+                                    <td>${m.needQty}</td>
+                                    <td>${m.available}</td>
+                                    <td <c:if test="${m.shortage > 0}">class="mat-short"</c:if>>${m.shortage}</td>
+                                </tr>
+                            </c:forEach>
+                        </c:when>
+                        <c:otherwise>
+                            <tr><td colspan="6" class="empty-cell">등록된 BOM 자재가 없습니다.</td></tr>
+                        </c:otherwise>
+                    </c:choose>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 2-2. 투입 LOT 내역 (생산투입으로 출고된 자재 LOT) -->
+        <div class="section-title">■ 투입 LOT 내역</div>
+        <div class="tbl-box">
+            <table class="stk-tbl">
+                <thead>
+                    <tr>
+                        <th>LOT 코드</th>
+                        <th>품목명</th>
+                        <th>출고수량</th>
+                        <th>생성일</th>
+                        <th>유통기한</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <c:choose>
+                        <c:when test="${not empty orderLots}">
+                            <c:forEach var="ol" items="${orderLots}">
+                                <tr>
+                                    <td>${ol.LOT_CODE}</td>
+                                    <td>${ol.ITEM_NAME}</td>
+                                    <td>${ol.QTY}</td>
+                                    <td>${ol.LOT_DATE}</td>
+                                    <td>${not empty ol.EXPIRY_DATE ? ol.EXPIRY_DATE : '-'}</td>
+                                </tr>
+                            </c:forEach>
+                        </c:when>
+                        <c:otherwise>
+                            <tr><td colspan="5" class="empty-cell">투입된 LOT이 없습니다.</td></tr>
+                        </c:otherwise>
+                    </c:choose>
+                </tbody>
+            </table>
+        </div>
+
         <!-- 3. 생산계획 정보 -->
         <div class="section-title">■ 생산계획정보</div>
         <div class="info-grid">
@@ -181,11 +267,30 @@
     </div>
 </div>
 
+<!-- 생산투입 수량 입력 모달 -->
+<div id="produceModal">
+    <div class="produce-box">
+        <div class="produce-title">생산투입 수량 입력</div>
+        <div class="produce-msg">
+            투입(출고)할 생산 수량을 입력하세요.<br>
+            최대 투입 가능 수량 : <span id="produceMax" class="mat-max-num"></span>
+        </div>
+        <input type="number" id="produceQty" class="produce-input" min="1">
+        <div class="produce-btn-wrap">
+            <button type="button" class="produce-btn" onclick="submitInput()">생산투입</button>
+            <button type="button" class="produce-btn produce-btn-cancel" onclick="closeProduceModal()">취소</button>
+        </div>
+    </div>
+</div>
+
 <script>
     var WORK_ORDER_ID = '${workDTO.work_order_id}';
     var ORDER_START   = '<fmt:formatDate value="${workDTO.order_start}" pattern="yyyy-MM-dd"/>';
     var ORDER_QTY     = parseInt('${workDTO.order_qty}')   || 0;
     var CURRENT_QTY   = parseInt('${workDTO.current_qty}') || 0;
+    var INPUT_QTY     = parseInt('${produceInfo.input_qty}')      || 0;
+    var PENDING_PRODUCE = parseInt('${produceInfo.pendingProduce}') || 0;
+    var MAX_INPUT     = parseInt('${produceInfo.maxInput}')       || 0;
 </script>
 <script src="/resources/js/work/workDetail.js"></script>
 

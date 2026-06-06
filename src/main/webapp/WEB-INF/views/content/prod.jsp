@@ -133,7 +133,7 @@ response.setContentType("text/html; charset=utf-8");
                                 <c:otherwise>${prod.type}</c:otherwise>
                             </c:choose></td>
                             <td>${prod.plan_qty}</td>
-                            <td>${prod.order_qty_sum > 0 ? prod.order_qty_sum : '-'}</td>
+                            <td>${prod.currentqty > 0 ? prod.currentqty : '-'}</td>
                             <td><fmt:formatDate value="${prod.plan_start}" pattern="yyyy-MM-dd"/></td>
                             <td><fmt:formatDate value="${prod.plan_end}"   pattern="yyyy-MM-dd"/></td>
                             <td><fmt:formatNumber
@@ -199,7 +199,7 @@ response.setContentType("text/html; charset=utf-8");
                     <label>품목</label>
                     <select name="item_num">
                         <option value="">선택</option>
-                        <c:forEach var="i" items="${itemList}">
+                        <c:forEach var="i" items="${regItemList}">
                             <option value="${i.num}">${i.name}</option>
                         </c:forEach>
                     </select>

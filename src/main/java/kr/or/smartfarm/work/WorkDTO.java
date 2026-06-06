@@ -24,6 +24,7 @@ public class WorkDTO {
 	private String work_status;    // DB: order_status → SQL alias
 	private int    emp_num;
 	private int    current_qty;
+	private int    input_qty;      // 누적 투입(생산예정) 수량
 	private String content;
 	private java.sql.Timestamp created_at;
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")

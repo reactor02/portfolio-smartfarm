@@ -63,19 +63,47 @@ public interface WorkService {
     void complete(String work_order_id);
 
     /**
-     * 생산실적을 처리한다. (BOM 기반 재고 차감 + LOT 생성)
+     * 생산투입(출고) — 입력 수량(qty)만큼 BOM 자재를 FIFO로 출고하여 작업지시에 묶는다.
      *
      * 처리 순서:
-     *  1. BOM 재료 목록 조회
-     *  2. 재료별 재고 사전 검증 (부족 시 RuntimeException("stock_error") 발생)
-     *  3. 생산 결과 LOT 신규 생성
-     *  4. 재료별 FIFO 차감 + io 출고 기록 + lot_relation 기록
-     *  5. work_order 완료 처리 + 생산계획 완료 여부 갱신
+     *  1. 입력 수량 검증 (1 ≤ qty ≤ min(재고기준 최대, order_qty − input_qty)이 아니면 "qty_error")
+     *  2. BOM 자재별 FIFO(QC합격·유통기한 유효) 차감 + io 출고 + order_lot 기록 + stock 차감
+     *  3. work_order.input_qty += qty
      *
-     * @param work_order_id 생산실적을 처리할 작업지시 ID
-     * @throws RuntimeException "stock_error" - BOM 기준 재고가 부족할 때
+     * @param work_order_id 작업지시 ID
+     * @param qty           이번에 투입(출고)할 생산 수량
+     * @throws RuntimeException "qty_error"
+     */
+    void input(String work_order_id, int qty);
+
+    /**
+     * 작업완료(생산) — 이미 투입된 분량(input_qty − current_qty)만큼 완제품 LOT을 생성한다.
+     * 자재는 생산투입 단계에서 이미 차감되었으므로 재차감하지 않는다.
+     *
+     * @param work_order_id 작업지시 ID
+     * @throws RuntimeException "nothing" - 투입된(미생산) 분량이 없을 때
      */
     void produce(String work_order_id);
+
+    /**
+     * 투입취소 — 아직 생산되지 않은(남은) 투입 자재만 환원한다.
+     * 환원량 = 자재별 required_qty × (input_qty − current_qty). 이미 소모된 분량은 환원하지 않는다.
+     *
+     * @param work_order_id 작업지시 ID
+     */
+    void cancelInput(String work_order_id);
+
+    /**
+     * 상세 페이지의 소모자재/재고/투입·생산 가능 수량 정보를 계산해 반환한다.
+     * 가용재고는 QC 합격 FIFO LOT 합계를 기준으로 한다.
+     *
+     * @param work_order_id 작업지시 ID
+     * @return Map { materials:[...], remaining, maxProducible, inputtable, maxInput, pendingProduce, input_qty }
+     */
+    Map<String, Object> getProduceInfo(String work_order_id);
+
+    /** 작업지시에 투입된 LOT 목록 조회 (상세 표시용) */
+    List<Map<String, Object>> getOrderLots(int order_num);
 
     /**
      * 담당자 선택 옵션 목록을 반환한다. (등록 모달 드롭다운용)

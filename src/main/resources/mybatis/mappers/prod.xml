@@ -136,13 +136,24 @@
         FROM facility
     </select>
 
-    <!-- 제품 드롭다운 옵션 조회 (PRODUCT + SEMIPRODUCT) -->
+    <!-- 제품 드롭다운 옵션 조회 (PRODUCT + SEMIPRODUCT, 검색용 — 기능중단 품목 포함) -->
     <select id="getItemOptions" resultType="SelectOptionDTO">
         SELECT item_num AS num,
                name || CASE WHEN item_status = 'N' THEN ' (기능중단)' ELSE '' END AS name,
                type AS type
         FROM item
         WHERE type IN ('PRODUCT', 'SEMIPRODUCT')
+        ORDER BY type, name
+    </select>
+
+    <!-- 제품 드롭다운 옵션 조회 (등록 모달용 — 활성 품목만, 기능중단 제외) -->
+    <select id="getActiveItemOptions" resultType="SelectOptionDTO">
+        SELECT item_num AS num,
+               name     AS name,
+               type     AS type
+        FROM item
+        WHERE type IN ('PRODUCT', 'SEMIPRODUCT')
+          AND item_status = 'Y'
         ORDER BY type, name
     </select>
 

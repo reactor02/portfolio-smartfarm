@@ -49,10 +49,10 @@ public class WorkDAOImpl implements WorkDAO {
         return session.update("kr.or.smartfarm.work.updateStatus", workDTO);
     }
 
-    /** 생산 완료 처리 — 작업지시 상태를 '완료'로 갱신 */
+    /** 부분 생산 처리 — current_qty 증분, 지시수량 도달 시 '완료'로 갱신 */
     @Override
-    public int produce(WorkDTO workDTO) {
-        return session.update("kr.or.smartfarm.work.produce", workDTO);
+    public int produce(Map<String, Object> params) {
+        return session.update("kr.or.smartfarm.work.produce", params);
     }
 
     /** 해당 생산계획의 작업지시가 모두 끝났으면 plan_status도 '완료'로 동기화 */
@@ -103,6 +103,12 @@ public class WorkDAOImpl implements WorkDAO {
         return session.selectList("kr.or.smartfarm.work.getMaterialsByItem", item_num);
     }
 
+    /** 품목의 BOM 재료 목록 + 품목명/코드 조회 — 상세 페이지 소모자재/재고 표시용 */
+    @Override
+    public List<BomDTO> getBomMaterialsDetail(int item_num) {
+        return session.selectList("kr.or.smartfarm.work.getBomMaterialsDetail", item_num);
+    }
+
     /** 자재 입출고(io) 이력 기록 — 생산투입 출고 등 */
     @Override
     public void insertIo(Map<String, Object> params) {
@@ -125,6 +131,50 @@ public class WorkDAOImpl implements WorkDAO {
     @Override
     public List<Map<String, Object>> getProcessesByItem(int item_num) {
         return session.selectList("kr.or.smartfarm.work.getProcessesByItem", item_num);
+    }
+
+    /* ── 생산투입(order_lot) 관련 ── */
+
+    /** 작업지시 누적 투입수량(input_qty) 가감 */
+    @Override
+    public int addInputQty(Map<String, Object> params) {
+        return session.update("kr.or.smartfarm.work.addInputQty", params);
+    }
+
+    /** 투입 LOT 배정 등록 */
+    @Override
+    public void insertOrderLot(Map<String, Object> params) {
+        session.insert("kr.or.smartfarm.work.insertOrderLot", params);
+    }
+
+    /** 작업지시에 투입된 LOT 목록 조회 (상세 표시용) */
+    @Override
+    public List<Map<String, Object>> getOrderLots(int order_num) {
+        return session.selectList("kr.or.smartfarm.work.getOrderLots", order_num);
+    }
+
+    /** 투입취소용 order_lot 목록 (LIFO) */
+    @Override
+    public List<Map<String, Object>> getOrderLotsForCancel(int order_num) {
+        return session.selectList("kr.or.smartfarm.work.getOrderLotsForCancel", order_num);
+    }
+
+    /** order_lot 부분 환원 (qty 감소) */
+    @Override
+    public int reduceOrderLot(Map<String, Object> params) {
+        return session.update("kr.or.smartfarm.work.reduceOrderLot", params);
+    }
+
+    /** order_lot 전량 환원 (행 삭제) */
+    @Override
+    public int deleteOrderLot(int order_lot_num) {
+        return session.delete("kr.or.smartfarm.work.deleteOrderLot", order_lot_num);
+    }
+
+    /** LOT 수량 환원 (투입취소 시 deductQty 역연산) */
+    @Override
+    public int restoreLotQty(Map<String, Object> params) {
+        return session.update("kr.or.smartfarm.work.restoreLotQty", params);
     }
 
     /** 작업지시 담당자 emp_num 조회 (취소/완료 권한 검증용) */

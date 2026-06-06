@@ -1,0 +1,151 @@
+@charset "UTF-8";
+
+/* ═══════════════════════════════════════════════════
+   lotRoute.css — LOT 공정 라우트(Routing) 가로 흐름도
+   공정 노드 + 화살표, 노드 위로 투입 자재 칩 합류
+   (색/토큰은 detail-common.css 의 :root 변수 재사용)
+   ═══════════════════════════════════════════════════ */
+
+/* 가로 스크롤 컨테이너 */
+.route-scroll {
+    overflow-x: auto;
+    padding: 10px 4px 6px;
+    border: 1px solid var(--border-cl);
+    border-radius: 8px;
+    background-color: #fff;
+}
+
+/* 단계들을 가로로 — 노드를 아래쪽 기준선에 정렬(자재 칩은 위로 자람) */
+.route-flow {
+    display: flex;
+    align-items: flex-end;
+    gap: 58px;
+    padding: 24px 20px 28px;
+    width: max-content;        /* 내용만큼 늘어나 가로 스크롤 발생 */
+    min-width: 100%;
+}
+
+/* 한 단계 (자재칩 + 커넥터 + 공정노드) */
+.route-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 180px;
+}
+
+/* ── 투입 자재 칩 묶음 (노드 위) ── */
+.mat-chips {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    min-height: 64px;          /* 칩 수가 달라도 노드 시작선 정렬 */
+    justify-content: flex-end;
+}
+.mat-chip {
+    background: var(--p-cl);
+    color: #1b4332;
+    border: 1px solid var(--s-cl);
+    border-radius: 14px;
+    padding: 4px 12px;
+    font-size: 12px;
+    font-weight: bold;
+    white-space: nowrap;
+}
+.mat-chip b { margin-left: 4px; color: var(--m-cl); }
+.mat-none {
+    font-size: 11px;
+    color: #aaa;
+    font-style: italic;
+}
+
+/* 자재 → 공정 합류 커넥터(▼) */
+.mat-connector {
+    color: var(--s-cl);
+    font-size: 14px;
+    line-height: 1;
+    margin: 4px 0 6px;
+}
+
+/* ── 공정 노드 카드 ── */
+.route-node {
+    position: relative;
+    width: 100%;
+    background: #fff;
+    border: 2px solid var(--m-cl);
+    border-radius: 10px;
+    padding: 14px 12px 12px;
+    text-align: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+}
+
+/* 단계 사이 진행 화살표 (마지막 노드 제외) — 노드 세로 중앙에 배치 */
+.route-step:not(:last-child) .route-node::after {
+    content: '\2192';          /* → */
+    position: absolute;
+    right: -44px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 30px;
+    font-weight: bold;
+    color: var(--s-cl);
+}
+
+/* 공정 순서 배지 */
+.node-order {
+    width: 30px; height: 30px;
+    line-height: 30px;
+    margin: 0 auto 8px;
+    border-radius: 50%;
+    background: var(--m-cl);
+    color: #fff;
+    font-weight: bold;
+    font-size: 14px;
+}
+.node-content {
+    font-size: 13px;
+    font-weight: bold;
+    color: var(--txt);
+    margin-bottom: 8px;
+    /* 긴 설명은 3줄까지만 */
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+.node-meta {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 5px;
+}
+.node-tag {
+    background: var(--bg);
+    border: 1px solid var(--border-cl);
+    border-radius: 10px;
+    padding: 2px 8px;
+    font-size: 11px;
+    color: #666;
+}
+
+/* "공정 미지정" 가상 노드 — 점선/회색 강조 */
+.route-node-etc {
+    border-style: dashed;
+    border-color: #aaa;
+}
+.route-node-etc .node-order { background: #aaa; }
+
+/* 안내 문구 / 빈 상태 */
+.route-hint {
+    margin-top: 12px;
+    font-size: 12px;
+    color: #888;
+}
+.route-empty {
+    padding: 40px;
+    text-align: center;
+    color: #aaa;
+    border: 1px solid var(--border-cl);
+    border-radius: 8px;
+    background-color: #fff;
+}

@@ -11,6 +11,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -180,23 +181,61 @@ public class ShipmentController {
         return result;
     }
 
+    /**
+     * 출하 상세 — 수동 선택용 후보 LOT(FIFO) 목록을 JSON 으로 반환한다.
+     * item_num/plan_qty 등 신뢰가 필요한 값은 서버에서 selectDetail 로 재조회한다.
+     */
+    @RequestMapping("/shipmentCandidateLots")
+    @ResponseBody
+    public List shipmentCandidateLots(@RequestParam("shipmentId") String shipmentId) {
+        Map detail = shipmentService.selectDetail(shipmentId);
+        if (detail == null || detail.get("ITEM_NUM") == null) {
+            return new java.util.ArrayList();
+        }
+        int itemNum = ((Number) detail.get("ITEM_NUM")).intValue();
+        return shipmentService.selectShippableLots(itemNum);
+    }
+
+    /**
+     * 출하확정(수동 LOT 선택) — JSON 본문 {@code {shipmentId, force, selections:[{lot_num,qty}]}}.
+     *
+     * <p>empNum 은 세션에서, plan_qty·shipment_num·shipment_request_num 은 서버에서
+     * selectDetail 로 재조회한다(클라이언트 값 불신). 결과는 JSON {status, reason}.</p>
+     */
     @PostMapping("/confirmShipment")
-    public String confirmShipment(
-            @RequestParam("shipmentNum")        int    shipmentNum,
-            @RequestParam("shipmentId")         String shipmentId,
-            @RequestParam("shipmentRequestNum") String shipmentRequestNum,
-            HttpSession session) {
+    @ResponseBody
+    public Map confirmShipment(@RequestBody Map payload, HttpSession session) {
+        Map result = new HashMap();
 
         LoginDTO loginUser = (LoginDTO) session.getAttribute("loginUser");
-        if (loginUser == null) return "redirect:/login";
+        if (loginUser == null) {
+            result.put("status", "error");
+            result.put("reason", "login");
+            return result;
+        }
+
+        String shipmentId = (String) payload.get("shipmentId");
 
         // [권한] 담당자 또는 실무자 본인만 출하확정 가능
         String me              = loginUser.getEmp_num();
         String recordEmpNum    = shipmentService.getEmpNum(shipmentId);    // 담당자
         String recordWorkerNum = shipmentService.getWorkerNum(shipmentId); // 실무자
         if (me == null || !(me.equals(recordEmpNum) || me.equals(recordWorkerNum))) {
-            return "redirect:/shipmentDetail/" + shipmentId + "?error=forbidden";
+            result.put("status", "error");
+            result.put("reason", "forbidden");
+            return result;
         }
+
+        // 서버 신뢰값 재조회
+        Map detail = shipmentService.selectDetail(shipmentId);
+        if (detail == null || detail.get("SHIPMENT_NUM") == null) {
+            result.put("status", "error");
+            result.put("reason", "not_found");
+            return result;
+        }
+        int    shipmentNum        = ((Number) detail.get("SHIPMENT_NUM")).intValue();
+        int    planQty            = ((Number) detail.get("PLAN_QTY")).intValue();
+        String shipmentRequestNum = String.valueOf(detail.get("SHIPMENT_REQUEST_NUM"));
 
         int empNum = 1;
         try {
@@ -205,19 +244,21 @@ public class ShipmentController {
             e.printStackTrace();
         }
 
-        Map map = new HashMap();
-        map.put("shipment_num",        shipmentNum);
-        map.put("shipment_request_num", shipmentRequestNum);
-        map.put("emp_num",             empNum);
+        boolean force = Boolean.TRUE.equals(payload.get("force"));
+        List<Map> selections = (List<Map>) payload.get("selections");
 
-        // [방어] 확정 중 재고 부족(stock_error) 등 예외 발생 시 트랜잭션은 롤백되며,
-        //        화면에 알림을 띄우기 위해 error 파라미터를 붙여 상세 페이지로 redirect.
+        // [방어] 검증 실패(under/over/empty)·재고 부족(stock_error) 시 트랜잭션 롤백,
+        //        실패 사유를 JSON 으로 surface 하여 화면이 알림/경고를 띄운다.
         try {
-            shipmentService.confirmShipment(map);
+            shipmentService.confirmShipmentManual(
+                    shipmentNum, shipmentRequestNum, empNum, planQty, selections, force);
         } catch (RuntimeException e) {
-            return "redirect:/shipmentDetail/" + shipmentId + "?error=stock";
+            result.put("status", "error");
+            result.put("reason", e.getMessage());
+            return result;
         }
-        return "redirect:/shipmentDetail/" + shipmentId;
+        result.put("status", "ok");
+        return result;
     }
 
     @PostMapping("/cancelShipment")

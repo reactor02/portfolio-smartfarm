@@ -27,15 +27,9 @@ response.setContentType("text/html; charset=utf-8");
     <div class="hdr">
         <h1>출하 상세</h1>
         <div class="hdr-right">
-            <%-- 출하확정: 담당자 또는 실무자 본인만 노출 --%>
+            <%-- 등록완료(수동 LOT 선택 확정): 담당자 또는 실무자 본인만 노출 --%>
             <c:if test="${canConfirm and detail.SHIPMENT_STATUS == '출하대기'}">
-                <form method="POST" action="/confirmShipment" style="display:inline;">
-                    <input type="hidden" name="shipmentNum"        value="${detail.SHIPMENT_NUM}">
-                    <input type="hidden" name="shipmentId"         value="${detail.SHIPMENT_ID}">
-                    <input type="hidden" name="shipmentRequestNum" value="${detail.SHIPMENT_REQUEST_NUM}">
-                    <button type="submit" class="btn-action btn-primary"
-                            onclick="return confirm('출하확정하시겠습니까? 재고가 차감됩니다.')">출하확정</button>
-                </form>
+                <button type="button" class="btn-action btn-primary" onclick="submitConfirm()">등록완료</button>
             </c:if>
             <%-- 취소버튼: e_level >= 3(사장) 또는 담당자 본인 + 진행 가능 상태 --%>
             <c:if test="${canCancel and detail.SHIPMENT_STATUS != '취소' and detail.SHIPMENT_STATUS != '출하완료'}">
@@ -124,6 +118,31 @@ response.setContentType("text/html; charset=utf-8");
                 </div>
                 <div class="progress-text" id="progressText"></div>
             </div>
+
+            <%-- ══ 출하 LOT 수동 선택 (출하대기 + 권한 있을 때만) ══ --%>
+            <c:if test="${canConfirm and detail.SHIPMENT_STATUS == '출하대기'}">
+            <div class="section-box">
+                <div class="section-title">출하 LOT 선택 (FIFO · 오래된 순)</div>
+                <table class="data-table" id="candTable">
+                    <thead>
+                        <tr>
+                            <th>LOT 코드</th>
+                            <th>생성일</th>
+                            <th>유통기한</th>
+                            <th>보유수량</th>
+                            <th>출하수량(입력)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="candBody">
+                        <tr><td colspan="5" class="empty-cell">후보 LOT을 불러오는 중...</td></tr>
+                    </tbody>
+                </table>
+                <div class="progress-text" style="margin-top:8px;">
+                    선택 합계 <b id="selTotal">0</b> / 계획 <b>${detail.PLAN_QTY}</b> EA
+                    <span id="selHint" style="color:#c0392b;"></span>
+                </div>
+            </div>
+            </c:if>
 
             <div class="section-box">
                 <div class="section-title">연결 주문 정보</div>
@@ -225,6 +244,11 @@ response.setContentType("text/html; charset=utf-8");
 <script>
     var PLAN_QTY     = parseInt('${detail.PLAN_QTY}') || 0;
     var COMPLETE_QTY = parseInt('${completeQty}')     || 0;
+
+    // 수동 LOT 선택/확정용 전역
+    var SHIPMENT_ID = '${detail.SHIPMENT_ID}';
+    var ITEM_NUM    = parseInt('${detail.ITEM_NUM}') || 0;
+    var EDITABLE    = ${(canConfirm and detail.SHIPMENT_STATUS == '출하대기') ? 'true' : 'false'};
 
     var SHIPMENT_DATA = {
         shipmentId:  '${detail.SHIPMENT_ID}',

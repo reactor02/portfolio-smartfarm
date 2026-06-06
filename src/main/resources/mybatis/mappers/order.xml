@@ -96,6 +96,7 @@
                wo.order_status  AS work_status,
                wo.emp_num,
                wo.current_qty,
+               NVL(wo.input_qty, 0) AS input_qty,
                wo.content,
                wo.created_at,
                wo.order_start,
@@ -209,12 +210,12 @@
           AND order_status NOT IN ('완료', '취소')
     </update>
 
-    <!-- 작업 등록: current_qty=order_qty, order_end=SYSDATE, status=DONE (DONE/취소면 무시) -->
-    <update id="produce" parameterType="WorkDTO">
+    <!-- 부분 생산 처리: current_qty 증분(+qty), 지시수량 도달 시에만 order_end/status='완료' (DONE/취소면 무시) -->
+    <update id="produce" parameterType="map">
         UPDATE work_order
-        SET current_qty  = order_qty,
-            order_end    = SYSDATE,
-            order_status = '완료'
+        SET current_qty  = current_qty + #{qty},
+            order_status = CASE WHEN current_qty + #{qty} &gt;= order_qty THEN '완료' ELSE order_status END,
+            order_end    = CASE WHEN current_qty + #{qty} &gt;= order_qty THEN SYSDATE ELSE order_end END
         WHERE order_id = #{work_order_id}
           AND order_status != '완료'
           AND order_status != '취소'
@@ -241,6 +242,15 @@
         FROM bom
         WHERE item_num   = #{item_num}
           AND bom_status = 'Y'
+    </select>
+
+    <!-- BOM 재료 목록 + 품목명/코드 (상세 페이지 소모자재/재고 표시용) -->
+    <select id="getBomMaterialsDetail" parameterType="int" resultType="BomDTO">
+        SELECT b.item_num2, b.required_qty, i.name, i.code
+        FROM bom b
+        JOIN item i ON b.item_num2 = i.item_num
+        WHERE b.item_num   = #{item_num}
+          AND b.bom_status = 'Y'
     </select>
 
     <!-- 재료 출고 io 기록 -->
@@ -279,6 +289,69 @@
         UPDATE stock
         SET stock_qty = GREATEST(NVL(stock_qty, 0) + #{qty}, 0)
         WHERE item_num = #{itemNum}
+    </update>
+
+    <!-- ── 생산투입(order_lot) : shipment_lot 패턴 미러 ── -->
+
+    <!-- 누적 투입수량 가감 (생산투입 +, 투입취소 -) -->
+    <update id="addInputQty" parameterType="map">
+        UPDATE work_order
+        SET input_qty = NVL(input_qty, 0) + #{delta}
+        WHERE order_id = #{work_order_id}
+    </update>
+
+    <!-- 투입 LOT 배정 등록 -->
+    <insert id="insertOrderLot" parameterType="map">
+        INSERT INTO order_lot (order_lot_num, order_num, lot_num, qty)
+        VALUES (ORDER_LOT_SEQ.NEXTVAL, #{order_num}, #{lot_num}, #{qty})
+    </insert>
+
+    <!-- 작업지시에 투입된 LOT 목록 (상세 표시용) -->
+    <select id="getOrderLots" parameterType="int" resultType="hashMap">
+        SELECT ol.order_lot_num,
+               ol.lot_num,
+               ol.qty,
+               l.lot_code,
+               i.name AS item_name,
+               TO_CHAR(l.lot_date,    'YYYY-MM-DD') AS lot_date,
+               TO_CHAR(l.expiry_date, 'YYYY-MM-DD') AS expiry_date
+        FROM order_lot ol
+        JOIN lot  l ON ol.lot_num  = l.lot_num
+        JOIN item i ON l.item_num  = i.item_num
+        WHERE ol.order_num = #{order_num}
+        ORDER BY l.lot_date ASC, ol.order_lot_num ASC
+    </select>
+
+    <!-- 투입취소용: 자재 item_num·LOT 포함, 되돌릴 때 LIFO(lot_date DESC) 처리 -->
+    <select id="getOrderLotsForCancel" parameterType="int" resultType="hashMap">
+        SELECT ol.order_lot_num,
+               ol.lot_num,
+               ol.qty,
+               l.item_num
+        FROM order_lot ol
+        JOIN lot l ON ol.lot_num = l.lot_num
+        WHERE ol.order_num = #{order_num}
+        ORDER BY l.lot_date DESC, ol.order_lot_num DESC
+    </select>
+
+    <!-- order_lot 부분 환원: qty 감소 -->
+    <update id="reduceOrderLot" parameterType="map">
+        UPDATE order_lot
+        SET qty = qty - #{qty}
+        WHERE order_lot_num = #{order_lot_num}
+          AND qty >= #{qty}
+    </update>
+
+    <!-- order_lot 전량 환원: 행 삭제 -->
+    <delete id="deleteOrderLot" parameterType="int">
+        DELETE FROM order_lot WHERE order_lot_num = #{order_lot_num}
+    </delete>
+
+    <!-- LOT 수량 환원 (투입취소 시 deductQty의 역연산) -->
+    <update id="restoreLotQty" parameterType="map">
+        UPDATE lot
+        SET current_qty = current_qty + #{qty}
+        WHERE lot_num = #{lot_num}
     </update>
 
     <!-- 작업지시 상세용: 품목별 공정 목록 (작업순서 오름차순) -->

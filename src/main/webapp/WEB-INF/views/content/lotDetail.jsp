@@ -21,6 +21,7 @@
     <div class="hdr">
         <h1>LOT 관리 상세</h1>
         <div class="hdr-right">
+            <button type="button" class="btn-action" onclick="location.href='/lot/${lotCode}/route'">공정 라우트</button>
             <button type="button" class="btn-action" onclick="location.href='/lot'">목록으로</button>
         </div>
     </div>

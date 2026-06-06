@@ -61,4 +61,16 @@ public class LotRelationDAOImpl implements LotRelationDAO {
     public List<Map<String, Object>> getLotHistory(java.util.Map<String,Object> param) {
         return session.selectList("kr.or.smartfarm.lot.getLotHistory", param);
     }
+
+    /** 공정 라우트 — 품목의 공정 단계(flow 순) + 각 공정 투입 자재 (평면 행, 서비스에서 그룹핑) */
+    @Override
+    public List<Map<String, Object>> getRouteByItem(int item_num) {
+        return session.selectList("kr.or.smartfarm.lot.getRouteByItem", item_num);
+    }
+
+    /** 공정 미지정(bom.process_num IS NULL) 자재 목록 */
+    @Override
+    public List<Map<String, Object>> getUnassignedMaterials(int item_num) {
+        return session.selectList("kr.or.smartfarm.lot.getUnassignedMaterials", item_num);
+    }
 }

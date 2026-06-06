@@ -124,4 +124,12 @@ public class ProdDAOImpl implements ProdDAO {
     public String getEmpNum(String plan_id) {
         return session.selectOne("kr.or.smartfarm.prod.getEmpNum", plan_id);
     }
+
+	@Override
+	public List<SelectOptionDTO> getActiveItemOptions() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
 }

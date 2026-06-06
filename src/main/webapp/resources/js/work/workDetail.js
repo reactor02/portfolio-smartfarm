@@ -2,7 +2,7 @@
  * workDetail.js — 작업지시 상세 화면 스크립트
  *   진행률 게이지 렌더링 + 시작/완료/생산/취소 액션(AJAX POST).
  *   ORDER_QTY/CURRENT_QTY/ORDER_START/WORK_ORDER_ID 전역값은 JSP가 주입한다.
- *   서버 응답 문자열(date_error/stock_error/error)에 따라 분기 처리한다.
+ *   서버 응답 문자열(date_error/qty_error/error)에 따라 분기 처리한다.
  */
 
 // 로딩 시 (현재수량/지시수량) 비율로 진행률 바를 채운다(최대 100%)
@@ -59,19 +59,78 @@ function completeWork() {
         .catch(function() { alert('처리 중 오류가 발생했습니다.'); });
 }
 
-/** 생산 처리 — 서버에서 BOM 자재 차감/LOT 생성. 재고 부족 시 stock_error 알림 */
+/** 생산투입 모달 열기 — 수량 입력칸 기본값/상한을 최대 투입 가능 수량으로 설정 */
+function openInputModal() {
+    if (MAX_INPUT <= 0) {
+        alert('투입 가능한 재고가 없습니다.\nBOM 기준 재고를 확인해주세요.');
+        return;
+    }
+    document.getElementById('produceMax').innerText = MAX_INPUT;
+    var input = document.getElementById('produceQty');
+    input.max   = MAX_INPUT;
+    input.value = MAX_INPUT;   // 기본값 = 최대 투입 가능 수량
+    document.getElementById('produceModal').style.display = 'flex';
+}
+
+function closeProduceModal() {
+    document.getElementById('produceModal').style.display = 'none';
+}
+
+/** 생산투입(출고) — 입력 수량(1~최대)만큼 서버에서 BOM 자재 FIFO 출고 + order_lot 기록 */
+function submitInput() {
+    var qty = parseInt(document.getElementById('produceQty').value);
+    if (!qty || qty < 1) { alert('투입 수량은 1 이상이어야 합니다.'); return; }
+    if (qty > MAX_INPUT) {
+        alert('입력 수량이 투입 가능 수량(' + MAX_INPUT + ')을 초과합니다.');
+        return;
+    }
+    fetch('/work/' + WORK_ORDER_ID + '/input', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: 'qty=' + qty
+    })
+        .then(function(r) { return r.text(); })
+        .then(function(result) {
+            if (result === 'forbidden')    { alert('담당자 또는 실무자만 가능합니다.'); return; }
+            if (result === 'unauthorized') { location.href = '/login'; return; }
+            if (result === 'qty_error') {
+                alert('입력 수량이 투입 가능 수량을 초과합니다.\nBOM 기준 재고를 확인해주세요.');
+                return;
+            }
+            if (result === 'error') { alert('처리 중 오류가 발생했습니다.'); return; }
+            location.reload();
+        })
+        .catch(function() { alert('처리 중 오류가 발생했습니다.'); });
+}
+
+/** 작업완료(생산) — 투입된 미생산 분량만큼 완제품 LOT 생성 (자재 재차감 없음) */
 function produceWork() {
-    if (!confirm('지시수량(' + ORDER_QTY + ')만큼 생산 완료 처리하시겠습니까?')) return;
+    if (PENDING_PRODUCE <= 0) {
+        alert('먼저 생산투입을 해주세요.');
+        return;
+    }
+    if (!confirm('투입분 ' + PENDING_PRODUCE + '개를 완제품으로 생산 완료하시겠습니까?')) return;
     fetch('/work/' + WORK_ORDER_ID + '/produce', { method: 'POST' })
         .then(function(r) { return r.text(); })
         .then(function(result) {
             if (result === 'forbidden')    { alert('담당자 또는 실무자만 가능합니다.'); return; }
             if (result === 'unauthorized') { location.href = '/login'; return; }
-            if (result === 'stock_error') {
-                alert('원재료 재고가 부족합니다.\nBOM 기준 재고를 확인해주세요.');
-                return;
-            }
-            if (result === 'error') { alert('처리 중 오류가 발생했습니다.'); return; }
+            if (result === 'nothing')      { alert('먼저 생산투입을 해주세요.'); return; }
+            if (result === 'error')        { alert('처리 중 오류가 발생했습니다.'); return; }
+            location.reload();
+        })
+        .catch(function() { alert('처리 중 오류가 발생했습니다.'); });
+}
+
+/** 투입취소 — 아직 생산되지 않은 남은 투입 자재를 되돌린다 */
+function cancelInput() {
+    if (!confirm('남은 투입 자재(' + PENDING_PRODUCE + '개분)를 되돌립니다.\n이미 생산된 분량은 환원되지 않습니다.')) return;
+    fetch('/work/' + WORK_ORDER_ID + '/input-cancel', { method: 'POST' })
+        .then(function(r) { return r.text(); })
+        .then(function(result) {
+            if (result === 'forbidden')    { alert('담당자 또는 실무자만 가능합니다.'); return; }
+            if (result === 'unauthorized') { location.href = '/login'; return; }
+            if (result === 'error')        { alert('처리 중 오류가 발생했습니다.'); return; }
             location.reload();
         })
         .catch(function() { alert('처리 중 오류가 발생했습니다.'); });

@@ -55,14 +55,14 @@ public interface WorkDAO {
     int updateStatus(WorkDTO workDTO);
 
     /**
-     * 생산실적 처리: current_qty = order_qty, order_end = SYSDATE, order_status = '완료' 로 갱신.
+     * 부분 생산실적 처리: current_qty += qty, 지시수량 도달 시 order_end=SYSDATE·order_status='완료'.
      * SQL: kr.or.smartfarm.work.produce
      * 이미 완료·취소 상태이면 UPDATE가 무시된다.
      *
-     * @param workDTO work_order_id가 담긴 DTO
+     * @param params Map { work_order_id, qty }
      * @return UPDATE 행 수
      */
-    int produce(WorkDTO workDTO);
+    int produce(Map<String, Object> params);
 
     /**
      * 작업 완료 후 생산계획의 완료 여부를 검사하여 완료 처리한다.
@@ -135,6 +135,15 @@ public interface WorkDAO {
     List<BomDTO> getMaterialsByItem(int item_num);
 
     /**
+     * 완성품 item_num 기준 BOM 재료 목록을 품목명/코드와 함께 조회한다. (상세 페이지 표시용)
+     * SQL: kr.or.smartfarm.work.getBomMaterialsDetail
+     *
+     * @param item_num 완성품 또는 반제품의 item_num
+     * @return BOM 재료 목록 (item_num2, required_qty, name, code)
+     */
+    List<BomDTO> getBomMaterialsDetail(int item_num);
+
+    /**
      * 재료 출고 내역을 io 테이블에 INSERT 한다.
      * SQL: kr.or.smartfarm.work.insertIo
      *
@@ -175,6 +184,29 @@ public interface WorkDAO {
 
     /** 품목별 공정 목록 조회 (작업순서 오름차순, 작업지시 상세 페이지용) */
     List<Map<String, Object>> getProcessesByItem(int item_num);
+
+    /* ── 생산투입(order_lot) 관련 ── */
+
+    /** 작업지시 누적 투입수량(input_qty) 가감. params { work_order_id, delta } */
+    int addInputQty(Map<String, Object> params);
+
+    /** 투입 LOT 배정 등록. params { order_num, lot_num, qty } */
+    void insertOrderLot(Map<String, Object> params);
+
+    /** 작업지시에 투입된 LOT 목록 조회 (상세 표시용, lot_date ASC) */
+    List<Map<String, Object>> getOrderLots(int order_num);
+
+    /** 투입취소용 order_lot 목록 (item_num 포함, lot_date DESC = LIFO) */
+    List<Map<String, Object>> getOrderLotsForCancel(int order_num);
+
+    /** order_lot 부분 환원 (qty 감소). params { order_lot_num, qty } */
+    int reduceOrderLot(Map<String, Object> params);
+
+    /** order_lot 전량 환원 (행 삭제) */
+    int deleteOrderLot(int order_lot_num);
+
+    /** LOT 수량 환원 (투입취소 시 deductQty 역연산). params { lot_num, qty } */
+    int restoreLotQty(Map<String, Object> params);
 
     /**
      * 작업지시 담당자 emp_num 조회 (취소/완료 권한 검증용)

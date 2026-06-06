@@ -138,6 +138,38 @@ public class LotController {
      * @param lot_code  URL 경로 변수 — LOT 코드 문자열
      * @return          롯이력 목록 (JSON 배열). lot_code가 없으면 빈 리스트 반환.
      */
+    /**
+     * 공정 라우트(Routing) 화면 — GET /lot/{lot_code}/route
+     *
+     * <p>이 LOT 품목의 공정 경로를 가로 흐름도로 보여준다. 각 공정 노드 위에
+     * 그 공정에서 투입되는 자재(bom.process_num 매핑)가 칩으로 합류한다.
+     * 존재하지 않는 lot_code 는 detail()과 동일하게 alert 후 목록으로 되돌린다.</p>
+     *
+     * @param lot_code  URL 경로 변수 — LOT 코드
+     * @return          Tiles 정의 이름("content/lotRoute.tiles"), 없으면 null
+     */
+    @RequestMapping("/{lot_code}/route")
+    public String route(@PathVariable String lot_code, Model model,
+                        HttpServletRequest request, HttpServletResponse response) throws IOException {
+        LotDTO lotDTO = lotService.selectOne(lot_code);
+        if (lotDTO == null) {
+            String url = request.getContextPath() + "/lot";
+            response.setContentType("text/html; charset=UTF-8");
+            response.getWriter().write(
+                "<script>" +
+                "alert('해당 LOT가 존재하지 않습니다.');" +
+                "location.href='" + url + "';" +
+                "</script>"
+            );
+            return null;
+        }
+        model.addAttribute("lotCode", lot_code);
+        model.addAttribute("lotDTO",  lotDTO);
+        // 공정 경로 + 단계별 투입 자재 (품목 기준)
+        model.addAttribute("steps",   lotService.getRoute(lotDTO.getItem_num()));
+        return "content/lotRoute.tiles";
+    }
+
     /* ── 롯이력 AJAX ── */
     @RequestMapping("/{lot_code}/lotHistory")
     @ResponseBody

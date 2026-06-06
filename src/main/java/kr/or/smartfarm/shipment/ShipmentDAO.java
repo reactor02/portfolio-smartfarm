@@ -1,5 +1,6 @@
 package kr.or.smartfarm.shipment;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -14,11 +15,9 @@ public interface ShipmentDAO {
     public List searchShipment(Map map);
     public Map selectDetail(String shipmentId);
     public List selectLots(int shipmentNum);
-    public List getAvailableLots(int itemNum);
     public int insertShipment(Map map);
     public int insertShipmentLot(Map map);
     public int updateRequestStatusToDispatch(String shipmentRequestNum);
-    public List getShipmentLots(int shipmentNum);
     public int deductLotQty(Map map);
     public int insertShipmentIo(Map map);
     public int confirmShipmentStatus(int shipmentNum);
@@ -41,4 +40,22 @@ public interface ShipmentDAO {
 
     /** 출하 실무자 worker_num 조회 (출하확정 권한 검증용) */
     public String getWorkerNum(String shipmentId);
+
+    /** 선택한 LOT의 유통기한(expiry_date) 조회 */
+    public Date getLotExpiry(int lotNum);
+
+    /** 출하에 배정된 LOT들의 유통기한(expiry_date) 목록 조회 */
+    public List<Date> getShipmentLotExpiries(int shipmentNum);
+
+    /** 해당 LOT이 속한 품목의 타입(item.type) 조회 */
+    public String getLotItemType(int lotNum);
+
+    /** 해당 lot_num이 shipment_lot에 배정된 건수 조회 (중복 배정 검증용) */
+    public int countShipmentLotByLotNum(int lotNum);
+
+    /** 해당 품목의 출하 가능 후보 LOT 목록(FIFO) 조회 — PRODUCT·보유>0·유통기한 미경과·미배정·qc PASS */
+    public List<ShippableLotDTO> selectShippableLots(int itemNum);
+
+    /** 확정 시 분할 판단용 — 단건 LOT의 current_qty/item_num/expiry_date 조회 */
+    public Map selectLotForConfirm(int lotNum);
 }

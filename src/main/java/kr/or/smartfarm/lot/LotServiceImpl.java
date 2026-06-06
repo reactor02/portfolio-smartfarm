@@ -1,6 +1,8 @@
 package kr.or.smartfarm.lot;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -158,5 +160,69 @@ public class LotServiceImpl implements LotService {
         param.put("prodLot", prodLot);
         param.put("selfLot", lot_num);
         return relationDao.getLotHistory(param);
+    }
+
+    /**
+     * 공정 라우트 흐름도 데이터 조회 + 그룹핑.
+     *
+     * <p>평면 행(공정 × 자재)을 process_num 기준으로 묶어 단계별 자재 목록을 구성한다.
+     * flow 순서는 쿼리 ORDER BY 로 보장되며, LinkedHashMap 으로 그 순서를 유지한다.
+     * 공정 미지정 자재가 있으면 마지막에 가상 단계(process_num=0, "공정 미지정")로 덧붙인다.</p>
+     */
+    @Override
+    public List<LotRouteStepDTO> getRoute(int item_num) {
+        List<Map<String, Object>> rows = relationDao.getRouteByItem(item_num);
+
+        // process_num → 단계 DTO (등장 순서 = flow 순서 유지)
+        Map<Integer, LotRouteStepDTO> byProcess = new LinkedHashMap<>();
+        for (Map<String, Object> row : rows) {
+            int procNum = toInt(row.get("PROCESS_NUM"));
+            LotRouteStepDTO step = byProcess.get(procNum);
+            if (step == null) {
+                step = new LotRouteStepDTO();
+                step.setProcess_num(procNum);
+                step.setFlow(row.get("FLOW") == null ? null : toInt(row.get("FLOW")));
+                step.setProcess_content((String) row.get("PROCESS_CONTENT"));
+                step.setHead_count(toInt(row.get("HEAD_COUNT")));
+                step.setFacility_name((String) row.get("FACILITY_NAME"));
+                byProcess.put(procNum, step);
+            }
+            // 자재가 매핑된 행이면 칩 추가 (자재 없는 공정은 material_num 이 NULL)
+            if (row.get("MATERIAL_NUM") != null) {
+                step.getMaterials().add(toMaterial(row));
+            }
+        }
+
+        List<LotRouteStepDTO> steps = new ArrayList<>(byProcess.values());
+
+        // 공정 미지정 자재 → 가상 단계로 묶어 마지막에 추가
+        List<Map<String, Object>> unassigned = relationDao.getUnassignedMaterials(item_num);
+        if (unassigned != null && !unassigned.isEmpty()) {
+            LotRouteStepDTO etc = new LotRouteStepDTO();
+            etc.setProcess_num(0);
+            etc.setFlow(null);
+            etc.setProcess_content("공정 미지정");
+            for (Map<String, Object> row : unassigned) {
+                etc.getMaterials().add(toMaterial(row));
+            }
+            steps.add(etc);
+        }
+        return steps;
+    }
+
+    /** 한 행을 자재 칩 DTO로 변환 */
+    private LotRouteMaterialDTO toMaterial(Map<String, Object> row) {
+        LotRouteMaterialDTO m = new LotRouteMaterialDTO();
+        m.setMaterial_num(toInt(row.get("MATERIAL_NUM")));
+        m.setMaterial_name((String) row.get("MATERIAL_NAME"));
+        m.setRequired_qty(toInt(row.get("REQUIRED_QTY")));
+        return m;
+    }
+
+    /** Oracle NUMBER → BigDecimal 등으로 오는 값을 int 로 안전 변환 (null=0) */
+    private int toInt(Object o) {
+        if (o == null) return 0;
+        if (o instanceof Number) return ((Number) o).intValue();
+        return Integer.parseInt(o.toString());
     }
 }

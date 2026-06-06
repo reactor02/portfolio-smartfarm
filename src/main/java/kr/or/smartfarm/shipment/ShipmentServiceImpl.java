@@ -1,5 +1,7 @@
 package kr.or.smartfarm.shipment;
 
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,159 +45,21 @@ public class ShipmentServiceImpl implements ShipmentService {
     }
 
     /**
-     * 출하지시 — SHIPMENT 레코드 생성 + FIFO LOT 배정 + 요청 상태 변경.
+     * 출하지시 — SHIPMENT 레코드(shell)만 생성하고 요청 상태를 '출하대기'로 변경한다.
      *
-     * <p>재고가 계획 수량에 미달하면 가용 LOT까지만 부분 배정한다(사용자 정책상 허용).
-     * {@code @Transactional}이므로 중간 실패 시 전체 롤백된다.</p>
+     * <p>예전에는 여기서 FIFO로 LOT을 자동 배정했으나, 이제 LOT 선택은 상세 페이지에서
+     * 사용자가 수동으로 한다({@link #confirmShipmentManual}). 따라서 지시 시점에는
+     * shipment_lot 행을 만들지 않는다. {@code @Transactional}이므로 실패 시 전체 롤백.</p>
      */
     @Override
     @Transactional
     public void dispatchShipment(Map map) {
-        String shipmentRequestNum = (String) map.get("shipment_request_num");
-        int itemNum  = (Integer) map.get("item_num");
-        int planQty  = (Integer) map.get("plan_qty");
-        int empNum   = (Integer) map.get("emp_num");
-
-        // 1. Insert SHIPMENT record (selectKey gives back shipment_num)
+        // 1. SHIPMENT 레코드 생성 (selectKey 로 shipment_num 채번, plan_qty 등은 map 에 포함)
         shipmentDAO.insertShipment(map);
-        int shipmentNum = (Integer) map.get("shipment_num");
 
-        // 2. FIFO LOT 배정
-        List<Map> availableLots = shipmentDAO.getAvailableLots(itemNum);
-        int remaining = planQty;
-        for (Map lot : availableLots) {
-            if (remaining <= 0) break;
-
-            int lotNum     = ((Number) lot.get("LOT_NUM")).intValue();
-            int currentQty = ((Number) lot.get("CURRENT_QTY")).intValue();
-            int allocQty   = Math.min(remaining, currentQty);
-
-            Map slMap = new HashMap();
-            slMap.put("shipment_num", shipmentNum);
-            slMap.put("lot_num",      lotNum);
-            slMap.put("qty",          allocQty);
-            shipmentDAO.insertShipmentLot(slMap);
-
-            remaining -= allocQty;
-        }
-
-        // 3. Request status → 출하대기
+        // 2. 요청 상태 → 출하대기 (자동 LOT 배정 없음)
+        String shipmentRequestNum = (String) map.get("shipment_request_num");
         shipmentDAO.updateRequestStatusToDispatch(shipmentRequestNum);
-    }
-
-    /**
-     * 출하확정 — 배정된 LOT을 실제 출고 처리한다.
-     *
-     * <p>출하 수량이 LOT 보유 수량보다 적으면 자식 LOT으로 분할하여
-     * 롯이력 추적(lot_relation)이 출하까지 따라가도록 한다.</p>
-     *
-     * <p>[방어] 더블클릭/새로고침으로 인한 중복 확정을 막기 위해
-     * "출하대기 → 출하완료" 상태 변경을 가장 먼저 실행해 해당 건을 선점(claim)한다.
-     * 이미 확정/취소된 건이면 상태 UPDATE의 영향 행이 0이므로 즉시 종료한다.
-     * @Transactional 이므로 이후 단계에서 예외가 나면 이 선점도 함께 롤백된다.</p>
-     */
-    @Override
-    @Transactional
-    public void confirmShipment(Map map) {
-        int    shipmentNum        = (Integer) map.get("shipment_num");
-        String shipmentRequestNum = (String)  map.get("shipment_request_num");
-        int    empNum             = (Integer) map.get("emp_num");
-
-        // [0] 중복 확정 방지 — '출하대기' 상태를 먼저 선점(claim)
-        //     이미 확정/취소된 건이면 영향 행 0 → 무작업 종료(재고 이중 차감 차단)
-        int claimed = shipmentDAO.confirmShipmentStatus(shipmentNum);
-        if (claimed == 0) return;
-
-        // 1. LOT별 수량 처리 (분할 or 직접 출고)
-        List<Map> lots = shipmentDAO.getShipmentLots(shipmentNum);
-        for (Map lot : lots) {
-            int lotNum     = ((Number) lot.get("LOT_NUM")).intValue();
-            int qty        = ((Number) lot.get("QTY")).intValue();
-            int currentQty = ((Number) lot.get("CURRENT_QTY")).intValue();
-
-            if (qty < currentQty) {
-                // ── 분할: 출하 수량 < 보유 수량 ──
-
-                // ① 자식 LOT 생성 (부모 expiry_date 상속)
-                Map childMap = new HashMap();
-                childMap.put("item_num",    ((Number) lot.get("ITEM_NUM")).intValue());
-                childMap.put("qty",         qty);
-                childMap.put("expiry_date", lot.get("EXPIRY_DATE"));
-                shipmentDAO.insertSplitLot(childMap);
-                int childLotNum = ((Number) childMap.get("lot_num")).intValue();
-
-                // ② lot_split: 원본 → 분할 신규
-                Map relMap = new HashMap();
-                relMap.put("origin_lot_num", lotNum);
-                relMap.put("split_lot_num",  childLotNum);
-                shipmentDAO.insertLotSplit(relMap);
-
-                // ③ 부모 LOT: IO 출고 (분할)
-                Map parentIo = new HashMap();
-                parentIo.put("lot_num",   lotNum);
-                parentIo.put("qty",       qty);
-                parentIo.put("emp_num",   empNum);
-                parentIo.put("io_reason", "분할");
-                shipmentDAO.insertShipmentIo(parentIo);
-
-                // ④ 부모 LOT: 수량 차감
-                //    [방어] deductLotQty는 current_qty >= qty 일 때만 차감(음수 재고 방지).
-                //    영향 행이 0이면 보유 수량 부족 → 예외로 전체 트랜잭션 롤백.
-                Map deductParent = new HashMap();
-                deductParent.put("lot_num", lotNum);
-                deductParent.put("qty",     qty);
-                if (shipmentDAO.deductLotQty(deductParent) == 0) {
-                    throw new RuntimeException("stock_error");
-                }
-
-                // ⑤ shipment_lot: 부모 → 자식 교체
-                Map slUpdate = new HashMap();
-                slUpdate.put("shipment_num",   shipmentNum);
-                slUpdate.put("parent_lot_num", lotNum);
-                slUpdate.put("child_lot_num",  childLotNum);
-                shipmentDAO.updateShipmentLotRef(slUpdate);
-
-                // ⑥ 자식 LOT: IO 출고 (출하)
-                Map childIo = new HashMap();
-                childIo.put("lot_num",   childLotNum);
-                childIo.put("qty",       qty);
-                childIo.put("emp_num",   empNum);
-                childIo.put("io_reason", "출하");
-                shipmentDAO.insertShipmentIo(childIo);
-
-                // ⑦ 자식 LOT: 수량 차감 (→ 0)
-                //    방금 생성한 LOT(current_qty=qty)이라 항상 성공하지만 일관성 위해 동일 검사
-                Map deductChild = new HashMap();
-                deductChild.put("lot_num", childLotNum);
-                deductChild.put("qty",     qty);
-                if (shipmentDAO.deductLotQty(deductChild) == 0) {
-                    throw new RuntimeException("stock_error");
-                }
-
-            } else {
-                // ── 분할 불필요: 수량 일치(qty == currentQty) ──
-                //    [방어] qty > currentQty(과배정)인 경우에도 deductLotQty가 0을 반환하므로
-                //    여기서 예외로 롤백된다(음수 재고 방지).
-                Map deductMap = new HashMap();
-                deductMap.put("lot_num", lotNum);
-                deductMap.put("qty",     qty);
-                if (shipmentDAO.deductLotQty(deductMap) == 0) {
-                    throw new RuntimeException("stock_error");
-                }
-
-                Map ioMap = new HashMap();
-                ioMap.put("lot_num",   lotNum);
-                ioMap.put("qty",       qty);
-                ioMap.put("emp_num",   empNum);
-                ioMap.put("io_reason", "출하");
-                shipmentDAO.insertShipmentIo(ioMap);
-            }
-        }
-
-        // 2. 출하 상태 변경은 [0]에서 이미 선점 완료(중복 호출 제거)
-
-        // 3. Request 상태 → 출하완료
-        shipmentDAO.updateRequestStatusToComplete(shipmentRequestNum);
     }
 
     /**
@@ -255,5 +119,199 @@ public class ShipmentServiceImpl implements ShipmentService {
     @Override
     public String getWorkerNum(String shipmentId) {
         return shipmentDAO.getWorkerNum(shipmentId);
+    }
+
+    /**
+     * 선택한 LOT의 유통기한 검증.
+     * 유통기한이 sysdate(현재)보다 이전이면 -1, 아니면 유통기한 그대로 반환한다.
+     */
+    @Override
+    public Object selectLotExpiry(int lotNum) {
+        Date expiry = shipmentDAO.getLotExpiry(lotNum);
+        if (expiry.before(new Date())) {
+            return -1;
+        }
+        return expiry;
+    }
+
+    /**
+     * 출하에 배정된 LOT 중 유통기한이 sysdate보다 늦은(아직 안 지난, 유효한) 롯이
+     * 하나라도 있으면 통과, 하나도 없으면 예외를 던진다.
+     */
+    @Override
+    public void validateUsableLotExists(int shipmentNum) {
+        List<Date> expiries = shipmentDAO.getShipmentLotExpiries(shipmentNum);
+        Date now = new Date();
+        for (Date expiry : expiries) {
+            if (expiry.after(now)) {
+                return; // 유통기한 안 지난(유효한) 롯이 하나라도 있으면 통과
+            }
+        }
+        throw new RuntimeException("no_usable_lot");
+    }
+
+    /**
+     * 출하 배정 전 LOT 검증.
+     * 1) 품목 타입이 PRODUCT가 아니면 예외, 2) 이미 shipment_lot에 배정된 롯이면 예외.
+     */
+    @Override
+    public void validateLotForShipment(int lotNum) {
+        String type = shipmentDAO.getLotItemType(lotNum);
+        if (type == null || !"PRODUCT".equalsIgnoreCase(type)) {
+            throw new RuntimeException("not_product");
+        }
+        if (shipmentDAO.countShipmentLotByLotNum(lotNum) > 0) {
+            throw new RuntimeException("already_allocated");
+        }
+    }
+
+    /**
+     * 후보 LOT 중 출하 가능한 롯만 골라 list로 모은다.
+     * 하나도 없으면 예외를 던진다.
+     */
+    @Override
+    public List<Integer> collectShippableLots(List<Integer> lotNums) {
+        List<Integer> shippable = new ArrayList<Integer>();
+        for (Integer lotNum : lotNums) {
+            if (isShippableLot(lotNum)) {
+                shippable.add(lotNum);
+            }
+        }
+        if (shippable.isEmpty()) {
+            throw new RuntimeException("no_shippable_lot");
+        }
+        return shippable;
+    }
+
+    /** PRODUCT 타입 + 미배정이면 출하 가능(true). validateLotForShipment와 동일 규칙(비throw 버전). */
+    private boolean isShippableLot(int lotNum) {
+        String type = shipmentDAO.getLotItemType(lotNum);
+        if (type == null || !"PRODUCT".equalsIgnoreCase(type)) {
+            return false;
+        }
+        return shipmentDAO.countShipmentLotByLotNum(lotNum) == 0;
+    }
+
+    /**
+     * 해당 품목의 출하 가능 후보 LOT(FIFO)을 조회. 필터링은 SQL WHERE가 수행한다.
+     * 상세 페이지 수동 선택 UI가 채울 목록이므로, 없으면 빈 리스트를 반환한다.
+     */
+    @Override
+    public List<ShippableLotDTO> selectShippableLots(int itemNum) {
+        List<ShippableLotDTO> lots = shipmentDAO.selectShippableLots(itemNum);
+        return lots == null ? new ArrayList<ShippableLotDTO>() : lots;
+    }
+
+    /**
+     * 출하확정(수동 LOT 선택). {@code @Transactional}.
+     *
+     * <p>검증 → claim-first 선점 → 선택별 출고/분할 → 요청 완료 순으로 처리한다.
+     * 합계가 plan_qty 미만이면 force=true 일 때만 통과(부분출하 허용). 보유수량 초과 차감은
+     * deductLotQty 가드(영향행 0)로 막혀 stock_error 로 전체 롤백된다.</p>
+     */
+    @Override
+    @Transactional
+    public void confirmShipmentManual(int shipmentNum, String shipmentRequestNum,
+                                      int empNum, int planQty, List<Map> selections, boolean force) {
+        // 1. 검증 (DB 변경 전)
+        if (selections == null || selections.isEmpty()) {
+            throw new RuntimeException("empty_selection");
+        }
+        int total = 0;
+        for (Map sel : selections) {
+            int qty = ((Number) sel.get("qty")).intValue();
+            if (qty <= 0) throw new RuntimeException("invalid_qty");
+            total += qty;
+        }
+        if (total > planQty) throw new RuntimeException("over_plan");
+        if (total < planQty && !force) throw new RuntimeException("under_plan");
+
+        // 2. claim-first — '출하대기' 선점(중복 확정 방지). 이미 확정/취소면 영향행 0 → 종료
+        int claimed = shipmentDAO.confirmShipmentStatus(shipmentNum);
+        if (claimed == 0) return;
+
+        // 3. 선택별 출고/분할
+        for (Map sel : selections) {
+            int lotNum = ((Number) sel.get("lot_num")).intValue();
+            int qty    = ((Number) sel.get("qty")).intValue();
+
+            // shipment_lot 기록 (지시 단계에서 자동배정하지 않으므로 여기서 생성)
+            Map slMap = new HashMap();
+            slMap.put("shipment_num", shipmentNum);
+            slMap.put("lot_num",      lotNum);
+            slMap.put("qty",          qty);
+            shipmentDAO.insertShipmentLot(slMap);
+
+            Map lot = shipmentDAO.selectLotForConfirm(lotNum);
+            int currentQty = ((Number) lot.get("CURRENT_QTY")).intValue();
+
+            if (qty < currentQty) {
+                // ── 분할: 출하 수량 < 보유 수량 ──
+                Map childMap = new HashMap();
+                childMap.put("item_num",    ((Number) lot.get("ITEM_NUM")).intValue());
+                childMap.put("qty",         qty);
+                childMap.put("expiry_date", lot.get("EXPIRY_DATE"));
+                shipmentDAO.insertSplitLot(childMap);
+                int childLotNum = ((Number) childMap.get("lot_num")).intValue();
+
+                Map relMap = new HashMap();
+                relMap.put("origin_lot_num", lotNum);
+                relMap.put("split_lot_num",  childLotNum);
+                shipmentDAO.insertLotSplit(relMap);
+
+                Map parentIo = new HashMap();
+                parentIo.put("lot_num",   lotNum);
+                parentIo.put("qty",       qty);
+                parentIo.put("emp_num",   empNum);
+                parentIo.put("io_reason", "분할");
+                shipmentDAO.insertShipmentIo(parentIo);
+
+                Map deductParent = new HashMap();
+                deductParent.put("lot_num", lotNum);
+                deductParent.put("qty",     qty);
+                if (shipmentDAO.deductLotQty(deductParent) == 0) {
+                    throw new RuntimeException("stock_error");
+                }
+
+                Map slUpdate = new HashMap();
+                slUpdate.put("shipment_num",   shipmentNum);
+                slUpdate.put("parent_lot_num", lotNum);
+                slUpdate.put("child_lot_num",  childLotNum);
+                shipmentDAO.updateShipmentLotRef(slUpdate);
+
+                Map childIo = new HashMap();
+                childIo.put("lot_num",   childLotNum);
+                childIo.put("qty",       qty);
+                childIo.put("emp_num",   empNum);
+                childIo.put("io_reason", "출하");
+                shipmentDAO.insertShipmentIo(childIo);
+
+                Map deductChild = new HashMap();
+                deductChild.put("lot_num", childLotNum);
+                deductChild.put("qty",     qty);
+                if (shipmentDAO.deductLotQty(deductChild) == 0) {
+                    throw new RuntimeException("stock_error");
+                }
+
+            } else {
+                // ── 직접 출고: qty == currentQty (qty > currentQty 면 deduct 0 → stock_error) ──
+                Map deductMap = new HashMap();
+                deductMap.put("lot_num", lotNum);
+                deductMap.put("qty",     qty);
+                if (shipmentDAO.deductLotQty(deductMap) == 0) {
+                    throw new RuntimeException("stock_error");
+                }
+
+                Map ioMap = new HashMap();
+                ioMap.put("lot_num",   lotNum);
+                ioMap.put("qty",       qty);
+                ioMap.put("emp_num",   empNum);
+                ioMap.put("io_reason", "출하");
+                shipmentDAO.insertShipmentIo(ioMap);
+            }
+        }
+
+        // 4. 요청 상태 → 출하완료
+        shipmentDAO.updateRequestStatusToComplete(shipmentRequestNum);
     }
 }

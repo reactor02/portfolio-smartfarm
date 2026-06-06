@@ -21,4 +21,8 @@ public interface LotRelationDAO {
     Integer                      getOriginLotNum(int lot_num);
     /** 롯이력 통합 조회 (전 이력) — map 키: prodLot, selfLot */
     List<Map<String, Object>>    getLotHistory(java.util.Map<String,Object> param);
+    /** 공정 라우트 — 품목의 공정 단계(flow 순) + 각 공정 투입 자재 평면 행 */
+    List<Map<String, Object>>    getRouteByItem(int item_num);
+    /** 공정 미지정(bom.process_num IS NULL) 자재 목록 */
+    List<Map<String, Object>>    getUnassignedMaterials(int item_num);
 }

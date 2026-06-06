@@ -71,14 +71,16 @@ public class ProdController {
      */
     @RequestMapping
     public String list(@ModelAttribute ProdPageDTO pageDTO, Model model) {
-        List<ProdDTO>         list     = prodService.getList(pageDTO);
-        List<SelectOptionDTO> itemList = prodService.getItemOptions();
-        List<SelectOptionDTO> empList  = prodService.getEmpList();
+        List<ProdDTO>         list        = prodService.getList(pageDTO);
+        List<SelectOptionDTO> itemList    = prodService.getItemOptions();       // 검색 필터용 (기능중단 포함)
+        List<SelectOptionDTO> regItemList = prodService.getActiveItemOptions(); // 등록 모달용 (활성 품목만)
+        List<SelectOptionDTO> empList     = prodService.getEmpList();
 
-        model.addAttribute("list",     list);
-        model.addAttribute("page",     pageDTO);
-        model.addAttribute("itemList", itemList);
-        model.addAttribute("empList",  empList);
+        model.addAttribute("list",        list);
+        model.addAttribute("page",        pageDTO);
+        model.addAttribute("itemList",    itemList);
+        model.addAttribute("regItemList", regItemList);
+        model.addAttribute("empList",     empList);
         return "content/prod.tiles";
     }
 

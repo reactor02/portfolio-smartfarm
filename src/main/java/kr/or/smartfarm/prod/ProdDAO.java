@@ -44,6 +44,13 @@ public interface ProdDAO {
     public List<SelectOptionDTO> getItemOptions();
 
     /**
+     * 활성 품목 드롭다운 옵션 목록 조회 (등록 모달용, item_status = 'Y' 만)
+     *
+     * @return num(item_num), name(품목명), type(품목 유형) 을 담은 SelectOptionDTO 목록
+     */
+    public List<SelectOptionDTO> getActiveItemOptions();
+
+    /**
      * 생산계획 단건 조회
      *
      * @param plan_id  조회할 생산계획 식별자
