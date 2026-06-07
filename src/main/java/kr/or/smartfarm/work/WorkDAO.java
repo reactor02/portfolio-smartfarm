@@ -228,8 +228,17 @@ public interface WorkDAO {
     /** 공정별 소모 자재 LOT 기록. params { work_process_num, lot_num, item_num, qty } */
     void insertWorkProcessLot(Map<String, Object> params);
 
-    /** 작업지시 전체 소모 자재 LOT 목록 (lot_relation 연결/표시용) */
+    /** 작업지시 전체 소모 자재 LOT 목록 (표시용, 회차순) */
     List<Map<String, Object>> getWorkProcessLots(int order_num);
+
+    /** 현재(최신) 회차의 소모 자재 LOT 목록 (lot_relation 연결용 — 현재 회차 자재만) */
+    List<Map<String, Object>> getCurrentCycleProcessLots(int order_num);
+
+    /** 현재(최신) 회차 번호 조회 (회차 행 없으면 1) */
+    int getCurrentCycleNo(int order_num);
+
+    /** 다음 회차 시작 시 배치수량(input_qty) 0으로 리셋. params { work_order_id } */
+    int resetInputQty(Map<String, Object> params);
 
     /** 특정 공정의 BOM 소모 자재 (process_num 기준) */
     List<BomDTO> getProcessMaterials(int process_num);

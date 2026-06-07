@@ -215,6 +215,21 @@ public class WorkDAOImpl implements WorkDAO {
     }
 
     @Override
+    public List<Map<String, Object>> getCurrentCycleProcessLots(int order_num) {
+        return session.selectList("kr.or.smartfarm.work.getCurrentCycleProcessLots", order_num);
+    }
+
+    @Override
+    public int getCurrentCycleNo(int order_num) {
+        return session.selectOne("kr.or.smartfarm.work.getCurrentCycleNo", order_num);
+    }
+
+    @Override
+    public int resetInputQty(Map<String, Object> params) {
+        return session.update("kr.or.smartfarm.work.resetInputQty", params);
+    }
+
+    @Override
     public List<BomDTO> getProcessMaterials(int process_num) {
         return session.selectList("kr.or.smartfarm.work.getProcessMaterials", process_num);
     }

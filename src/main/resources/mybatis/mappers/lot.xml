@@ -127,10 +127,18 @@
         ORDER BY l.lot_date ASC
     </select>
 
-    <!-- lot_relation 등록 -->
+    <!-- lot_relation 등록 (멱등)
+         [방어] 같은 (parent, child) 계보가 이미 있으면 INSERT 생략.
+                회차 반복 시 동일 자재 LOT을 여러 회차에 쓰거나 최종완료가 재호출돼도
+                계보가 중복되지 않도록 한다 (getRecursiveMaterials 트리 뻥튀기 방지). -->
     <insert id="insertLotRelation" parameterType="LotRelationDTO">
         INSERT INTO lot_relation (lot_relation_num, lot_parent, lot_child)
-        VALUES (LOT_RELATION_SEQ.NEXTVAL, #{parent_lot_num}, #{child_lot_num})
+        SELECT LOT_RELATION_SEQ.NEXTVAL, #{parent_lot_num}, #{child_lot_num}
+        FROM DUAL
+        WHERE NOT EXISTS (
+            SELECT 1 FROM lot_relation
+            WHERE lot_parent = #{parent_lot_num} AND lot_child = #{child_lot_num}
+        )
     </insert>
 
     <!-- 분할 자식 LOT의 원본 LOT 조회 (분할이 아니면 결과 없음) -->
@@ -223,7 +231,10 @@
 
                 UNION ALL
 
-                /* ── [2] 현재 완제품 LOT의 진행 공정 종합 (공정 flow 순서대로 각 공정 단계 표시) ── */
+                /* ── [2] 완제품 LOT 생산 공정 추적 — 회차(cycle_no) × 공정(flow) 단계별 펼침 ──
+                       작업지시를 한 줄로 합치지 않고 work_process 를 조인해 회차/공정별로 표시한다.
+                       · status_col = 공정별 상태(대기/자재투입/진행/완료)
+                       · 정렬: reg_date 동일 → flow_order = cycle_no*1000 + flow 로 회차→공정 순 */
                 SELECT
                     2                                        AS level_num,
                     1                                        AS sort_phase,
@@ -232,29 +243,22 @@
                     i.type                                   AS item_type,
                     '제품생산'                               AS gubun,
                     wo.order_id                              AS id_col,
-                    /* 위치(시설) / 수량(LOT 초기수량) */
-                    (SELECT f.facility_name
-                       FROM (
-                            SELECT item_num, facility_num,
-                                   ROW_NUMBER() OVER (PARTITION BY item_num ORDER BY flow) AS rn
-                              FROM process
-                             WHERE facility_num IS NOT NULL
-                       ) pr
-                       JOIN facility f ON pr.facility_num = f.facility_num
-                      WHERE pr.item_num = pp.item_num
-                        AND pr.rn = 1)
-                    || ' / ' || l.init_qty                   AS content_col,
-                    TO_CHAR(wo.order_start, 'YYYY-MM-DD HH24:MI:SS') AS date_col,
-                    wo.order_status                          AS status_col,
+                    /* {n}회차 {공정명} @ {시설} */
+                    wp.cycle_no || '회차 ' || p.process_content
+                        || NVL2(f.facility_name, ' @ ' || f.facility_name, '') AS content_col,
+                    TO_CHAR(NVL(wp.start_time, wp.end_time), 'YYYY-MM-DD HH24:MI:SS') AS date_col,
+                    wp.status                                AS status_col,
                     e.ename                                  AS worker,
                     NVL(wo.order_start, l.lot_date)          AS reg_date,
-                    1                                        AS flow_order,
-                    0                                        AS ord_seq
+                    (wp.cycle_no * 1000 + NVL(wp.flow, 0))   AS flow_order,
+                    wp.work_process_num                      AS ord_seq
                 FROM lot l
                 JOIN item i               ON l.item_num = i.item_num
                 JOIN work_order wo        ON l.order_num = wo.order_num
-                LEFT JOIN production_plan pp ON wo.plan_num = pp.plan_num
-                LEFT JOIN emp e               ON wo.emp_num = e.emp_num
+                JOIN work_process wp      ON wp.order_num = wo.order_num
+                LEFT JOIN process  p      ON wp.process_num = p.process_num
+                LEFT JOIN facility f      ON p.facility_num = f.facility_num
+                LEFT JOIN emp e           ON wo.emp_num = e.emp_num
                 WHERE l.lot_num = #{prodLot}
 
                 UNION ALL

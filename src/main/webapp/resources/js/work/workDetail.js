@@ -33,6 +33,8 @@ function wireEvents() {
     bindProcessBtn('btnStartProcess',    startProcess);
     bindProcessBtn('btnCompleteProcess', completeProcess);
 
+    bindClick('btnNextCycle',    nextCycle);
+
     bindClick('btnDateErrClose', closeDateErrModal);
     bindClick('btnSubmitInput',  submitInput);
     bindClick('btnCloseInput',   closeInputModal);
@@ -196,6 +198,21 @@ function completeWork(force) {
                 if (confirm('지시수량만큼 생산하지 못했습니다. 그래도 완료합니까?')) completeWork(true);
                 return;
             }
+            alert('처리 중 오류가 발생했습니다.');
+        })
+        .catch(function(){ alert('처리 중 오류가 발생했습니다.'); });
+}
+
+/* ── 다음 회차 생산 시작 ── */
+function nextCycle() {
+    if (!confirm('다음 회차 생산을 시작하시겠습니까? 공정이 1공정부터 다시 진행됩니다.')) return;
+    fetch('/work/' + CFG.workOrderId + '/next-cycle', { method: 'POST' })
+        .then(function(r){ return r.text(); })
+        .then(function(result){
+            if (result === 'ok') { location.reload(); return; }
+            if (result === 'unauthorized') { location.href = '/login'; return; }
+            if (result === 'forbidden')   { alert('담당자 또는 실무자만 가능합니다.'); return; }
+            if (result === 'state_error') { alert('지금은 다음 회차를 시작할 수 없습니다.'); location.reload(); return; }
             alert('처리 중 오류가 발생했습니다.');
         })
         .catch(function(){ alert('처리 중 오류가 발생했습니다.'); });
