@@ -3,20 +3,50 @@
  *   1. 진행률 게이지 렌더링
  *   2. LOT 출하 라벨 보기 / 인쇄 기능
  *
- *   전역변수 (JSP가 주입):
- *     PLAN_QTY, COMPLETE_QTY — 진행률용
- *     SHIPMENT_DATA           — 출하 기본 정보 객체
- *     LOT_DATA                — LOT 배열
+ *   서버값은 인라인 스크립트가 아니라 DOM data-* 에서 읽는다.
+ *     #shipmentMeta data-*           — 계획/완료수량 + 출하 기본정보(SHIPMENT_DATA)
+ *     .btn-label   data-*            — LOT별 라벨 데이터
  */
 
-/* ══ 1. 진행률 게이지 ══ */
-(function() {
-    var pct  = PLAN_QTY > 0 ? Math.min(100, Math.round(COMPLETE_QTY / PLAN_QTY * 100)) : 0;
+/* ── 출하 기본정보(SHIPMENT_DATA): #shipmentMeta data-* 에서 구성 ── */
+function getShipmentData() {
+    var m = document.getElementById('shipmentMeta');
+    if (!m) return {};
+    return {
+        shipmentId:   m.dataset.shipmentId   || '',
+        venderName:   m.dataset.venderName   || '',
+        requestId:    m.dataset.requestId    || '',
+        dueDate:      m.dataset.dueDate      || '',
+        shipmentDate: m.dataset.shipmentDate || ''
+    };
+}
+
+/* ── LOT 한 건 data-* → 라벨 데이터 객체 ── */
+function lotFromBtn(btn) {
+    return {
+        lotCode:    btn.dataset.lotCode  || '',
+        itemName:   btn.dataset.itemName || '',
+        qty:        btn.dataset.qty      || '',
+        lotDate:    btn.dataset.lotDate  || '',
+        expiryDate: btn.dataset.expiry   || ''
+    };
+}
+
+/* 현재 모달에 표시 중인 LOT (단일 PDF 저장용) */
+var CURRENT_LABEL_LOT = null;
+
+/* ══ 1. 진행률 게이지 (너비는 CSS 변수 --pct 로 주입) ══ */
+function renderProgress() {
+    var m = document.getElementById('shipmentMeta');
+    if (!m) return;
+    var plan     = parseInt(m.dataset.planQty, 10)     || 0;
+    var complete = parseInt(m.dataset.completeQty, 10)  || 0;
+    var pct  = plan > 0 ? Math.min(100, Math.round(complete / plan * 100)) : 0;
     var bar  = document.getElementById('progressBar');
     var text = document.getElementById('progressText');
-    if (bar)  bar.style.width  = pct + '%';
+    if (bar)  bar.style.setProperty('--pct', pct + '%');
     if (text) text.textContent = pct + '%';
-})();
+}
 
 /* ══ 2. 라벨 기능 ══ */
 
@@ -73,21 +103,21 @@ function generateQR(elementId, lotCode, size) {
 }
 
 /* ── LOT 한 건 라벨 모달 표시 ── */
-function showLabel(idx) {
-    if (!LOT_DATA || LOT_DATA.length === 0 || idx < 0 || idx >= LOT_DATA.length) {
+function showLabel(lot) {
+    if (!lot || !lot.lotCode) {
         alert('라벨 데이터를 찾을 수 없습니다.');
         return;
     }
-    var lot = LOT_DATA[idx];
+    CURRENT_LABEL_LOT = lot;
     var qrId = 'qr-modal-' + lot.lotCode.replace(/[^a-zA-Z0-9]/g, '_');
 
     var preview = document.getElementById('labelPreview');
-    preview.innerHTML = buildLabelHTML(lot, SHIPMENT_DATA, qrId);
+    preview.innerHTML = buildLabelHTML(lot, getShipmentData(), qrId);
 
     // QR 코드 렌더링 (DOM 추가 직후 바로 실행)
     generateQR(qrId, lot.lotCode, 120);
 
-    document.getElementById('labelModal').style.display = 'flex';
+    document.getElementById('labelModal').classList.add('is-open');
 }
 
 /* ── 단일 라벨 PDF 다운로드 ── */
@@ -95,11 +125,7 @@ function downloadSingleLabel() {
     var preview = document.getElementById('labelPreview');
     if (!preview || !preview.innerHTML) return;
 
-    var currentLot = null;
-    LOT_DATA.forEach(function(lot) {
-        var qrId = 'qr-modal-' + lot.lotCode.replace(/[^a-zA-Z0-9]/g, '_');
-        if (document.getElementById(qrId)) currentLot = lot;
-    });
+    var currentLot = CURRENT_LABEL_LOT;
 
     html2pdf().set({
         margin: 5,
@@ -117,27 +143,28 @@ function downloadSingleLabel() {
 
 /* ── 전체 라벨 PDF 다운로드 ── */
 function downloadAllLabels() {
-    if (!LOT_DATA || LOT_DATA.length === 0) {
+    var lots = [].slice.call(document.querySelectorAll('.btn-label')).map(lotFromBtn);
+    if (lots.length === 0) {
         alert('배정된 LOT가 없어 다운로드할 라벨이 없습니다.');
         return;
     }
 
+    var shipment = getShipmentData();
     var area = document.getElementById('printLabelArea');
     var grid = document.getElementById('printLabelGrid');
     var html = '';
 
-    LOT_DATA.forEach(function(lot, idx) {
+    lots.forEach(function(lot, idx) {
         var qrId = 'qr-dl-' + idx + '-' + lot.lotCode.replace(/[^a-zA-Z0-9]/g, '_');
-        html += '<div class="label-print-card">' + buildLabelHTML(lot, SHIPMENT_DATA, qrId) + '</div>';
+        html += '<div class="label-print-card">' + buildLabelHTML(lot, shipment, qrId) + '</div>';
     });
 
     grid.innerHTML = html;
 
-    // display: block 상태에서 브라우저가 높이를 온전히 계산할 수 있도록 설정
-    // left: 0, top: 0으로 하되 z-index와 투명도로 숨기는 것이 html2canvas 캡처에 더 안전합니다.
-    area.style.cssText = 'display:block; position:fixed; left:0; top:0; z-index:-9999; opacity:0; width:100%;';
+    // 캡처 중에만 화면 밖으로 표시 (.capturing 클래스로 제어 — 인라인 style 금지)
+    area.classList.add('capturing');
 
-    LOT_DATA.forEach(function(lot, idx) {
+    lots.forEach(function(lot, idx) {
         var qrId = 'qr-dl-' + idx + '-' + lot.lotCode.replace(/[^a-zA-Z0-9]/g, '_');
         generateQR(qrId, lot.lotCode, 100);
     });
@@ -146,17 +173,17 @@ function downloadAllLabels() {
     setTimeout(function() {
         html2pdf().set({
             margin: 5,
-            filename: 'labels_' + SHIPMENT_DATA.shipmentId + '.pdf',
+            filename: 'labels_' + shipment.shipmentId + '.pdf',
             image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { 
-                scale: 2, 
+            html2canvas: {
+                scale: 2,
                 useCORS: true,
                 scrollY: 0,
                 windowScrollY: 0
             },
             jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
         }).from(grid).save().then(function() {
-            area.style.cssText = '';
+            area.classList.remove('capturing');
             grid.innerHTML = '';
         });
     }, 800); // 400ms -> 800ms로 상향
@@ -164,14 +191,40 @@ function downloadAllLabels() {
 
 /* ── 라벨 모달 닫기 ── */
 function closeLabelModal() {
-    document.getElementById('labelModal').style.display = 'none';
-    document.getElementById('labelPreview').innerHTML   = '';
+    document.getElementById('labelModal').classList.remove('is-open');
+    document.getElementById('labelPreview').innerHTML = '';
+    CURRENT_LABEL_LOT = null;
 }
 
-/* ── 모달 외부 클릭 시 닫기 ── */
-document.getElementById('labelModal').addEventListener('click', function(e) {
-    if (e.target === this) closeLabelModal();
-});
+/* ── 진행률/라벨 기능 이벤트 연결 (인라인 onclick 대체) ── */
+(function initLabelFeature() {
+    renderProgress();
+
+    // LOT별 "라벨 보기" — 버튼 data-* 에서 LOT 구성
+    document.querySelectorAll('.btn-label').forEach(function(btn) {
+        btn.addEventListener('click', function() { showLabel(lotFromBtn(btn)); });
+    });
+
+    var btnAll = document.getElementById('btnDownloadAll');
+    if (btnAll) btnAll.addEventListener('click', downloadAllLabels);
+
+    var btnDl = document.getElementById('btnLabelDownload');
+    if (btnDl) btnDl.addEventListener('click', downloadSingleLabel);
+
+    var btnClose = document.getElementById('btnLabelClose');
+    if (btnClose) btnClose.addEventListener('click', closeLabelModal);
+
+    var modal = document.getElementById('labelModal');
+    if (modal) modal.addEventListener('click', function(e) {
+        if (e.target === this) closeLabelModal();   // 외부 클릭 시 닫기
+    });
+
+    // 출하 취소 폼 — 제출 전 확인 (인라인 onclick 대체)
+    var cancelForm = document.getElementById('cancelShipmentForm');
+    if (cancelForm) cancelForm.addEventListener('submit', function(e) {
+        if (!confirm('출하를 취소하시겠습니까?')) e.preventDefault();
+    });
+})();
 
 /* ══════════════════════════════════════════════════════════════
  * 3. 출하 LOT 수동 선택/확정 (출하대기 + 권한 있을 때만)
@@ -184,11 +237,16 @@ function _esc(s) {
         .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
+/* 선택 박스(출하대기+권한일 때만 렌더)와 그 data-* 값 */
+function _selBox()  { return document.getElementById('lotSelectBox'); }
+function _shipId()  { var b = _selBox(); return b ? b.getAttribute('data-shipment-id') : ''; }
+function _planQty() { var b = _selBox(); return b ? (parseInt(b.getAttribute('data-plan-qty'), 10) || 0) : 0; }
+
 /* 후보 LOT 목록 로드 → 테이블 렌더 */
 function loadCandidateLots() {
     var body = document.getElementById('candBody');
     if (!body) return;
-    fetch('/shipmentCandidateLots?shipmentId=' + encodeURIComponent(SHIPMENT_ID))
+    fetch('/shipmentCandidateLots?shipmentId=' + encodeURIComponent(_shipId()))
         .then(function(r) { return r.json(); })
         .then(function(list) {
             if (!list || list.length === 0) {
@@ -204,8 +262,7 @@ function loadCandidateLots() {
                     + '<td>' + _esc(lot.expiry_date || '-') + '</td>'
                     + '<td>' + cur + '</td>'
                     + '<td><input type="number" min="0" max="' + cur + '" value="0" '
-                    +        'class="qty-input" data-lot="' + lot.lot_num + '" data-cur="' + cur + '" '
-                    +        'oninput="recalcTotal()" style="width:90px;"></td>'
+                    +        'class="qty-input" data-lot="' + lot.lot_num + '" data-cur="' + cur + '"></td>'
                     + '</tr>';
             });
             body.innerHTML = html;
@@ -230,7 +287,26 @@ function recalcTotal() {
     });
     var totalEl = document.getElementById('selTotal');
     if (totalEl) totalEl.textContent = total;
-    if (!hint && total > PLAN_QTY) hint = '계획 수량을 초과했습니다.';
+
+    // 계획 대비 남은(부족) 수량 안내 — 100% 채우려면 몇 개 더 필요한지
+    var plan   = _planQty();
+    var remain = plan - total;              // 양수=부족, 0=충족, 음수=초과
+    var remainEl = document.getElementById('selRemain');
+    if (remainEl) {
+        remainEl.classList.remove('txt-danger', 'txt-success');
+        if (remain > 0) {
+            remainEl.textContent = '계획까지 ' + remain + '개 더 필요';
+            remainEl.classList.add('txt-danger');
+        } else if (remain === 0) {
+            remainEl.textContent = '계획 수량 충족 (100%)';
+            remainEl.classList.add('txt-success');
+        } else {
+            remainEl.textContent = '계획 초과 ' + (-remain) + '개';
+            remainEl.classList.add('txt-danger');
+        }
+    }
+
+    if (!hint && total > plan) hint = '계획 수량을 초과했습니다.';
     var hintEl = document.getElementById('selHint');
     if (hintEl) hintEl.textContent = hint ? ('  ⚠ ' + hint) : '';
     return total;
@@ -239,6 +315,7 @@ function recalcTotal() {
 /* 등록완료 — 충족 검사 → (미달 시 경고) → AJAX 확정 */
 function submitConfirm() {
     var inputs = document.querySelectorAll('.qty-input');
+    var plan = _planQty();
     var selections = [];
     var total = 0;
     var over  = false;
@@ -253,19 +330,19 @@ function submitConfirm() {
     });
 
     if (selections.length === 0) { alert('출하할 LOT 수량을 입력하세요.'); return; }
-    if (over)             { alert('보유수량을 초과한 LOT이 있습니다. 분할은 보유수량 이하만 가능합니다.'); return; }
-    if (total > PLAN_QTY) { alert('선택 합계가 계획 수량(' + PLAN_QTY + ')을 초과했습니다.'); return; }
+    if (over)          { alert('보유수량을 초과한 LOT이 있습니다. 분할은 보유수량 이하만 가능합니다.'); return; }
+    if (total > plan)  { alert('선택 합계가 계획 수량(' + plan + ')을 초과했습니다.'); return; }
 
     var force = false;
-    if (total < PLAN_QTY) {
-        if (!confirm('지정 수량(' + PLAN_QTY + ')을 다 채우지 못했습니다. 이대로 출하완료하시겠습니까?')) return;
+    if (total < plan) {
+        if (!confirm('지정 수량(' + plan + ')을 다 채우지 못했습니다. 이대로 출하완료하시겠습니까?')) return;
         force = true;
     }
 
     fetch('/confirmShipment', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ shipmentId: SHIPMENT_ID, force: force, selections: selections })
+        body: JSON.stringify({ shipmentId: _shipId(), force: force, selections: selections })
     })
     .then(function(r) { return r.json(); })
     .then(function(res) {
@@ -294,7 +371,17 @@ function _confirmReason(code) {
     }
 }
 
-/* 출하대기 + 권한 있을 때만 후보 로드 */
-if (typeof EDITABLE !== 'undefined' && EDITABLE) {
+/* 초기화 — #lotSelectBox는 출하대기+권한일 때만 렌더되므로, 존재할 때만 동작 연결 */
+(function initLotSelect() {
+    var box = _selBox();
+    if (!box) return;                 // 선택 UI 없음(완료/취소/권한없음) → 아무것도 안 함
     loadCandidateLots();
-}
+    var body = document.getElementById('candBody');
+    if (body) {
+        body.addEventListener('input', function (e) {   // 동적 행 → 이벤트 위임
+            if (e.target && e.target.classList.contains('qty-input')) recalcTotal();
+        });
+    }
+    var btn = document.getElementById('btnConfirm');
+    if (btn) btn.addEventListener('click', submitConfirm);
+})();

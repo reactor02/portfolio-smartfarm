@@ -16,3 +16,23 @@
 /* 취소 버튼 — 채워진 빨간 버튼 */
 .btn-del       { color: #fff; border-color: #dc3545; background-color: #dc3545; }
 .btn-del:hover { background-color: #ff4757; border-color: #ff4757; color: #fff; }
+
+/* ── 출하 LOT 수동 선택 영역 ── */
+.qty-input    { width: 90px; }              /* 출하수량 입력칸 */
+.sel-summary  { margin-top: 8px; }          /* 선택 합계/계획 요약 줄 */
+.sel-hint     { color: #c0392b; }           /* 초과 등 경고 문구 */
+.txt-danger   { color: #c0392b; }           /* 부족/초과 — 빨강 */
+.txt-success  { color: #1e8449; }           /* 계획 충족 — 초록 */
+
+/* ── 인라인 style 제거용 유틸 ── */
+.is-hidden    { display: none; }            /* JS용 메타 컨테이너 등 */
+.form-inline  { display: inline; }          /* 헤더 취소 폼 */
+.empty-msg    { text-align: center; color: #999; padding: 30px; }
+
+/* 진행률 바: 너비는 JS가 --pct(CSS 변수)로 주입 (하드코딩 인라인 style 대체) */
+.progress-bar-fill { width: var(--pct, 0%); }
+
+/* ── 라벨 미리보기 모달 (modal.css 미로드 → 자체 정의) ── */
+#labelModal        { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4);
+                     z-index: 9999; align-items: center; justify-content: center; }
+#labelModal.is-open { display: flex; }

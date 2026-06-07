@@ -167,6 +167,16 @@
     display: none;
 }
 
+/* html2pdf 캡처 중에만 화면 밖으로 표시 (인라인 style.cssText 대체) */
+#printLabelArea.capturing {
+    display: block;
+    position: fixed;
+    left: 0; top: 0;
+    z-index: -9999;
+    opacity: 0;
+    width: 100%;
+}
+
 /* ══════════════════════════════════
    PDF 라벨 그리드 / 카드 (html2pdf이 캡처)
    ══════════════════════════════════ */

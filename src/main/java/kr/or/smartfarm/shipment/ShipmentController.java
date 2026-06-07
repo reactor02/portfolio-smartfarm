@@ -185,6 +185,12 @@ public class ShipmentController {
      * 출하 상세 — 수동 선택용 후보 LOT(FIFO) 목록을 JSON 으로 반환한다.
      * item_num/plan_qty 등 신뢰가 필요한 값은 서버에서 selectDetail 로 재조회한다.
      */
+    /** hashMap 결과 컬럼(Number 또는 String)을 안전하게 int로 변환 */
+    private static int toInt(Object o) {
+        if (o instanceof Number) return ((Number) o).intValue();
+        return Integer.parseInt(String.valueOf(o).trim());
+    }
+
     @RequestMapping("/shipmentCandidateLots")
     @ResponseBody
     public List shipmentCandidateLots(@RequestParam("shipmentId") String shipmentId) {
@@ -233,8 +239,10 @@ public class ShipmentController {
             result.put("reason", "not_found");
             return result;
         }
-        int    shipmentNum        = ((Number) detail.get("SHIPMENT_NUM")).intValue();
-        int    planQty            = ((Number) detail.get("PLAN_QTY")).intValue();
+        // [방어] hashMap 결과의 숫자 컬럼이 NUMBER(→BigDecimal) 또는 VARCHAR(→String)로
+        //        올 수 있어(예: plan_qty가 String), 둘 다 안전하게 int로 변환한다.
+        int    shipmentNum        = toInt(detail.get("SHIPMENT_NUM"));
+        int    planQty            = toInt(detail.get("PLAN_QTY"));
         String shipmentRequestNum = String.valueOf(detail.get("SHIPMENT_REQUEST_NUM"));
 
         int empNum = 1;

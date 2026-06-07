@@ -29,16 +29,15 @@ response.setContentType("text/html; charset=utf-8");
         <div class="hdr-right">
             <%-- 등록완료(수동 LOT 선택 확정): 담당자 또는 실무자 본인만 노출 --%>
             <c:if test="${canConfirm and detail.SHIPMENT_STATUS == '출하대기'}">
-                <button type="button" class="btn-action btn-primary" onclick="submitConfirm()">등록완료</button>
+                <button type="button" id="btnConfirm" class="btn-action btn-primary">등록완료</button>
             </c:if>
             <%-- 취소버튼: e_level >= 3(사장) 또는 담당자 본인 + 진행 가능 상태 --%>
             <c:if test="${canCancel and detail.SHIPMENT_STATUS != '취소' and detail.SHIPMENT_STATUS != '출하완료'}">
-                <form method="POST" action="/cancelShipment" style="display:inline;">
+                <form method="POST" action="/cancelShipment" id="cancelShipmentForm" class="form-inline">
                     <input type="hidden" name="shipmentNum"        value="${detail.SHIPMENT_NUM}">
                     <input type="hidden" name="shipmentId"         value="${detail.SHIPMENT_ID}">
                     <input type="hidden" name="shipmentRequestNum" value="${detail.SHIPMENT_REQUEST_NUM}">
-                    <button type="submit" class="btn-action btn-del"
-                            onclick="return confirm('출하를 취소하시겠습니까?')">취소</button>
+                    <button type="submit" class="btn-action btn-del">취소</button>
                 </form>
             </c:if>
             <a href="/shipment" class="btn-action">목록으로</a>
@@ -53,6 +52,16 @@ response.setContentType("text/html; charset=utf-8");
             <c:forEach var="lot" items="${lots}">
                 <c:set var="completeQty" value="${completeQty + lot.QTY}"/>
             </c:forEach>
+
+            <%-- JS가 읽는 출하 메타값 (EL → data-*, 인라인 스크립트 금지) --%>
+            <div id="shipmentMeta" class="is-hidden"
+                 data-plan-qty="${detail.PLAN_QTY}"
+                 data-complete-qty="${completeQty}"
+                 data-shipment-id="<c:out value='${detail.SHIPMENT_ID}'/>"
+                 data-vender-name="<c:out value='${detail.VENDER_NAME}'/>"
+                 data-request-id="<c:out value='${detail.REQUEST_ID}'/>"
+                 data-due-date="<c:out value='${detail.DUE_DATE}'/>"
+                 data-shipment-date="<c:out value='${detail.SHIPMENT_DATE}'/>"></div>
 
             <div class="section-box">
                 <div class="section-title">기본 정보</div>
@@ -121,7 +130,10 @@ response.setContentType("text/html; charset=utf-8");
 
             <%-- ══ 출하 LOT 수동 선택 (출하대기 + 권한 있을 때만) ══ --%>
             <c:if test="${canConfirm and detail.SHIPMENT_STATUS == '출하대기'}">
-            <div class="section-box">
+            <div class="section-box" id="lotSelectBox"
+                 data-shipment-id="${detail.SHIPMENT_ID}"
+                 data-item-num="${detail.ITEM_NUM}"
+                 data-plan-qty="${detail.PLAN_QTY}">
                 <div class="section-title">출하 LOT 선택 (FIFO · 오래된 순)</div>
                 <table class="data-table" id="candTable">
                     <thead>
@@ -137,9 +149,10 @@ response.setContentType("text/html; charset=utf-8");
                         <tr><td colspan="5" class="empty-cell">후보 LOT을 불러오는 중...</td></tr>
                     </tbody>
                 </table>
-                <div class="progress-text" style="margin-top:8px;">
+                <div class="progress-text sel-summary">
                     선택 합계 <b id="selTotal">0</b> / 계획 <b>${detail.PLAN_QTY}</b> EA
-                    <span id="selHint" style="color:#c0392b;"></span>
+                    &nbsp;·&nbsp; <b id="selRemain"></b>
+                    <span id="selHint" class="sel-hint"></span>
                 </div>
             </div>
             </c:if>
@@ -173,7 +186,7 @@ response.setContentType("text/html; charset=utf-8");
                 <div class="section-title-row">
                     <span class="section-title">연결 LOT 번호</span>
                     <c:if test="${not empty lots}">
-                        <button type="button" class="btn-label-all" onclick="downloadAllLabels()">
+                        <button type="button" class="btn-label-all" id="btnDownloadAll">
                             &#128229; 전체 라벨 다운로드
                         </button>
                     </c:if>
@@ -201,7 +214,11 @@ response.setContentType("text/html; charset=utf-8");
                                         <td>${not empty lot.EXPIRY_DATE ? lot.EXPIRY_DATE : '-'}</td>
                                         <td>
                                             <button type="button" class="btn-label"
-                                                    onclick="showLabel(${vs.index})">라벨 보기</button>
+                                                    data-lot-code="<c:out value='${lot.LOT_CODE}'/>"
+                                                    data-item-name="<c:out value='${lot.ITEM_NAME}'/>"
+                                                    data-qty="${lot.QTY}"
+                                                    data-lot-date="<c:out value='${lot.LOT_DATE}'/>"
+                                                    data-expiry="<c:out value='${not empty lot.EXPIRY_DATE ? lot.EXPIRY_DATE : ""}'/>">라벨 보기</button>
                                         </td>
                                     </tr>
                                 </c:forEach>
@@ -217,7 +234,7 @@ response.setContentType("text/html; charset=utf-8");
         </c:when>
         <c:otherwise>
             <div class="section-box">
-                <p style="text-align:center; color:#999; padding:30px;">출하 정보를 찾을 수 없습니다.</p>
+                <p class="empty-msg">출하 정보를 찾을 수 없습니다.</p>
             </div>
         </c:otherwise>
     </c:choose>
@@ -225,12 +242,12 @@ response.setContentType("text/html; charset=utf-8");
 </main>
 
 <%-- ══ 라벨 미리보기 모달 ══ --%>
-<div id="labelModal" class="modal-overlay" style="display:none;">
+<div id="labelModal" class="label-overlay">
     <div class="label-modal-box">
         <div class="label-card" id="labelPreview"></div>
         <div class="label-modal-btns">
-            <button type="button" class="btn-label-print" onclick="downloadSingleLabel()">&#128229; PDF 저장</button>
-            <button type="button" class="btn-label-close" onclick="closeLabelModal()">닫기</button>
+            <button type="button" class="btn-label-print" id="btnLabelDownload">&#128229; PDF 저장</button>
+            <button type="button" class="btn-label-close" id="btnLabelClose">닫기</button>
         </div>
     </div>
 </div>
@@ -240,36 +257,6 @@ response.setContentType("text/html; charset=utf-8");
     <div class="print-label-grid" id="printLabelGrid"></div>
 </div>
 
-<%-- JSP 서버값을 JS 전역변수로 주입 --%>
-<script>
-    var PLAN_QTY     = parseInt('${detail.PLAN_QTY}') || 0;
-    var COMPLETE_QTY = parseInt('${completeQty}')     || 0;
-
-    // 수동 LOT 선택/확정용 전역
-    var SHIPMENT_ID = '${detail.SHIPMENT_ID}';
-    var ITEM_NUM    = parseInt('${detail.ITEM_NUM}') || 0;
-    var EDITABLE    = ${(canConfirm and detail.SHIPMENT_STATUS == '출하대기') ? 'true' : 'false'};
-
-    var SHIPMENT_DATA = {
-        shipmentId:  '${detail.SHIPMENT_ID}',
-        venderName:  '<c:out value="${detail.VENDER_NAME}" escapeXml="false"/>',
-        requestId:   '${detail.REQUEST_ID}',
-        dueDate:     '${detail.DUE_DATE}',
-        shipmentDate:'${detail.SHIPMENT_DATE}'
-    };
-
-    var LOT_DATA = [
-        <c:forEach var="lot" items="${lots}" varStatus="vs">
-        {
-            lotCode:    '${lot.LOT_CODE}',
-            itemName:   '<c:out value="${lot.ITEM_NAME}" escapeXml="false"/>',
-            qty:        '${lot.QTY}',
-            lotDate:    '${lot.LOT_DATE}',
-            expiryDate: '${not empty lot.EXPIRY_DATE ? lot.EXPIRY_DATE : ""}'
-        }<c:if test="${!vs.last}">,</c:if>
-        </c:forEach>
-    ];
-</script>
 <script src="/resources/js/lib/qrcode.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <script src="/resources/js/shipment/shipmentDetail.js"></script>
