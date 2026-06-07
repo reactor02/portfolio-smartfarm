@@ -115,8 +115,17 @@
             <div class="wp-control">
                 <c:choose>
                     <c:when test="${actionState.allDone}">
-                        <span class="wp-final-badge">✔ 최종생산완료</span>
-                        <span class="wp-ctl-msg">모든 공정이 완료되었습니다. 상단 [작업완료]로 마감하세요.</span>
+                        <c:choose>
+                            <c:when test="${actionState.canNextCycle}">
+                                <span class="wp-ctl-msg">${actionState.currentCycleNo}회차 공정이 모두 완료되었습니다.
+                                    지시수량 미달(${workDTO.current_qty}/${workDTO.order_qty}) — 다음 회차를 진행하세요.</span>
+                                <button type="button" class="btn-action" id="btnNextCycle">다음 회차 생산</button>
+                            </c:when>
+                            <c:otherwise>
+                                <span class="wp-final-badge">✔ 최종생산완료</span>
+                                <span class="wp-ctl-msg">모든 공정이 완료되었습니다. 상단 [작업완료]로 마감하세요.</span>
+                            </c:otherwise>
+                        </c:choose>
                     </c:when>
                     <c:otherwise>
                         <span class="wp-ctl-msg">현재 공정 (순서 ${actionState.activeFlow}) :

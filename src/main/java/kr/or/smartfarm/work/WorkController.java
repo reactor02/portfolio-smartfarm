@@ -363,6 +363,26 @@ public class WorkController {
         }
     }
 
+    /* ── 다음 회차 생산 시작 (AJAX) ── */
+    /**
+     * POST /work/{id}/next-cycle - 현재 회차 전 공정 완료 + 지시수량 미달일 때
+     * 새 회차 공정 행을 '대기'로 생성하고 배치수량을 리셋한다.
+     */
+    @RequestMapping(value = "/{work_order_id}/next-cycle", method = RequestMethod.POST)
+    @ResponseBody
+    public String nextCycle(@PathVariable String work_order_id, HttpSession session) {
+        LoginDTO loginUser = (LoginDTO) session.getAttribute("loginUser");
+        if (loginUser == null) return "unauthorized";
+        if (!isEmpOrWorker(loginUser, work_order_id)) return "forbidden";
+        try {
+            workService.startNextCycle(work_order_id);
+            return "ok";
+        } catch (RuntimeException e) {
+            if ("state_error".equals(e.getMessage())) return "state_error";
+            return "error";
+        }
+    }
+
     /* ── 생산계획 검색 AJAX (등록 모달용, 대기/진행만) ── */
     /**
      * GET /work/plans - 등록 모달에서 사용하는 생산계획 AJAX 검색.

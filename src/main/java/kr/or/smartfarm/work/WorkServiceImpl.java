@@ -118,11 +118,18 @@ public class WorkServiceImpl implements WorkService {
         if (work == null) return;
         int orderNum = work.getOrder_num();
         if (dao.countWorkProcesses(orderNum) > 0) return;   // 멱등
+        insertCycleProcesses(work, 1);   // 최초 1회차 공정 행 생성
+    }
+
+    /** 지정 회차(cycle)의 공정 행을 품목 공정 수만큼 '대기'로 INSERT */
+    private void insertCycleProcesses(WorkDTO work, int cycleNo) {
+        int orderNum = work.getOrder_num();
         for (Map<String, Object> p : dao.getProcessesByItem(work.getItem_num())) {
             Map<String, Object> row = new HashMap<String, Object>();
             row.put("order_num",   orderNum);
             row.put("process_num", toInt(p.get("PROCESS_NUM")));
             row.put("flow",        p.get("FLOW") == null ? null : toInt(p.get("FLOW")));
+            row.put("cycle_no",    cycleNo);
             dao.insertWorkProcess(row);
         }
     }
@@ -276,7 +283,8 @@ public class WorkServiceImpl implements WorkService {
                 stockIn.put("qty",     producedQty);
                 dao.adjustStock(stockIn);
 
-                for (Map<String, Object> wpl : dao.getWorkProcessLots(orderNum)) {
+                // 현재 회차에 투입된 자재 LOT만 계보 연결 (insert는 멱등 → 중복 방지)
+                for (Map<String, Object> wpl : dao.getCurrentCycleProcessLots(orderNum)) {
                     LotRelationDTO rel = new LotRelationDTO();
                     rel.setParent_lot_num(productLot.intValue());
                     rel.setChild_lot_num(toInt(wpl.get("LOT_NUM")));
@@ -308,6 +316,24 @@ public class WorkServiceImpl implements WorkService {
     }
 
     @Override
+    public void startNextCycle(String work_order_id) {
+        WorkDTO work = requireWork(work_order_id);
+        int orderNum = work.getOrder_num();
+        // [게이트] 진행 상태 && 현재 회차 전 공정 완료(활성 공정 없음) && 지시수량 미달
+        //  → 더블클릭/연타로 활성 공정이 남아있으면 새 회차를 만들지 않는다.
+        if (!"진행".equals(work.getWork_status())) throw new RuntimeException("state_error");
+        if (findActiveProcess(orderNum) != null) throw new RuntimeException("state_error");
+        if (work.getCurrent_qty() >= work.getOrder_qty()) throw new RuntimeException("state_error");
+
+        int nextCycle = dao.getCurrentCycleNo(orderNum) + 1;
+        insertCycleProcesses(work, nextCycle);   // 새 회차 공정 행(대기) 생성
+
+        Map<String, Object> rq = new HashMap<String, Object>();
+        rq.put("work_order_id", work_order_id);
+        dao.resetInputQty(rq);                    // 회차 배치수량 재확정을 위해 0으로
+    }
+
+    @Override
     public List<Map<String, Object>> getWorkProcesses(int order_num) {
         return dao.getWorkProcesses(order_num);
     }
@@ -322,13 +348,18 @@ public class WorkServiceImpl implements WorkService {
         Map<String, Object> result = new HashMap<String, Object>();
         WorkDTO work = dao.getSelectOne(work_order_id);
         if (work == null) { result.put("allDone", false); result.put("action", "none"); return result; }
-        result.put("workStatus", work.getWork_status());
+        result.put("workStatus",     work.getWork_status());
+        result.put("currentCycleNo", dao.getCurrentCycleNo(work.getOrder_num()));
         Map<String, Object> active = findActiveProcess(work.getOrder_num());
         if (active == null) {
-            result.put("allDone", true);
-            result.put("action",  "done");
+            // 현재 회차 전 공정 완료. 지시수량 미달이면 다음 회차 진행 가능.
+            boolean canNextCycle = work.getCurrent_qty() < work.getOrder_qty();
+            result.put("allDone",      true);
+            result.put("action",       "done");
+            result.put("canNextCycle", canNextCycle);
             return result;
         }
+        result.put("canNextCycle", false);
         String st = (String) active.get("STATUS");
         String action = "대기".equals(st) ? "input"
                       : "자재투입".equals(st) ? "start"

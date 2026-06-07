@@ -99,6 +99,13 @@ public interface WorkService {
      */
     String completeWork(String work_order_id, boolean force);
 
+    /**
+     * 다음 회차 생산 시작. 현재 회차 전 공정이 완료되고 지시수량에 미달일 때만 가능하며,
+     * 새 회차(cycle)의 공정 행을 '대기'로 생성하고 배치수량(input_qty)을 0으로 리셋한다.
+     * @throws RuntimeException "state_error" (진행 아님 / 활성 공정 존재 / 지시수량 충족)
+     */
+    void startNextCycle(String work_order_id);
+
     /** 작업지시 공정기록 목록 (상세 표시용) */
     List<Map<String, Object>> getWorkProcesses(int order_num);
 
