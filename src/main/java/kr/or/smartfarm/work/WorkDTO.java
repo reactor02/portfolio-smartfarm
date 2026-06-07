@@ -24,7 +24,8 @@ public class WorkDTO {
 	private String work_status;    // DB: order_status → SQL alias
 	private int    emp_num;
 	private int    current_qty;
-	private int    input_qty;      // 누적 투입(생산예정) 수량
+	private int    input_qty;      // 배치 생산수량(공정별 흐름에서 1회 확정)
+	private Integer product_lot_num; // 작업시작 시 생성한 완제품 LOT
 	private String content;
 	private java.sql.Timestamp created_at;
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")

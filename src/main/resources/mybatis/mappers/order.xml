@@ -97,6 +97,7 @@
                wo.emp_num,
                wo.current_qty,
                NVL(wo.input_qty, 0) AS input_qty,
+               wo.product_lot_num,
                wo.content,
                wo.created_at,
                wo.order_start,
@@ -365,6 +366,138 @@
           AND process_status = '사용중'
         ORDER BY flow ASC
     </select>
+
+    <!-- ═══════════ 공정별(라우팅) 진행 : work_process / work_process_lot ═══════════ -->
+
+    <!-- 공정기록 행 존재 개수 (lazy 생성 멱등 체크) -->
+    <select id="countWorkProcesses" parameterType="int" resultType="int">
+        SELECT COUNT(*) FROM work_process WHERE order_num = #{order_num}
+    </select>
+
+    <!-- 공정기록 행 생성 (작업지시 상세 렌더 시 공정 수만큼 '대기'로) -->
+    <insert id="insertWorkProcess" parameterType="map">
+        INSERT INTO work_process (work_process_num, order_num, process_num, flow, status)
+        VALUES (WORK_PROCESS_SEQ.NEXTVAL, #{order_num}, #{process_num}, #{flow}, '대기')
+    </insert>
+
+    <!-- 작업지시 공정기록 목록 (상세 표시 + 상태머신용) -->
+    <select id="getWorkProcesses" parameterType="int" resultType="hashMap">
+        SELECT wp.work_process_num,
+               wp.order_num,
+               wp.process_num,
+               wp.flow,
+               wp.status,
+               TO_CHAR(wp.start_time, 'YYYY-MM-DD HH24:MI') AS start_time,
+               TO_CHAR(wp.end_time,   'YYYY-MM-DD HH24:MI') AS end_time,
+               p.process_content,
+               f.facility_name
+        FROM work_process wp
+        LEFT JOIN process  p ON wp.process_num = p.process_num
+        LEFT JOIN facility f ON p.facility_num = f.facility_num
+        WHERE wp.order_num = #{order_num}
+        ORDER BY wp.flow ASC, wp.work_process_num ASC
+    </select>
+
+    <!-- 단건 공정기록 (게이팅 검증용) -->
+    <select id="getWorkProcessOne" parameterType="map" resultType="hashMap">
+        SELECT work_process_num, order_num, process_num, flow, status
+        FROM work_process
+        WHERE order_num = #{order_num} AND process_num = #{process_num}
+    </select>
+
+    <!-- 공정 상태 전이 (+ 시작/완료 시각). status='진행'이면 start_time, '완료'면 end_time 기록 -->
+    <update id="setWorkProcessStatus" parameterType="map">
+        UPDATE work_process
+        SET status     = #{status},
+            start_time = CASE WHEN #{status} = '진행' THEN SYSDATE ELSE start_time END,
+            end_time   = CASE WHEN #{status} = '완료' THEN SYSDATE ELSE end_time   END
+        WHERE order_num = #{order_num} AND process_num = #{process_num}
+    </update>
+
+    <!-- 공정별 소모 자재 LOT 기록 -->
+    <insert id="insertWorkProcessLot" parameterType="map">
+        INSERT INTO work_process_lot (wp_lot_num, work_process_num, lot_num, item_num, qty)
+        VALUES (WORK_PROCESS_LOT_SEQ.NEXTVAL, #{work_process_num}, #{lot_num}, #{item_num}, #{qty})
+    </insert>
+
+    <!-- 작업지시 전체 소모 자재 LOT 목록 (lot_relation 연결 + 표시용) -->
+    <select id="getWorkProcessLots" parameterType="int" resultType="hashMap">
+        SELECT wpl.wp_lot_num,
+               wpl.work_process_num,
+               wpl.lot_num,
+               wpl.item_num,
+               wpl.qty,
+               l.lot_code,
+               i.name AS item_name,
+               wp.flow
+        FROM work_process_lot wpl
+        JOIN work_process wp ON wpl.work_process_num = wp.work_process_num
+        JOIN lot  l ON wpl.lot_num  = l.lot_num
+        JOIN item i ON wpl.item_num = i.item_num
+        WHERE wp.order_num = #{order_num}
+        ORDER BY wp.flow ASC, wpl.wp_lot_num ASC
+    </select>
+
+    <!-- 특정 공정의 BOM 소모 자재 (process_num 기준, 품목명/코드 포함) -->
+    <select id="getProcessMaterials" parameterType="int" resultType="BomDTO">
+        SELECT b.item_num2, b.required_qty, i.name, i.code
+        FROM bom b
+        JOIN item i ON b.item_num2 = i.item_num
+        WHERE b.process_num = #{process_num}
+          AND b.bom_status  = 'Y'
+    </select>
+
+    <!-- 작업시작 시 완제품 LOT 생성 (init_qty NULL, current_qty 0) -->
+    <insert id="insertProductLotStart" parameterType="map">
+        <selectKey keyProperty="lot_num" resultType="int" order="BEFORE">
+            SELECT LOT_SEQ.NEXTVAL FROM DUAL
+        </selectKey>
+        INSERT INTO lot (lot_num, lot_code, item_num, order_num, init_qty, current_qty, lot_date, expiry_date)
+        VALUES (
+            #{lot_num},
+            'LOT-' || TO_CHAR(SYSDATE, 'YYYYMMDD') || '-' || #{lot_num},
+            #{item_num},
+            #{order_num},
+            NULL,
+            0,
+            SYSDATE,
+            CASE WHEN #{type} = 'SEMIPRODUCT' THEN SYSDATE + 10 ELSE SYSDATE + 20 END
+        )
+    </insert>
+
+    <!-- 최종 공정 완료 시 완제품 LOT 확정 (init_qty=current_qty=생산완료수량) -->
+    <update id="finalizeProductLot" parameterType="map">
+        UPDATE lot
+        SET init_qty = #{qty}, current_qty = #{qty}
+        WHERE lot_num = #{lot_num}
+    </update>
+
+    <!-- 작업시작 시 생성한 완제품 LOT 참조 저장 -->
+    <update id="setProductLotNum" parameterType="map">
+        UPDATE work_order SET product_lot_num = #{lot_num} WHERE order_id = #{work_order_id}
+    </update>
+
+    <!-- 배치 생산수량 1회 확정 (input_qty 재사용) -->
+    <update id="setInputQty" parameterType="map">
+        UPDATE work_order SET input_qty = #{qty} WHERE order_id = #{work_order_id}
+    </update>
+
+    <!-- 생산완료수량 반영 (work_order.current_qty) -->
+    <update id="setCurrentQty" parameterType="map">
+        UPDATE work_order SET current_qty = #{qty} WHERE order_id = #{work_order_id}
+    </update>
+
+    <!-- 진행 중('진행') 공정 개수 (작업완료 게이트) -->
+    <select id="countActiveProcess" parameterType="int" resultType="int">
+        SELECT COUNT(*) FROM work_process WHERE order_num = #{order_num} AND status = '진행'
+    </select>
+
+    <!-- 작업지시 상태만 변경 (작업완료 force/완료 처리) -->
+    <update id="setWorkStatus" parameterType="map">
+        UPDATE work_order SET order_status = #{status},
+               order_end = CASE WHEN #{status} = '완료' THEN SYSDATE ELSE order_end END
+        WHERE order_id = #{work_order_id}
+    </update>
 
     <!-- 생산계획 검색 (AJAX 모달용, 취소·완료 제외) -->
     <select id="searchPlans" parameterType="map" resultType="ProdDTO">

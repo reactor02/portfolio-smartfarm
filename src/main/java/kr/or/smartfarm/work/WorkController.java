@@ -42,6 +42,10 @@ public class WorkController {
     @Autowired
     WorkService workService;
 
+    // 공정 라우트(가로 흐름도) 렌더링에 Lot 라우트 로직 재사용
+    @Autowired
+    kr.or.smartfarm.lot.LotService lotService;
+
 
     /**
      * 날짜 형식 바인딩 설정.
@@ -124,14 +128,20 @@ public class WorkController {
                      || me.equals(recordEmpNum);
             canWork   = me.equals(recordEmpNum) || me.equals(recordWorkerNum);
         }
+        // 공정기록 행 보장 (상세 진입 시 공정 수만큼 '대기'로 lazy 생성)
+        workService.ensureWorkProcesses(work_order_id);
+
         model.addAttribute("canCancel", canCancel);
         model.addAttribute("canWork",  canWork);
         model.addAttribute("workDTO",     workDTO);
-        model.addAttribute("processList", workService.getProcessesByItem(workDTO.getItem_num()));
-        // 소모자재/재고 부족분/투입·생산 가능 수량 (생산투입 모달 + 자재 테이블 표시용)
-        model.addAttribute("produceInfo", workService.getProduceInfo(work_order_id));
-        // 이 작업지시에 투입(출고)된 LOT 목록
-        model.addAttribute("orderLots",   workService.getOrderLots(workDTO.getOrder_num()));
+        // 공정 라우트(가로 흐름도) — Lot 라우트 로직 재사용
+        model.addAttribute("routeSteps",  lotService.getRoute(workDTO.getItem_num()));
+        // 공정 진행 기록 테이블 + 소모 자재 LOT
+        model.addAttribute("workProcesses",   workService.getWorkProcesses(workDTO.getOrder_num()));
+        model.addAttribute("workProcessLots", workService.getWorkProcessLots(workDTO.getOrder_num()));
+        // 현재 활성 공정/가능 액션 (버튼 제어) + 최대생산량·자재정보
+        model.addAttribute("actionState", workService.getActionState(work_order_id));
+        model.addAttribute("maxInfo",     workService.getMaxInfo(work_order_id));
         return "content/workDetail.tiles";
     }
 
@@ -234,82 +244,120 @@ public class WorkController {
         return "ok";
     }
 
-    /* ── 작업등록 POST (AJAX): current_qty=order_qty, order_end=SYSDATE, status=DONE ── */
+    /* ── 공정 소모자재 투입 (AJAX) ── */
     /**
-     * POST /work/{work_order_id}/produce - 생산실적을 처리한다. (AJAX)
+     * POST /work/{id}/process/{pn}/input - 해당 공정 BOM 자재를 생산수량만큼 FIFO 차감한다.
+     * 첫 투입이면 qty로 배치 생산수량 확정. 초과 시 부족 자재 목록과 함께 qty_error 반환.
      *
-     * 내부 처리 흐름 (WorkServiceImpl.produce 참조):
-     *  1. 해당 품목의 BOM 재료 목록 조회
-     *  2. 재료별 QC 합격 LOT FIFO 차감
-     *  3. 각 차감 내역을 io 테이블에 출고 기록
-     *  4. 생산된 품목의 신규 LOT 생성
-     *  5. work_order 완료 처리 + 생산계획 완료 여부 체크
-     *
-     * 입력 수량이 투입 가능 수량(재고·미투입 잔여)을 초과하면 "qty_error"를 반환한다.
-     *
-     * @param work_order_id 작업지시 ID
-     * @param qty           이번에 투입(출고)할 생산 수량
-     * @return "ok" | "qty_error" | "forbidden" | "unauthorized" | "error"
+     * @return JSON Map { result: ok|qty_error|state_error|forbidden|unauthorized|error, max, shortages[] }
      */
-    @RequestMapping(value = "/{work_order_id}/input", method = RequestMethod.POST)
+    @RequestMapping(value = "/{work_order_id}/process/{process_num}/input", method = RequestMethod.POST)
     @ResponseBody
-    public String input(@PathVariable String work_order_id,
-                        @org.springframework.web.bind.annotation.RequestParam int qty,
-                        HttpSession session) {
-        // [권한] 담당자 또는 실무자 본인만 생산투입 가능
+    public java.util.Map<String, Object> inputMaterial(
+            @PathVariable String work_order_id,
+            @PathVariable int process_num,
+            @org.springframework.web.bind.annotation.RequestParam int qty,
+            HttpSession session) {
+        java.util.Map<String, Object> res = new java.util.HashMap<String, Object>();
+        LoginDTO loginUser = (LoginDTO) session.getAttribute("loginUser");
+        if (loginUser == null) { res.put("result", "unauthorized"); return res; }
+        if (!isEmpOrWorker(loginUser, work_order_id)) { res.put("result", "forbidden"); return res; }
+        try {
+            workService.inputProcessMaterial(work_order_id, process_num, qty);
+            res.put("result", "ok");
+        } catch (RuntimeException e) {
+            if ("qty_error".equals(e.getMessage())) {
+                res.put("result", "qty_error");
+                java.util.Map<String, Object> maxInfo = workService.getMaxInfo(work_order_id);
+                res.put("max", maxInfo.get("maxProducible"));
+                // 요청 수량 기준 부족 자재 목록 산출
+                java.util.List<java.util.Map<String, Object>> shortages = new java.util.ArrayList<java.util.Map<String, Object>>();
+                @SuppressWarnings("unchecked")
+                java.util.List<java.util.Map<String, Object>> mats =
+                    (java.util.List<java.util.Map<String, Object>>) maxInfo.get("materials");
+                if (mats != null) for (java.util.Map<String, Object> m : mats) {
+                    int unit = ((Number) m.get("unitQty")).intValue();
+                    int avail = ((Number) m.get("available")).intValue();
+                    int need  = unit * qty;
+                    if (need > avail) {
+                        java.util.Map<String, Object> s = new java.util.HashMap<String, Object>();
+                        s.put("name",     m.get("name"));
+                        s.put("need",     need);
+                        s.put("available", avail);
+                        s.put("shortage", need - avail);
+                        shortages.add(s);
+                    }
+                }
+                res.put("shortages", shortages);
+            } else if ("state_error".equals(e.getMessage())) {
+                res.put("result", "state_error");
+            } else {
+                res.put("result", "error");
+            }
+        }
+        return res;
+    }
+
+    /* ── 차감 예정 LOT 미리보기 (AJAX) ── */
+    @RequestMapping(value = "/{work_order_id}/process/{process_num}/preview", method = RequestMethod.GET)
+    @ResponseBody
+    public java.util.List<java.util.Map<String, Object>> previewLots(
+            @PathVariable String work_order_id,
+            @PathVariable int process_num,
+            @org.springframework.web.bind.annotation.RequestParam(defaultValue = "0") int qty) {
+        return workService.previewProcessLots(work_order_id, process_num, qty);
+    }
+
+    /* ── 공정 시작 (AJAX) ── */
+    @RequestMapping(value = "/{work_order_id}/process/{process_num}/start", method = RequestMethod.POST)
+    @ResponseBody
+    public String startProcess(@PathVariable String work_order_id, @PathVariable int process_num,
+                               HttpSession session) {
         LoginDTO loginUser = (LoginDTO) session.getAttribute("loginUser");
         if (loginUser == null) return "unauthorized";
         if (!isEmpOrWorker(loginUser, work_order_id)) return "forbidden";
         try {
-            workService.input(work_order_id, qty);
+            workService.startProcess(work_order_id, process_num);
             return "ok";
         } catch (RuntimeException e) {
-            if ("qty_error".equals(e.getMessage())) return "qty_error";
+            if ("state_error".equals(e.getMessage())) return "state_error";
             return "error";
         }
     }
 
-    /**
-     * POST /work/{work_order_id}/produce - 작업완료(생산). (AJAX)
-     * 이미 투입된 분량(input_qty − current_qty)만큼 완제품 LOT을 생성하고 완료 처리한다.
-     * 투입된 미생산 분량이 없으면 "nothing"을 반환한다.
-     *
-     * @param work_order_id 작업지시 ID
-     * @return "ok" | "nothing" | "forbidden" | "unauthorized" | "error"
-     */
-    @RequestMapping(value = "/{work_order_id}/produce", method = RequestMethod.POST)
+    /* ── 공정 완료 (AJAX): 최종 공정이면 완제품 LOT 확정 ── */
+    @RequestMapping(value = "/{work_order_id}/process/{process_num}/complete", method = RequestMethod.POST)
     @ResponseBody
-    public String produce(@PathVariable String work_order_id, HttpSession session) {
-        // [권한] 담당자 또는 실무자 본인만 작업완료 가능
+    public String completeProcess(@PathVariable String work_order_id, @PathVariable int process_num,
+                                  HttpSession session) {
         LoginDTO loginUser = (LoginDTO) session.getAttribute("loginUser");
         if (loginUser == null) return "unauthorized";
         if (!isEmpOrWorker(loginUser, work_order_id)) return "forbidden";
         try {
-            workService.produce(work_order_id);
+            workService.completeProcess(work_order_id, process_num);
             return "ok";
         } catch (RuntimeException e) {
-            if ("nothing".equals(e.getMessage())) return "nothing";
+            if ("state_error".equals(e.getMessage())) return "state_error";
             return "error";
         }
     }
 
+    /* ── 작업완료 (AJAX) ── */
     /**
-     * POST /work/{work_order_id}/input-cancel - 투입취소. (AJAX)
-     * 아직 생산되지 않은(남은) 투입 자재만 LOT/재고로 환원하고 order_lot을 정리한다.
-     *
-     * @param work_order_id 작업지시 ID
-     * @return "ok" | "forbidden" | "unauthorized" | "error"
+     * POST /work/{id}/complete-work - 작업지시 완료 처리.
+     * 진행 중 공정이 있으면 "in_progress". current==order면 "ok",
+     * current&lt;order면 force=false→"not_full", force=true→"ok".
      */
-    @RequestMapping(value = "/{work_order_id}/input-cancel", method = RequestMethod.POST)
+    @RequestMapping(value = "/{work_order_id}/complete-work", method = RequestMethod.POST)
     @ResponseBody
-    public String cancelInput(@PathVariable String work_order_id, HttpSession session) {
-        // [권한] 담당자 또는 실무자 본인만 투입취소 가능
+    public String completeWork(@PathVariable String work_order_id,
+                               @org.springframework.web.bind.annotation.RequestParam(defaultValue = "false") boolean force,
+                               HttpSession session) {
         LoginDTO loginUser = (LoginDTO) session.getAttribute("loginUser");
         if (loginUser == null) return "unauthorized";
         if (!isEmpOrWorker(loginUser, work_order_id)) return "forbidden";
         try {
-            workService.cancelInput(work_order_id);
-            return "ok";
+            return workService.completeWork(work_order_id, force);
         } catch (RuntimeException e) {
             return "error";
         }

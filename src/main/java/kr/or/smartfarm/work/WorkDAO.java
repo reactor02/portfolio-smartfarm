@@ -208,6 +208,53 @@ public interface WorkDAO {
     /** LOT 수량 환원 (투입취소 시 deductQty 역연산). params { lot_num, qty } */
     int restoreLotQty(Map<String, Object> params);
 
+    /* ── 공정별(라우팅) 진행 : work_process / work_process_lot ── */
+
+    /** 작업지시 공정기록 행 개수 (lazy 생성 멱등 체크) */
+    int countWorkProcesses(int order_num);
+
+    /** 공정기록 행 생성. params { order_num, process_num, flow } */
+    void insertWorkProcess(Map<String, Object> params);
+
+    /** 작업지시 공정기록 목록 (flow순, 상세/상태머신용) */
+    List<Map<String, Object>> getWorkProcesses(int order_num);
+
+    /** 단건 공정기록 조회. params { order_num, process_num } */
+    Map<String, Object> getWorkProcessOne(Map<String, Object> params);
+
+    /** 공정 상태 전이(+시작/완료 시각). params { order_num, process_num, status } */
+    int setWorkProcessStatus(Map<String, Object> params);
+
+    /** 공정별 소모 자재 LOT 기록. params { work_process_num, lot_num, item_num, qty } */
+    void insertWorkProcessLot(Map<String, Object> params);
+
+    /** 작업지시 전체 소모 자재 LOT 목록 (lot_relation 연결/표시용) */
+    List<Map<String, Object>> getWorkProcessLots(int order_num);
+
+    /** 특정 공정의 BOM 소모 자재 (process_num 기준) */
+    List<BomDTO> getProcessMaterials(int process_num);
+
+    /** 작업시작 시 완제품 LOT 생성 (init_qty NULL). params { item_num, order_num, type } → lot_num 채번 */
+    void insertProductLotStart(Map<String, Object> params);
+
+    /** 최종 공정 완료 시 완제품 LOT 확정. params { lot_num, qty } */
+    int finalizeProductLot(Map<String, Object> params);
+
+    /** 완제품 LOT 참조 저장. params { work_order_id, lot_num } */
+    int setProductLotNum(Map<String, Object> params);
+
+    /** 배치 생산수량 1회 확정(input_qty). params { work_order_id, qty } */
+    int setInputQty(Map<String, Object> params);
+
+    /** 생산완료수량 반영(current_qty). params { work_order_id, qty } */
+    int setCurrentQty(Map<String, Object> params);
+
+    /** 진행('진행') 공정 개수 (작업완료 게이트) */
+    int countActiveProcess(int order_num);
+
+    /** 작업지시 상태 변경. params { work_order_id, status } */
+    int setWorkStatus(Map<String, Object> params);
+
     /**
      * 작업지시 담당자 emp_num 조회 (취소/완료 권한 검증용)
      *

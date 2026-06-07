@@ -19,6 +19,8 @@
 /* 작업일 오류 모달 */
 #dateErrModal  { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.45);
                  z-index: 9999; align-items: center; justify-content: center; }
+/* 모달 표시 토글 (인라인 style 금지 → 클래스로 제어) */
+#dateErrModal.is-open, #inputModal.is-open { display: flex; }
 .date-err-box  { background: #fff; border-radius: 12px; padding: 32px 36px;
                  max-width: 340px; width: 90%; box-shadow: 0 8px 28px rgba(0,0,0,0.2);
                  text-align: center; font-family: 'Malgun Gothic', sans-serif; }
@@ -35,17 +37,43 @@
 .mat-max-num  { color: #2D6A4F; font-weight: bold; font-size: 1.05rem; }
 .mat-short    { color: #dc3545; font-weight: bold; }
 
-/* 생산 수량 입력 모달 (dateErrModal 패턴 재사용) */
-#produceModal   { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.45);
+/* 소모자재 투입 모달 (dateErrModal 패턴 재사용) */
+#inputModal     { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.45);
                   z-index: 9999; align-items: center; justify-content: center; }
-.produce-box    { background: #fff; border-radius: 12px; padding: 32px 36px;
-                  max-width: 360px; width: 90%; box-shadow: 0 8px 28px rgba(0,0,0,0.2);
+.produce-box    { background: #fff; border-radius: 12px; padding: 28px 30px;
+                  max-width: 420px; width: 92%; box-shadow: 0 8px 28px rgba(0,0,0,0.2);
                   text-align: center; font-family: 'Malgun Gothic', sans-serif; }
 .produce-title  { font-size: 1.1rem; font-weight: bold; color: #333; margin-bottom: 8px; }
-.produce-msg    { font-size: 0.88rem; color: #666; margin-bottom: 18px; }
+.produce-msg    { font-size: 0.88rem; color: #666; margin-bottom: 14px; }
+.produce-sub    { font-size: 0.82rem; color: #888; }
 .produce-input  { width: 100%; padding: 10px 12px; font-size: 1rem; box-sizing: border-box;
-                  border: 1px solid #ccc; border-radius: 6px; margin-bottom: 22px; text-align: center; }
-.produce-btn-wrap   { display: flex; gap: 10px; justify-content: center; }
+                  border: 1px solid #ccc; border-radius: 6px; margin-bottom: 16px; text-align: center; }
+.produce-btn-wrap   { display: flex; gap: 10px; justify-content: center; margin-top: 18px; }
 .produce-btn        { padding: 10px 28px; background: #2D6A4F; color: #fff; border: none;
                       border-radius: 6px; font-size: 0.95rem; font-weight: bold; cursor: pointer; }
 .produce-btn-cancel { background: #fff; color: #555; border: 1px solid #ccc; }
+
+/* 모달 내 LOT 미리보기 / 부족분 */
+.preview-wrap  { text-align: left; margin-bottom: 6px; }
+.preview-body  { max-height: 150px; overflow-y: auto; font-size: 0.85rem; color: #444;
+                 border: 1px solid #eee; border-radius: 6px; padding: 6px 8px; }
+.preview-tbl   { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+.preview-tbl th, .preview-tbl td { border-bottom: 1px solid #eee; padding: 4px 6px; text-align: center; }
+.shortage-box  { display: none; text-align: left; margin-top: 10px; padding: 10px; border: 1px solid #f5c2c7;
+                 background: #fff5f5; border-radius: 6px; font-size: 0.85rem; color: #842029; }
+.shortage-box.is-open { display: block; }
+
+/* 공정 제어 패널 */
+.wp-control    { display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+                 padding: 14px 16px; border: 1px solid #d8e6dd; background: #f4faf6; border-radius: 8px; }
+.wp-ctl-msg    { font-size: 0.92rem; color: #333; }
+.wp-final-badge{ display: inline-block; padding: 4px 14px; background: #2D6A4F; color: #fff;
+                 border-radius: 14px; font-weight: bold; font-size: 0.9rem; }
+
+/* 공정 진행 상태 뱃지 */
+.wp-st              { display: inline-block; min-width: 56px; padding: 2px 10px; border-radius: 10px;
+                      font-size: 12px; font-weight: bold; }
+.wp-st-대기         { background: #e9ecef; color: #555; }
+.wp-st-자재투입     { background: #cfe2ff; color: #084298; }
+.wp-st-진행         { background: #fff3cd; color: #664d03; }
+.wp-st-완료         { background: #B7E4C7; color: #2D6A4F; }

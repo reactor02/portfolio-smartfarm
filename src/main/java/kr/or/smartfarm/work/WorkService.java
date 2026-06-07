@@ -62,48 +62,51 @@ public interface WorkService {
      */
     void complete(String work_order_id);
 
-    /**
-     * 생산투입(출고) — 입력 수량(qty)만큼 BOM 자재를 FIFO로 출고하여 작업지시에 묶는다.
-     *
-     * 처리 순서:
-     *  1. 입력 수량 검증 (1 ≤ qty ≤ min(재고기준 최대, order_qty − input_qty)이 아니면 "qty_error")
-     *  2. BOM 자재별 FIFO(QC합격·유통기한 유효) 차감 + io 출고 + order_lot 기록 + stock 차감
-     *  3. work_order.input_qty += qty
-     *
-     * @param work_order_id 작업지시 ID
-     * @param qty           이번에 투입(출고)할 생산 수량
-     * @throws RuntimeException "qty_error"
-     */
-    void input(String work_order_id, int qty);
+    /* ── 공정별(라우팅) 진행 상태머신 ── */
 
     /**
-     * 작업완료(생산) — 이미 투입된 분량(input_qty − current_qty)만큼 완제품 LOT을 생성한다.
-     * 자재는 생산투입 단계에서 이미 차감되었으므로 재차감하지 않는다.
-     *
+     * 작업지시 상세 진입 시 공정기록 행을 보장(없으면 품목 공정 수만큼 '대기'로 생성). 멱등.
      * @param work_order_id 작업지시 ID
-     * @throws RuntimeException "nothing" - 투입된(미생산) 분량이 없을 때
      */
-    void produce(String work_order_id);
+    void ensureWorkProcesses(String work_order_id);
 
     /**
-     * 투입취소 — 아직 생산되지 않은(남은) 투입 자재만 환원한다.
-     * 환원량 = 자재별 required_qty × (input_qty − current_qty). 이미 소모된 분량은 환원하지 않는다.
-     *
-     * @param work_order_id 작업지시 ID
+     * 최대생산량/자재 정보 계산. 가용재고는 QC합격 FIFO LOT 합계, order_qty−current_qty로 cap.
+     * @return Map { maxProducible, materials:[{name,code,unitQty,needQty,available,shortage}] }
      */
-    void cancelInput(String work_order_id);
+    Map<String, Object> getMaxInfo(String work_order_id);
 
     /**
-     * 상세 페이지의 소모자재/재고/투입·생산 가능 수량 정보를 계산해 반환한다.
-     * 가용재고는 QC 합격 FIFO LOT 합계를 기준으로 한다.
-     *
-     * @param work_order_id 작업지시 ID
-     * @return Map { materials:[...], remaining, maxProducible, inputtable, maxInput, pendingProduce, input_qty }
+     * 공정 소모자재 투입 — 해당 공정 BOM 자재를 생산수량만큼 FIFO 차감하고 work_process_lot에 기록.
+     * 첫 투입이면 qty로 배치 생산수량(input_qty) 확정(1 ≤ qty ≤ 최대생산량). 이후 공정은 확정 수량 사용.
+     * @throws RuntimeException "state_error" | "qty_error"(부족 자재 목록 동반)
      */
-    Map<String, Object> getProduceInfo(String work_order_id);
+    void inputProcessMaterial(String work_order_id, int process_num, int qty);
 
-    /** 작업지시에 투입된 LOT 목록 조회 (상세 표시용) */
-    List<Map<String, Object>> getOrderLots(int order_num);
+    /** 차감 예정 FIFO LOT 미리보기(비차감). @return 자재별 차감 LOT 목록 */
+    List<Map<String, Object>> previewProcessLots(String work_order_id, int process_num, int qty);
+
+    /** 공정 시작 ('자재투입'→'진행'). @throws RuntimeException "state_error" */
+    void startProcess(String work_order_id, int process_num);
+
+    /** 공정 완료 ('진행'→'완료'). 최종 공정이면 완제품 LOT 확정·생산입고·lot_relation. @throws "state_error" */
+    void completeProcess(String work_order_id, int process_num);
+
+    /**
+     * 작업완료. 진행 중 공정 있으면 "in_progress". current==order면 완료("ok").
+     * current&lt;order면 force=false→"not_full", force=true→완료("ok").
+     * @return "ok" | "in_progress" | "not_full"
+     */
+    String completeWork(String work_order_id, boolean force);
+
+    /** 작업지시 공정기록 목록 (상세 표시용) */
+    List<Map<String, Object>> getWorkProcesses(int order_num);
+
+    /** 작업지시 소모 자재 LOT 목록 (표시용) */
+    List<Map<String, Object>> getWorkProcessLots(int order_num);
+
+    /** 현재 진행 액션 상태. @return Map { activeProcessNum, activeFlow, action, allDone } */
+    Map<String, Object> getActionState(String work_order_id);
 
     /**
      * 담당자 선택 옵션 목록을 반환한다. (등록 모달 드롭다운용)

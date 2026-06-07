@@ -177,6 +177,83 @@ public class WorkDAOImpl implements WorkDAO {
         return session.update("kr.or.smartfarm.work.restoreLotQty", params);
     }
 
+    /* ── 공정별(라우팅) 진행 : work_process / work_process_lot ── */
+
+    @Override
+    public int countWorkProcesses(int order_num) {
+        return session.selectOne("kr.or.smartfarm.work.countWorkProcesses", order_num);
+    }
+
+    @Override
+    public void insertWorkProcess(Map<String, Object> params) {
+        session.insert("kr.or.smartfarm.work.insertWorkProcess", params);
+    }
+
+    @Override
+    public List<Map<String, Object>> getWorkProcesses(int order_num) {
+        return session.selectList("kr.or.smartfarm.work.getWorkProcesses", order_num);
+    }
+
+    @Override
+    public Map<String, Object> getWorkProcessOne(Map<String, Object> params) {
+        return session.selectOne("kr.or.smartfarm.work.getWorkProcessOne", params);
+    }
+
+    @Override
+    public int setWorkProcessStatus(Map<String, Object> params) {
+        return session.update("kr.or.smartfarm.work.setWorkProcessStatus", params);
+    }
+
+    @Override
+    public void insertWorkProcessLot(Map<String, Object> params) {
+        session.insert("kr.or.smartfarm.work.insertWorkProcessLot", params);
+    }
+
+    @Override
+    public List<Map<String, Object>> getWorkProcessLots(int order_num) {
+        return session.selectList("kr.or.smartfarm.work.getWorkProcessLots", order_num);
+    }
+
+    @Override
+    public List<BomDTO> getProcessMaterials(int process_num) {
+        return session.selectList("kr.or.smartfarm.work.getProcessMaterials", process_num);
+    }
+
+    @Override
+    public void insertProductLotStart(Map<String, Object> params) {
+        session.insert("kr.or.smartfarm.work.insertProductLotStart", params);
+    }
+
+    @Override
+    public int finalizeProductLot(Map<String, Object> params) {
+        return session.update("kr.or.smartfarm.work.finalizeProductLot", params);
+    }
+
+    @Override
+    public int setProductLotNum(Map<String, Object> params) {
+        return session.update("kr.or.smartfarm.work.setProductLotNum", params);
+    }
+
+    @Override
+    public int setInputQty(Map<String, Object> params) {
+        return session.update("kr.or.smartfarm.work.setInputQty", params);
+    }
+
+    @Override
+    public int setCurrentQty(Map<String, Object> params) {
+        return session.update("kr.or.smartfarm.work.setCurrentQty", params);
+    }
+
+    @Override
+    public int countActiveProcess(int order_num) {
+        return session.selectOne("kr.or.smartfarm.work.countActiveProcess", order_num);
+    }
+
+    @Override
+    public int setWorkStatus(Map<String, Object> params) {
+        return session.update("kr.or.smartfarm.work.setWorkStatus", params);
+    }
+
     /** 작업지시 담당자 emp_num 조회 (취소/완료 권한 검증용) */
     @Override
     public String getEmpNum(String work_order_id) {
