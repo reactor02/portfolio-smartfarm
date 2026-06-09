@@ -1,3 +1,5 @@
+지능화된 생산관리 솔루션(MES-WEB) 무병묘 스마트팜
+
 개요 : 라이브러리와 프레임워크를 이용해서 스마트팜 MES 구현 
 역할 : 생산계획/작업지시/출하관리/주문관리/롯관리 페이지 풀스택 구현
 - 활용기술 : html5, css3, javascript,java, Servlet, jsp, ajax, Apache Tomcat, spring, mybatis, REST API, sql, junit
